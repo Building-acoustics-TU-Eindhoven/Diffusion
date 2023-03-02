@@ -109,7 +109,7 @@ source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be
 
 np.around(s1, 1, s1)
 
-x_source = 0.5 #position of the source in the x direction [m]
+x_source = 20 #position of the source in the x direction [m]
 y_source = 0.7 #position of the source in the x direction [m]
 #index_source = kdt.query([[x_source,y_source]])[1] #index of the source position
 
@@ -167,9 +167,7 @@ def draw_fig2():
     plt.yticks([1e-10, 1e-8, 1e-6, 1e-4, 1e-2])
 
 def draw_fig():
-    minVal = w_new.min()
-    maxVal = w_new.max()
-    plt.imshow(w_new.transpose(), vmin=minVal, vmax=maxVal);
+    plt.imshow(w_new.transpose(), vmin=w_new.min(), vmax=w_new.max());
 
 #Computing w;
 for steps in range(0, recording_steps):
@@ -201,8 +199,8 @@ for steps in range(0, recording_steps):
     w_new[0:Nx, Ny-1] = np.divide((4*w_new[0:Nx,Ny-2] - w_new[0:Nx,Ny-3]),(3+((2*Abs_y*dx)/Dy))) #boundary condition at at ly=lymax, any x
  
     #SDL = 20*np.log10(abs(w_new)) #sound density level
-    
-    drawnow(draw_fig)
+    if (steps % 100 == 0):
+        drawnow(draw_fig)
     #Update w before next step
     w_old = w #The w at n step becomes the w at n-1 step
     w = w_new #The w at n+1 step becomes the w at n step

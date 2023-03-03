@@ -15,13 +15,13 @@ from drawnow import drawnow
 from math import ceil
 from math import log
 from math import pi
-# from scipy.io import wavfile
-# from scipy import stats
-# from acoustics.utils import _is_1d
-# from acoustics.signal import bandpass
-# from acoustics.bands import (_check_band_type, octave_low, octave_high, third_low, third_high)
-# from FunctionRT import *
-# from scipy.spatial import KDTree
+from scipy.io import wavfile
+from scipy import stats
+from acoustics.utils import _is_1d
+from acoustics.signal import bandpass
+from acoustics.bands import (_check_band_type, octave_low, octave_high, third_low, third_high)
+#from FunctionRT import *
+from scipy.spatial import KDTree
 
 #General settings
 c0= 343 #sound particle velocity [m.s^-1]
@@ -30,8 +30,8 @@ m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper
 pRef = 2 * (10**-5) #Reference pressure
 
 #Spatial discretization
-dx = 0.1 #distance between grid points x direction [m]
-dy = 0.1 #distance between grid points y direction [m]
+dx = 0.05 #distance between grid points x direction [m]
+dy = 0.05 #distance between grid points y direction [m]
 
 #Time discretization
 dt = 0.0001 #distance between grid points on the time discretization [s]
@@ -91,8 +91,8 @@ if beta_zero_condition >1:
     print("aa! errors! Check beta condition")
 
 #Position matrix for both source and receiver
-xv = xx.flatten("F") #the matrix xx in one big vector
-yv = yy.flatten("F") #the matrix yy in one big vector
+#xv = xx.flatten("F") #the matrix xx in one big vector
+#yv = yy.flatten("F") #the matrix yy in one big vector
 #position_matrix = np.column_stack((xv,yv)) #stack the two columns xv and yv together to check for the index of the source position and receiver position
 #kdt = KDTree(position_matrix) #object to search from; Matlab dsearchn equivalent function
 
@@ -107,24 +107,24 @@ s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 
 #####does the source not need to be only at the time 0 to 2seconds and after that there should not be any source term? Yes
 source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
 
-np.around(s1, 1, s1)
+np.around(s1, 4, s1) #evenly round to the given number of decimals
 
-x_source = 20 #position of the source in the x direction [m]
-y_source = 0.7 #position of the source in the x direction [m]
+x_source = 20.5 #position of the source in the x direction [m]
+y_source = 0.75 #position of the source in the x direction [m]
 #index_source = kdt.query([[x_source,y_source]])[1] #index of the source position
 
 coord_source = [x_source , y_source] #coordinates of the source position in an list
 #index_x = (np.argwhere(xx==x_source))[0][1]
 #index_y = (np.argwhere(yy==y_source))[0][0]
-xxRound = xx
-yyRound = yy
+#xxRound = xx
+#yyRound = yy
 
-for i in range(0,398):
-    np.around(xx[i], 1, xxRound[i])
-    np.around(yy[i], 1, yyRound[i])
-coord_sourceRound0 = round(coord_source[0], 1)
-coord_sourceRound1 = round(coord_source[1], 1)
-index_source = (np.argwhere((xxRound == coord_sourceRound0) & (yyRound == coord_sourceRound1)))[0] #finding the index of the source in the meshgrid
+for i in range(0,Nx):
+    np.around(xx[i], 2, xx[i]) #evenly round to the given number of decimals
+    np.around(yy[i], 2, yy[i]) #evenly round to the given number of decimals
+coord_sourceRound0 = round(coord_source[0], 2)
+coord_sourceRound1 = round(coord_source[1], 2)
+index_source = (np.argwhere((xx == coord_sourceRound0) & (yy == coord_sourceRound1)))[0] #finding the index of the source in the meshgrid
 rows_s, cols_s = index_source[0], index_source[1] #the row index is the first item in the list; the col index is the second item in the list
 
 #Set initial condition - Receiver Info
@@ -178,18 +178,18 @@ for steps in range(0, recording_steps):
     
     #In the x direction
     w_iminus1 = w[0:Nx-1, 0:Ny] 
-    w_iminus1 = np.vstack([np.zeros(Ny),w_iminus1])
+    w_iminus1 = np.vstack([np.ones(Ny),w_iminus1])
     w_iplus1 = w[1:Nx, 0:Ny]
-    w_iplus1 = np.vstack([w_iplus1,np.zeros(Ny)])
+    w_iplus1 = np.vstack([w_iplus1,np.ones(Ny)])
     
     #In the y direction
     w_jminus1 = w[0:Nx, 0:Ny-1] 
-    w_jminus1 = np.hstack([np.zeros((Nx,1)),w_jminus1])
+    w_jminus1 = np.hstack([np.ones((Nx,1)),w_jminus1])
     w_jplus1 = w[0:Nx, 1:Ny]
-    w_jplus1 = np.hstack([w_jplus1,np.zeros((Nx,1))])
+    w_jplus1 = np.hstack([w_jplus1,np.ones((Nx,1))])
     
     #Compututing w_new (w at n+1 time step)
-    w_new = np.divide((np.multiply(w_old,(1-beta_zero))) - (2*dt*c0*m_atm*w) + (2*dt*s) + (np.multiply(beta_zero_x,(w_iplus1+w_iminus1))) + (np.multiply(beta_zero_y,(w_jplus1+w_jminus1))),(1+beta_zero))
+    w_new = np.divide((np.multiply(w_old,(1-beta_zero))),(1+beta_zero)) - np.divide((2*dt*c0*m_atm*w),(1+beta_zero)) + np.divide((2*dt*s),(1+beta_zero)) + np.divide((np.multiply(beta_zero_x,(w_iplus1+w_iminus1))),(1+beta_zero)) + np.divide((np.multiply(beta_zero_y,(w_jplus1+w_jminus1))),(1+beta_zero))
     
     #Insert boundary conditions
     w_new[0,0:Ny] = np.divide((4*w_new[1,0:Ny] - w_new[2,0:Ny]),(3+((2*Abs_x*dx)/Dx))) #boundary condition at x=0, any y
@@ -198,9 +198,9 @@ for steps in range(0, recording_steps):
     w_new[0:Nx,0] = np.divide((4*w_new[0:Nx,1] - w_new[0:Nx,2]),(3+((2*Abs_y*dx)/Dy))) #boundary condition at y=0, any x
     w_new[0:Nx, Ny-1] = np.divide((4*w_new[0:Nx,Ny-2] - w_new[0:Nx,Ny-3]),(3+((2*Abs_y*dx)/Dy))) #boundary condition at at ly=lymax, any x
  
-    #SDL = 20*np.log10(abs(w_new)) #sound density level
-    if (steps % 100 == 0):
-        drawnow(draw_fig)
+    SDL = 10*np.log10(abs(w_new)) #sound density level
+    #if (steps % 100 == 0): #draw only on certain steps and not all the steps
+    #    drawnow(draw_fig)
     #Update w before next step
     w_old = w #The w at n step becomes the w at n-1 step
     w = w_new #The w at n+1 step becomes the w at n step
@@ -236,7 +236,7 @@ plt.yticks(np.arange(0, -120, -20))
 sch_db[sch_db == -np.inf] = 0 #replace the -inf with zero in the decay
 
 bands = np.array([63,125,250,500,1000,2000,4000]) #array of frequency bands 
-t60 = t60_impulse(t, sch_db, fspatial, rt='t30') #called function for calculation of t60 
+#t60 = t60_impulse(t, sch_db, fspatial, rt='t30') #called function for calculation of t60 
 
 
 

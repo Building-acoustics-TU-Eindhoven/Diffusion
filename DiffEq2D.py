@@ -90,12 +90,6 @@ beta_zero_condition = round(((beta_zero**2) - 1)/(1+(beta_zero**2)+(2*beta_zero)
 if beta_zero_condition >1:
     print("aa! errors! Check beta condition")
 
-#Position matrix for both source and receiver
-#xv = xx.flatten("F") #the matrix xx in one big vector
-#yv = yy.flatten("F") #the matrix yy in one big vector
-#position_matrix = np.column_stack((xv,yv)) #stack the two columns xv and yv together to check for the index of the source position and receiver position
-#kdt = KDTree(position_matrix) #object to search from; Matlab dsearchn equivalent function
-
 #Set initial condition - Source Info (excitation with Gaussian) 
 Ws=10**-2   #Source point power [Watts] interrupted after 2seconds
 Vs=round(4/3*round(pi,4)*(dx**3),10) #Source volume
@@ -111,13 +105,8 @@ np.around(s1, 4, s1) #evenly round to the given number of decimals
 
 x_source = 20.5 #position of the source in the x direction [m]
 y_source = 0.75 #position of the source in the x direction [m]
-#index_source = kdt.query([[x_source,y_source]])[1] #index of the source position
 
 coord_source = [x_source , y_source] #coordinates of the source position in an list
-#index_x = (np.argwhere(xx==x_source))[0][1]
-#index_y = (np.argwhere(yy==y_source))[0][0]
-#xxRound = xx
-#yyRound = yy
 
 for i in range(0,Nx):
     np.around(xx[i], 2, xx[i]) #evenly round to the given number of decimals

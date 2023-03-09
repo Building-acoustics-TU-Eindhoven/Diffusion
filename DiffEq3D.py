@@ -14,15 +14,8 @@ import sys
 from drawnow import drawnow
 from math import ceil
 from math import log
-from math import pi
-from scipy.io import wavfile
-from scipy import stats
-from acoustics.utils import _is_1d
-from acoustics.signal import bandpass
-from acoustics.bands import (_check_band_type, octave_low, octave_high, third_low, third_high)
 from FunctionRT import *
-from scipy.spatial import KDTree
-from mpl_toolkits import mplot3d
+from FunctionClarity import *
 
 #General settings
 c0= 343 #sound particle velocity [m.s^-1]
@@ -31,9 +24,9 @@ m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper
 pRef = 2 * (10**-5) #Reference pressure
 
 #Spatial discretization
-dx = 0.2 #distance between grid points x direction [m]
-dy = 0.2 #distance between grid points y direction [m]
-dz = 0.2 #distance between grid points z direction [m]
+dx = 0.5 #distance between grid points x direction [m]
+dy = 0.5 #distance between grid points y direction [m]
+dz = 0.5 #distance between grid points z direction [m]
 
 #Time discretization
 dt = 0.0001 #distance between grid points on the time discretization [s]
@@ -280,8 +273,9 @@ plt.yticks(np.arange(0, -120, -20))
 sch_db[sch_db == -np.inf] = 0 #replace the -inf with zero in the decay
 
 bands = np.array([63,125,250,500,1000,2000,4000]) #array of frequency bands 
-t60 = t60_decay(t, sch_db, fspatial, rt='t30') #called function for calculation of t60 
-
+t60 = t60_decay(t, sch_db, fspatial, rt='t30') #called function for calculation of t60
+edt = t60_decay(t, sch_db, fspatial, rt='edt') #called function for calculation of edt
+c50 = clarity(50, w_rec, fspatial) #called function for calculation of c50
 
 
 

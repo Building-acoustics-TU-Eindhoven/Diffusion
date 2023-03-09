@@ -107,11 +107,11 @@ if beta_zero_condition >1:
 Ws=10**-2 #Source point power [Watts] interrupted after 2seconds; value taken from Jing 2007; correspondent to a SWL of 100dB
 Vs=0.0001
 #Vs=round(4/3*round(pi,4)*(dx**3),10) #Source volume
-w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
+#w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
 
 sourceon_time =  0.5 #time that the source is on before interrupting [s]
 sourceon_steps = ceil(sourceon_time/dt) #time steps at which the source is calculated/considered in the calculation
-s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position
+s1 = np.multiply(Vs,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position
 #####does the source not need to be only at the time 0 to 2seconds and after that there should not be any source term? Yes
 source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
 

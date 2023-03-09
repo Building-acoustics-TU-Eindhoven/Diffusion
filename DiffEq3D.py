@@ -16,6 +16,7 @@ from math import ceil
 from math import log
 from FunctionRT import *
 from FunctionClarity import *
+from FunctionDefinition import *
 
 #General settings
 c0= 343 #sound particle velocity [m.s^-1]
@@ -39,14 +40,13 @@ fspatial = 1/dt #frequency spatial resolution (sampling period)
 
 #Room dimensions
 lxmin = 0 #point x starts at zero [m]
-lxmax = 36.0 #point x finish at the length of the room in the x direction [m] %Length
+lxmax = 30.0 #point x finish at the length of the room in the x direction [m] %Length
 lymin = 0 #point y starts at zero [m]
 lymax = 30.0 #point y finish at the length of the room in the y direction [m] %Width
 lzmin = 0 #point z starts at zero [m]
-lzmax = 3.6 #point z finish at the length of the room in the x direction [m] %Height
+lzmax = 3.5 #point z finish at the length of the room in the x direction [m] %Height
 
 S = lxmax*lymax*2 + lxmax*lzmax*2 + lymax*lzmax*2 #Surface [m2]
-#P_2D = 2*(lxmax+lymax) #Perimeter [m]
 V = lxmax*lymax*lzmax #volume of the room [m^3]
 
 x = np.arange(lxmin, lxmax+dx, dx) #mesh points in space x direction
@@ -98,13 +98,13 @@ if beta_zero_condition >1:
 
 #Set initial condition - Source Info (excitation with Gaussian) 
 Ws=10**-2 #Source point power [Watts] interrupted after 2seconds; value taken from Jing 2007; correspondent to a SWL of 100dB
-Vs=0.0001
+#Vs=0.0001
 #Vs=round(4/3*round(pi,4)*(dx**3),10) #Source volume
 #w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
 
 sourceon_time =  0.5 #time that the source is on before interrupting [s]
 sourceon_steps = ceil(sourceon_time/dt) #time steps at which the source is calculated/considered in the calculation
-s1 = np.multiply(Vs,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position
+s1 = np.multiply(Ws,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position
 #####does the source not need to be only at the time 0 to 2seconds and after that there should not be any source term? Yes
 source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
 
@@ -247,9 +247,9 @@ for steps in range(0, recording_steps):
 
 #Figure 3: Decay of SPL in the recording_time
 plt.figure(3) 
-press_r = ((abs(w_rec))*rho*(c0**2))/(pRef**2)
+press_r = ((abs(w_rec))*rho*(c0**2))**2
 #max_press_r = np.max(((abs(w_rec))*rho*(c0**2))/(pRef**2))
-spl = 10*np.log10(press_r) #,where=press_r>0
+spl = 10*np.log10(((abs(w_rec))*rho*(c0**2))/(pRef**2)) #,where=press_r>0
 plt.plot(t,spl) #plot sound pressure level with Pref = (2e-5)**5
 plt.xlabel("t")
 plt.ylabel("SPL")
@@ -273,10 +273,10 @@ plt.yticks(np.arange(0, -120, -20))
 sch_db[sch_db == -np.inf] = 0 #replace the -inf with zero in the decay
 
 bands = np.array([63,125,250,500,1000,2000,4000]) #array of frequency bands 
-t60 = t60_decay(t, sch_db, fspatial, rt='t30') #called function for calculation of t60
-edt = t60_decay(t, sch_db, fspatial, rt='edt') #called function for calculation of edt
-c50 = clarity(50, w_rec, fspatial) #called function for calculation of c50
-
+t60 = t60_decay(t, sch_db, fspatial, rt='t30') #called function for calculation of t60 [s]
+edt = t60_decay(t, sch_db, fspatial, rt='edt') #called function for calculation of edt [s]
+c80 = clarity(80, press_r, fspatial) #called function for calculation of c80 [dB]
+d50 = definition(50, press_r, fspatial) #called function for calculation of d50 [%]
 
 
 

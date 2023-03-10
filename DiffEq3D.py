@@ -40,11 +40,11 @@ fspatial = 1/dt #frequency spatial resolution (sampling period)
 
 #Room dimensions
 lxmin = 0 #point x starts at zero [m]
-lxmax = 30.0 #point x finish at the length of the room in the x direction [m] %Length
+lxmax = 8.0 #point x finish at the length of the room in the x direction [m] %Length
 lymin = 0 #point y starts at zero [m]
-lymax = 30.0 #point y finish at the length of the room in the y direction [m] %Width
+lymax = 8.0 #point y finish at the length of the room in the y direction [m] %Width
 lzmin = 0 #point z starts at zero [m]
-lzmax = 3.5 #point z finish at the length of the room in the x direction [m] %Height
+lzmax = 8.0 #point z finish at the length of the room in the x direction [m] %Height
 
 S = lxmax*lymax*2 + lxmax*lzmax*2 + lymax*lzmax*2 #Surface [m2]
 V = lxmax*lymax*lzmax #volume of the room [m^3]
@@ -72,10 +72,10 @@ def abs_term(th,alpha):
         Absx = (c0*alpha)/(2*(2-alpha)) #Modified by Xiang
     return Absx
 
-th = 1#int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 just to understand the type of boundary chosen
-alpha_x = 0.99#float(input("Enter absorption coefficient:")) #enter absorption coefficient uniform for all the surfaces in the x direction and for one frequency only
-alpha_y = 0.1#float(input("Enter absorption coefficient:")) #enter absorption coefficient uniform for all the surfaces in the y direction and for one frequency only
-alpha_z = 0.1#float(input("Enter absorption coefficient:")) #enter absorption coefficient uniform for all the surfaces in the z direction and for one frequency only
+th = 3 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 just to understand the type of boundary chosen
+alpha_x = 1/6 #float(input("Enter absorption coefficient:")) #enter absorption coefficient uniform for all the surfaces in the x direction and for one frequency only
+alpha_y = 1/6 #float(input("Enter absorption coefficient:")) #enter absorption coefficient uniform for all the surfaces in the y direction and for one frequency only
+alpha_z = 1/6 #float(input("Enter absorption coefficient:")) #enter absorption coefficient uniform for all the surfaces in the z direction and for one frequency only
 Abs_x = round(abs_term(th,alpha_x),4) #absorption term for x
 Abs_y = round(abs_term(th,alpha_y),4) #absorption term for y
 Abs_z = round(abs_term(th,alpha_z),4) #absorption term for y
@@ -97,7 +97,7 @@ if beta_zero_condition >1:
     print("aa! errors! Check beta condition")
 
 #Set initial condition - Source Info (excitation with Gaussian) 
-Ws=10**-2 #Source point power [Watts] interrupted after 2seconds; value taken from Jing 2007; correspondent to a SWL of 100dB
+Ws=0.005 #Source point power [Watts] interrupted after 2seconds; 10^-2 value taken from Jing 2007; correspondent to a SWL of 100dB
 #Vs=0.0001
 #Vs=round(4/3*round(pi,4)*(dx**3),10) #Source volume
 #w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
@@ -110,9 +110,9 @@ source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be
 
 #np.around(s1, 4, s1) #evenly round to the given number of decimals
 
-x_source = 1.0 #position of the source in the x direction [m]
-y_source = 1.0 #position of the source in the y direction [m]
-z_source = 1.0 #position of the source in the z direction [m]
+x_source = 4.0 #position of the source in the x direction [m]
+y_source = 4.0 #position of the source in the y direction [m]
+z_source = 4.0 #position of the source in the z direction [m]
 
 coord_source = [x_source , y_source, z_source] #coordinates of the source position in an list
 
@@ -127,7 +127,7 @@ index_source = (np.argwhere((xx == coord_sourceRound0) & (yy == coord_sourceRoun
 rows_s, cols_s, dept_s = index_source[0], index_source[1], index_source[2] #the row index is the first item in the list; the col index is the second item in the list, the dept is the third item in the list
 
 #Set initial condition - Receiver Info
-x_rec = 20.0 #position of the receiver in the x direction [m]
+x_rec = 2.0 #position of the receiver in the x direction [m]
 y_rec = 2.0 #position of the receiver in the y direction [m]
 z_rec = 2.0 #position of the receiver in the z direction [m]
 
@@ -197,21 +197,17 @@ for steps in range(0, recording_steps):
     w_p_j = (w_jplus1[:,-1,:])
     w_p_j = np.expand_dims(w_p_j, axis=1) #Expand the dimensions of w_p_j to match the shape of w_jplus1
     w_jplus1 = np.concatenate((w_jplus1,w_p_j), axis=1)
-    #w_jplus1 = np.concatenate((w_jplus1,np.ones((Nx,1,Nz))),axis =1)
     
     #In the z direction
     w_kminus1 = w[0:Nx, 0:Ny, 0:Nz-1]
     w_m_k = (w_kminus1[:,:,0])
     w_m_k = np.expand_dims(w_m_k, axis=2) # Expand the dimensions of w_m_k to match the shape of w_kminus1
     w_kminus1 = np.concatenate((w_m_k, w_kminus1), axis=2)
-    #w_kminus1 = np.stack((w_kminus1[:,:,0],*w_kminus1),axis=0)
-    #w_kminus1 = np.concatenate((np.ones((Nx,Ny,1)),w_kminus1),axis=2)
     
     w_kplus1 = w[0:Nx, 0:Ny, 1:Nz]
     w_p_k = (w_kplus1[:,:,-1])
     w_p_k = np.expand_dims(w_p_k, axis=2) #Expand the dimensions of w_p_k to match the shape of w_kplus1
     w_kplus1 = np.concatenate((w_kplus1,w_p_k), axis=2)
-    #w_kplus1 = np.concatenate((w_kplus1,np.ones((Nx,Ny,1))),axis=2)
     
     #Computing w_new (w at n+1 time step)
     w_new = np.divide((np.multiply(w_old,(1-beta_zero))),(1+beta_zero)) - \
@@ -224,8 +220,6 @@ for steps in range(0, recording_steps):
     #Insert boundary conditions  
     w_new[0,:,:] = np.divide((4*w_new[1,:,:] - w_new[2,:,:]),(3+((2*Abs_x*dx)/Dx))) #boundary condition at x=0, any y, any z
     w_new[-1,:,:] = np.divide((4*w_new[-2,:,:] - w_new[-3,:,:]),(3+((2*Abs_x*dx)/Dx))) #boundary condition at lx=lxmax, any y, any z
-    #w_new[0,0:Ny,0:Nz] = np.divide((4*w_new[1,0:Ny,0:Nz] - w_new[2,0:Ny,0:Nz]),(3+((2*Abs_x*dx)/Dx))) #boundary condition at x=0, any y, any z
-    #w_new[Nx-1,0:Ny,0:Nz] = np.divide((4*w_new[Nx-2,0:Ny,0:Nz] - w_new[Nx-3,0:Ny,0:Nz]),(3+((2*Abs_x*dx)/Dx))) #boundary condition at lx=lxmax, any y, any z
     
     w_new[:,0,:] = np.divide((4*w_new[:,1,:] - w_new[:,2,:]),(3+((2*Abs_y*dx)/Dy))) #boundary condition at y=0, any x, any z
     w_new[:,-1,:] = np.divide((4*w_new[:,-2,:] - w_new[:,-3,:]),(3+((2*Abs_y*dx)/Dy))) #boundary condition at at ly=lymax, any x, any z
@@ -273,9 +267,13 @@ plt.yticks(np.arange(0, -120, -20))
 sch_db[sch_db == -np.inf] = 0 #replace the -inf with zero in the decay
 
 bands = np.array([63,125,250,500,1000,2000,4000]) #array of frequency bands 
+
+time_c80 = 80/1000 #[s]
+time_div = int(time_c80 *(steps+1))
+
 t60 = t60_decay(t, sch_db, fspatial, rt='t30') #called function for calculation of t60 [s]
 edt = t60_decay(t, sch_db, fspatial, rt='edt') #called function for calculation of edt [s]
-c80 = clarity(80, press_r, fspatial) #called function for calculation of c80 [dB]
+c80 = clarity(time_div, press_r, fspatial) #called function for calculation of c80 [dB]
 d50 = definition(50, press_r, fspatial) #called function for calculation of d50 [%]
 
 

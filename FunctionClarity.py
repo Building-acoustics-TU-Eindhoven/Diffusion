@@ -4,20 +4,22 @@ Created on Thu Mar  9 15:25:01 2023
 
 @author: 20225533
 """
-
+import math
 import numpy as np
 
-def clarity(time_div, decay, fspatial):
+def clarity(t60, V, Eq_A, S, c0, dist):
     """
-    Clarity `C_i` determined from a Schoeder decay.
-    :param time: Time in miliseconds (e.g.: 50, 80).
-    :param decay: name of the decay calculated with the diffusion equation.
-    :param f_spatial: Frequency sample for the calculation of the x range in the graph.
+    Clarity determined from a SPL decay using Barron's formula
+    :param t60: Reverberation time in s
+    :param V: volume of the room
+    :param Eq_A: Equivalent absoption area of the room
+    :param S: total surface area of the rom
+    :param c0: sound speed
+    :param dist: distance between source and receiver
     """
-    
-    c = 10*np.log10(np.sum(decay[:time_div]) / np.sum(decay[time_div:]))
-    print(c)
-    return c
+    c80 = 10*np.log10(((t60/13.8*V)*(math.exp(-(Eq_A/S))-math.exp(-((1.104/t60)+(Eq_A/S)))) + (1/(4*math.pi*c0*dist**2)))/
+                      ((t60/13.8*V)*math.exp(-((1.104/t60)+(Eq_A/S)))))
+    return c80
 
 #dt = 0.0001 #distance between grid points on the time discretization [s]
 #fspatial = 1/dt #frequency spatial resolution (sampling period)

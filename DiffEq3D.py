@@ -22,17 +22,17 @@ from FunctionCentreTime import *
 #General settings
 c0= 343 #sound particle velocity [m.s^-1]
 rho = 1.21 #air density [Kg.m^-3] at 20°C
-m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper
+m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 pRef = 2 * (10**-5) #Reference pressure
 
 #Spatial discretization
-dx = 0.4 #distance between grid points x direction [m]
-dy = 0.4 #distance between grid points y direction [m]
-dz = 0.4 #distance between grid points z direction [m]
+dx = 0.5 #distance between grid points x direction [m]
+dy = 0.5 #distance between grid points y direction [m]
+dz = 0.5 #distance between grid points z direction [m]
 
 #Time discretization
-dt = 0.001 #distance between grid points on the time discretization [s]
-recording_time = 2 #time recorded for the source [s]
+dt = 0.0001 #distance between grid points on the time discretization [s]
+recording_time = 4 #time recorded for the source [s]
 recording_steps = ceil(recording_time/dt) #number of time steps to consider in the calculation
 t = np.arange(0, recording_time, dt) #mesh point in time
 
@@ -41,11 +41,11 @@ fspatial = 1/dt #frequency spatial resolution (sampling period)
 
 #Room dimensions
 lxmin = 0 #point x starts at zero [m]
-lxmax = 8.0 #point x finish at the length of the room in the x direction [m] %Length
+lxmax = 10.0 #point x finish at the length of the room in the x direction [m] %Length
 lymin = 0 #point y starts at zero [m]
-lymax = 8.0 #point y finish at the length of the room in the y direction [m] %Width
+lymax = 10.0 #point y finish at the length of the room in the y direction [m] %Width
 lzmin = 0 #point z starts at zero [m]
-lzmax = 8.0 #point z finish at the length of the room in the x direction [m] %Height
+lzmax = 10.0 #point z finish at the length of the room in the x direction [m] %Height
 
 S1,S2 = lxmax*lymax, lxmax*lymax #xy planes
 S3,S4 = lxmax*lzmax, lxmax*lzmax #xz planes
@@ -77,13 +77,13 @@ def abs_term(th,alpha):
         Absx = (c0*alpha)/(2*(2-alpha)) #Modified by Xiang
     return Absx
 
-th = 3 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 just to understand the type of boundary chosen
-alpha_1 = 1/6 #Absorption coefficient for Surface1
-alpha_2 = 1/6 #Absorption coefficient for Surface2
-alpha_3 = 1/6 #Absorption coefficient for Surface3
-alpha_4 = 1/6 #Absorption coefficient for Surface4
-alpha_5 = 1/6 #Absorption coefficient for Surface5
-alpha_6 = 1/6 #Absorption coefficient for Surface6
+th = 2 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 just to understand the type of boundary chosen
+alpha_1 = 0.1#1/6 #Absorption coefficient for Surface1
+alpha_2 = 0.1 #Absorption coefficient for Surface2
+alpha_3 = 0.1 #Absorption coefficient for Surface3
+alpha_4 = 0.1 #Absorption coefficient for Surface4
+alpha_5 = 0.1 #Absorption coefficient for Surface5
+alpha_6 = 0.1 #Absorption coefficient for Surface6
 
 Abs_1 = round(abs_term(th,alpha_1),4) #absorption term for S1
 Abs_2 = round(abs_term(th,alpha_2),4) #absorption term for S2
@@ -92,6 +92,7 @@ Abs_4 = round(abs_term(th,alpha_4),4) #absorption term for S4
 Abs_5 = round(abs_term(th,alpha_5),4) #absorption term for S5
 Abs_6 = round(abs_term(th,alpha_6),4) #absorption term for S6
 
+alpha_average = (alpha_1*S1 + alpha_2*S2 + alpha_3*S3 + alpha_4*S4 + alpha_5*S5 + alpha_6*S6)/S #average absorption
 Eq_A = alpha_1*S1 + alpha_2*S2 + alpha_3*S3 + alpha_4*S4 + alpha_5*S5 + alpha_6*S6 #equivalent absorption area of the room
 
 #Diffusion parameters
@@ -111,21 +112,21 @@ if beta_zero_condition >1:
     print("aa! errors! Check beta condition")
 
 #Set initial condition - Source Info (excitation with Gaussian) 
-Ws=0.005 #Source point power [Watts] interrupted after 2seconds; 10^-2 value taken from Jing 2007; correspondent to a SWL of 100dB
+Ws=10**-2#0.005 #Source point power [Watts] interrupted after 2seconds; 10^-2 value taken from Jing 2007; correspondent to a SWL of 100dB
 #Vs=0.0001
 #Vs=round(4/3*round(pi,4)*(dx**3),10) #Source volume
 #w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
 
-sourceon_time =  0.5 #time that the source is on before interrupting [s]
+sourceon_time =  1 #time that the source is on before interrupting [s]
 sourceon_steps = ceil(sourceon_time/dt) #time steps at which the source is calculated/considered in the calculation
 s1 = np.multiply(Ws,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position #does the source not need to be only at the time 0 to 2seconds and after that there should not be any source term? Yes
 source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
 
 #np.around(s1, 4, s1) #evenly round to the given number of decimals
 
-x_source = 4.0 #position of the source in the x direction [m]
-y_source = 4.0 #position of the source in the y direction [m]
-z_source = 4.0 #position of the source in the z direction [m]
+x_source = 9#ceil(Nx/2)#4.0 #position of the source in the x direction [m]
+y_source = 9#ceil(Nx/2) #position of the source in the y direction [m]
+z_source = 9#ceil(Nx/2) #position of the source in the z direction [m]
 
 coord_source = [x_source , y_source, z_source] #coordinates of the source position in an list
 
@@ -140,9 +141,9 @@ index_source = (np.argwhere((xx == coord_sourceRound0) & (yy == coord_sourceRoun
 rows_s, cols_s, dept_s = index_source[0], index_source[1], index_source[2] #the row index is the first item in the list; the col index is the second item in the list, the dept is the third item in the list
 
 #Set initial condition - Receiver Info
-x_rec = 2.0 #position of the receiver in the x direction [m]
-y_rec = 2.0 #position of the receiver in the y direction [m]
-z_rec = 2.0 #position of the receiver in the z direction [m]
+x_rec = ceil(Nx/4) #2.0 #position of the receiver in the x direction [m]
+y_rec = ceil(Nx/4) #position of the receiver in the y direction [m]
+z_rec = ceil(Nx/4) #position of the receiver in the z direction [m]
 
 dist = math.sqrt((abs(x_rec - x_source))**2 + (abs(y_rec - y_source))**2 + (abs(z_rec - z_source))**2) #distance between source and receiver
 
@@ -265,7 +266,7 @@ plt.ylabel("SPL")
 plt.xlim()
 plt.ylim()
 plt.xticks(np.arange(0, recording_time +0.1, 0.5))
-plt.yticks(np.arange(0, 120, 20))
+#plt.yticks(np.arange(0, 120, 20))
 
 sch_db = 10*np.log10((((abs(w_rec))*rho*(c0**2))/(pRef**2)) / np.max(((abs(w_rec))*rho*(c0**2))/(pRef**2))) #normalised to maximum to 0dB
 
@@ -277,21 +278,13 @@ plt.ylabel("SPL")
 plt.xlim()
 plt.ylim()
 plt.xticks(np.arange(0, recording_time +0.1, 0.5))
-plt.yticks(np.arange(0, -120, -20))
+#plt.yticks(np.arange(0, -120, -20))
 
-#sch_db[sch_db == -np.inf] = 0 #replace the -inf with zero in the decay
-#bands = np.array([63,125,250,500,1000,2000,4000]) #array of frequency bands 
-#time_c80 = 80/1000 #[s]
-#time_div = int(time_c80 *(steps+1))
+
+error = (dt**2) * (dx**(-2)) * (10**(-8))
 
 t60 = t60_decay(t, sch_db, fspatial, rt='t30') #called function for calculation of t60 [s]
 edt = t60_decay(t, sch_db, fspatial, rt='edt') #called function for calculation of edt [s]
 c80 = clarity(t60, V, Eq_A, S, c0, dist) #called function for calculation of c80 [dB]
 d50 = definition(t60, V, Eq_A, S, c0, dist) #called function for calculation of d50 [%]
 ts = centretime(t60, Eq_A, S) #called function for calculation of ts [ms]
-
-
-
-
-
-

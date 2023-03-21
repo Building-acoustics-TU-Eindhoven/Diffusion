@@ -9,7 +9,7 @@ import numpy as np
 
 def clarity(t60, V, Eq_A, S, c0, dist):
     """
-    Clarity determined from a SPL decay using Barron's formula
+    Clarity determined from a SPL decay using Barron's revised formula [Vorlander 2008]
     :param t60: Reverberation time in s
     :param V: volume of the room
     :param Eq_A: Equivalent absoption area of the room
@@ -18,7 +18,10 @@ def clarity(t60, V, Eq_A, S, c0, dist):
     :param dist: distance between source and receiver
     """
     c80 = 10*np.log10(((t60/13.8*V)*(math.exp(-(Eq_A/S))-math.exp(-((1.104/t60)+(Eq_A/S)))) + (1/(4*math.pi*c0*dist**2)))/
-                      ((t60/13.8*V)*math.exp(-((1.104/t60)+(Eq_A/S)))))
+                      ((t60/13.8*V)*math.exp(-((1.104/t60)+(Eq_A/S))))) 
+    
+#    c80 = 10*np.log10(((math.exp((13.8*t60)/V))*(1+((13.8*V)/(4*math.pi*c0*(dist**2)*t60))))-1) #equation for A<<S or alpha<<1
+    
     return c80
 
 #dt = 0.0001 #distance between grid points on the time discretization [s]

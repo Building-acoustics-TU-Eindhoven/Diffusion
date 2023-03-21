@@ -9,7 +9,7 @@ import numpy as np
 
 def definition(t60, V, Eq_A, S, c0, dist):
     """
-    Definition determined from a SPL decay using Barron's formula
+    Definition determined from a SPL decay using Barron's revised formula [Vorlander 2008]
     :param t60: Reverberation time in s
     :param V: volume of the room
     :param Eq_A: Equivalent absoption area of the room

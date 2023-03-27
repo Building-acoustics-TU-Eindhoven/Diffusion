@@ -11,13 +11,23 @@ import numpy as np
 from scipy.integrate import simps
 from scipy import linalg
 import sys
-from drawnow import drawnow
+#from drawnow import drawnow
 from math import ceil
 from math import log
-from FunctionRT import *
+#from FunctionRT import *
+#from FunctionRT1 import *
 from FunctionClarity import *
 from FunctionDefinition import *
 from FunctionCentreTime import *
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator
+import numpy as np
+import time as time
+from scipy import stats
+
+st = time.time() #start time
 
 #General settings
 c0= 343 #sound particle velocity [m.s^-1]
@@ -26,26 +36,26 @@ m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro p
 pRef = 2 * (10**-5) #Reference pressure
 
 #Spatial discretization
-dx = 0.5 #distance between grid points x direction [m]
-dy = 0.5 #distance between grid points y direction [m]
-dz = 0.5 #distance between grid points z direction [m]
+dx = 1.0 #distance between grid points x direction [m]
+dy = dx #distance between grid points y direction [m]
+dz = dx #distance between grid points z direction [m]
 
 #Time discretization
-dt = 0.0001 #distance between grid points on the time discretization [s]
-recording_time = 4 #time recorded for the source [s]
+dt = 0.000015625 #distance between grid points on the time discretization [s]
+recording_time = 2.2 #time recorded for the source [s]
 recording_steps = ceil(recording_time/dt) #number of time steps to consider in the calculation
 t = np.arange(0, recording_time, dt) #mesh point in time
 
 #Frequency resolution & spatial parameters
-fspatial = 1/dt #frequency spatial resolution (sampling period)
+fsample = 1/dt #frequency spatial resolution (sampling period)
 
 #Room dimensions
 lxmin = 0 #point x starts at zero [m]
-lxmax = 10.0 #point x finish at the length of the room in the x direction [m] %Length
+lxmax = 8.0 #point x finish at the length of the room in the x direction [m] %Length
 lymin = 0 #point y starts at zero [m]
-lymax = 10.0 #point y finish at the length of the room in the y direction [m] %Width
+lymax = 8.0 #point y finish at the length of the room in the y direction [m] %Width
 lzmin = 0 #point z starts at zero [m]
-lzmax = 10.0 #point z finish at the length of the room in the x direction [m] %Height
+lzmax = 8.0 #point z finish at the length of the room in the x direction [m] %Height
 
 S1,S2 = lxmax*lymax, lxmax*lymax #xy planes
 S3,S4 = lxmax*lzmax, lxmax*lzmax #xz planes
@@ -77,56 +87,56 @@ def abs_term(th,alpha):
         Absx = (c0*alpha)/(2*(2-alpha)) #Modified by Xiang
     return Absx
 
-th = 2 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 just to understand the type of boundary chosen
-alpha_1 = 0.1#1/6 #Absorption coefficient for Surface1
-alpha_2 = 0.1 #Absorption coefficient for Surface2
-alpha_3 = 0.1 #Absorption coefficient for Surface3
-alpha_4 = 0.1 #Absorption coefficient for Surface4
-alpha_5 = 0.1 #Absorption coefficient for Surface5
-alpha_6 = 0.1 #Absorption coefficient for Surface6
+th = 3 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 just to understand the type of boundary chosen
+alpha_1 = 1/6 #Absorption coefficient for Surface1
+alpha_2 = 1/6 #Absorption coefficient for Surface2
+alpha_3 = 1/6 #Absorption coefficient for Surface3
+alpha_4 = 1/6 #Absorption coefficient for Surface4
+alpha_5 = 1/6 #Absorption coefficient for Surface5
+alpha_6 = 1/6 #Absorption coefficient for Surface6
 
-Abs_1 = round(abs_term(th,alpha_1),4) #absorption term for S1
-Abs_2 = round(abs_term(th,alpha_2),4) #absorption term for S2
-Abs_3 = round(abs_term(th,alpha_3),4) #absorption term for S3
-Abs_4 = round(abs_term(th,alpha_4),4) #absorption term for S4
-Abs_5 = round(abs_term(th,alpha_5),4) #absorption term for S5
-Abs_6 = round(abs_term(th,alpha_6),4) #absorption term for S6
+Abs_1 = abs_term(th,alpha_1) #absorption term for S1
+Abs_2 = abs_term(th,alpha_2) #absorption term for S2
+Abs_3 = abs_term(th,alpha_3) #absorption term for S3
+Abs_4 = abs_term(th,alpha_4) #absorption term for S4
+Abs_5 = abs_term(th,alpha_5) #absorption term for S5
+Abs_6 = abs_term(th,alpha_6) #absorption term for S6
 
 alpha_average = (alpha_1*S1 + alpha_2*S2 + alpha_3*S3 + alpha_4*S4 + alpha_5*S5 + alpha_6*S6)/S #average absorption
 Eq_A = alpha_1*S1 + alpha_2*S2 + alpha_3*S3 + alpha_4*S4 + alpha_5*S5 + alpha_6*S6 #equivalent absorption area of the room
 
 #Diffusion parameters
-lambda_path = round(4*V/S,4) #mean free path for 3D
-Dx = round((lambda_path*c0)/3,4) #diffusion coefficient for proportionate rooms x direction
-Dy = round((lambda_path*c0)/3,4) #diffusion coefficient for proportionate rooms y direction
-Dz = round((lambda_path*c0)/3,4) #diffusion coefficient for proportionate rooms z direction
+lambda_path = (4*V)/S #mean free path for 3D
+Dx = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms x direction
+Dy = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms y direction
+Dz = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms z direction
 
-beta_zero_x = round((2*Dx*dt)/(dx**2),4) #mesh number in x direction
-beta_zero_y = round((2*Dy*dt)/(dy**2),4) #mesh number in x direction
-beta_zero_z = round((2*Dz*dt)/(dz**2),4) #mesh number in x direction
+beta_zero_x = (2*Dx*dt)/(dx**2) #mesh number in x direction
+beta_zero_y = (2*Dy*dt)/(dy**2) #mesh number in x direction
+beta_zero_z = (2*Dz*dt)/(dz**2) #mesh number in x direction
 beta_zero = beta_zero_x + beta_zero_y + beta_zero_z #beta_zero is the condition for all the directions deltax, deltay and deltaz.
  
 #Condition for the model to be unconditionally stable
-beta_zero_condition = round(((beta_zero**2) - 1)/(1+(beta_zero**2)+(2*beta_zero)),4) #from Navarro 2012 paper
+beta_zero_condition = ((beta_zero**2) - 1)/(1+(beta_zero**2)+(2*beta_zero)) #from Navarro 2012 paper
 if beta_zero_condition >1:
     print("aa! errors! Check beta condition")
 
 #Set initial condition - Source Info (excitation with Gaussian) 
-Ws=10**-2#0.005 #Source point power [Watts] interrupted after 2seconds; 10^-2 value taken from Jing 2007; correspondent to a SWL of 100dB
+Ws=0.005 #Source point power [Watts] interrupted after 2seconds; 10^-2 value taken from Jing 2007; correspondent to a SWL of 100dB
 #Vs=0.0001
 #Vs=round(4/3*round(pi,4)*(dx**3),10) #Source volume
 #w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
 
-sourceon_time =  1 #time that the source is on before interrupting [s]
+sourceon_time =  1.2 #time that the source is on before interrupting [s]
 sourceon_steps = ceil(sourceon_time/dt) #time steps at which the source is calculated/considered in the calculation
 s1 = np.multiply(Ws,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position #does the source not need to be only at the time 0 to 2seconds and after that there should not be any source term? Yes
 source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
 
 #np.around(s1, 4, s1) #evenly round to the given number of decimals
 
-x_source = 9#ceil(Nx/2)#4.0 #position of the source in the x direction [m]
-y_source = 9#ceil(Nx/2) #position of the source in the y direction [m]
-z_source = 9#ceil(Nx/2) #position of the source in the z direction [m]
+x_source = 4# ceil(Nx/2)#4 #position of the source in the x direction [m]
+y_source = 4#ceil(Nx/2)#4 #position of the source in the y direction [m]
+z_source = 4#ceil(Nx/2)#4 #position of the source in the z direction [m]
 
 coord_source = [x_source , y_source, z_source] #coordinates of the source position in an list
 
@@ -141,17 +151,17 @@ index_source = (np.argwhere((xx == coord_sourceRound0) & (yy == coord_sourceRoun
 rows_s, cols_s, dept_s = index_source[0], index_source[1], index_source[2] #the row index is the first item in the list; the col index is the second item in the list, the dept is the third item in the list
 
 #Set initial condition - Receiver Info
-x_rec = ceil(Nx/4) #2.0 #position of the receiver in the x direction [m]
-y_rec = ceil(Nx/4) #position of the receiver in the y direction [m]
-z_rec = ceil(Nx/4) #position of the receiver in the z direction [m]
-
-dist = math.sqrt((abs(x_rec - x_source))**2 + (abs(y_rec - y_source))**2 + (abs(z_rec - z_source))**2) #distance between source and receiver
+x_rec = 2#ceil(Nx/4)#2.0 #position of the receiver in the x direction [m]
+y_rec = 2#ceil(Nx/4)#2.0  #position of the receiver in the y direction [m]
+z_rec = 2#ceil(Nx/4)#2.0  #position of the receiver in the z direction [m]
 
 coord_receiver = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
 index_receiver = (np.argwhere((xx==coord_receiver[0]) & (yy==coord_receiver[1]) & (zz==coord_receiver[2])))[0] #finding the index of the receiver in the meshgrid
 rows_r, cols_r, dept_r = index_receiver[0], index_receiver[1], index_receiver[2] #the row index is the first item in the list; the col index is the second item in the list,the dept is the third item in the list
 
-s = np.zeros((Nx,Ny,Nz)) #matrix of zeros for source 
+dist = math.sqrt((abs(x_rec - x_source))**2 + (abs(y_rec - y_source))**2 + (abs(z_rec - z_source))**2) #distance between source and receiver
+
+s = np.zeros((Nx,Ny,Nz)) #matrix of zeros for source
 s[rows_s, cols_s, dept_s] = source1[1] #at the index where the different between the source and x is zero, the source value is the energy density of the source, for all the other values it is zero.
 
 w_new = np.zeros((Nx,Ny,Nz)) #unknown w at new time level (n+1)
@@ -182,13 +192,10 @@ def draw_fig2():
     plt.xticks(np.arange(0, 1+0.1, 0.1))
     plt.yticks([1e-10, 1e-8, 1e-6, 1e-4, 1e-2])
 
-def draw_fig():
-    plt.imshow(w_new.transpose(), vmin=w_new.min(), vmax=w_new.max());
-
 #Computing w;
 for steps in range(0, recording_steps):
     #Compute w at inner mesh points
-    time = steps*dt #total time for the calculation
+    time_steps = steps*dt #total time for the calculation
     s[rows_s, cols_s, dept_s] = source1[steps] #array of zero of the source apart from the index_dist_source = energy density of the source at each step position
     #w_trans = np.transpose(w) #transpose of w could be the trans???
     
@@ -251,9 +258,11 @@ for steps in range(0, recording_steps):
     w = w_new #The w at n+1 step becomes the w at n step
 
     #w_rec is the energy density at the receiver specifically
-    w_rec[steps] = w_new[rows_r, cols_r,dept_r] #energy density at the receiver is equal to the energy density new calcuated in time
+    w_rec[steps] = w_new[rows_r, cols_r, dept_r] #energy density at the receiver is equal to the energy density new calcuated in time
+    print(time_steps)
     #drawnow(draw_fig1)
     #drawnow(draw_fig2)
+
 
 #Figure 3: Decay of SPL in the recording_time
 plt.figure(3) 
@@ -268,23 +277,89 @@ plt.ylim()
 plt.xticks(np.arange(0, recording_time +0.1, 0.5))
 #plt.yticks(np.arange(0, 120, 20))
 
-sch_db = 10*np.log10((((abs(w_rec))*rho*(c0**2))/(pRef**2)) / np.max(((abs(w_rec))*rho*(c0**2))/(pRef**2))) #normalised to maximum to 0dB
+spl_norm = 10*np.log10((((abs(w_rec))*rho*(c0**2))/(pRef**2)) / np.max(((abs(w_rec))*rho*(c0**2))/(pRef**2))) #normalised to maximum to 0dB
 
 #Figure 4: Decay of SPL in the recording_time normalised to maximum 0dB
 plt.figure(4)
-plt.plot(t,sch_db)
+plt.plot(t,spl_norm)
 plt.xlabel("t")
 plt.ylabel("SPL")
 plt.xlim()
 plt.ylim()
-plt.xticks(np.arange(0, recording_time +0.1, 0.5))
-#plt.yticks(np.arange(0, -120, -20))
+plt.xticks(np.arange(0, recording_time +0.1, 0.1))
+plt.yticks(np.arange(0, -120, -10))
 
+plt.figure(5)
+plt.plot(t,w_rec)
 
-error = (dt**2) * (dx**(-2)) * (10**(-8))
+#fig = plt.figure(1)
+#ax = fig.add_subplot(111, projection='3d')
+#ax.set_box_aspect([0.5, 0.5, 0.5])  # Set the aspect ratio of the plot
+#X, Y= np.meshgrid(x, y)
+#ax.contourf(X, Y, w_new[:, :, 4], cmap='hot', alpha=0.8)
+#ax.view_init(azim=-120, elev=30)  # Set the viewing angle
+#plt.show()
 
-t60 = t60_decay(t, sch_db, fspatial, rt='t30') #called function for calculation of t60 [s]
-edt = t60_decay(t, sch_db, fspatial, rt='edt') #called function for calculation of edt [s]
-c80 = clarity(t60, V, Eq_A, S, c0, dist) #called function for calculation of c80 [dB]
-d50 = definition(t60, V, Eq_A, S, c0, dist) #called function for calculation of d50 [%]
-ts = centretime(t60, Eq_A, S) #called function for calculation of ts [ms]
+init = -5.0
+end = -35.0
+factor = 2.0
+    
+press_r_rev = (w_rec)[::-1]
+press_r_rev_sqt = press_r_rev**2
+press_r_rev_sqt_cum = np.cumsum(press_r_rev_sqt)
+schroeder = press_r_rev_sqt_cum[::-1]
+sch_db = 10.0 * np.log10(schroeder / np.max(schroeder))
+plt.plot(t,sch_db)
+    
+#Linear regression
+rt_decay = sch_db #decay of spl removing all the part before the zerodecay
+ 
+timeVector = np.arange(0, recording_time, dt)
+idxL1 = np.where(rt_decay <= init)[0][0]
+idxL2 = np.where(rt_decay <= end)[0][0]
+   
+timeL1 = timeVector[idxL1]
+timeL2 = timeVector[idxL2]
+EDCTimeVec = np.arange(0, (len(rt_decay)-1)/fsample+1/fsample, 1/fsample)
+
+# Classical Approach (T30 = 2*(t[-35dB]-t[-5dB])
+RTCalc = factor*(timeL2 - timeL1)
+
+# Linregress approach
+slope,intercept = stats.linregress(EDCTimeVec[idxL1:idxL2],rt_decay[idxL1:idxL2])[0:2]
+db_regress_init = (init - intercept) / slope 
+db_regress_end = (end - intercept) / slope
+t60I = factor * (db_regress_end - db_regress_init)
+
+# Poly-based Approach y = Ax + B
+CoefAlpha = np.polyfit(EDCTimeVec[idxL1:idxL2], rt_decay[idxL1:idxL2], 1)
+t60 = (-60/CoefAlpha[0])
+   
+EDCL1 = rt_decay[idxL1]
+EDCL2 = rt_decay[idxL2]
+    
+y_axis = slope*timeVector + intercept
+
+plt.figure()
+plt.plot(timeVector,rt_decay, color ='b', linewidth = 1.8)
+plt.plot(timeVector,y_axis,color='r',linewidth=2)
+plt.plot(timeVector[idxL1],np.real(rt_decay[idxL1]),'o',linewidth=2)
+plt.plot(timeVector[idxL2],np.real(rt_decay[idxL2]),'o',linewidth=2)
+plt.axvline(x=t60I,ymin=-100,ymax=0,linestyle='--',linewidth=2)
+plt.ylabel('Normalized Magnitude (dB)')
+plt.xlabel('Time (s)')
+plt.legend(['EDC','Line Fitting','Upper Point','Lower Point','Estimate T_{30}'])
+plt.title('T_{30} = ' + str(round(t60I,2)) + ' s.')
+plt.grid(True)
+plt.ylim([-100,0])
+plt.show()
+
+#t60 = t60_decay(t, press_r, fsample, rt='t30') #called function for calculation of t60 [s]
+#t60M = t60_decayM(t, spl_norm, fsample, rt='t30') #called function for calculation of t60 [s]
+#edt = t60_decay(t, spl_norm, fsample, rt='edt') #called function for calculation of edt [s]
+#c80 = clarity(t60, V, Eq_A, S, c0, dist) #called function for calculation of c80 [dB]
+#d50 = definition(t60, V, Eq_A, S, c0, dist) #called function for calculation of d50 [%]
+#ts = centretime(t60, Eq_A, S) #called function for calculation of ts [ms]
+
+et = time.time() #end time
+elapsed_time = et - st

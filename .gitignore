@@ -1,5 +1,11 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+DiffEq3D1
+possiblert
+understanding1
+understanding2
+w_rec
+
 *.py[cod]
 *$py.class
 

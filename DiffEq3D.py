@@ -36,7 +36,7 @@ m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro p
 pRef = 2 * (10**-5) #Reference pressure
 
 #Spatial discretization
-dx = 0.5 #distance between grid points x direction [m]
+dx = 0.1 #distance between grid points x direction [m]
 dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
@@ -123,8 +123,8 @@ if beta_zero_condition >1:
 
 #Set initial condition - Source Info (excitation with Gaussian) 
 Ws=10**(-2) #Source point power [Watts] interrupted after 2seconds; 10^-2 value taken from Jing 2007; correspondent to a SWL of 100dB
-Vs=0.2
-#Vs=round(4/3*round(pi,4)*(dx**3),10) #Source volume
+#Vs=0.2
+#Vs=round(4/3*round(math.pi,4)*(dx**3),10) #Source volume
 #w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
 
 sourceon_time =  1 #time that the source is on before interrupting [s]
@@ -151,9 +151,9 @@ index_source = (np.argwhere((xx == coord_sourceRound0) & (yy == coord_sourceRoun
 rows_s, cols_s, dept_s = index_source[0], index_source[1], index_source[2] #the row index is the first item in the list; the col index is the second item in the list, the dept is the third item in the list
 
 #Set initial condition - Receiver Info
-x_rec = int(ceil(Nx/4))#2.0 #position of the receiver in the x direction [m]
-y_rec = int(ceil(Nx/4))#2.0  #position of the receiver in the y direction [m]
-z_rec = int(ceil(Nx/4))#2.0  #position of the receiver in the z direction [m]
+x_rec = 2#int(ceil(Nx/4)) #position of the receiver in the x direction [m]
+y_rec = 2#int(ceil(Nx/4)) #position of the receiver in the y direction [m]
+z_rec = 2#int(ceil(Nx/4)) #position of the receiver in the z direction [m]
 
 coord_receiver = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
 index_receiver = (np.argwhere((xx==coord_receiver[0]) & (yy==coord_receiver[1]) & (zz==coord_receiver[2])))[0] #finding the index of the receiver in the meshgrid
@@ -239,17 +239,20 @@ for steps in range(0, recording_steps):
                 np.divide((np.multiply(beta_zero_x,(w_iplus1+w_iminus1))),(1+beta_zero)) + \
                     np.divide((np.multiply(beta_zero_y,(w_jplus1+w_jminus1))),(1+beta_zero)) + \
                         np.divide((np.multiply(beta_zero_z,(w_kplus1+w_kminus1))),(1+beta_zero))
-      
+    
+     
     #Insert boundary conditions  
     w_new[0,:,:] = np.divide((4*w_new[1,:,:] - w_new[2,:,:]),(3+((2*Abs_1*dx)/Dx))) #boundary condition at x=0, any y, any z
     w_new[-1,:,:] = np.divide((4*w_new[-2,:,:] - w_new[-3,:,:]),(3+((2*Abs_2*dx)/Dx))) #boundary condition at lx=lxmax, any y, any z
-    
+
+
     w_new[:,0,:] = np.divide((4*w_new[:,1,:] - w_new[:,2,:]),(3+((2*Abs_3*dx)/Dy))) #boundary condition at y=0, any x, any z
     w_new[:,-1,:] = np.divide((4*w_new[:,-2,:] - w_new[:,-3,:]),(3+((2*Abs_4*dx)/Dy))) #boundary condition at at ly=lymax, any x, any z
  
+    
     w_new[:,:,0] = np.divide((4*w_new[:,:,1] - w_new[:,:,2]),(3+((2*Abs_5*dx)/Dz))) #boundary condition at z=0, any x, any y
     w_new[:,:,-1] = np.divide((4*w_new[:,:,-2] - w_new[:,:,-3]),(3+((2*Abs_6*dx)/Dz))) #boundary condition at at lz=lzmax, any x, any y
- 
+    
     sdl = 10*np.log10(abs(w_new),where=abs(w_new)>0) #sound density level
     #if (steps % 100 == 0): #draw only on certain steps and not all the steps
     #    drawnow(draw_fig)

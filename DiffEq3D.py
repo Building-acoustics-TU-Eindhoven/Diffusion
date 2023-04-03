@@ -36,13 +36,13 @@ m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro p
 pRef = 2 * (10**-5) #Reference pressure
 
 #Spatial discretization
-dx = 0.1 #distance between grid points x direction [m]
+dx = 0.5 #distance between grid points x direction [m]
 dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
 #Time discretization
-dt = 0.0001 #distance between grid points on the time discretization [s]
-recording_time = 4 #time recorded for the source [s]
+dt = 1/64000 #distance between grid points on the time discretization [s]
+recording_time = 1.5 #time recorded for the source [s]
 recording_steps = ceil(recording_time/dt) #number of time steps to consider in the calculation
 t = np.arange(0, recording_time, dt) #mesh point in time
 
@@ -51,11 +51,11 @@ fsample = 1/dt #frequency spatial resolution (sampling period)
 
 #Room dimensions
 lxmin = 0 #point x starts at zero [m]
-lxmax = 10.0 #point x finish at the length of the room in the x direction [m] %Length
+lxmax = 15.0 #point x finish at the length of the room in the x direction [m] %Length
 lymin = 0 #point y starts at zero [m]
-lymax = 10.0 #point y finish at the length of the room in the y direction [m] %Width
+lymax = 15.0 #point y finish at the length of the room in the y direction [m] %Width
 lzmin = 0 #point z starts at zero [m]
-lzmax = 10.0 #point z finish at the length of the room in the x direction [m] %Height
+lzmax = 2.0 #point z finish at the length of the room in the x direction [m] %Height
 
 S1,S2 = lxmax*lymax, lxmax*lymax #xy planes
 S3,S4 = lxmax*lzmax, lxmax*lzmax #xz planes
@@ -88,12 +88,12 @@ def abs_term(th,alpha):
     return Absx
 
 th = 2 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 just to understand the type of boundary chosen
-alpha_1 = 0.1 #Absorption coefficient for Surface1
-alpha_2 = 0.1 #Absorption coefficient for Surface2
-alpha_3 = 0.1 #Absorption coefficient for Surface3
-alpha_4 = 0.1 #Absorption coefficient for Surface4
-alpha_5 = 0.1 #Absorption coefficient for Surface5
-alpha_6 = 0.1 #Absorption coefficient for Surface6
+alpha_1 = 0.3#1/6 #Absorption coefficient for Surface1
+alpha_2 = 0.8#1/6 #Absorption coefficient for Surface2
+alpha_3 = 0.3#1/6 #Absorption coefficient for Surface3
+alpha_4 = 0.3#1/6 #Absorption coefficient for Surface4
+alpha_5 = 0.3#1/6 #Absorption coefficient for Surface5
+alpha_6 = 0.3#1/6 #Absorption coefficient for Surface6
 
 Abs_1 = abs_term(th,alpha_1) #absorption term for S1
 Abs_2 = abs_term(th,alpha_2) #absorption term for S2
@@ -122,21 +122,22 @@ if beta_zero_condition >1:
     print("aa! errors! Check beta condition")
 
 #Set initial condition - Source Info (excitation with Gaussian) 
-Ws=10**(-2) #Source point power [Watts] interrupted after 2seconds; 10^-2 value taken from Jing 2007; correspondent to a SWL of 100dB
-#Vs=0.2
+Ws=0.01 #Source point power [Watts] interrupted after 2seconds; 10^-2 value taken from Jing 2007; correspondent to a SWL of 100dB
+Vs=0.2
 #Vs=round(4/3*round(math.pi,4)*(dx**3),10) #Source volume
-#w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
+#w1=Ws
+w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
 
-sourceon_time =  1 #time that the source is on before interrupting [s]
+sourceon_time =  dt #time that the source is on before interrupting [s]
 sourceon_steps = ceil(sourceon_time/dt) #time steps at which the source is calculated/considered in the calculation
-s1 = np.multiply(Ws,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position #does the source not need to be only at the time 0 to 2seconds and after that there should not be any source term? Yes
+s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position #does the source not need to be only at the time 0 to 2seconds and after that there should not be any source term? Yes
 source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
 
 #np.around(s1, 4, s1) #evenly round to the given number of decimals
 
-x_source = 5#int(ceil(Nx/2))#4 #position of the source in the x direction [m]
-y_source = 5#int(ceil(Ny/2))#4 #position of the source in the y direction [m]
-z_source = 5#int(ceil(Nz/2))#4 #position of the source in the z direction [m]
+x_source = 2.0 #int(ceil(Nx/2))#4 #position of the source in the x direction [m]
+y_source = 5.0 #int(ceil(Ny/2))#4 #position of the source in the y direction [m]
+z_source = 1.0 #int(ceil(Nz/2))#4 #position of the source in the z direction [m]
 
 coord_source = [x_source , y_source, z_source] #coordinates of the source position in an list
 
@@ -151,9 +152,9 @@ index_source = (np.argwhere((xx == coord_sourceRound0) & (yy == coord_sourceRoun
 rows_s, cols_s, dept_s = index_source[0], index_source[1], index_source[2] #the row index is the first item in the list; the col index is the second item in the list, the dept is the third item in the list
 
 #Set initial condition - Receiver Info
-x_rec = 2#int(ceil(Nx/4)) #position of the receiver in the x direction [m]
-y_rec = 2#int(ceil(Nx/4)) #position of the receiver in the y direction [m]
-z_rec = 2#int(ceil(Nx/4)) #position of the receiver in the z direction [m]
+x_rec = 2.5 #int(ceil(Nx/4)) #position of the receiver in the x direction [m]
+y_rec = 5.0 #int(ceil(Nx/4)) #position of the receiver in the y direction [m]
+z_rec = 1.0 #int(ceil(Nx/4)) #position of the receiver in the z direction [m]
 
 coord_receiver = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
 index_receiver = (np.argwhere((xx==coord_receiver[0]) & (yy==coord_receiver[1]) & (zz==coord_receiver[2])))[0] #finding the index of the receiver in the meshgrid
@@ -264,10 +265,15 @@ for steps in range(0, recording_steps):
     w_rec[steps] = w_new[rows_r, cols_r, dept_r] #energy density at the receiver is equal to the energy density new calcuated in time
     
     s[rows_s, cols_s, dept_s] = source1[steps] #array of zero of the source apart from the index_dist_source = energy density of the source at each step position
-    #print(time_steps)
+    
+    print(time_steps)
     #drawnow(draw_fig1)
     #drawnow(draw_fig2)
 
+addition = Ws/(4*math.pi*dist**2)
+multiplication = np.add((abs(w_new))*c0,addition)
+
+spl_stat = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist**2)) + ((abs(w_new))*c0)/(pRef**2))) #It should be the spl stationaty but it cannot be because I would not need tp use w_new for that. I need a w_stationary.
 
 #Figure 3: Decay of SPL in the recording_time
 plt.figure(3) 
@@ -292,11 +298,22 @@ plt.ylabel("SPL")
 plt.xlim()
 plt.ylim()
 plt.xticks(np.arange(0, recording_time +0.1, 0.1))
-plt.yticks(np.arange(0, -120, -10))
+plt.yticks(np.arange(0, -60, -10))
 
 plt.figure(5)
 plt.plot(t,w_rec)
 
+#Failed trial for graph of sound pressure level stationary over the space.
+#plt.figure(6)
+#t_dim = len(t)
+#last_time_index = t_dim-1
+#spl_y = spl_stat[index_receiver[0],:,index_receiver[2]]
+#data_x = 2.5
+#data_z = 1
+#data_y = spl_y
+#plt.plot(y,data_y)
+
+#3D image of the energy density in the room
 #fig = plt.figure(1)
 #ax = fig.add_subplot(111, projection='3d')
 #ax.set_box_aspect([0.5, 0.5, 0.5])  # Set the aspect ratio of the plot
@@ -305,42 +322,43 @@ plt.plot(t,w_rec)
 #ax.view_init(azim=-120, elev=30)  # Set the viewing angle
 #plt.show()
 
-init = 0.0
-end = -60.0
-factor = 1.0
+init = -5.0 #because I want the T30, I need to start at -5
+end = -35.0 #because I want the T30, I need to finish at -35
+factor = 2.0 #factor of 2 since I need the T30
 
-idx_w_rec = np.where(t == sourceon_time)[0][0]
-w_rec = w_rec[idx_w_rec:]    
-press_r_rev = (w_rec)[::-1]
-press_r_rev_sqt = press_r_rev
-press_r_rev_sqt_cum = np.cumsum(press_r_rev_sqt)
-schroeder = press_r_rev_sqt_cum[::-1]
-sch_db = 10.0 * np.log10(schroeder / np.max(schroeder))
+#Schroeder integration
+idx_w_rec = np.where(t == sourceon_time)[0][0] #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
+w_rec = w_rec[idx_w_rec:] #cutting the energy density array at the receiver from the idx_w_rec to the end   
+press_r_rev = (w_rec)[::-1] #reverting the array
+#The energy density is related to the pressure with the following relation: w = p^2
+press_r_rev_cum = np.cumsum(press_r_rev) #sumulative summation of all the item in the array
+schroeder = press_r_rev_cum[::-1] #reverting the array again -> creating the schroder decay
+sch_db = 10.0 * np.log10(schroeder / np.max(schroeder)) #level of the array: schroeder decay
 #plt.plot(t,sch_db)
     
 #Linear regression
-rt_decay = sch_db #decay of spl removing all the part before the zerodecay
+rt_decay = sch_db #decay to be used to calcuate the RT
  
-timeVector = np.arange(0, recording_time, dt)
-idxL1 = np.where(rt_decay <= init)[0][0]
-idxL2 = np.where(rt_decay <= end)[0][0]
+timeVector = np.arange(0, recording_time, dt) #equal to t
+idxL1 = np.where(rt_decay <= init)[0][0] #index at which the rtdecay is equal to -5
+idxL2 = np.where(rt_decay <= end)[0][0] #index at which the rtdecay is equal to -35
    
-timeL1 = timeVector[idxL1]
-timeL2 = timeVector[idxL2]
-EDCTimeVec = np.arange(0, (len(rt_decay)-1)/fsample+1/fsample, 1/fsample)
+timeL1 = timeVector[idxL1] #index at which the time vector is equal to the idxL1
+timeL2 = timeVector[idxL2] #index at which the time vector is equal to the idxL2
+EDCTimeVec = np.arange(0, (len(rt_decay)-1)/fsample+1/fsample, 1/fsample) #equal to t and timeVector
 
 # Classical Approach (T30 = 2*(t[-35dB]-t[-5dB])
 RTCalc = factor*(timeL2 - timeL1)
 
 # Linregress approach
-slope,intercept = stats.linregress(EDCTimeVec[idxL1:idxL2],rt_decay[idxL1:idxL2])[0:2]
-db_regress_init = (init - intercept) / slope 
-db_regress_end = (end - intercept) / slope
-t60I = factor * (db_regress_end - db_regress_init)
+slope,intercept = stats.linregress(EDCTimeVec[idxL1:idxL2],rt_decay[idxL1:idxL2])[0:2] #calculating the slope and the interception of the line connecting the two points
+db_regress_init = (init - intercept) / slope #dB initial
+db_regress_end = (end - intercept) / slope #dB End
+t60I = factor * (db_regress_end - db_regress_init) #t60 according to linregress approach
 
 # Poly-based Approach y = Ax + B
-CoefAlpha = np.polyfit(EDCTimeVec[idxL1:idxL2], rt_decay[idxL1:idxL2], 1)
-t60 = (-60/CoefAlpha[0])
+CoefAlpha = np.polyfit(EDCTimeVec[idxL1:idxL2], rt_decay[idxL1:idxL2], 1) ##calculating the slope and the interception of the line connecting the two points
+t60 = (-60/CoefAlpha[0]) #t60 according to polyfit approach
    
 EDCL1 = rt_decay[idxL1]
 EDCL2 = rt_decay[idxL2]
@@ -364,9 +382,9 @@ plt.show()
 #t60 = t60_decay(t, press_r, fsample, rt='t30') #called function for calculation of t60 [s]
 #t60M = t60_decayM(t, spl_norm, fsample, rt='t30') #called function for calculation of t60 [s]
 #edt = t60_decay(t, spl_norm, fsample, rt='edt') #called function for calculation of edt [s]
-#c80 = clarity(t60, V, Eq_A, S, c0, dist) #called function for calculation of c80 [dB]
-#d50 = definition(t60, V, Eq_A, S, c0, dist) #called function for calculation of d50 [%]
-#ts = centretime(t60, Eq_A, S) #called function for calculation of ts [ms]
+c80 = clarity(t60, V, Eq_A, S, c0, dist) #called function for calculation of c80 [dB]
+d50 = definition(t60, V, Eq_A, S, c0, dist) #called function for calculation of d50 [%]
+ts = centretime(t60, Eq_A, S) #called function for calculation of ts [ms]
 
 et = time.time() #end time
 elapsed_time = et - st

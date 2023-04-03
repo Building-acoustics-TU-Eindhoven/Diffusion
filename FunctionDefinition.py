@@ -20,5 +20,9 @@ def definition(t60, V, Eq_A, S, c0, dist):
 
     d50 = 100*(((t60/13.8*V)*(math.exp(-(Eq_A/S))-math.exp(-((0.69/t60)+(Eq_A/S)))) + (1/(4*math.pi*c0*dist**2)))/
                       (((t60/13.8*V)*(math.exp(-(Eq_A/S)))) + (1/(4*math.pi*c0*dist**2))))
+    
+#    d50 = 100*(((t60/13.8*V)*(1-math.exp(-(276/t60)))+ (1/(4*math.pi*c0*dist**2)))/
+#               ((t60/13.8*V) + (1/(4*math.pi*c0*dist**2))))
+    
     return d50
 

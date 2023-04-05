@@ -32,7 +32,7 @@ st = time.time() #start time
 #General settings
 c0= 343 #sound particle velocity [m.s^-1]
 rho = 1.21 #air density [Kg.m^-3] at 20°C
-m_atm = 1e-5 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
+m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 pRef = 2 * (10**-5) #Reference pressure
 
 #Spatial discretization
@@ -42,11 +42,11 @@ dz = dx #distance between grid points z direction [m]
 
 #Room dimensions
 lxmin = 0 #point x starts at zero [m]
-lxmax = 8.0 #point x finish at the length of the room in the x direction [m] %Length
+lxmax = 15.0 #point x finish at the length of the room in the x direction [m] %Length
 lymin = 0 #point y starts at zero [m]
-lymax = 8.0 #point y finish at the length of the room in the y direction [m] %Width
+lymax = 15.0 #point y finish at the length of the room in the y direction [m] %Width
 lzmin = 0 #point z starts at zero [m]
-lzmax = 8.0 #point z finish at the length of the room in the x direction [m] %Height
+lzmax = 2.0 #point z finish at the length of the room in the x direction [m] %Height
 
 S1,S2 = lxmax*lymax, lxmax*lymax #xy planes
 S3,S4 = lxmax*lzmax, lxmax*lzmax #xz planes
@@ -78,20 +78,20 @@ def abs_term(th,alpha):
         Absx = (c0*alpha)/(2*(2-alpha)) #Modified by Xiang
     return Absx
 
-th = 1 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 just to understand the type of boundary chosen
-alpha_1 = 1/6 #Absorption coefficient for Surface1
-alpha_2 = 1/6 #Absorption coefficient for Surface2
-alpha_3 = 1/6 #Absorption coefficient for Surface3
-alpha_4 = 1/6 #Absorption coefficient for Surface4
-alpha_5 = 1/6 #Absorption coefficient for Surface5
-alpha_6 = 1/6 #Absorption coefficient for Surface6
+th = 2 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 just to understand the type of boundary chosen
+alpha_1 = 0.3 #Absorption coefficient for Surface1
+alpha_2 = 0.3 #Absorption coefficient for Surface2
+alpha_3 = 0.3 #Absorption coefficient for Surface3
+alpha_4 = 0.8 #Absorption coefficient for Surface4
+alpha_5 = 0.3 #Absorption coefficient for Surface5
+alpha_6 = 0.3 #Absorption coefficient for Surface6
 
-Abs_1 = alpha_1*S1#abs_term(th,alpha_1) #absorption term for S1
-Abs_2 = alpha_2*S2#abs_term(th,alpha_2) #absorption term for S2
-Abs_3 = alpha_3*S3#abs_term(th,alpha_3) #absorption term for S3
-Abs_4 = alpha_4*S4#abs_term(th,alpha_4) #absorption term for S4
-Abs_5 = alpha_5*S5#abs_term(th,alpha_5) #absorption term for S5
-Abs_6 = alpha_6*S6#abs_term(th,alpha_6) #absorption term for S6
+Abs_1 = abs_term(th,alpha_1) #absorption term for S1
+Abs_2 = abs_term(th,alpha_2) #absorption term for S2
+Abs_3 = abs_term(th,alpha_3) #absorption term for S3
+Abs_4 = abs_term(th,alpha_4) #absorption term for S4
+Abs_5 = abs_term(th,alpha_5) #absorption term for S5
+Abs_6 = abs_term(th,alpha_6) #absorption term for S6
 
 alpha_average = (alpha_1*S1 + alpha_2*S2 + alpha_3*S3 + alpha_4*S4 + alpha_5*S5 + alpha_6*S6)/S #average absorption
 Eq_A = alpha_1*S1 + alpha_2*S2 + alpha_3*S3 + alpha_4*S4 + alpha_5*S5 + alpha_6*S6 #equivalent absorption area of the room
@@ -103,8 +103,8 @@ Dy = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms y directi
 Dz = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms z direction
 
 #Time discretization
-dt = (2*Dx*((1/(dx**2))+(1/(dy**2))+(1/(dz**2)))-(c0*m_atm/2))**-1 #distance between grid points on the time discretization [s]
-recording_time = 2 #time recorded for the source [s]
+dt = 1/64000 #distance between grid points on the time discretization [s]
+recording_time = 1.5 #time recorded for the source [s]
 recording_steps = ceil(recording_time/dt) #number of time steps to consider in the calculation
 t = np.arange(0, recording_time, dt) #mesh point in time
 
@@ -122,23 +122,41 @@ if beta_zero_condition >1:
 fsample = 1/dt #frequency spatial resolution (sampling period)
 
 ##Set initial condition - Source Info - Stationary source - excitation Gaussian
-x_source = int(ceil(Nx/2))#4 #position of the source in the x direction [m]
-y_source = int(ceil(Ny/2))#4 #position of the source in the y direction [m]
-z_source = int(ceil(Nz/2))#4 #position of the source in the z direction [m]
+x_source = 2.0 #int(ceil(Nx/2))#4 #position of the source in the x direction [m]
+y_source = 5.0 #int(ceil(Ny/2))#4 #position of the source in the y direction [m]
+z_source = 1.0 #int(ceil(Nz/2))#4 #position of the source in the z direction [m]
 
-n_gau = 1 #??
-sigmax_gau = n_gau*dx #??
-Ax_gau = 5e-3 #??
-ax_gau = 1/(2*(sigmax_gau**2)) #??
-power_x = (np.subtract(xx,x[x_source-1]))**2 #?? 
-power_y = (np.subtract(yy,y[y_source-1]))**2 #??
-power_z = (np.subtract(zz,z[z_source-1]))**2 #??
-P = np.multiply(Ax_gau, np.exp(np.multiply(-ax_gau,(power_x+power_y+power_z)))) #??
+coord_source = [x_source , y_source, z_source] #coordinates of the source position in an list
+
+for i in range(0,Nx):
+    np.around(xx[i], 2, xx[i]) #evenly round to the given number of decimals
+    np.around(yy[i], 2, yy[i]) #evenly round to the given number of decimals
+    np.around(zz[i], 2, zz[i]) #evenly round to the given number of decimals
+coord_sourceRound0 = round(coord_source[0], 2)
+coord_sourceRound1 = round(coord_source[1], 2)
+coord_sourceRound2 = round(coord_source[2], 2)
+index_source = (np.argwhere((xx == coord_sourceRound0) & (yy == coord_sourceRound1) & (zz == coord_sourceRound2)))[0] #finding the index of the source in the meshgrid
+rows_s, cols_s, dept_s = index_source[0], index_source[1], index_source[2] #the row index is the first item in the list; the col index is the second item in the list, the dept is the third item in the list
+
+#n_gau = 1 #??
+#sigmax_gau = n_gau*dx #??
+#Ax_gau = 5e-3 #??
+#ax_gau = 1/(2*(sigmax_gau**2)) #??
+#power_x = (np.subtract(xx,x[x_source-1]))**2 #?? 
+#power_y = (np.subtract(yy,y[y_source-1]))**2 #??
+#power_z = (np.subtract(zz,z[z_source-1]))**2 #??
+#P = np.multiply(Ax_gau, np.exp(np.multiply(-ax_gau,(power_x+power_y+power_z)))) #??
+P = np.zeros((Nx,Ny,Nz)) #matrix of zeros for source
+P[rows_s, cols_s, dept_s] = 0.1
 
 #Set initial condition - Receiver Info
-x_rec = int(ceil(Nx/4)) #int(ceil(Nx/4)) #position of the receiver in the x direction [m]
-y_rec = int(ceil(Nx/4)) #int(ceil(Nx/4)) #position of the receiver in the y direction [m]
-z_rec = int(ceil(Nx/4)) #int(ceil(Nx/4)) #position of the receiver in the z direction [m]
+x_rec = 2.5#int(ceil(Nx/4)) #position of the receiver in the x direction [m]
+y_rec = 5.0#int(ceil(Nx/4)) #position of the receiver in the y direction [m]
+z_rec = 1.0#int(ceil(Nx/4)) #position of the receiver in the z direction [m]
+
+coord_receiver = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
+index_receiver = (np.argwhere((xx==coord_receiver[0]) & (yy==coord_receiver[1]) & (zz==coord_receiver[2])))[0] #finding the index of the receiver in the meshgrid
+rows_r, cols_r, dept_r = index_receiver[0], index_receiver[1], index_receiver[2] #the row index is the first item in the list; the col index is the second item in the list,the dept is the third item in the list
 
 dist = math.sqrt((abs(x_rec - x_source))**2 + (abs(y_rec - y_source))**2 + (abs(z_rec - z_source))**2) #distance between source and receiver
 
@@ -214,7 +232,7 @@ for steps in range(0, recording_steps):
     w = w_new #The w at n+1 step becomes the w at n step
 
     #w_rec is the energy density at the receiver specifically
-    w_rec[steps] = w_new[x_rec,y_rec, z_rec] #energy density at the receiver is equal to the energy density new calcuated in time
+    w_rec[steps] = w_new[rows_r, cols_r, dept_r] #energy density at the receiver is equal to the energy density new calcuated in time
     
     print(time_steps)
 
@@ -254,9 +272,7 @@ plt.plot(t,w_rec)
 plt.figure(4)
 t_dim = len(t)
 last_time_index = t_dim-1
-spl_y = spl_stat[x_rec,:,z_rec]
-data_x = x_rec
-data_z = z_rec
+spl_y = spl_stat[rows_r,:,dept_r]
 data_y = spl_y
 plt.title("SPL over the y axis")
 plt.plot(y,data_y)

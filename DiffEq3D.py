@@ -36,7 +36,7 @@ m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro p
 pRef = 2 * (10**-5) #Reference pressure
 
 #Spatial discretization
-dx = 0.2 #distance between grid points x direction [m]
+dx = 0.5 #distance between grid points x direction [m]
 dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
@@ -121,46 +121,37 @@ beta_zero_condition = ((beta_zero**2) - 1)/(1+(beta_zero**2)+(2*beta_zero)) #fro
 if beta_zero_condition >1:
     print("aa! errors! Check beta condition")
 
-#Set initial condition - Source Info (excitation with Gaussian) 
+#Set initial condition - Source Info (interrupted method)
 Ws=0.005 #Source point power [Watts] interrupted after 2seconds; 10^-2 value taken from Jing 2007; correspondent to a SWL of 100dB
 Vs=0.2
-#Vs=round(4/3*round(math.pi,4)*(dx**3),10) #Source volume
 w1=Ws
 #w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
-
 sourceon_time =  2 #time that the source is on before interrupting [s]
 sourceon_steps = ceil(sourceon_time/dt) #time steps at which the source is calculated/considered in the calculation
 s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position #does the source not need to be only at the time 0 to 2seconds and after that there should not be any source term? Yes
 source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
 
-#np.around(s1, 4, s1) #evenly round to the given number of decimals
-
+#Finding index in meshgrid of the source position
 x_source = 4.0 #int(ceil(Nx/2))#4 #position of the source in the x direction [m]
 y_source = 4.0 #int(ceil(Ny/2))#4 #position of the source in the y direction [m]
 z_source = 4.0 #int(ceil(Nz/2))#4 #position of the source in the z direction [m]
-
 coord_source = [x_source , y_source, z_source] #coordinates of the source position in an list
+#dist_sg = np.sqrt((xx - coord_source[0])**2 + (y - coord_source[1])**2 + (z - coord_source[2])**2) #distance between source and grid points
+rows_s = np.argmin(abs(xx[:,0,0] - coord_source[0])) #Find index of grid point with minimum distance from source along x direction
+cols_s = np.argmin(abs(yy[0,:,0] - coord_source[1])) #Find index of grid point with minimum distance from source along y direction
+dept_s = np.argmin(abs(zz[0,0,:] - coord_source[2])) #Find index of grid point with minimum distance from source along z direction
 
-for i in range(0,Nx):
-    np.around(xx[i], 2, xx[i]) #evenly round to the given number of decimals
-    np.around(yy[i], 2, yy[i]) #evenly round to the given number of decimals
-    np.around(zz[i], 2, zz[i]) #evenly round to the given number of decimals
-coord_sourceRound0 = round(coord_source[0], 2)
-coord_sourceRound1 = round(coord_source[1], 2)
-coord_sourceRound2 = round(coord_source[2], 2)
-index_source = (np.argwhere((xx == coord_sourceRound0) & (yy == coord_sourceRound1) & (zz == coord_sourceRound2)))[0] #finding the index of the source in the meshgrid
-rows_s, cols_s, dept_s = index_source[0], index_source[1], index_source[2] #the row index is the first item in the list; the col index is the second item in the list, the dept is the third item in the list
-
-#Set initial condition - Receiver Info
+#Finding index in meshgrid of the receiver position
 x_rec = 2.0 #int(ceil(Nx/4)) #position of the receiver in the x direction [m]
 y_rec = 2.0 #int(ceil(Nx/4)) #position of the receiver in the y direction [m]
 z_rec = 2.0 #int(ceil(Nx/4)) #position of the receiver in the z direction [m]
-
 coord_receiver = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
-index_receiver = (np.argwhere((xx==coord_receiver[0]) & (yy==coord_receiver[1]) & (zz==coord_receiver[2])))[0] #finding the index of the receiver in the meshgrid
-rows_r, cols_r, dept_r = index_receiver[0], index_receiver[1], index_receiver[2] #the row index is the first item in the list; the col index is the second item in the list,the dept is the third item in the list
+#dist_rg = np.sqrt((xx - coord_receiver[0])**2 + (y - coord_receiver[1])**2 + (z - coord_receiver[2])**2) #distance between receiver and grid points
+rows_r = np.argmin(abs(xx[:,0,0] - coord_receiver[0])) #Find index of grid point with minimum distance from receiver along x direction
+cols_r = np.argmin(abs(yy[0,:,0] - coord_receiver[1])) #Find index of grid point with minimum distance from receiver along y direction
+dept_r = np.argmin(abs(zz[0,0,:] - coord_receiver[2])) #Find index of grid point with minimum distance from receiver along z direction
 
-dist = math.sqrt((abs(x_rec - x_source))**2 + (abs(y_rec - y_source))**2 + (abs(z_rec - z_source))**2) #distance between source and receiver
+dist_sr = math.sqrt((abs(x_rec - x_source))**2 + (abs(y_rec - y_source))**2 + (abs(z_rec - z_source))**2) #distance between source and receiver
 
 s = np.zeros((Nx,Ny,Nz)) #matrix of zeros for source
 s[rows_s, cols_s, dept_s] = source1[1] #at the index where the different between the source and x is zero, the source value is the energy density of the source, for all the other values it is zero.
@@ -270,10 +261,7 @@ for steps in range(0, recording_steps):
     #drawnow(draw_fig1)
     #drawnow(draw_fig2)
 
-addition = Ws/(4*math.pi*dist**2)
-multiplication = np.add((abs(w_new))*c0,addition)
-
-spl_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist**2))*np.exp(-m_atm*dist) + ((abs(w_rec))*c0)/(pRef**2))) #It should be the spl total (including direct field) at the receiver position????? but it will need to be calculated for astationary source 100dB
+spl_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_sr) + ((abs(w_rec))*c0)/(pRef**2))) #It should be the spl total (including direct field) at the receiver position????? but it will need to be calculated for astationary source 100dB
 
 #Figure 3: Decay of SPL in the recording_time
 plt.figure(3) 
@@ -393,8 +381,8 @@ plt.show()
 #t60 = t60_decay(t, press_r, fsample, rt='t30') #called function for calculation of t60 [s]
 #t60M = t60_decayM(t, spl_norm, fsample, rt='t30') #called function for calculation of t60 [s]
 #edt = t60_decay(t, spl_norm, fsample, rt='edt') #called function for calculation of edt [s]
-c80 = clarity(t60, V, Eq_A, S, c0, dist) #called function for calculation of c80 [dB]
-d50 = definition(t60, V, Eq_A, S, c0, dist) #called function for calculation of d50 [%]
+c80 = clarity(t60, V, Eq_A, S, c0, dist_sr) #called function for calculation of c80 [dB]
+d50 = definition(t60, V, Eq_A, S, c0, dist_sr) #called function for calculation of d50 [%]
 ts = centretime(t60, Eq_A, S) #called function for calculation of ts [ms]
 
 et = time.time() #end time

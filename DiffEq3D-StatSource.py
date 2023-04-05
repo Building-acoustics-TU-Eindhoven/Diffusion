@@ -42,11 +42,11 @@ dz = dx #distance between grid points z direction [m]
 
 #Room dimensions
 lxmin = 0 #point x starts at zero [m]
-lxmax = 15.0 #point x finish at the length of the room in the x direction [m] %Length
+lxmax = 30.0 #point x finish at the length of the room in the x direction [m] %Length
 lymin = 0 #point y starts at zero [m]
-lymax = 15.0 #point y finish at the length of the room in the y direction [m] %Width
+lymax = 8.0 #point y finish at the length of the room in the y direction [m] %Width
 lzmin = 0 #point z starts at zero [m]
-lzmax = 2.0 #point z finish at the length of the room in the x direction [m] %Height
+lzmax = 3.0 #point z finish at the length of the room in the x direction [m] %Height
 
 S1,S2 = lxmax*lymax, lxmax*lymax #xy planes
 S3,S4 = lxmax*lzmax, lxmax*lzmax #xz planes
@@ -78,13 +78,13 @@ def abs_term(th,alpha):
         Absx = (c0*alpha)/(2*(2-alpha)) #Modified by Xiang
     return Absx
 
-th = 2 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 just to understand the type of boundary chosen
-alpha_1 = 0.3 #Absorption coefficient for Surface1
-alpha_2 = 0.3 #Absorption coefficient for Surface2
-alpha_3 = 0.3 #Absorption coefficient for Surface3
+th = 3 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 just to understand the type of boundary chosen
+alpha_1 = 0.2 #Absorption coefficient for Surface1
+alpha_2 = 0.2 #Absorption coefficient for Surface2
+alpha_3 = 0.2 #Absorption coefficient for Surface3
 alpha_4 = 0.8 #Absorption coefficient for Surface4
-alpha_5 = 0.3 #Absorption coefficient for Surface5
-alpha_6 = 0.3 #Absorption coefficient for Surface6
+alpha_5 = 0.2 #Absorption coefficient for Surface5
+alpha_6 = 0.2 #Absorption coefficient for Surface6
 
 Abs_1 = abs_term(th,alpha_1) #absorption term for S1
 Abs_2 = abs_term(th,alpha_2) #absorption term for S2
@@ -123,8 +123,8 @@ fsample = 1/dt #frequency spatial resolution (sampling period)
 
 ##Set initial condition - Source Info - Stationary source - excitation Gaussian
 x_source = 2.0 #int(ceil(Nx/2))#4 #position of the source in the x direction [m]
-y_source = 5.0 #int(ceil(Ny/2))#4 #position of the source in the y direction [m]
-z_source = 1.0 #int(ceil(Nz/2))#4 #position of the source in the z direction [m]
+y_source = 4.0 #int(ceil(Ny/2))#4 #position of the source in the y direction [m]
+z_source = 2.0 #int(ceil(Nz/2))#4 #position of the source in the z direction [m]
 
 coord_source = [x_source , y_source, z_source] #coordinates of the source position in an list
 
@@ -147,12 +147,12 @@ rows_s, cols_s, dept_s = index_source[0], index_source[1], index_source[2] #the 
 #power_z = (np.subtract(zz,z[z_source-1]))**2 #??
 #P = np.multiply(Ax_gau, np.exp(np.multiply(-ax_gau,(power_x+power_y+power_z)))) #??
 P = np.zeros((Nx,Ny,Nz)) #matrix of zeros for source
-P[rows_s, cols_s, dept_s] = 0.1
+P[rows_s, cols_s, dept_s] = 0.01
 
 #Set initial condition - Receiver Info
-x_rec = 2.5#int(ceil(Nx/4)) #position of the receiver in the x direction [m]
-y_rec = 5.0#int(ceil(Nx/4)) #position of the receiver in the y direction [m]
-z_rec = 1.0#int(ceil(Nx/4)) #position of the receiver in the z direction [m]
+x_rec = 5.0#int(ceil(Nx/4)) #position of the receiver in the x direction [m]
+y_rec = 4.0#int(ceil(Nx/4)) #position of the receiver in the y direction [m]
+z_rec = 1.5#int(ceil(Nx/4)) #position of the receiver in the z direction [m]
 
 coord_receiver = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
 index_receiver = (np.argwhere((xx==coord_receiver[0]) & (yy==coord_receiver[1]) & (zz==coord_receiver[2])))[0] #finding the index of the receiver in the meshgrid
@@ -237,6 +237,7 @@ for steps in range(0, recording_steps):
     print(time_steps)
 
 spl_stat = 10*np.log10(rho*c0*((P/(4*math.pi*dist**2)) + ((abs(w_new))*c0)/(pRef**2))) #It should be the spl stationary
+spl_stat_norm = 10*np.log10(rho*c0*((P/(4*math.pi*dist**2)) + ((abs(w_new))*c0)/(pRef**2))/ np.max(rho*c0*((P/(4*math.pi*dist**2)) + ((abs(w_new))*c0)/(pRef**2)))) #It should be the spl stationary
 
 #Figure 1: Decay of SPL in the recording_time at the receiver
 plt.figure(1) 
@@ -268,7 +269,7 @@ plt.figure(3)
 plt.title("Energy density over time at the receiver")
 plt.plot(t,w_rec)
 
-#Failed trial for graph of sound pressure level stationary over the space.
+#Sound pressure level stationary over the space y.
 plt.figure(4)
 t_dim = len(t)
 last_time_index = t_dim-1
@@ -276,6 +277,15 @@ spl_y = spl_stat[rows_r,:,dept_r]
 data_y = spl_y
 plt.title("SPL over the y axis")
 plt.plot(y,data_y)
+
+#Sound pressure level stationary over the space x.
+plt.figure(5)
+t_dim = len(t)
+last_time_index = t_dim-1
+spl_x = spl_stat[:,cols_r,dept_r]
+data_x = spl_x
+plt.title("SPL over the x axis")
+plt.plot(x,data_x)
 
 et = time.time() #end time
 elapsed_time = et - st

@@ -5,6 +5,9 @@ The diffusion equation, generally used in heat conduction, can be used also for 
 The acoustic modelling method of the diffusion equation allows to study the acoustics properties of a room and to obtain spatial distribution of acoustic energies over time in a specific room.
 The code is a currently a **PROTOTYPE**. The code is written in Python language.
 
+## Release version
+
+## Documentation
 
 ### How to run the code
 The code is based on the finite different method Du Fort&Frankel.
@@ -17,6 +20,9 @@ The "DiffEq3D" is the main code and it works with the following associated funct
 + The Function Definition calculate the definition50ms of the room in question based on Barron's revised theory formulas.
 + The Function Centre Time calculate the centre time of the room in question based on Barron's revised theory formulas.
 
+## Authors
+
+## Publications
 
 ### References
 + ....
@@ -24,6 +30,7 @@ The "DiffEq3D" is the main code and it works with the following associated funct
 + ....
 + ....
 
+## Fundings
 
 ### Licence
 Diffusion Code is licenced under MIT licence. See LICENCE.md for more details.

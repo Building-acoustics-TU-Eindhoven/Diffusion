@@ -2,20 +2,31 @@
 
 The code is based on the Du Fort and Frankel method (explicit unconditionally stable Finite difference method).
 
-## Steps to follow
-1. Set up the dimension of the line
+## Objectives/what it can do
+
+## Requirements
+Install ....
+
+## Libraries
+Python version
+Libraries for python...
+
+## Inputs
+
+## Implementation
+1. Geometry model - Set up the dimension of the line
 2. Set up the spatial distribution and temporal distribution (dx and dt)
-3. Calculate Absorption term (at the moment is only one absorption term for all the surfaces) based on the absorption coefficient and the type of absorption condition.
+3. Calculate Absorption term based on one absorption coefficient and the type of absorption condition (Sabine, Eyring or Modified).
 4. Define Diffusion coefficient Dx as a constant:
 ```{math}
-Dx = (λ*c)/3
+Dx = (λc)/3
 ```
 Where:
 λ = mean free path = length of the line
 
 5. Define stability criterion (Eq. 18 of Navarro 2012)
 ```{math}
-(β_0^{-1}/(1+β_0^2+2*β_0)≤ 1
+(β_0^{-1}/(1+β_0^2+2β_0)≤ 1
 ```
 Where beta\_zero comes from the discretization of the diffusion equation.
 
@@ -107,3 +118,7 @@ SPL = 20 log_10⁡(((w_{i_r}^{n+1}ρc_{0}^2 ))/p_{ref}^2)
 
 13. Calculate Clarity, Definition and Centre Time
 The values are calculate from the Barron’s revisited theory formulas (Vorlander 2008) with the influence of the direct field neglected.
+
+## Results/Images
+
+## References

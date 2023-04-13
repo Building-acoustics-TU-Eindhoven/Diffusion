@@ -36,7 +36,7 @@ m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro p
 pRef = 2 * (10**-5) #Reference pressure
 
 #Spatial discretization
-dx = 0.5 #distance between grid points x direction [m]
+dx = 0.2 #distance between grid points x direction [m]
 dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
@@ -148,10 +148,17 @@ dept_r = np.argmin(abs(zz[0,0,:] - coord_receiver[2])) #Find index of grid point
 #power_z = (np.subtract(zz,z[z_source-1]))**2 #??
 #P = np.multiply(Ax_gau, np.exp(np.multiply(-ax_gau,(power_x+power_y+power_z)))) #??
 P = np.zeros((Nx,Ny,Nz)) #matrix of zeros for source
-Vs = 0.1 #????????????????????????????
-P[rows_s, cols_s, dept_s] = 0.01/Vs
+radius_s = 0.2 #[m]
+Vs = 1#4/3*math.pi*(radius_s**3) #????????????????????????????
+Ws = 0.01 # power of the source in [W]
+P[rows_s, cols_s, dept_s] = Ws/Vs
 
 dist = math.sqrt((abs(x_rec - x_source))**2 + (abs(y_rec - y_source))**2 + (abs(z_rec - z_source))**2) #distance between source and receiver
+
+dist_x = np.sqrt((xx[:,cols_r,dept_r] - x_source)**2 + (yy[rows_r,cols_r,dept_r] - y_source)**2 + (zz[rows_r,cols_r,dept_r] - z_source)**2)
+dist_y = np.sqrt((xx[rows_r,cols_r,dept_r] - x_source)**2 + (yy[rows_r,:,dept_r] - y_source)**2 + (zz[rows_r,cols_r,dept_r] - z_source)**2)
+
+#dist_y = math.sqrt(np.add((abs(x_rec - x_source))**2, np.power((abs(y[:] - y_source)),2) , (abs(z_rec - z_source))**2)) 
 
 w_new = np.zeros((Nx,Ny,Nz)) #unknown w at new time level (n+1)
 w = w_new #w at n level
@@ -229,8 +236,14 @@ for steps in range(0, recording_steps):
     
     print(time_steps)
 
-spl_stat = 10*np.log10(rho*c0*((P/(4*math.pi*dist**2)) + ((abs(w_new))*c0)/(pRef**2))) #It should be the spl stationary
-spl_stat_norm = 10*np.log10(rho*c0*((P/(4*math.pi*dist**2)) + ((abs(w_new))*c0)/(pRef**2))/ np.max(rho*c0*((P/(4*math.pi*dist**2)) + ((abs(w_new))*c0)/(pRef**2)))) #It should be the spl stationary
+w_rec_x = w_new[:, cols_r, dept_r]  
+w_rec_y = w_new[rows_r, :, dept_r]
+
+spl_stat_x = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_x**2))) + ((abs(w_rec_x)*c0)))/(pRef**2))
+spl_stat_y = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_y**2))) + ((abs(w_rec_y)*c0)))/(pRef**2)) #It should be the spl stationary
+#spl_stat_norm = 10*np.log10(rho*c0*((P/(4*math.pi*dist**2)) + ((abs(w_new))*c0)/(pRef**2))/ np.max(rho*c0*((P/(4*math.pi*dist**2)) + ((abs(w_new))*c0)/(pRef**2)))) #It should be the spl stationary
+
+spl_norm = 10*np.log10((((abs(w_rec))*rho*(c0**2))/(pRef**2)) / np.max(((abs(w_rec))*rho*(c0**2))/(pRef**2))) #normalised to maximum to 0dB
 
 #Figure 1: Decay of SPL in the recording_time at the receiver
 plt.figure(1) 
@@ -245,8 +258,6 @@ plt.ylim()
 plt.xticks(np.arange(0, recording_time +0.1, 0.5))
 #plt.yticks(np.arange(0, 120, 20))
 
-spl_norm = 10*np.log10((((abs(w_rec))*rho*(c0**2))/(pRef**2)) / np.max(((abs(w_rec))*rho*(c0**2))/(pRef**2))) #normalised to maximum to 0dB
-
 #Figure 2: Decay of SPL in the recording_time normalised to maximum 0dB
 plt.figure(2)
 plt.title("Normalised SPL over time at the receiver")
@@ -258,24 +269,27 @@ plt.ylim()
 plt.xticks(np.arange(0, recording_time +0.1, 0.1))
 plt.yticks(np.arange(0, -60, -10))
 
+#Figure 3: Energy density over time at the receiver
 plt.figure(3)
 plt.title("Energy density over time at the receiver")
 plt.plot(t,w_rec)
 
-#Sound pressure level stationary over the space y.
+#Figure 4: Sound pressure level stationary over the space y.
 plt.figure(4)
 t_dim = len(t)
 last_time_index = t_dim-1
-spl_y = spl_stat[rows_r,:,dept_r]
+#spl_y = spl_stat[rows_r,:,dept_r]
+spl_y = spl_stat_y
 data_y = spl_y
 plt.title("SPL over the y axis")
 plt.plot(y,data_y)
+plt.yticks(np.arange(75, 105, 5))
 
-#Sound pressure level stationary over the space x.
+#Figure 5: Sound pressure level stationary over the space x.
 plt.figure(5)
 t_dim = len(t)
 last_time_index = t_dim-1
-spl_x = spl_stat[:,cols_r,dept_r]
+spl_x = spl_stat_x
 data_x = spl_x
 plt.title("SPL over the x axis")
 plt.plot(x,data_x)

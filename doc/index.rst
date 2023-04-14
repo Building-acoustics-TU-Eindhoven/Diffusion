@@ -6,6 +6,8 @@
 Welcome to DiffusionEquationCode's documentation!
 =================================================
 
+This is a description of the Diffusion Equation Code for Acoustics.
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:

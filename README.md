@@ -6,8 +6,13 @@ The acoustic modelling method of the diffusion equation allows to study the acou
 The code is a currently a **PROTOTYPE**. The code is written in Python language.
 
 ## Release version
+Version 1.0
 
 ## Documentation
+Documentation documents can be found below:
+Documentation 1D
+Documentation 2D
+Documentation 3D
 
 ### How to run the code
 The code is based on the finite different method Du Fort&Frankel.
@@ -21,16 +26,15 @@ The "DiffEq3D" is the main code and it works with the following associated funct
 + The Function Centre Time calculate the centre time of the room in question based on Barron's revised theory formulas.
 
 ## Authors
+Code is developed by Ilaria Fichera at Eindhoven University of Technology.
 
-## Publications
-
-### References
-+ ....
-+ ....
-+ ....
-+ ....
+## References
++ J. M. Navarro, J. Escolano and J. J. Lopez, Implementation and evaluation of a diffusion equa-tion model based on finite difference schemes for sound field prediction in rooms,Appl. Acoust.73(2012) 659–665.
++ Billon A, Picaut J, Foy C, Valeau V, Sakout A. Introducing atmospheric attenuation within a diffusion model for room-acoustic predictions. J Acoust Soc Am. 2008 Jun;123(6):4040-3. doi: 10.1121/1.2903872. PMID: 18537354.
++ Vorländer M. Auralization: fundamentals of acoustics, modelling, simulation,algorithms and acoustic virtual reality. Springer 2008
 
 ## Fundings
+The project is funded by NWO, in the Netherlands.
 
-### Licence
+## Licence
 Diffusion Code is licenced under MIT licence. See LICENCE.md for more details.

@@ -94,36 +94,35 @@ Where:
 ```{math}
 c_0=343 m/s
 ```
-P_(i_s)^n=source term (soft source) at position i_s and at the time step of n; this comes from the source term function (Navarro 2012). 
-| {math}`w_{i_s}^{n+1}= w_{i_s}^{n+1}+2∆tP_{i_s}^n`
+P_(i_s)^n=source term (soft source) at position i_s and at the time step of n; this comes from the source term function (Navarro 2012) {math}`w_{i_s}^{n+1}= w_{i_s}^{n+1}+2∆tP_{i_s}^n`
 
 m = air absorption coefficient = 0 from Billon paper 2008
 
 10. Define boundary conditions:
-| Boundary at x = 0
+Boundary at x = 0
 ```{math}
 D  ∂w/∂x-cA_x w=0
 ```
-| Boundary at x = Lx
+Boundary at x = Lx
 ```{math}
 D  ∂w/∂x+cA_x w=0
 ```
 The discretized equations are based on the forward and backward three points formula (Necati book) as per the below:
 
-| Forward Difference Approximation (first derivative - three points formula) for x=0
+Forward Difference Approximation (first derivative - three points formula) for x=0
 ```{math}
 ∂w/∂x=(-3 w_{0}^{n+1}+4w_{1}^{n+1}- w_{2}^{n+1})/(2∆x)
 ```
-| Backward Difference Approximation (first derivative - three points formula) for x=Lx
+Backward Difference Approximation (first derivative - three points formula) for x=Lx
 ```{math}
 ∂w/∂x=(3 w_{L_x}^{n+1}-4w_{L_{x-1}}^{n+1}+ w_{L_{x-2}}^{n+1})/(2∆x)
 ```
 And the discretized boundary reshaped are:
-| Boundary at x = 0
+Boundary at x = 0
 ```{math}
 w_{0}^{n+1}=   (4w_{1}^{n+1}-2w_{2}^{n+1})/(3+(2 A_{x_{0}}∆x)/D_{x})=boundary at x=0
 ```
-| Boundary at x = Lx
+Boundary at x = Lx
 ```{math}
 w_{L_{x}}^{n+1}=   (4w_{L_{x-1}}^{n+1}-2w_{L_{x-2}}^{n+1})/(3+(2 A_{x_{L_x}}∆x)/D_{x})=boundary at x=Lx
 ```

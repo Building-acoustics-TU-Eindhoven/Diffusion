@@ -100,15 +100,15 @@ P_(i_s)^n=source term (soft source) at position i_s and at the time step of n; t
 m = air absorption coefficient = 0 from Billon paper 2008
 
 10. Define boundary conditions:
-| Boundary at x = 0 |br|
+| Boundary at x = 0
 ```{math}
 D  ∂w/∂x-cA_x w=0
 ```
-| Boundary at x = Lx |br|
+| Boundary at x = Lx
 ```{math}
 D  ∂w/∂x+cA_x w=0
 ```
-The discretized equations are based on the forward and backward three points formula (Necati book) as per the below: |br|
+The discretized equations are based on the forward and backward three points formula (Necati book) as per the below:
 
 | Forward Difference Approximation (first derivative - three points formula) for x=0
 ```{math}

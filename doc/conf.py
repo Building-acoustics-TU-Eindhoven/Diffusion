@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'DiffusionEquationCode'
+project = 'Diffusion Equation Code'
 copyright = '2023, Ilaria Fichera'
 author = 'Ilaria Fichera'
 

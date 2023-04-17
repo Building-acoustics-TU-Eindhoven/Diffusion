@@ -36,6 +36,7 @@ jobs:
       - name: Build HTML
         run: | 
           cd doc/
+          touch .nojekill
           make html
 
       # Runs a set of commands using the runners shell

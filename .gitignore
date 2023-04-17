@@ -8,3 +8,4 @@ w_rec.npy
 .spyproject
 DiffEq3DOLD.py
 FunctionRT1.py
+doc/.ipynb_checkpoints/

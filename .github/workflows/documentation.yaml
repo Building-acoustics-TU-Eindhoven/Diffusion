@@ -1,4 +1,4 @@
-name: Docs
+name: Docs Pages Workflow
 on: [push, pull_request, workflow_dispatch]
 permissions:
     contents: write
@@ -10,15 +10,18 @@ jobs:
       - uses: actions/setup-python@v3
       - name: Install dependencies
         run: |
+          pip install sphinx
           pip install sphinx sphinx_rtd_theme
       - name: Sphinx build
         run: |
+          cd doc/_build/
           sphinx-build doc _build
+          touch .nojekill
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         with:
           publish_branch: master
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: _build/
+          publish_dir: ./doc/_build/
           force_orphan: true

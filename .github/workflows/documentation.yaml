@@ -37,9 +37,6 @@ jobs:
         run: | 
           cd doc/
           make html
-      - name: Run ghp-import
-        run: | 
-          ghp-import -n -p -f doc/_build/html
 
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script

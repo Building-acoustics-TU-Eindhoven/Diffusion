@@ -15,7 +15,7 @@ jobs:
       - name: Sphinx build
         run: |
           cd doc/_build/
-          sphinx-build doc _build
+          sphinx-build _build
           touch .nojekill
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3

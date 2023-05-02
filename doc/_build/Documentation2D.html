@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Diffusion Equation Code 1D documentation &#8212; Diffusion Equation Code 0.1 documentation</title>
+    <title>Diffusion Equation Code 2D documentation &#8212; Diffusion Equation Code 0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
@@ -17,8 +17,8 @@
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Diffusion Equation Code 2D documentation" href="Documentation2D.html" />
-    <link rel="prev" title="Welcome to DiffusionEquationCode’s documentation!" href="index.html" />
+    <link rel="next" title="Diffusion Equation Code 2D documentation" href="Documentation3D.html" />
+    <link rel="prev" title="Diffusion Equation Code 1D documentation" href="Documentation1D.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -35,12 +35,12 @@
 
           <div class="body" role="main">
             
-  <section id="diffusion-equation-code-1d-documentation">
-<h1>Diffusion Equation Code 1D documentation<a class="headerlink" href="#diffusion-equation-code-1d-documentation" title="Permalink to this heading">¶</a></h1>
+  <section id="diffusion-equation-code-2d-documentation">
+<h1>Diffusion Equation Code 2D documentation<a class="headerlink" href="#diffusion-equation-code-2d-documentation" title="Permalink to this heading">¶</a></h1>
 <p>The code is based on the Du Fort and Frankel method (explicit unconditionally stable Finite difference method).</p>
 <section id="objectives-what-it-can-do">
 <h2>Objectives/what it can do<a class="headerlink" href="#objectives-what-it-can-do" title="Permalink to this heading">¶</a></h2>
-<p>This code can calculate the acoustics energy density over time and space. It will give an acoustics energy distribution of the line.</p>
+<p>This code can calculate the acoustics energy density over time and space. It will give an acoustics energy distribution of the plane xy.</p>
 </section>
 <section id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading">¶</a></h2>
@@ -55,9 +55,9 @@
 <li><p>import math</p></li>
 <li><p>import matplotlib.pyplot as plt #import matplotlib as mpl</p></li>
 <li><p>import numpy as np</p></li>
-<li><p>from drawnow import drawnow</p></li>
 <li><p>from math import ceil</p></li>
 <li><p>from math import log</p></li>
+<li><p>from math import pi</p></li>
 <li><p>from FunctionRT import *</p></li>
 </ul>
 </section>
@@ -65,9 +65,9 @@
 <h2>Inputs<a class="headerlink" href="#inputs" title="Permalink to this heading">¶</a></h2>
 <p>The inputs are:</p>
 <ul class="simple">
-<li><p>Length of the line lmax in m;</p></li>
+<li><p>Length of the line x direction lxmax in m and line in y direction in m;</p></li>
 <li><p>Air absorption m_atm in 1/m;</p></li>
-<li><p>Distance between grid points dx in m;</p></li>
+<li><p>Distance between grid points dx and dy in m;</p></li>
 <li><p>Distance between grid points on the time discretization dt in s;</p></li>
 <li><p>Recording time of the calculation in s;</p></li>
 <li><p>Source time (time of the source beeing on before interrupting);</p></li>
@@ -82,25 +82,25 @@
 <section id="implementation">
 <h2>Implementation<a class="headerlink" href="#implementation" title="Permalink to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p>Geometry model - Set up the dimension of the line</p></li>
-<li><p>Set up the spatial distribution and temporal distribution (dx and dt)</p></li>
-<li><p>Calculate Absorption term based on one absorption coefficient and the type of absorption condition (Sabine, Eyring or Modified).</p></li>
-<li><p>Define Diffusion coefficient Dx as a constant:</p></li>
+<li><p>Geometry model - Set up the dimension of the line\</p></li>
+<li><p>Set up the spatial distribution and temporal distribution (dx, dy and dt)\</p></li>
+<li><p>Calculate Absorption term based on one absorption coefficient and the type of absorption condition (Sabine, Eyring or Modified)\</p></li>
+<li><p>Define Diffusion coefficient Dx and Dy as constants:</p></li>
 </ol>
 <div class="math notranslate nohighlight">
-\[Dx = (λc)/3\]</div>
+\[Dx = Dy = (λc)/3\]</div>
 <p>Where:
-λ = mean free path = length of the line</p>
+λ = mean free path</p>
 <ol class="arabic simple" start="5">
-<li><p>Define stability criterion (Eq. 18 of Navarro 2012)</p></li>
+<li><p>Define stability criterion (Eq. 18 of Navarro 2012) \</p></li>
 </ol>
 <div class="math notranslate nohighlight">
 \[(β_0^{-1}/(1+β_0^2+2β_0)≤ 1\]</div>
 <p>Where beta_zero comes from the discretization of the diffusion equation.</p>
 <ol class="arabic simple" start="6">
-<li><p>Define source:
-The source is positioned at x (to define) in the line and it changes over time depending on the recording time and the source time. The source is defined with intermittant noise level.</p></li>
-<li><p>Define receiver:
+<li><p>Define source:<br />
+The source is positioned at x,y (to define) in the plane and it changes over time depending on the recording time and the source time. The source is defined with intermittant noise level.</p></li>
+<li><p>Define receiver: <br />
 The receiver position will need to be defined.</p></li>
 <li><p>Define the energy density temporal discretization:
 <img alt="" src="1DGrid.png" /></p></li>
@@ -111,44 +111,49 @@ The receiver position will need to be defined.</p></li>
 <li><p>w_old = energy density at n-1 level</p></li>
 </ul>
 <ol class="arabic simple" start="9">
-<li><p>According to Dufort and Frankel method, we will need the energy density at the following points to get the energy density at the point – based on Navarro 2012</p></li>
+<li><p>According to Dufort and Frankel method, the discretaization is based on the following image – based on Navarro 2012</p></li>
 </ol>
 <ul class="simple">
 <li><p>i is the spatial element along x direction</p></li>
+<li><p>j is the spatial element along y direction</p></li>
 <li><p>n is the temporal element</p></li>
 </ul>
 <p>The partial differential equation is:</p>
 <div class="math notranslate nohighlight">
-\[∂w/∂t- D((∂^2 w)/(∂x^2 ))+ cmw=Pδ(r-r_s ) in V\]</div>
+\[∂w/∂t- D((∂^2 w)/(∂x^2 )+(∂^2 w)/(∂y^2 ))+ cmw=Pδ(r-r_s ) in V\]</div>
 <p>Each term of the equation is discretized as follows:</p>
 <div class="math notranslate nohighlight">
 \[∂w/∂t=(w_{i}^{n+1}- w_{i}^{n-1})/(2∆t)\]</div>
 <div class="math notranslate nohighlight">
-\[∂^2 w/∂x^2=(w_{i+1}^n - 2((w_{i}^{n+1}+w_{i}^{n-1})/2)+w_{i-1}^n)/(∆x)^2\]</div>
+\[∂^2 w/∂x^2=(w_{i+1,j}^n - 2((w_{i,j}^{n+1}+w_{i,j}^{n-1})/2)+w_{i-1,j}^n)/(∆x)^2\]</div>
 <div class="math notranslate nohighlight">
-\[cmw=cmw_{i}^n\]</div>
+\[∂^2 w/∂y^2=(w_{i,j+1}^n - 2((w_{i,j}^{n+1}+w_{i,j}^{n-1})/2)+w_{i,j-1}^n)/(∆y)^2\]</div>
 <div class="math notranslate nohighlight">
-\[Pδ(r-r_s )=P_{i}^n\]</div>
+\[cmw=cmw_{i,j}^n\]</div>
+<div class="math notranslate nohighlight">
+\[Pδ(r-r_s )=P_{i,j}^n\]</div>
 <p>The full discretised equation is:</p>
 <div class="math notranslate nohighlight">
-\[w_{i}^{n+1}=   (w_{i}^{n-1}(1-β_{0{x}} )-2∆tc_0mw_{i}^n - 2∆tP_{i_s}^n + β_{0{x}}(w_{i+1}^n+ w_{i-1}^n ))/(1+ β_{0{x}})\]</div>
+\[w_{i,j}^{n+1}=   (w_{i,j}^{n-1}(1-β_{0} )-2∆tc_0mw_{i,j}^n - 2∆tP_{i_s,j_s}^n + β_{0{x}}(w_{i+1,j}^n+ w_{i-1,j}^n )++ β_{0{y}}(w_{i,j+1}^n+ w_{i,j-1}^n ))/(1+ β_{0})\]</div>
 <p>Where:</p>
 <div class="math notranslate nohighlight">
-\[β_{0{x}}=(2D∆t)/(∆x)^2 \]</div>
+\[β_{0{x}}=β_{0{y}}=(2D∆t)/(∆x)^2 \]</div>
+<p>And</p>
+<div class="math notranslate nohighlight">
+\[β_{0}=β_{0{x}}+β_{0{y}} \]</div>
+<p>And</p>
 <div class="math notranslate nohighlight">
 \[c_0=343 m/s\]</div>
-<p>P_(i_s)^n=source term (soft source) at position i_s and at the time step of n; this comes from the source term function (Navarro 2012) <span class="math notranslate nohighlight">\(w_{i_s}^{n+1}= w_{i_s}^{n+1}+2∆tP_{i_s}^n\)</span></p>
+<p>P_(i_s,j_s)^n=source term (soft source) at position i_s,j_s and at the time step of n; this comes from the source term function (Navarro 2012) <span class="math notranslate nohighlight">\(w_{i_s,j_s}^{n+1}= w_{i_s,j_s}^{n+1}+2∆tP_{i_s,j_s}^n\)</span></p>
 <p>m = air absorption coefficient = 0 from Billon paper 2008</p>
 <ol class="arabic simple" start="10">
-<li><p>Define boundary conditions:
-Boundary at x = 0</p></li>
+<li><p>Define boundary conditions:</p></li>
 </ol>
-<div class="math notranslate nohighlight">
-\[D  ∂w/∂x-cA_x w=0\]</div>
-<p>Boundary at x = Lx</p>
-<div class="math notranslate nohighlight">
-\[D  ∂w/∂x+cA_x w=0\]</div>
-<p>The discretized equations are based on the forward and backward three points formula (Necati book) as per the below:</p>
+<p>| Boundary at x = 0  | 1 |
+| Boundary at y = 0  | 2 |
+| Boundary at x = Lx | 3 |
+| Boundary at y = Lx | 4 |</p>
+<p>The discretized equations are based on the forward and backward three points formula (Necati book). Only the one directional formulas have been included as examples.</p>
 <p>Forward Difference Approximation (first derivative - three points formula) for x=0</p>
 <div class="math notranslate nohighlight">
 \[∂w/∂x=(-3 w_{0}^{n+1}+4w_{1}^{n+1}- w_{2}^{n+1})/(2∆x)\]</div>
@@ -166,9 +171,9 @@ Boundary at x = 0</p>
 <li><p>Calculate Sound Density Level and Sound Pressure Level:</p></li>
 </ol>
 <div class="math notranslate nohighlight">
-\[SDL = 10 log_10⁡(w_{i}^{n+1})\]</div>
+\[SDL = 10 log_10⁡(w_{i,j}^{n+1})\]</div>
 <div class="math notranslate nohighlight">
-\[SPL = 20 log_10⁡(((w_{i_r}^{n+1}ρc_{0}^2 ))/p_{ref}^2) \]</div>
+\[SPL = 20 log_10⁡(((w_{i_r,j_r}^{n+1}ρc_{0}^2 ))/p_{ref}^2) \]</div>
 <ol class="arabic simple" start="12">
 <li><p>Calculate Reverberation time:
 The Reverberation time is calculated using backward integration and in between -5 and -35 dB difference.</p></li>
@@ -205,7 +210,8 @@ The values are calculate from the Barron’s revisited theory formulas (Vorlande
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Diffusion Equation Code 1D documentation</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="Documentation1D.html">Diffusion Equation Code 1D documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Diffusion Equation Code 2D documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#objectives-what-it-can-do">Objectives/what it can do</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#libraries">Libraries</a></li>
@@ -214,7 +220,6 @@ The values are calculate from the Barron’s revisited theory formulas (Vorlande
 <li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="Documentation2D.html">Diffusion Equation Code 2D documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Documentation3D.html">Diffusion Equation Code 2D documentation</a></li>
 </ul>
 
@@ -222,8 +227,8 @@ The values are calculate from the Barron’s revisited theory formulas (Vorlande
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="index.html" title="previous chapter">Welcome to DiffusionEquationCode’s documentation!</a></li>
-      <li>Next: <a href="Documentation2D.html" title="next chapter">Diffusion Equation Code 2D documentation</a></li>
+      <li>Previous: <a href="Documentation1D.html" title="previous chapter">Diffusion Equation Code 1D documentation</a></li>
+      <li>Next: <a href="Documentation3D.html" title="next chapter">Diffusion Equation Code 2D documentation</a></li>
   </ul></li>
 </ul>
 </div>
@@ -257,7 +262,7 @@ The values are calculate from the Barron’s revisited theory formulas (Vorlande
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
-      <a href="_sources/Documentation1D.md.txt"
+      <a href="_sources/Documentation2D.md.txt"
           rel="nofollow">Page source</a>
     </div>
 

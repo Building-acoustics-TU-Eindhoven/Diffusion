@@ -59,7 +59,7 @@ The source is positioned at x (to define) in the line and it changes over time d
 The receiver position will need to be defined.
 
 8. Define the energy density temporal discretization:
-![](1DGrid.png)
+
 
 - w\_new = unknown energy density at new time level (n+1)
 - w = energy density at n level

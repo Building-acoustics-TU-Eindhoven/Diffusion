@@ -147,12 +147,35 @@ The receiver position will need to be defined.</p></li>
 <p>P_(i_s,j_s)^n=source term (soft source) at position i_s,j_s and at the time step of n; this comes from the source term function (Navarro 2012) <span class="math notranslate nohighlight">\(w_{i_s,j_s}^{n+1}= w_{i_s,j_s}^{n+1}+2∆tP_{i_s,j_s}^n\)</span></p>
 <p>m = air absorption coefficient = 0 from Billon paper 2008</p>
 <ol class="arabic simple" start="10">
-<li><p>Define boundary conditions:</p></li>
+<li><p>Define boundary conditions:
+:::{table} Boundary conditions
+:widths: auto
+:align: center</p></li>
 </ol>
-<p>| Boundary at x = 0  | 1 |
-| Boundary at y = 0  | 2 |
-| Boundary at x = Lx | 3 |
-| Boundary at y = Lx | 4 |</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Boundaries</p></th>
+<th class="head"><p>Formula</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Boundary at x = 0</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>Boundary at y = 0</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-even"><td><p>Boundary at x = Lx</p></td>
+<td><p>3</p></td>
+</tr>
+<tr class="row-odd"><td><p>Boundary at y = Lx</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-even"><td><p>:::</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
 <p>The discretized equations are based on the forward and backward three points formula (Necati book). Only the one directional formulas have been included as examples.</p>
 <p>Forward Difference Approximation (first derivative - three points formula) for x=0</p>
 <div class="math notranslate nohighlight">

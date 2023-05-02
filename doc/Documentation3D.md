@@ -112,11 +112,17 @@ P_(i_s,j_s)^n=source term (soft source) at position i_s,j_s and at the time step
 m = air absorption coefficient = 0 from Billon paper 2008
 
 10. Define boundary conditions:
+:::{table} Boundary conditions
+:widths: auto
+:align: center
 
+| Boundaries         | Formula                  |
+| ------------------ | ------------------------ |
 | Boundary at x = 0  | {math}`D ∂w/∂x-cA_x w=0` |
 | Boundary at y = 0  | {math}`D ∂w/∂y-cA_y w=0` |
 | Boundary at x = Lx | {math}`D ∂w/∂x+cA_x w=0` |
 | Boundary at y = Lx | {math}`D ∂w/∂y+cA_y w=0` |
+:::
 
 The discretized equations are based on the forward and backward three points formula (Necati book). Only the one directional formulas have been included as examples.
 

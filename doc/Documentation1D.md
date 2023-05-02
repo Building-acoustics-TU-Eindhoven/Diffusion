@@ -59,13 +59,13 @@ The source is positioned at x (to define) in the line and it changes over time d
 The receiver position will need to be defined.
 
 8. Define the energy density temporal discretization:
-![](1DGrid.png)
 
 - w\_new = unknown energy density at new time level (n+1)
 - w = energy density at n level
 - w\_old = energy density at n-1 level
 
 9. According to Dufort and Frankel method, we will need the energy density at the following points to get the energy density at the point – based on Navarro 2012
+![Grid 1D](images/1DGrid.png)
 
 - i is the spatial element along x direction
 - n is the temporal element

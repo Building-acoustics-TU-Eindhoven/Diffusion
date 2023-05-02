@@ -32,13 +32,13 @@ The inputs are:
 - Absorption coefficient of the surface alpha for one frequency only;
 - Source point power Ws in Watts;
 - Volume of the source Vs in m^3;
-- Position of the source x_source in m in the x direction;
-- Position of the receiver x_rec in m in the x direction.
+- Position of the source x_source,y_source in m in the x,y directions;
+- Position of the receiver x_rec,y_rec in m in the x,y directions.
 
 ## Implementation
-1. Geometry model - Set up the dimension of the line\
-2. Set up the spatial distribution and temporal distribution (dx, dy and dt)\
-3. Calculate Absorption term based on one absorption coefficient and the type of absorption condition (Sabine, Eyring or Modified)\
+1. Geometry model - Set up the dimension of the plane \
+2. Set up the spatial distribution and temporal distribution (dx, dy and dt) \
+3. Calculate Absorption term based on one absorption coefficient and the type of absorption condition (Sabine, Eyring or Modified) \
 4. Define Diffusion coefficient Dx and Dy as constants:
 ```{math}
 Dx = Dy = (λc)/3
@@ -77,7 +77,7 @@ The partial differential equation is:
 ```
 Each term of the equation is discretized as follows:
 ```{math}
-∂w/∂t=(w_{i}^{n+1}- w_{i}^{n-1})/(2∆t)
+∂w/∂t=(w_{i,j}^{n+1}- w_{i,j}^{n-1})/(2∆t)
 ```
 ```{math}
 ∂^2 w/∂x^2=(w_{i+1,j}^n - 2((w_{i,j}^{n+1}+w_{i,j}^{n-1})/2)+w_{i-1,j}^n)/(∆x)^2

@@ -1,4 +1,4 @@
-# Diffusion Equation Code 1D documentation
+# Diffusion Equation Code 2D documentation
 
 The code is based on the Du Fort and Frankel method (explicit unconditionally stable Finite difference method).
 
@@ -113,10 +113,10 @@ m = air absorption coefficient = 0 from Billon paper 2008
 
 10. Define boundary conditions:
 
-| Boundary at x = 0  | {math}`D ∂w/∂x-cA_x w=0` |
-| Boundary at y = 0  | {math}`D ∂w/∂y-cA_y w=0` |
-| Boundary at x = Lx | {math}`D ∂w/∂x+cA_x w=0` |
-| Boundary at y = Lx | {math}`D ∂w/∂y+cA_y w=0` |
+| Boundary at x = 0  | 1 |
+| Boundary at y = 0  | 2 |
+| Boundary at x = Lx | 3 |
+| Boundary at y = Lx | 4 |
 
 The discretized equations are based on the forward and backward three points formula (Necati book). Only the one directional formulas have been included as examples.
 

@@ -11,6 +11,8 @@ Welcome to DiffusionEquationCode's documentation!
    :caption: Contents:
 
    Documentation1D.md
+   Documentation2D.md
+   Documentation3D.md
 
 Indices and tables
 ==================

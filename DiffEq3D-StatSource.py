@@ -36,7 +36,7 @@ m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro p
 pRef = 2 * (10**-5) #Reference pressure
 
 #Spatial discretization
-dx = 0.2 #distance between grid points x direction [m]
+dx = 0.25 #distance between grid points x direction [m]
 dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
@@ -139,6 +139,7 @@ rows_r = np.argmin(abs(xx[:,0,0] - coord_receiver[0])) #Find index of grid point
 cols_r = np.argmin(abs(yy[0,:,0] - coord_receiver[1])) #Find index of grid point with minimum distance from receiver along y direction
 dept_r = np.argmin(abs(zz[0,0,:] - coord_receiver[2])) #Find index of grid point with minimum distance from receiver along z direction
 
+#Gaussian distribution
 #n_gau = 1 #??
 #sigmax_gau = n_gau*dx #??
 #Ax_gau = 5e-3 #??
@@ -149,7 +150,7 @@ dept_r = np.argmin(abs(zz[0,0,:] - coord_receiver[2])) #Find index of grid point
 #P = np.multiply(Ax_gau, np.exp(np.multiply(-ax_gau,(power_x+power_y+power_z)))) #??
 P = np.zeros((Nx,Ny,Nz)) #matrix of zeros for source
 radius_s = 0.2 #[m]
-Vs = 1#4/3*math.pi*(radius_s**3) #????????????????????????????
+Vs = dx*dy*dz #4/3*math.pi*(radius_s**3) #????????????????????????????
 Ws = 0.01 # power of the source in [W]
 P[rows_s, cols_s, dept_s] = Ws/Vs
 

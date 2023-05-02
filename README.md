@@ -10,9 +10,9 @@ Version 1.0
 
 ## Documentation
 Documentation documents can be found below:
-Documentation 1D - [A link](https://ilariafichera.github.io/Diffusion/Documentation1D.html)
-Documentation 2D - [A link](https://ilariafichera.github.io/Diffusion/Documentation2D.html)
-Documentation 3D - [A link](https://ilariafichera.github.io/Diffusion/Documentation3D.html)
+- [Documentation 1D](https://ilariafichera.github.io/Diffusion/Documentation1D.html)
+- [Documentation 2D](https://ilariafichera.github.io/Diffusion/Documentation2D.html)
+- [Documentation 3D](https://ilariafichera.github.io/Diffusion/Documentation3D.html)
 
 ### How to run the code
 The code is based on the finite different method Du Fort&Frankel.

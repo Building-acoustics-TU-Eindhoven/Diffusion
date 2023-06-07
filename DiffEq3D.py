@@ -42,7 +42,7 @@ dz = dx #distance between grid points z direction [m]
 
 #Time discretization
 dt = 1/32000 #distance between grid points on the time discretization [s]
-recording_time = 3 #time recorded for the source [s]
+recording_time = 4 #time recorded for the source [s]
 recording_steps = ceil(recording_time/dt) #number of time steps to consider in the calculation
 t = np.arange(0, recording_time, dt) #mesh point in time
 
@@ -51,11 +51,11 @@ fsample = 1/dt #frequency spatial resolution (sampling period)
 
 #Room dimensions
 lxmin = 0 #point x starts at zero [m]
-lxmax = 8.0 #point x finish at the length of the room in the x direction [m] %Length
+lxmax = 6.0 #point x finish at the length of the room in the x direction [m] %Length
 lymin = 0 #point y starts at zero [m]
-lymax = 8.0 #point y finish at the length of the room in the y direction [m] %Width
+lymax = 6.0 #point y finish at the length of the room in the y direction [m] %Width
 lzmin = 0 #point z starts at zero [m]
-lzmax = 8.0 #point z finish at the length of the room in the x direction [m] %Height
+lzmax = 6.0 #point z finish at the length of the room in the x direction [m] %Height
 
 S1,S2 = lxmax*lymax, lxmax*lymax #xy planes
 S3,S4 = lxmax*lzmax, lxmax*lzmax #xz planes
@@ -87,13 +87,13 @@ def abs_term(th,alpha):
         Absx = (c0*alpha)/(2*(2-alpha)) #Modified by Xiang
     return Absx
 
-th = 3 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 just to understand the type of boundary chosen
-alpha_1 = 1/6 #Absorption coefficient for Surface1
-alpha_2 = 1/6 #Absorption coefficient for Surface2
-alpha_3 = 1/6 #Absorption coefficient for Surface3
-alpha_4 = 1/6 #Absorption coefficient for Surface4
-alpha_5 = 1/6 #Absorption coefficient for Surface5
-alpha_6 = 1/6 #Absorption coefficient for Surface6
+th = 2 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 just to understand the type of boundary chosen
+alpha_1 = 0.9 #Absorption coefficient for Surface1
+alpha_2 = 0.9 #Absorption coefficient for Surface2
+alpha_3 = 0.9 #Absorption coefficient for Surface3
+alpha_4 = 0.9 #Absorption coefficient for Surface4
+alpha_5 = 0.9 #Absorption coefficient for Surface5
+alpha_6 = 0.9 #Absorption coefficient for Surface6
 
 Abs_1 = abs_term(th,alpha_1) #absorption term for S1
 Abs_2 = abs_term(th,alpha_2) #absorption term for S2
@@ -122,7 +122,7 @@ if beta_zero_condition >1:
     print("aa! errors! Check beta condition")
 
 #Set initial condition - Source Info (interrupted method)
-Ws=0.005 #Source point power [Watts] interrupted after 2seconds; 10^-2 value taken from Jing 2007; correspondent to a SWL of 100dB
+Ws=10**(-2) #Source point power [Watts] interrupted after 2seconds; 10^-2 value taken from Jing 2007; correspondent to a SWL of 100dB
 Vs=0.2
 w1=Ws
 #w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
@@ -132,9 +132,9 @@ s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 
 source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
 
 #Finding index in meshgrid of the source position
-x_source = 4.0 #int(ceil(Nx/2))#4 #position of the source in the x direction [m]
-y_source = 4.0 #int(ceil(Ny/2))#4 #position of the source in the y direction [m]
-z_source = 4.0 #int(ceil(Nz/2))#4 #position of the source in the z direction [m]
+x_source = 3.0 #int(ceil(Nx/2))#4 #position of the source in the x direction [m]
+y_source = 3.0 #int(ceil(Ny/2))#4 #position of the source in the y direction [m]
+z_source = 3.0 #int(ceil(Nz/2))#4 #position of the source in the z direction [m]
 coord_source = [x_source , y_source, z_source] #coordinates of the source position in an list
 rows_s = np.argmin(abs(xx[:,0,0] - coord_source[0])) #Find index of grid point with minimum distance from source along x direction
 cols_s = np.argmin(abs(yy[0,:,0] - coord_source[1])) #Find index of grid point with minimum distance from source along y direction

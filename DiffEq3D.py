@@ -32,7 +32,7 @@ st = time.time() #start time
 #General settings
 c0= 343 #sound particle velocity [m.s^-1]
 rho = 1.21 #air density [Kg.m^-3] at 20°C
-m_atm = 10**(-2) #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
+m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 pRef = 2 * (10**-5) #Reference pressure
 
 #Spatial discretization
@@ -51,11 +51,11 @@ fsample = 1/dt #frequency spatial resolution (sampling period)
 
 #Room dimensions
 lxmin = 0 #point x starts at zero [m]
-lxmax = 30.0 #point x finish at the length of the room in the x direction [m] %Length
+lxmax = 5.0 #point x finish at the length of the room in the x direction [m] %Length
 lymin = 0 #point y starts at zero [m]
-lymax = 30.0 #point y finish at the length of the room in the y direction [m] %Width
+lymax = 5.0 #point y finish at the length of the room in the y direction [m] %Width
 lzmin = 0 #point z starts at zero [m]
-lzmax = 3.0 #point z finish at the length of the room in the x direction [m] %Height
+lzmax = 5.0 #point z finish at the length of the room in the x direction [m] %Height
 
 S1,S2 = lxmax*lymax, lxmax*lymax #xy planes
 S3,S4 = lxmax*lzmax, lxmax*lzmax #xz planes
@@ -87,13 +87,13 @@ def abs_term(th,alpha):
         Absx = (c0*alpha)/(2*(2-alpha)) #Modified by Xiang
     return Absx
 
-th = 2 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 just to understand the type of boundary chosen
-alpha_1 = 0.1 #Absorption coefficient for Surface1
-alpha_2 = 0.1 #Absorption coefficient for Surface2
-alpha_3 = 0.1 #Absorption coefficient for Surface3
-alpha_4 = 0.1 #Absorption coefficient for Surface4
-alpha_5 = 0.1 #Absorption coefficient for Surface5
-alpha_6 = 0.1 #Absorption coefficient for Surface6
+th = 3 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 just to understand the type of boundary chosen
+alpha_1 = 0.5 #Absorption coefficient for Surface1
+alpha_2 = 0.5 #Absorption coefficient for Surface2
+alpha_3 = 0.5 #Absorption coefficient for Surface3
+alpha_4 = 0.5 #Absorption coefficient for Surface4
+alpha_5 = 1.0 #Absorption coefficient for Surface5
+alpha_6 = 0.5 #Absorption coefficient for Surface6
 
 Abs_1 = abs_term(th,alpha_1) #absorption term for S1
 Abs_2 = abs_term(th,alpha_2) #absorption term for S2
@@ -132,18 +132,18 @@ s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 
 source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
 
 #Finding index in meshgrid of the source position
-x_source = 2.0 #int(ceil(Nx/2))#4 #position of the source in the x direction [m]
-y_source = 2.0 #int(ceil(Ny/2))#4 #position of the source in the y direction [m]
-z_source = 1.0 #int(ceil(Nz/2))#4 #position of the source in the z direction [m]
+x_source = 2.5 #int(ceil(Nx/2))#4 #position of the source in the x direction [m]
+y_source = 2.5 #int(ceil(Ny/2))#4 #position of the source in the y direction [m]
+z_source = 2.5 #int(ceil(Nz/2))#4 #position of the source in the z direction [m]
 coord_source = [x_source , y_source, z_source] #coordinates of the source position in an list
 rows_s = np.argmin(abs(xx[:,0,0] - coord_source[0])) #Find index of grid point with minimum distance from source along x direction
 cols_s = np.argmin(abs(yy[0,:,0] - coord_source[1])) #Find index of grid point with minimum distance from source along y direction
 dept_s = np.argmin(abs(zz[0,0,:] - coord_source[2])) #Find index of grid point with minimum distance from source along z direction
 
 #Finding index in meshgrid of the receiver position
-x_rec = 10.0 #int(ceil(Nx/4)) #position of the receiver in the x direction [m]
-y_rec = 2.0 #int(ceil(Nx/4)) #position of the receiver in the y direction [m]
-z_rec = 1.0 #int(ceil(Nx/4)) #position of the receiver in the z direction [m]
+x_rec = 3.5 #int(ceil(Nx/4)) #position of the receiver in the x direction [m]
+y_rec = 3.5 #int(ceil(Nx/4)) #position of the receiver in the y direction [m]
+z_rec = 3.5 #int(ceil(Nx/4)) #position of the receiver in the z direction [m]
 coord_receiver = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
 rows_r = np.argmin(abs(xx[:,0,0] - coord_receiver[0])) #Find index of grid point with minimum distance from receiver along x direction
 cols_r = np.argmin(abs(yy[0,:,0] - coord_receiver[1])) #Find index of grid point with minimum distance from receiver along y direction

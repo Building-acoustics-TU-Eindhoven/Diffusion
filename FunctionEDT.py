@@ -8,19 +8,17 @@ import matplotlib.pyplot as plt #import matplotlib as mpl
 import numpy as np
 from scipy import stats
 
-def t60_decay(t, sch_db, idx_w_rec):
+def edt_decay(t, sch_db, idx_w_rec):
     """
     Reverberation time from a Schroeder decay (Schroeder 1965)
     :param t: time axis
     :param sch_db: name of the Schroeder decay calculated with the diffusion equation.
-    :param idx_w_rec: Index at which the t array is equal to the sourceon_time - calculation of RT from when the source stops.
-    :returns: Reverberation time T_{60}
+    :param idx_w_rec: Index at which the t array is equal to the sourceon_time - calculation of EDT from when the source stops.
+    :returns: Early Decay Time edt
     """    
-    init = -5.0 #because I want the T30, I need to start at -5
-    end = -35.0 #because I want the T30, I need to finish at -35
-    factor = 2.0 #factor of 2 since I need the T30
-    
-    #rt_decay = sch_db #decay to be used to calculate the RT
+    init = 0.0 #because I want the edt, I need to start at 0
+    end = -10.0 #because I want the edt, I need to finish at -10
+    factor = 6.0 #factor of 2 since I need the edt
     
     #Linear regression
     idxL1 = np.where(sch_db <= init)[0][0] #index at which the rtdecay is equal to -5
@@ -36,12 +34,12 @@ def t60_decay(t, sch_db, idx_w_rec):
     slope,intercept = stats.linregress(t[idxL1:idxL2],sch_db[idxL1:idxL2])[0:2] #calculating the slope and the interception of the line connecting the two points
     db_regress_init = (init - intercept) / slope #dB initial
     db_regress_end = (end - intercept) / slope #dB End
-    t60I = factor * (db_regress_end - db_regress_init) #t60 according to linregress approach
+    edtI = factor * (db_regress_end - db_regress_init) #t60 according to linregress approach
     
     # Poly-based Approach y = Ax + B
     CoefAlpha = np.polyfit(t[idxL1:idxL2], sch_db[idxL1:idxL2], 1) ##calculating the slope and the interception of the line connecting the two points
-    t60 = (-60/CoefAlpha[0]) #t60 according to polyfit approach
-    
+    edt = (-60/CoefAlpha[0]) #t60 according to polyfit approach
+        
     y_axis = (slope*t[idx_w_rec:] + intercept) + slope
 
     plt.figure()
@@ -49,13 +47,13 @@ def t60_decay(t, sch_db, idx_w_rec):
     plt.plot(t[idx_w_rec:],y_axis,color='r',linewidth=2)
     plt.plot(t[idx_w_rec:][idxL1],np.real(sch_db[idxL1]),'o',linewidth=2)
     plt.plot(t[idx_w_rec:][idxL2],np.real(sch_db[idxL2]),'o',linewidth=2)
-    plt.axvline(x=t60,ymin=-100,ymax=0,linestyle='--',linewidth=2)
+    plt.axvline(x=edt,ymin=-100,ymax=0,linestyle='--',linewidth=2)
     plt.ylabel('Normalized Magnitude (dB)')
     plt.xlabel('Time (s)')
-    plt.legend(['EDC','Line Fitting','Upper Point','Lower Point','Estimate T_{30}'])
-    plt.title('T_{30} = ' + str(round(t60,2)) + ' s.')
+    plt.legend(['EDC','Line Fitting','Upper Point','Lower Point','Estimate EDT'])
+    plt.title('EDT = ' + str(round(edt,2)) + ' s.')
     plt.grid(True)
     plt.ylim([-100,0])
     plt.show()
     
-    return t60
+    return edt

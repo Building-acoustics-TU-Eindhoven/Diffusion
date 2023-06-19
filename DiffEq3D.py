@@ -14,8 +14,8 @@ import sys
 #from drawnow import drawnow
 from math import ceil
 from math import log
-#from FunctionRT import *
-#from FunctionRT1 import *
+from FunctionRT import *
+from FunctionEDT import *
 from FunctionClarity import *
 from FunctionDefinition import *
 from FunctionCentreTime import *
@@ -32,17 +32,17 @@ st = time.time() #start time
 #General settings
 c0= 343 #sound particle velocity [m.s^-1]
 rho = 1.21 #air density [Kg.m^-3] at 20°C
-m_atm = 1.202 * 10**(-3) #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
+m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 pRef = 2 * (10**-5) #Reference pressure
 
 #Spatial discretization
-dx = 0.5 #distance between grid points x direction [m]
+dx = 0.2 #distance between grid points x direction [m]
 dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
 #Time discretization
-dt = 1/32000 #distance between grid points on the time discretization [s]
-recording_time = 4 #time recorded for the source [s]
+dt = 1/8000 #distance between grid points on the time discretization [s]
+recording_time = 2 #time recorded for the source [s]
 recording_steps = ceil(recording_time/dt) #number of time steps to consider in the calculation
 t = np.arange(0, recording_time, dt) #mesh point in time
 
@@ -51,11 +51,11 @@ fsample = 1/dt #frequency spatial resolution (sampling period)
 
 #Room dimensions
 lxmin = 0 #point x starts at zero [m]
-lxmax = 3.94 #point x finish at the length of the room in the x direction [m] %Length
+lxmax = 8 #point x finish at the length of the room in the x direction [m] %Length
 lymin = 0 #point y starts at zero [m]
-lymax = 5.36 #point y finish at the length of the room in the y direction [m] %Width
+lymax = 8 #point y finish at the length of the room in the y direction [m] %Width
 lzmin = 0 #point z starts at zero [m]
-lzmax = 2.71 #point z finish at the length of the room in the x direction [m] %Height
+lzmax = 8 #point z finish at the length of the room in the x direction [m] %Height
 
 S1,S2 = lxmax*lymax, lxmax*lymax #xy planes
 S3,S4 = lxmax*lzmax, lxmax*lzmax #xz planes
@@ -88,12 +88,12 @@ def abs_term(th,alpha):
     return Absx
 
 th = 3 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 just to understand the type of boundary chosen
-alpha_1 = 0.01 #Absorption coefficient for Surface1
-alpha_2 = 0.17 #Absorption coefficient for Surface2
-alpha_3 = 0.02 #Absorption coefficient for Surface3
-alpha_4 = 0.02 #Absorption coefficient for Surface4
-alpha_5 = 0.02 #Absorption coefficient for Surface5
-alpha_6 = 0.02 #Absorption coefficient for Surface6
+alpha_1 = 0.5 #Absorption coefficient for Surface1 - Floor
+alpha_2 = 0.5 #Absorption coefficient for Surface2 - Ceiling
+alpha_3 = 0 #Absorption coefficient for Surface3 - Wall Front
+alpha_4 = 0 #Absorption coefficient for Surface4 - Wall Back
+alpha_5 = 0 #Absorption coefficient for Surface5 - Wall Left
+alpha_6 = 0 #Absorption coefficient for Surface6 - Wall Right
 
 Abs_1 = abs_term(th,alpha_1) #absorption term for S1
 Abs_2 = abs_term(th,alpha_2) #absorption term for S2
@@ -122,28 +122,28 @@ if beta_zero_condition >1:
     print("aa! errors! Check beta condition")
 
 #Set initial condition - Source Info (interrupted method)
-Ws=0.01 #Source point power [Watts] interrupted after 2seconds; 10^-2 value taken from Jing 2007; correspondent to a SWL of 100dB
+Ws=0.005 #Source point power [Watts] interrupted after 2seconds; 10^-2 value taken from Jing 2007; correspondent to a SWL of 100dB
 Vs=0.2
 w1=Ws
 #w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
-sourceon_time =  2 #time that the source is on before interrupting [s]
+sourceon_time =  1 #time that the source is on before interrupting [s]
 sourceon_steps = ceil(sourceon_time/dt) #time steps at which the source is calculated/considered in the calculation
 s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position #does the source not need to be only at the time 0 to 2seconds and after that there should not be any source term? Yes
 source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
 
 #Finding index in meshgrid of the source position
-x_source = 1.1 #int(ceil(Nx/2))#4 #position of the source in the x direction [m]
-y_source = 1.97 #int(ceil(Ny/2))#4 #position of the source in the y direction [m]
-z_source = 1.72 #int(ceil(Nz/2))#4 #position of the source in the z direction [m]
+x_source = 4.0 #int(ceil(Nx/2))#4 #position of the source in the x direction [m]
+y_source = 4.0 #int(ceil(Ny/2))#4 #position of the source in the y direction [m]
+z_source = 4.0 #int(ceil(Nz/2))#4 #position of the source in the z direction [m]
 coord_source = [x_source , y_source, z_source] #coordinates of the source position in an list
 rows_s = np.argmin(abs(xx[:,0,0] - coord_source[0])) #Find index of grid point with minimum distance from source along x direction
 cols_s = np.argmin(abs(yy[0,:,0] - coord_source[1])) #Find index of grid point with minimum distance from source along y direction
 dept_s = np.argmin(abs(zz[0,0,:] - coord_source[2])) #Find index of grid point with minimum distance from source along z direction
 
 #Finding index in meshgrid of the receiver position
-x_rec = 3.25 #int(ceil(Nx/4)) #position of the receiver in the x direction [m]
-y_rec = 1.97 #int(ceil(Nx/4)) #position of the receiver in the y direction [m]
-z_rec = 0.9 #int(ceil(Nx/4)) #position of the receiver in the z direction [m]
+x_rec = 2.0 #int(ceil(Nx/4)) #position of the receiver in the x direction [m]
+y_rec = 2.0 #int(ceil(Nx/4)) #position of the receiver in the y direction [m]
+z_rec = 2.0 #int(ceil(Nx/4)) #position of the receiver in the z direction [m]
 coord_receiver = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
 rows_r = np.argmin(abs(xx[:,0,0] - coord_receiver[0])) #Find index of grid point with minimum distance from receiver along x direction
 cols_r = np.argmin(abs(yy[0,:,0] - coord_receiver[1])) #Find index of grid point with minimum distance from receiver along y direction
@@ -319,97 +319,21 @@ plt.plot(t,w_rec)
 #ax.view_init(azim=-120, elev=30)  # Set the viewing angle
 #plt.show()
 
-init = -5.0 #because I want the T30, I need to start at -5
-end = -35.0 #because I want the T30, I need to finish at -35
-factor = 2.0 #factor of 2 since I need the T30
-
 #Schroeder integration
 idx_w_rec = np.where(t == sourceon_time)[0][0] #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
 w_rec = w_rec[idx_w_rec:] #cutting the energy density array at the receiver from the idx_w_rec to the end   
-press_r_rev = (w_rec)[::-1] #reverting the array
+energy_r_rev = (w_rec)[::-1] #reverting the array
 #The energy density is related to the pressure with the following relation: w = p^2
-press_r_rev_cum = np.cumsum(press_r_rev) #sumulative summation of all the item in the array
-schroeder = press_r_rev_cum[::-1] #reverting the array again -> creating the schroder decay
+energy_r_rev_cum = np.cumsum(energy_r_rev) #sumulative summation of all the item in the array
+schroeder = energy_r_rev_cum[::-1] #reverting the array again -> creating the schroder decay
 sch_db = 10.0 * np.log10(schroeder / np.max(schroeder)) #level of the array: schroeder decay
 #plt.plot(t,sch_db)
-    
-#Linear regression
-rt_decay = sch_db #decay to be used to calcuate the RT
- 
-timeVector = np.arange(0, recording_time, dt) #equal to t
-idxL1 = np.where(rt_decay <= init)[0][0] #index at which the rtdecay is equal to -5
-idxL2 = np.where(rt_decay <= end)[0][0] #index at which the rtdecay is equal to -35
-   
-timeL1 = timeVector[idxL1] #index at which the time vector is equal to the idxL1
-timeL2 = timeVector[idxL2] #index at which the time vector is equal to the idxL2
-EDCTimeVec = np.arange(0, (len(rt_decay)-1)/fsample+1/fsample, 1/fsample) #equal to t and timeVector
 
-# Classical Approach (T30 = 2*(t[-35dB]-t[-5dB])
-RTCalc = factor*(timeL2 - timeL1)
-
-# Linregress approach
-slope,intercept = stats.linregress(EDCTimeVec[idxL1:idxL2],rt_decay[idxL1:idxL2])[0:2] #calculating the slope and the interception of the line connecting the two points
-db_regress_init = (init - intercept) / slope #dB initial
-db_regress_end = (end - intercept) / slope #dB End
-t60I = factor * (db_regress_end - db_regress_init) #t60 according to linregress approach
-
-# Poly-based Approach y = Ax + B
-CoefAlpha = np.polyfit(EDCTimeVec[idxL1:idxL2], rt_decay[idxL1:idxL2], 1) ##calculating the slope and the interception of the line connecting the two points
-t60 = (-60/CoefAlpha[0]) #t60 according to polyfit approach
-   
-EDCL1 = rt_decay[idxL1]
-EDCL2 = rt_decay[idxL2]
-    
-y_axis = (slope*timeVector[idx_w_rec:] + intercept) + slope
-
-plt.figure()
-plt.plot(timeVector[idx_w_rec:],rt_decay, color ='b', linewidth = 1.8)
-plt.plot(timeVector[idx_w_rec:],y_axis,color='r',linewidth=2)
-plt.plot(timeVector[idx_w_rec:][idxL1],np.real(rt_decay[idxL1]),'o',linewidth=2)
-plt.plot(timeVector[idx_w_rec:][idxL2],np.real(rt_decay[idxL2]),'o',linewidth=2)
-plt.axvline(x=t60I,ymin=-100,ymax=0,linestyle='--',linewidth=2)
-plt.ylabel('Normalized Magnitude (dB)')
-plt.xlabel('Time (s)')
-plt.legend(['EDC','Line Fitting','Upper Point','Lower Point','Estimate T_{30}'])
-plt.title('T_{30} = ' + str(round(t60I,2)) + ' s.')
-plt.grid(True)
-plt.ylim([-100,0])
-plt.show()
-
-#t60 = t60_decay(t, press_r, fsample, rt='t30') #called function for calculation of t60 [s]
-#t60M = t60_decayM(t, spl_norm, fsample, rt='t30') #called function for calculation of t60 [s]
-#edt = t60_decay(t, spl_norm, fsample, rt='edt') #called function for calculation of edt [s]
+t60 = t60_decay(t, sch_db, idx_w_rec) #called function for calculation of t60 [s]
+edt = edt_decay(t, sch_db, idx_w_rec) #called function for calculation of edt [s]
 c80 = clarity(t60, V, Eq_A, S, c0, dist_sr) #called function for calculation of c80 [dB]
 d50 = definition(t60, V, Eq_A, S, c0, dist_sr) #called function for calculation of d50 [%]
 ts = centretime(t60, Eq_A, S) #called function for calculation of ts [ms]
-
-#EDT Calc
-initEDT = 0.0 #because I want the T30, I need to start at -5
-endEDT = -10.0 #because I want the T30, I need to finish at -35
-factorEDT = 6.0 #factor of 2 since I need the T30
-
-idxL1EDT = np.where(rt_decay <= initEDT)[0][0] #index at which the rtdecay is equal to -5
-idxL2EDT = np.where(rt_decay <= endEDT)[0][0] #index at which the rtdecay is equal to -35
-   
-timeL1EDT = timeVector[idxL1EDT] #index at which the time vector is equal to the idxL1
-timeL2EDT = timeVector[idxL2EDT] #index at which the time vector is equal to the idxL2
-EDCTimeVec = np.arange(0, (len(rt_decay)-1)/fsample+1/fsample, 1/fsample) #equal to t and timeVector
-
-# Classical Approach (T30 = 2*(t[-35dB]-t[-5dB])
-EDTCalc = factorEDT*(timeL2EDT - timeL1EDT)
-
-# Linregress approach
-slopeEDT,interceptEDT = stats.linregress(EDCTimeVec[idxL1EDT:idxL2EDT],rt_decay[idxL1EDT:idxL2EDT])[0:2] #calculating the slope and the interception of the line connecting the two points
-db_regress_initEDT = (initEDT - interceptEDT) / slopeEDT #dB initial
-db_regress_endEDT = (endEDT - interceptEDT) / slopeEDT #dB End
-EDTI = factorEDT * (db_regress_endEDT - db_regress_initEDT) #t60 according to linregress approach
-
-# Poly-based Approach y = Ax + B
-CoefAlpha = np.polyfit(EDCTimeVec[idxL1EDT:idxL2EDT], rt_decay[idxL1EDT:idxL2EDT], 1) ##calculating the slope and the interception of the line connecting the two points
-EDT = (-60/CoefAlpha[0]) #t60 according to polyfit approach
-
-
-
 
 et = time.time() #end time
 elapsed_time = et - st

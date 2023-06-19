@@ -4,7 +4,7 @@ Created on Tue Feb 28 10:39:42 2023
 
 @author: 20225533
 """
-#Code developed by Ilaria Fichera for the analysis of the FDM method Du Fort & Frankel on the 3D diffusion equation with one impulse source
+#Code developed by Ilaria Fichera for the analysis of the FDM method Du Fort & Frankel on the 3D diffusion equation with one intermittent source
 import math
 import matplotlib.pyplot as plt #import matplotlib as mpl
 import numpy as np
@@ -42,7 +42,7 @@ dz = dx #distance between grid points z direction [m]
 
 #Time discretization
 dt = 1/8000 #distance between grid points on the time discretization [s]
-recording_time = 2 #time recorded for the source [s]
+recording_time = 1.5 #time recorded for the source [s]
 recording_steps = ceil(recording_time/dt) #number of time steps to consider in the calculation
 t = np.arange(0, recording_time, dt) #mesh point in time
 
@@ -61,8 +61,8 @@ S1,S2 = lxmax*lymax, lxmax*lymax #xy planes
 S3,S4 = lxmax*lzmax, lxmax*lzmax #xz planes
 S5,S6 = lymax*lzmax, lymax*lzmax #yz planes
 
-S = lxmax*lymax*2 + lxmax*lzmax*2 + lymax*lzmax*2 #Surface [m2]
-V = lxmax*lymax*lzmax #volume of the room [m^3]
+S = lxmax*lymax*2 + lxmax*lzmax*2 + lymax*lzmax*2 #Total Surface Area[m2]
+V = lxmax*lymax*lzmax #Volume of the room [m^3]
 
 x = np.arange(lxmin, lxmax+dx, dx) #mesh points in space x direction
 y = np.arange(lymin, lymax+dy, dy) #mesh points in space y direction
@@ -73,11 +73,14 @@ Ny = len(y) #number of point in the y direction
 Nz = len(z) #number of point in the z direction
 
 yy, xx , zz = np.meshgrid(y,x,z) #Return coordinate matrices from coordinate vectors; create the 3D grid
-#fig = plt.figure()
-#ax = plt.axes(projection='3d')
-#ax = ax.scatter3D(xx, yy, zz, c=zz, cmap='Greens')
 
-#Absorption term for boundary conditions - options Sabine, Eyring and modified by Xiang
+#Visualization of 3D meshgrid
+fig = plt.figure()
+ax = plt.axes(projection='3d')
+ax = ax.scatter3D(xx, yy, zz, c=zz, cmap='Greens')
+plt.title("Visualization of 3D meshgrid")
+
+#Absorption term for boundary conditions - options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
 def abs_term(th,alpha):
     if th == 1:
         Absx = (c0*alpha)/4 #Sabine
@@ -87,7 +90,7 @@ def abs_term(th,alpha):
         Absx = (c0*alpha)/(2*(2-alpha)) #Modified by Xiang
     return Absx
 
-th = 3 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 just to understand the type of boundary chosen
+th = 3 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 for different boundary conditions
 alpha_1 = 0.5 #Absorption coefficient for Surface1 - Floor
 alpha_2 = 0.5 #Absorption coefficient for Surface2 - Ceiling
 alpha_3 = 0 #Absorption coefficient for Surface3 - Wall Front
@@ -122,28 +125,28 @@ if beta_zero_condition >1:
     print("aa! errors! Check beta condition")
 
 #Set initial condition - Source Info (interrupted method)
-Ws=0.005 #Source point power [Watts] interrupted after 2seconds; 10^-2 value taken from Jing 2007; correspondent to a SWL of 100dB
+Ws=0.005 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
 Vs=0.2
 w1=Ws
 #w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
-sourceon_time =  1 #time that the source is on before interrupting [s]
+sourceon_time =  0.5 #time that the source is on before interrupting [s]
 sourceon_steps = ceil(sourceon_time/dt) #time steps at which the source is calculated/considered in the calculation
-s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position #does the source not need to be only at the time 0 to 2seconds and after that there should not be any source term? Yes
+s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position
 source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
 
 #Finding index in meshgrid of the source position
-x_source = 4.0 #int(ceil(Nx/2))#4 #position of the source in the x direction [m]
-y_source = 4.0 #int(ceil(Ny/2))#4 #position of the source in the y direction [m]
-z_source = 4.0 #int(ceil(Nz/2))#4 #position of the source in the z direction [m]
+x_source = 4.0  #position of the source in the x direction [m]
+y_source = 4.0  #position of the source in the y direction [m]
+z_source = 4.0  #position of the source in the z direction [m]
 coord_source = [x_source , y_source, z_source] #coordinates of the source position in an list
 rows_s = np.argmin(abs(xx[:,0,0] - coord_source[0])) #Find index of grid point with minimum distance from source along x direction
 cols_s = np.argmin(abs(yy[0,:,0] - coord_source[1])) #Find index of grid point with minimum distance from source along y direction
 dept_s = np.argmin(abs(zz[0,0,:] - coord_source[2])) #Find index of grid point with minimum distance from source along z direction
 
 #Finding index in meshgrid of the receiver position
-x_rec = 2.0 #int(ceil(Nx/4)) #position of the receiver in the x direction [m]
-y_rec = 2.0 #int(ceil(Nx/4)) #position of the receiver in the y direction [m]
-z_rec = 2.0 #int(ceil(Nx/4)) #position of the receiver in the z direction [m]
+x_rec = 2.0 #position of the receiver in the x direction [m]
+y_rec = 2.0 #position of the receiver in the y direction [m]
+z_rec = 2.0 #position of the receiver in the z direction [m]
 coord_receiver = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
 rows_r = np.argmin(abs(xx[:,0,0] - coord_receiver[0])) #Find index of grid point with minimum distance from receiver along x direction
 cols_r = np.argmin(abs(yy[0,:,0] - coord_receiver[1])) #Find index of grid point with minimum distance from receiver along y direction
@@ -158,7 +161,7 @@ w_new = np.zeros((Nx,Ny,Nz)) #unknown w at new time level (n+1)
 w = w_new #w at n level
 w_old = w #w_old at n-1 level
 
-w_rec = np.arange(0,recording_time,dt) #energy density at the receiver; mesh for the graph later on
+w_rec = np.arange(0,recording_time,dt) #energy density at the receiver
 
 #Function to draw figure1
 def draw_fig1():
@@ -186,8 +189,6 @@ def draw_fig2():
 for steps in range(0, recording_steps):
     #Compute w at inner mesh points
     time_steps = steps*dt #total time for the calculation
-    #s[rows_s, cols_s, dept_s] = source1[steps] #array of zero of the source apart from the index_dist_source = energy density of the source at each step position
-    #w_trans = np.transpose(w) #transpose of w could be the trans???
     
     #In the x direction
     w_iminus1 = w[0:Nx-1, 0:Ny, 0:Nz]
@@ -244,13 +245,16 @@ for steps in range(0, recording_steps):
     w_new[:,:,-1] = np.divide((4*w_new[:,:,-2] - w_new[:,:,-3]),(3+((2*Abs_2*dx)/Dz))) #boundary condition at at lz=lzmax, any x, any y
     
     sdl = 10*np.log10(abs(w_new),where=abs(w_new)>0) #sound density level
+    
+    #Visualization of the energy density changes while the calculation is progressing
     #if (steps % 100 == 0): #draw only on certain steps and not all the steps
     #    drawnow(draw_fig)
+    
     #Update w before next step
     w_old = w #The w at n step becomes the w at n-1 step
     w = w_new #The w at n+1 step becomes the w at n step
 
-    #w_rec is the energy density at the receiver specifically
+    #w_rec is the energy density at the specific receiver
     w_rec[steps] = w_new[rows_r, cols_r, dept_r] #energy density at the receiver is equal to the energy density new calcuated in time
     
     s[rows_s, cols_s, dept_s] = source1[steps] #array of zero of the source apart from the index_dist_source = energy density of the source at each step position
@@ -259,75 +263,19 @@ for steps in range(0, recording_steps):
     #drawnow(draw_fig1)
     #drawnow(draw_fig2)
 
-spl_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_sr) + ((abs(w_rec))*c0)/(pRef**2))) #It should be the spl total (including direct field) at the receiver position????? but it will need to be calculated for astationary source 100dB
-
-#Figure 3: Decay of SPL in the recording_time
-plt.figure(3) 
 press_r = ((abs(w_rec))*rho*(c0**2))
-#max_press_r = np.max(((abs(w_rec))*rho*(c0**2))/(pRef**2))
 spl = 10*np.log10(((abs(w_rec))*rho*(c0**2))/(pRef**2)) #,where=press_r>0
-plt.plot(t,spl) #plot sound pressure level with Pref = (2e-5)**5
-plt.title("SPL over time at the receiver")
-plt.xlabel("t")
-plt.ylabel("SPL")
-plt.xlim()
-plt.ylim()
-plt.xticks(np.arange(0, recording_time +0.1, 0.5))
-#plt.yticks(np.arange(0, 120, 20))
-
+spl_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_sr) + ((abs(w_rec))*c0)/(pRef**2))) #It should be the spl total (including direct field) at the receiver position????? but it will need to be calculated for astationary source 100dB
 spl_norm = 10*np.log10((((abs(w_rec))*rho*(c0**2))/(pRef**2)) / np.max(((abs(w_rec))*rho*(c0**2))/(pRef**2))) #normalised to maximum to 0dB
-
-#Figure 4: Decay of SPL in the recording_time normalised to maximum 0dB
-plt.figure(4)
-plt.plot(t,spl_norm)
-plt.title("Normalised SPL over time at the receiver")
-plt.xlabel("t")
-plt.ylabel("SPL")
-plt.xlim()
-plt.ylim()
-plt.xticks(np.arange(0, recording_time +0.1, 0.1))
-plt.yticks(np.arange(0, -60, -10))
-
-plt.figure(5)
-plt.title("Energy density over time at the receiver")
-plt.plot(t,w_rec)
-
-#Failed trial for graph of sound pressure level stationary over the space.
-#plt.figure(6)
-#t_dim = len(t)
-#last_time_index = t_dim-1
-#spl_y = spl_tot[index_receiver[0],:,index_receiver[2]]
-#data_y = spl_y
-#plt.plot(y,data_y)
-#plt.title("SPL over the y axis")
-
-#plt.figure(7)
-#plt.plot(t,spl_tot) #plot sound pressure level with Pref = (2e-5)**5
-#plt.title("SPL_tot over time at the receiver")
-#plt.xlabel("t")
-#plt.ylabel("SPL")
-#plt.xlim()
-#plt.ylim()
-#plt.xticks(np.arange(0, recording_time +0.1, 0.5))
-
-#3D image of the energy density in the room
-#fig = plt.figure(1)
-#ax = fig.add_subplot(111, projection='3d')
-#ax.set_box_aspect([0.5, 0.5, 0.5])  # Set the aspect ratio of the plot
-#X, Y= np.meshgrid(x, y)
-#ax.contourf(X, Y, w_new[:, :, 4], cmap='hot', alpha=0.8)
-#ax.view_init(azim=-120, elev=30)  # Set the viewing angle
-#plt.show()
 
 #Schroeder integration
 idx_w_rec = np.where(t == sourceon_time)[0][0] #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
-w_rec = w_rec[idx_w_rec:] #cutting the energy density array at the receiver from the idx_w_rec to the end   
-energy_r_rev = (w_rec)[::-1] #reverting the array
+w_rec_off = w_rec[idx_w_rec:] #cutting the energy density array at the receiver from the idx_w_rec to the end   
+energy_r_rev = (w_rec_off)[::-1] #reverting the array
 #The energy density is related to the pressure with the following relation: w = p^2
-energy_r_rev_cum = np.cumsum(energy_r_rev) #sumulative summation of all the item in the array
+energy_r_rev_cum = np.cumsum(energy_r_rev) #cumulative summation of all the item in the array
 schroeder = energy_r_rev_cum[::-1] #reverting the array again -> creating the schroder decay
 sch_db = 10.0 * np.log10(schroeder / np.max(schroeder)) #level of the array: schroeder decay
-#plt.plot(t,sch_db)
 
 t60 = t60_decay(t, sch_db, idx_w_rec) #called function for calculation of t60 [s]
 edt = edt_decay(t, sch_db, idx_w_rec) #called function for calculation of edt [s]
@@ -337,3 +285,58 @@ ts = centretime(t60, Eq_A, S) #called function for calculation of ts [ms]
 
 et = time.time() #end time
 elapsed_time = et - st
+
+#%%
+###Figures###
+
+#Figure 3: Decay of SPL in the recording_time
+plt.figure(3) 
+plt.plot(t,spl) #plot sound pressure level with Pref = (2e-5)**5
+plt.title("SPL over time at the receiver")
+plt.xlabel("t [s]")
+plt.ylabel("SPL [dB]")
+plt.xlim()
+plt.ylim()
+plt.xticks(np.arange(0, recording_time +0.1, 0.5))
+plt.yticks(np.arange(0, 120, 20))
+
+#Figure 4: Decay of SPL in the recording_time normalised to maximum 0dB
+plt.figure(4)
+plt.plot(t,spl_norm)
+plt.title("Normalised SPL over time at the receiver")
+plt.xlabel("t [s]")
+plt.ylabel("SPL [dB]")
+plt.xlim()
+plt.ylim()
+plt.xticks(np.arange(0, recording_time +0.1, 0.1))
+plt.yticks(np.arange(0, -60, -10))
+
+#Figure 5: Energy density at the receiver over time
+plt.figure(5)
+plt.plot(t,w_rec)
+plt.title("Energy density over time at the receiver")
+plt.xlabel("t [s]")
+plt.ylabel("Energy density")
+plt.xlim()
+plt.ylim()
+plt.xticks(np.arange(0, recording_time +0.1, 0.1))
+
+#Figure 6: 3D image of the energy density in the room
+plt.figure(6)
+fig = plt.figure(6)
+ax = fig.add_subplot(111, projection='3d')
+ax.set_box_aspect([0.5, 0.5, 0.5])  # Set the aspect ratio of the plot
+X, Y= np.meshgrid(x, y)
+ax.contourf(X, Y, w_new[:, :, 4], cmap='hot', alpha=0.8)
+ax.view_init(azim=-120, elev=30)  # Set the viewing angle
+plt.show()
+
+#Figure 7: Schroeder decay
+plt.figure(7)
+plt.plot(t[idx_w_rec:],sch_db)
+plt.title("Schroeder decay")
+plt.xlabel("t [s]")
+plt.ylabel("Energy decay [dB]")
+plt.xlim()
+plt.ylim()
+plt.xticks(np.arange(t[idx_w_rec:], recording_time +0.1, 0.1))

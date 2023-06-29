@@ -36,13 +36,13 @@ m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro p
 pRef = 2 * (10**-5) #Reference pressure
 
 #Spatial discretization
-dx = 0.2 #distance between grid points x direction [m]
+dx = 0.5 #distance between grid points x direction [m]
 dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
 #Time discretization
-dt = 1/8000 #distance between grid points on the time discretization [s]
-recording_time = 1.5 #time recorded for the source [s]
+dt = 1/32000 #distance between grid points on the time discretization [s]
+recording_time = 2 #time recorded for the source [s]
 recording_steps = ceil(recording_time/dt) #number of time steps to consider in the calculation
 t = np.arange(0, recording_time, dt) #mesh point in time
 
@@ -51,11 +51,11 @@ fsample = 1/dt #frequency spatial resolution (sampling period)
 
 #Room dimensions
 lxmin = 0 #point x starts at zero [m]
-lxmax = 8 #point x finish at the length of the room in the x direction [m] %Length
+lxmax = 70 #point x finish at the length of the room in the x direction [m] %Length
 lymin = 0 #point y starts at zero [m]
-lymax = 8 #point y finish at the length of the room in the y direction [m] %Width
+lymax = 10 #point y finish at the length of the room in the y direction [m] %Width
 lzmin = 0 #point z starts at zero [m]
-lzmax = 8 #point z finish at the length of the room in the x direction [m] %Height
+lzmax = 10 #point z finish at the length of the room in the x direction [m] %Height
 
 S1,S2 = lxmax*lymax, lxmax*lymax #xy planes
 S3,S4 = lxmax*lzmax, lxmax*lzmax #xz planes
@@ -90,13 +90,13 @@ def abs_term(th,alpha):
         Absx = (c0*alpha)/(2*(2-alpha)) #Modified by Xiang
     return Absx
 
-th = 3 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 for different boundary conditions
-alpha_1 = 0.5 #Absorption coefficient for Surface1 - Floor
-alpha_2 = 0.5 #Absorption coefficient for Surface2 - Ceiling
-alpha_3 = 0 #Absorption coefficient for Surface3 - Wall Front
-alpha_4 = 0 #Absorption coefficient for Surface4 - Wall Back
-alpha_5 = 0 #Absorption coefficient for Surface5 - Wall Left
-alpha_6 = 0 #Absorption coefficient for Surface6 - Wall Right
+th = 1 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 for different boundary conditions
+alpha_1 = 0.1 #Absorption coefficient for Surface1 - Floor
+alpha_2 = 0.1 #Absorption coefficient for Surface2 - Ceiling
+alpha_3 = 0.1 #Absorption coefficient for Surface3 - Wall Front
+alpha_4 = 0.1 #Absorption coefficient for Surface4 - Wall Back
+alpha_5 = 0.1 #Absorption coefficient for Surface5 - Wall Left
+alpha_6 = 0.1 #Absorption coefficient for Surface6 - Wall Right
 
 Abs_1 = abs_term(th,alpha_1) #absorption term for S1
 Abs_2 = abs_term(th,alpha_2) #absorption term for S2
@@ -135,18 +135,18 @@ s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 
 source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
 
 #Finding index in meshgrid of the source position
-x_source = 4.0  #position of the source in the x direction [m]
-y_source = 4.0  #position of the source in the y direction [m]
-z_source = 4.0  #position of the source in the z direction [m]
+x_source = 1.0  #position of the source in the x direction [m]
+y_source = 5.0  #position of the source in the y direction [m]
+z_source = 5.0  #position of the source in the z direction [m]
 coord_source = [x_source , y_source, z_source] #coordinates of the source position in an list
 rows_s = np.argmin(abs(xx[:,0,0] - coord_source[0])) #Find index of grid point with minimum distance from source along x direction
 cols_s = np.argmin(abs(yy[0,:,0] - coord_source[1])) #Find index of grid point with minimum distance from source along y direction
 dept_s = np.argmin(abs(zz[0,0,:] - coord_source[2])) #Find index of grid point with minimum distance from source along z direction
 
 #Finding index in meshgrid of the receiver position
-x_rec = 2.0 #position of the receiver in the x direction [m]
-y_rec = 2.0 #position of the receiver in the y direction [m]
-z_rec = 2.0 #position of the receiver in the z direction [m]
+x_rec = 35.0 #position of the receiver in the x direction [m]
+y_rec = 5.0 #position of the receiver in the y direction [m]
+z_rec = 5.0 #position of the receiver in the z direction [m]
 coord_receiver = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
 rows_r = np.argmin(abs(xx[:,0,0] - coord_receiver[0])) #Find index of grid point with minimum distance from receiver along x direction
 cols_r = np.argmin(abs(yy[0,:,0] - coord_receiver[1])) #Find index of grid point with minimum distance from receiver along y direction
@@ -316,27 +316,76 @@ plt.figure(5)
 plt.plot(t,w_rec)
 plt.title("Energy density over time at the receiver")
 plt.xlabel("t [s]")
-plt.ylabel("Energy density")
+plt.ylabel("Energy density [kg m^-1 s^-2]")
 plt.xlim()
 plt.ylim()
 plt.xticks(np.arange(0, recording_time +0.1, 0.1))
 
-#Figure 6: 3D image of the energy density in the room
+#Figure 6: Schroeder decay
 plt.figure(6)
-fig = plt.figure(6)
-ax = fig.add_subplot(111, projection='3d')
-ax.set_box_aspect([0.5, 0.5, 0.5])  # Set the aspect ratio of the plot
-X, Y= np.meshgrid(x, y)
-ax.contourf(X, Y, w_new[:, :, 4], cmap='hot', alpha=0.8)
-ax.view_init(azim=-120, elev=30)  # Set the viewing angle
-plt.show()
-
-#Figure 7: Schroeder decay
-plt.figure(7)
 plt.plot(t[idx_w_rec:],sch_db)
 plt.title("Schroeder decay")
 plt.xlabel("t [s]")
 plt.ylabel("Energy decay [dB]")
 plt.xlim()
 plt.ylim()
-plt.xticks(np.arange(t[idx_w_rec:], recording_time +0.1, 0.1))
+plt.xticks(np.arange(t[idx_w_rec], recording_time +0.1, 0.1))
+
+#Figure 7: 3D image of the energy density in the room
+plt.figure(7)
+fig = plt.figure(7)
+ax = fig.add_subplot(111, projection='3d')
+ax.set_box_aspect([0.5, 0.5, 0.5])  # Set the aspect ratio of the plot
+X, Y= np.meshgrid(x, y)
+X = X.T
+Y = Y.T
+ax.contourf(X, Y, w_new[:, :, 4], cmap='hot', alpha=0.8)
+ax.view_init(azim=-120, elev=30)  # Set the viewing angle
+plt.show()
+
+##############################################################################
+#TRIAL CALCULATION PICAUT 1997
+##############################################################################
+
+w_inf = w_new[0,:,:].mean() *lzmax/lxmax
+Q = abs(w_rec/w_inf - 1)
+phi = np.log10(Q)
+A_x = np.log10(abs((2*np.cos(np.pi*x/lxmax)))) 
+
+#phi_norm = phi / np.max(phi)
+two_lambda_time = 2*lambda_path/c0
+
+difference = np.abs(t-(sourceon_time+two_lambda_time))
+index_diff = difference.argmin()
+
+idx_phi = np.where(t == t[index_diff])[0][0] 
+phi_off = phi[idx_phi:]  
+
+# Linregress approach
+slope,intercept = stats.linregress(t[idx_phi:],phi_off)[0:2] 
+
+Diff = -((slope*lxmax**2)/(np.pi**2))
+
+# Poly-based Approach y = Ax + B
+CoefAlpha = np.polyfit(t[idx_phi:], phi_off, 1) ##calculating the slope and the interception of the line connecting the two points
+slope2 = CoefAlpha[0]
+
+
+Diffusion = (np.subtract(A_x[4], phi)*lxmax**2)/(np.pi**2*t)
+Aminusphi =np.subtract(A_x[4], phi)
+
+plt.figure(9)
+plt.plot(x/lxmax,A_x)
+plt.title("Representation of A{x}")
+plt.xlabel("x/L")
+plt.ylabel("A{x}")
+plt.ylim([-4, 1])
+plt.yticks(np.arange(-4, 1, 1))
+
+plt.figure(10)
+plt.plot(t,Diffusion)
+plt.title("Diffusion coefficient over time")
+plt.xlabel("t [s]")
+plt.ylabel("Diffusion coefficient [m^2/s]")
+#plt.ylim([0,20000])
+#plt.yticks(np.arange(-4, 1, 1))

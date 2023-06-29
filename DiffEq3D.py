@@ -26,6 +26,7 @@ from matplotlib.ticker import LinearLocator
 import numpy as np
 import time as time
 from scipy import stats
+from scipy.interpolate import griddata
 
 st = time.time() #start time
 
@@ -51,11 +52,11 @@ fsample = 1/dt #frequency spatial resolution (sampling period)
 
 #Room dimensions
 lxmin = 0 #point x starts at zero [m]
-lxmax = 70 #point x finish at the length of the room in the x direction [m] %Length
+lxmax = 8 #point x finish at the length of the room in the x direction [m] %Length
 lymin = 0 #point y starts at zero [m]
-lymax = 10 #point y finish at the length of the room in the y direction [m] %Width
+lymax = 8 #point y finish at the length of the room in the y direction [m] %Width
 lzmin = 0 #point z starts at zero [m]
-lzmax = 10 #point z finish at the length of the room in the x direction [m] %Height
+lzmax = 8 #point z finish at the length of the room in the x direction [m] %Height
 
 S1,S2 = lxmax*lymax, lxmax*lymax #xy planes
 S3,S4 = lxmax*lzmax, lxmax*lzmax #xz planes
@@ -90,13 +91,13 @@ def abs_term(th,alpha):
         Absx = (c0*alpha)/(2*(2-alpha)) #Modified by Xiang
     return Absx
 
-th = 1 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 for different boundary conditions
-alpha_1 = 0.1 #Absorption coefficient for Surface1 - Floor
-alpha_2 = 0.1 #Absorption coefficient for Surface2 - Ceiling
-alpha_3 = 0.1 #Absorption coefficient for Surface3 - Wall Front
-alpha_4 = 0.1 #Absorption coefficient for Surface4 - Wall Back
-alpha_5 = 0.1 #Absorption coefficient for Surface5 - Wall Left
-alpha_6 = 0.1 #Absorption coefficient for Surface6 - Wall Right
+th = 3 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 for different boundary conditions
+alpha_1 = 0.17 #Absorption coefficient for Surface1 - Floor
+alpha_2 = 0.17 #Absorption coefficient for Surface2 - Ceiling
+alpha_3 = 0.17 #Absorption coefficient for Surface3 - Wall Front
+alpha_4 = 0.17 #Absorption coefficient for Surface4 - Wall Back
+alpha_5 = 0.17 #Absorption coefficient for Surface5 - Wall Left
+alpha_6 = 0.17 #Absorption coefficient for Surface6 - Wall Right
 
 Abs_1 = abs_term(th,alpha_1) #absorption term for S1
 Abs_2 = abs_term(th,alpha_2) #absorption term for S2
@@ -135,18 +136,77 @@ s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 
 source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
 
 #Finding index in meshgrid of the source position
-x_source = 1.0  #position of the source in the x direction [m]
-y_source = 5.0  #position of the source in the y direction [m]
-z_source = 5.0  #position of the source in the z direction [m]
-coord_source = [x_source , y_source, z_source] #coordinates of the source position in an list
-rows_s = np.argmin(abs(xx[:,0,0] - coord_source[0])) #Find index of grid point with minimum distance from source along x direction
-cols_s = np.argmin(abs(yy[0,:,0] - coord_source[1])) #Find index of grid point with minimum distance from source along y direction
-dept_s = np.argmin(abs(zz[0,0,:] - coord_source[2])) #Find index of grid point with minimum distance from source along z direction
+x_source = 4.0  #position of the source in the x direction [m]
+y_source = 4.2  #position of the source in the y direction [m]
+z_source = 4.2  #position of the source in the z direction [m]
+coord_source = [x_source,y_source,z_source] #coordinates of the receiver position in an list
+
+rows_s = x_source
+cols_s = y_source
+dept_s = z_source
+
+
+
+#rows_s = np.argmin(abs(xx[:,0,0] - coord_source[0])) #Find index of grid point with minimum distance from source along x direction
+#cols_s = np.argmin(abs(yy[0,:,0] - coord_source[1])) #Find index of grid point with minimum distance from source along y direction
+#dept_s = np.argmin(abs(zz[0,0,:] - coord_source[2])) #Find index of grid point with minimum distance from source along z direction
+
+#############################################################################
+###### SOURCE ############
+# Find the indices of the closest grid points in each direction
+x_idx = np.where(x <= x_source)[0][-1] #index of x of the closest grid point to the x coordinate of the source point
+y_idx = np.where(y <= y_source)[0][-1]
+z_idx = np.where(z <= z_source)[0][-1]
+
+# Calculate the weights for interpolation
+x_weight = (x_source - x[x_idx]) / dx
+y_weight = (y_source - y[y_idx]) / dy
+z_weight = (z_source - z[z_idx]) / dz
+
+# Position the source at the exact coordinates in between the grid points
+x_positioned = x[x_idx] + x_weight * dx
+y_positioned = y[y_idx] + y_weight * dy
+z_positioned = z[z_idx] + z_weight * dz
+#############################################################################
+
+# Calculate the fractional indices
+row_lower = int(np.floor(x_source / dx))
+row_upper = row_lower + 1
+col_lower = int(np.floor(y_source / dy))
+col_upper = col_lower + 1
+depth_lower = int(np.floor(z_source / dz))
+depth_upper = depth_lower + 1
+
+# Calculate the interpolation weights
+weight_row_upper = (x_source / dx) - row_lower
+weight_row_lower = 1 - weight_row_upper
+weight_col_upper = (y_source / dy) - col_lower
+weight_col_lower = 1 - weight_col_upper
+weight_depth_upper = (z_source / dz) - depth_lower
+weight_depth_lower = 1 - weight_depth_upper
+
+s = np.zeros((Nx,Ny,Nz)) #matrix of zeros for source
+
+# Perform linear interpolation
+s[row_lower, col_lower, depth_lower] += source1[1] * weight_row_lower * weight_col_lower * weight_depth_lower
+s[row_lower, col_lower, depth_upper] += source1[1] * weight_row_lower * weight_col_lower * weight_depth_upper
+s[row_lower, col_upper, depth_lower] += source1[1] * weight_row_lower * weight_col_upper * weight_depth_lower
+s[row_lower, col_upper, depth_upper] += source1[1] * weight_row_lower * weight_col_upper * weight_depth_upper
+s[row_upper, col_lower, depth_lower] += source1[1] * weight_row_upper * weight_col_lower * weight_depth_lower
+s[row_upper, col_lower, depth_upper] += source1[1] * weight_row_upper * weight_col_lower * weight_depth_upper
+s[row_upper, col_upper, depth_lower] += source1[1] * weight_row_upper * weight_col_upper * weight_depth_lower
+s[row_upper, col_upper, depth_upper] += source1[1] * weight_row_upper * weight_col_upper * weight_depth_upper
+
+
+
+
+
+
 
 #Finding index in meshgrid of the receiver position
-x_rec = 35.0 #position of the receiver in the x direction [m]
-y_rec = 5.0 #position of the receiver in the y direction [m]
-z_rec = 5.0 #position of the receiver in the z direction [m]
+x_rec = 2.0 #position of the receiver in the x direction [m]
+y_rec = 2.0 #position of the receiver in the y direction [m]
+z_rec = 2.0 #position of the receiver in the z direction [m]
 coord_receiver = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
 rows_r = np.argmin(abs(xx[:,0,0] - coord_receiver[0])) #Find index of grid point with minimum distance from receiver along x direction
 cols_r = np.argmin(abs(yy[0,:,0] - coord_receiver[1])) #Find index of grid point with minimum distance from receiver along y direction
@@ -154,8 +214,8 @@ dept_r = np.argmin(abs(zz[0,0,:] - coord_receiver[2])) #Find index of grid point
 
 dist_sr = math.sqrt((abs(x_rec - x_source))**2 + (abs(y_rec - y_source))**2 + (abs(z_rec - z_source))**2) #distance between source and receiver
 
-s = np.zeros((Nx,Ny,Nz)) #matrix of zeros for source
-s[rows_s, cols_s, dept_s] = source1[1] #at the index where the different between the source and x is zero, the source value is the energy density of the source, for all the other values it is zero.
+#s = np.zeros((Nx,Ny,Nz)) #matrix of zeros for source
+#s[rows_s, cols_s, dept_s] = source1[1] #at the index where the different between the source and x is zero, the source value is the energy density of the source, for all the other values it is zero.
 
 w_new = np.zeros((Nx,Ny,Nz)) #unknown w at new time level (n+1)
 w = w_new #w at n level
@@ -257,7 +317,16 @@ for steps in range(0, recording_steps):
     #w_rec is the energy density at the specific receiver
     w_rec[steps] = w_new[rows_r, cols_r, dept_r] #energy density at the receiver is equal to the energy density new calcuated in time
     
-    s[rows_s, cols_s, dept_s] = source1[steps] #array of zero of the source apart from the index_dist_source = energy density of the source at each step position
+    #s[rows_s, cols_s, dept_s] = source1[steps] #array of zero of the source apart from the index_dist_source = energy density of the source at each step position
+    s[row_lower, col_lower, depth_lower] += source1[steps] * weight_row_lower * weight_col_lower * weight_depth_lower
+    s[row_lower, col_lower, depth_upper] += source1[steps] * weight_row_lower * weight_col_lower * weight_depth_upper
+    s[row_lower, col_upper, depth_lower] += source1[steps] * weight_row_lower * weight_col_upper * weight_depth_lower
+    s[row_lower, col_upper, depth_upper] += source1[steps] * weight_row_lower * weight_col_upper * weight_depth_upper
+    s[row_upper, col_lower, depth_lower] += source1[steps] * weight_row_upper * weight_col_lower * weight_depth_lower
+    s[row_upper, col_lower, depth_upper] += source1[steps] * weight_row_upper * weight_col_lower * weight_depth_upper
+    s[row_upper, col_upper, depth_lower] += source1[steps] * weight_row_upper * weight_col_upper * weight_depth_lower
+    s[row_upper, col_upper, depth_upper] += source1[steps] * weight_row_upper * weight_col_upper * weight_depth_upper
+    
     
     print(time_steps)
     #drawnow(draw_fig1)

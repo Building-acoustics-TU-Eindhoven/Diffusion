@@ -141,12 +141,6 @@ y_source = 4.2  #position of the source in the y direction [m]
 z_source = 4.2  #position of the source in the z direction [m]
 coord_source = [x_source,y_source,z_source] #coordinates of the receiver position in an list
 
-rows_s = x_source
-cols_s = y_source
-dept_s = z_source
-
-
-
 #rows_s = np.argmin(abs(xx[:,0,0] - coord_source[0])) #Find index of grid point with minimum distance from source along x direction
 #cols_s = np.argmin(abs(yy[0,:,0] - coord_source[1])) #Find index of grid point with minimum distance from source along y direction
 #dept_s = np.argmin(abs(zz[0,0,:] - coord_source[2])) #Find index of grid point with minimum distance from source along z direction
@@ -154,21 +148,23 @@ dept_s = z_source
 #############################################################################
 ###### SOURCE ############
 # Find the indices of the closest grid points in each direction
-x_idx = np.where(x <= x_source)[0][-1] #index of x of the closest grid point to the x coordinate of the source point
-y_idx = np.where(y <= y_source)[0][-1]
-z_idx = np.where(z <= z_source)[0][-1]
+#x_idx = np.where(x <= x_source)[0][-1] #index of x of the closest grid point to the x coordinate of the source point
+#y_idx = np.where(y <= y_source)[0][-1]
+#z_idx = np.where(z <= z_source)[0][-1]
 
 # Calculate the weights for interpolation
-x_weight = (x_source - x[x_idx]) / dx
-y_weight = (y_source - y[y_idx]) / dy
-z_weight = (z_source - z[z_idx]) / dz
+#x_weight = (x_source - x[x_idx]) / dx
+#y_weight = (y_source - y[y_idx]) / dy
+#z_weight = (z_source - z[z_idx]) / dz
 
 # Position the source at the exact coordinates in between the grid points
-x_positioned = x[x_idx] + x_weight * dx
-y_positioned = y[y_idx] + y_weight * dy
-z_positioned = z[z_idx] + z_weight * dz
-#############################################################################
+#x_positioned = x[x_idx] + x_weight * dx
+#y_positioned = y[y_idx] + y_weight * dy
+#z_positioned = z[z_idx] + z_weight * dz
 
+#############################################################################
+                             #SOURCE INTERPOLATION
+#############################################################################
 # Calculate the fractional indices
 row_lower = int(np.floor(x_source / dx))
 row_upper = row_lower + 1
@@ -196,12 +192,7 @@ s[row_upper, col_lower, depth_lower] += source1[1] * weight_row_upper * weight_c
 s[row_upper, col_lower, depth_upper] += source1[1] * weight_row_upper * weight_col_lower * weight_depth_upper
 s[row_upper, col_upper, depth_lower] += source1[1] * weight_row_upper * weight_col_upper * weight_depth_lower
 s[row_upper, col_upper, depth_upper] += source1[1] * weight_row_upper * weight_col_upper * weight_depth_upper
-
-
-
-
-
-
+#############################################################################
 
 #Finding index in meshgrid of the receiver position
 x_rec = 2.0 #position of the receiver in the x direction [m]
@@ -291,7 +282,6 @@ for steps in range(0, recording_steps):
                     np.divide((np.multiply(beta_zero_y,(w_jplus1+w_jminus1))),(1+beta_zero)) + \
                         np.divide((np.multiply(beta_zero_z,(w_kplus1+w_kminus1))),(1+beta_zero))
     
-     
     #Insert boundary conditions  
     w_new[0,:,:] = np.divide((4*w_new[1,:,:] - w_new[2,:,:]),(3+((2*Abs_5*dx)/Dx))) #boundary condition at x=0, any y, any z
     w_new[-1,:,:] = np.divide((4*w_new[-2,:,:] - w_new[-3,:,:]),(3+((2*Abs_6*dx)/Dx))) #boundary condition at lx=lxmax, any y, any z
@@ -318,16 +308,15 @@ for steps in range(0, recording_steps):
     w_rec[steps] = w_new[rows_r, cols_r, dept_r] #energy density at the receiver is equal to the energy density new calcuated in time
     
     #s[rows_s, cols_s, dept_s] = source1[steps] #array of zero of the source apart from the index_dist_source = energy density of the source at each step position
-    s[row_lower, col_lower, depth_lower] += source1[steps] * weight_row_lower * weight_col_lower * weight_depth_lower
-    s[row_lower, col_lower, depth_upper] += source1[steps] * weight_row_lower * weight_col_lower * weight_depth_upper
-    s[row_lower, col_upper, depth_lower] += source1[steps] * weight_row_lower * weight_col_upper * weight_depth_lower
-    s[row_lower, col_upper, depth_upper] += source1[steps] * weight_row_lower * weight_col_upper * weight_depth_upper
-    s[row_upper, col_lower, depth_lower] += source1[steps] * weight_row_upper * weight_col_lower * weight_depth_lower
-    s[row_upper, col_lower, depth_upper] += source1[steps] * weight_row_upper * weight_col_lower * weight_depth_upper
-    s[row_upper, col_upper, depth_lower] += source1[steps] * weight_row_upper * weight_col_upper * weight_depth_lower
-    s[row_upper, col_upper, depth_upper] += source1[steps] * weight_row_upper * weight_col_upper * weight_depth_upper
-    
-    
+    s[row_lower, col_lower, depth_lower] = source1[steps] * weight_row_lower * weight_col_lower * weight_depth_lower
+    s[row_lower, col_lower, depth_upper] = source1[steps] * weight_row_lower * weight_col_lower * weight_depth_upper
+    s[row_lower, col_upper, depth_lower] = source1[steps] * weight_row_lower * weight_col_upper * weight_depth_lower
+    s[row_lower, col_upper, depth_upper] = source1[steps] * weight_row_lower * weight_col_upper * weight_depth_upper
+    s[row_upper, col_lower, depth_lower] = source1[steps] * weight_row_upper * weight_col_lower * weight_depth_lower
+    s[row_upper, col_lower, depth_upper] = source1[steps] * weight_row_upper * weight_col_lower * weight_depth_upper
+    s[row_upper, col_upper, depth_lower] = source1[steps] * weight_row_upper * weight_col_upper * weight_depth_lower
+    s[row_upper, col_upper, depth_upper] = source1[steps] * weight_row_upper * weight_col_upper * weight_depth_upper
+     
     print(time_steps)
     #drawnow(draw_fig1)
     #drawnow(draw_fig2)

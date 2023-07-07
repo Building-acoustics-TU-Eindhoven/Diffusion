@@ -6,12 +6,13 @@ Created on Tue Feb 28 10:39:42 2023
 """
 #Code developed by Ilaria Fichera for the analysis of the FDM method Du Fort & Frankel on the 3D diffusion equation with one intermittent source
 import math
+import matplotlib
 import matplotlib.pyplot as plt #import matplotlib as mpl
 import numpy as np
 from scipy.integrate import simps
 from scipy import linalg
 import sys
-#from drawnow import drawnow
+from drawnow import drawnow
 from math import ceil
 from math import log
 from FunctionRT import *
@@ -27,6 +28,7 @@ import numpy as np
 import time as time
 from scipy import stats
 from scipy.interpolate import griddata
+from matplotlib.animation import FuncAnimation
 
 st = time.time() #start time
 
@@ -42,8 +44,8 @@ dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
 #Time discretization
-dt = 1/32000 #distance between grid points on the time discretization [s]
-recording_time = 1.5 #time recorded for the source [s]
+dt = 1/8000 #distance between grid points on the time discretization [s]
+recording_time = 1.00 #time recorded for the source [s]
 recording_steps = ceil(recording_time/dt) #number of time steps to consider in the calculation
 t = np.arange(0, recording_time, dt) #mesh point in time
 
@@ -52,11 +54,11 @@ fsample = 1/dt #frequency spatial resolution (sampling period)
 
 #Room dimensions
 lxmin = 0 #point x starts at zero [m]
-lxmax = 8 #point x finish at the length of the room in the x direction [m] %Length
+lxmax = 8.0 #point x finish at the length of the room in the x direction [m] %Length
 lymin = 0 #point y starts at zero [m]
-lymax = 8 #point y finish at the length of the room in the y direction [m] %Width
+lymax = 8.0 #point y finish at the length of the room in the y direction [m] %Width
 lzmin = 0 #point z starts at zero [m]
-lzmax = 8 #point z finish at the length of the room in the x direction [m] %Height
+lzmax = 8.0 #point z finish at the length of the room in the x direction [m] %Height
 
 S1,S2 = lxmax*lymax, lxmax*lymax #xy planes
 S3,S4 = lxmax*lzmax, lxmax*lzmax #xz planes
@@ -75,11 +77,11 @@ Nz = len(z) #number of point in the z direction
 
 yy, xx , zz = np.meshgrid(y,x,z) #Return coordinate matrices from coordinate vectors; create the 3D grid
 
-#Visualization of 3D meshgrid
-fig = plt.figure()
-ax = plt.axes(projection='3d')
-ax = ax.scatter3D(xx, yy, zz, c=zz, cmap='Greens')
-plt.title("Visualization of 3D meshgrid")
+##Visualization of 3D meshgrid
+##fig = plt.figure()
+##ax = plt.axes(projection='3d')
+##ax = ax.scatter3D(xx, yy, zz, c=zz, cmap='Greens')
+##plt.title("Visualization of 3D meshgrid")
 
 #Absorption term for boundary conditions - options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
 def abs_term(th,alpha):
@@ -130,22 +132,19 @@ Ws=0.005 #Source point power [Watts] interrupted after "sourceon_time" seconds; 
 Vs=0.2
 w1=Ws
 #w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
-sourceon_time =  0.5 #time that the source is on before interrupting [s]
+sourceon_time =  0.1 #time that the source is on before interrupting [s]
 sourceon_steps = ceil(sourceon_time/dt) #time steps at which the source is calculated/considered in the calculation
 s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position
 source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
 
 #############################################################################
-                             #SOURCE INTERPOLATION
+#SOURCE INTERPOLATION
 #############################################################################
 #Finding index in meshgrid of the source position
-x_source = 4  #position of the source in the x direction [m]
-y_source = 4  #position of the source in the y direction [m]
-z_source = 4  #position of the source in the z direction [m]
+x_source = 2.0  #position of the source in the x direction [m]
+y_source = 1.0  #position of the source in the y direction [m]
+z_source = 4.0  #position of the source in the z direction [m]
 coord_source = [x_source,y_source,z_source] #coordinates of the receiver position in an list
-#rows_s = np.argmin(abs(xx[:,0,0] - coord_source[0])) #Find index of grid point with minimum distance from source along x direction
-#cols_s = np.argmin(abs(yy[0,:,0] - coord_source[1])) #Find index of grid point with minimum distance from source along y direction
-#dept_s = np.argmin(abs(zz[0,0,:] - coord_source[2])) #Find index of grid point with minimum distance from source along z direction
 
 # Calculate the fractional indices
 row_lower = int(np.floor(x_source / dx))
@@ -176,16 +175,13 @@ s[row_upper, col_upper, depth_lower] += source1[1] * weight_row_upper * weight_c
 s[row_upper, col_upper, depth_upper] += source1[1] * weight_row_upper * weight_col_upper * weight_depth_upper
 
 #############################################################################
-                             #RECEIVER INTERPOLATION
+#RECEIVER INTERPOLATION
 #############################################################################
 #Finding index in meshgrid of the receiver position
-x_rec = 5.3 #position of the receiver in the x direction [m]
-y_rec = 2.1 #position of the receiver in the y direction [m]
+x_rec = 2.0 #position of the receiver in the x direction [m]
+y_rec = 2.0 #position of the receiver in the y direction [m]
 z_rec = 2.0 #position of the receiver in the z direction [m]
 coord_receiver = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
-#rows_r = np.argmin(abs(xx[:,0,0] - coord_receiver[0])) #Find index of grid point with minimum distance from receiver along x direction
-#cols_r = np.argmin(abs(yy[0,:,0] - coord_receiver[1])) #Find index of grid point with minimum distance from receiver along y direction
-#dept_r = np.argmin(abs(zz[0,0,:] - coord_receiver[2])) #Find index of grid point with minimum distance from receiver along z direction
 
 #Calculate the fractional indices for receiver
 row_lr = int(np.floor(x_rec / dx))
@@ -205,37 +201,32 @@ weight_depth_lr = 1 - weight_depth_ur #weight z lower
 
 dist_sr = math.sqrt((abs(x_rec - x_source))**2 + (abs(y_rec - y_source))**2 + (abs(z_rec - z_source))**2) #distance between source and receiver
 
-#s = np.zeros((Nx,Ny,Nz)) #matrix of zeros for source
-#s[rows_s, cols_s, dept_s] = source1[1] #at the index where the different between the source and x is zero, the source value is the energy density of the source, for all the other values it is zero.
-
 w_new = np.zeros((Nx,Ny,Nz)) #unknown w at new time level (n+1)
 w = w_new #w at n level
 w_old = w #w_old at n-1 level
 
 w_rec = np.arange(0,recording_time,dt) #energy density at the receiver
 
-#Function to draw figure1
-def draw_fig1():
-    plt.plot(x, w_new) #plot the figure energy density in space x
-    plt.grid()
-    plt.xlabel("x")
-    plt.ylabel("w")
-    plt.xlim(0, 1)
-    plt.ylim(1e-10, 1e-1)
-    plt.xticks(np.arange(0, 1+0.1, 0.1))
-    plt.yticks([1e-10, 1e-8, 1e-6, 1e-4, 1e-2])
-  
-#Function to draw figure2
-def draw_fig2():
-    plt.plot(x, sdl) #plot the figure energy density in decibel in space x
-    plt.grid()
-    plt.xlabel("x")
-    plt.ylabel("w")
-    plt.xlim(0, 1)
-    plt.ylim(1e-10, 1e-1)
-    plt.xticks(np.arange(0, 1+0.1, 0.1))
-    plt.yticks([1e-10, 1e-8, 1e-6, 1e-4, 1e-2])
+#Function to draw figure
+def draw_fig():
+    for i in range(w_new.shape[2]):
+        print(i)
+        plt.imshow(w_new[:, :, i], cmap='hot', vmin=w_new.min(), vmax=w_new.max())
+        plt.show()  # Display each slice separately
 
+############################################################################
+#TRIAL 4D PLOT - INITIALIZATION (main part within the for loop)
+############################################################################
+#Initialize the figure and axes
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+# Set the initial view angle
+ax.view_init(elev=30, azim=45)
+
+############################################################################
+#MAIN CALCULATION - COMPUTING ENERGY DENSITY
+############################################################################ 
 #Computing w;
 for steps in range(0, recording_steps):
     #Compute w at inner mesh points
@@ -296,9 +287,10 @@ for steps in range(0, recording_steps):
     
     sdl = 10*np.log10(abs(w_new),where=abs(w_new)>0) #sound density level
     
-    #Visualization of the energy density changes while the calculation is progressing
-    #if (steps % 100 == 0): #draw only on certain steps and not all the steps
-    #    drawnow(draw_fig)
+    ##Visualization of the energy density changes while the calculation is progressing
+    if (steps % 100 == 0): #draw only on certain steps and not all the steps
+        print("A")
+        drawnow(draw_fig)
     
     #Update w before next step
     w_old = w #The w at n step becomes the w at n-1 step
@@ -314,11 +306,44 @@ for steps in range(0, recording_steps):
                             (w_new[row_ur, col_ur, depth_lr]*(weight_row_ur * weight_col_ur * weight_depth_lr))+\
                                 (w_new[row_ur, col_ur, depth_ur]*(weight_row_ur * weight_col_ur * weight_depth_ur)))
 
-
-    #w_rec is the energy density at the specific receiver
-    #w_rec[steps] = w_new[rows_r, cols_r, dept_r] #energy density at the receiver is equal to the energy density new calcuated in time
+    if steps == sourceon_steps:
+        print("Steps for source:",steps)
+        w_t0 = w_new
     
-    #s[rows_s, cols_s, dept_s] = source1[steps] #array of zero of the source apart from the index_dist_source = energy density of the source at each step position
+    #Flatten the coordinates and w_new values for scatter plot
+    ##coords = np.column_stack([xx.ravel(), yy.ravel(), zz.ravel()])
+    ##w_new_flat = w_new.ravel()
+    
+    #Normalize the w_new values to [0, 1] range
+    ##norm = plt.Normalize(vmin=np.min(w_new_flat), vmax=np.max(w_new_flat))
+    ##colors = cm.jet(norm(w_new_flat))  # Use 'jet' colormap for a range of red to yellow colors
+    
+    #Update the scatter plot with the new w_new values
+    ##if steps == 0:
+    ##    scatter = ax.scatter(coords[:, 0], coords[:, 1], coords[:, 2], c=w_new_flat, cmap='hot')
+    ##else:
+    ##    scatter.set_array(w_new_flat)
+        
+    #Set a suitable title and labels
+    ##ax.set_title('Time Step: ', time_steps)
+    ##ax.set_xlabel('X')
+    ##ax.set_ylabel('Y')
+    ##ax.set_zlabel('Z')
+
+    #Adjust the plot limits
+    ##ax.set_xlim(lxmin, lxmax)
+    ##ax.set_ylim(lymin, lymax)
+    ##ax.set_zlim(lzmin, lzmax)
+
+    # Add a colorbar and legend
+    #cbar = fig.colorbar(scatter, ax=ax,fraction=0.04, pad=0.1)
+    #cbar.set_label('Energy Density')
+    #cbar.ax.yaxis.set_ticks_position('left')
+
+    # Pause to create an animated effect
+    ##plt.pause(0.01)  # Adjust the pause duration as needed
+    
+    #Updating the source term
     s[row_lower, col_lower, depth_lower] = source1[steps] * weight_row_lower * weight_col_lower * weight_depth_lower
     s[row_lower, col_lower, depth_upper] = source1[steps] * weight_row_lower * weight_col_lower * weight_depth_upper
     s[row_lower, col_upper, depth_lower] = source1[steps] * weight_row_lower * weight_col_upper * weight_depth_lower
@@ -329,12 +354,12 @@ for steps in range(0, recording_steps):
     s[row_upper, col_upper, depth_upper] = source1[steps] * weight_row_upper * weight_col_upper * weight_depth_upper
      
     print(time_steps)
-    #drawnow(draw_fig1)
-    #drawnow(draw_fig2)
 
-press_r = ((abs(w_rec))*rho*(c0**2))
+plt.show()
+
+press_r = ((abs(w_rec))*rho*(c0**2)) #pressure
 spl = 10*np.log10(((abs(w_rec))*rho*(c0**2))/(pRef**2)) #,where=press_r>0
-spl_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_sr) + ((abs(w_rec))*c0)/(pRef**2))) #It should be the spl total (including direct field) at the receiver position????? but it will need to be calculated for astationary source 100dB
+spl_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_sr) + ((abs(w_rec))*c0)/(pRef**2))) #spl total (including direct field) at the receiver position????? but it will need to be calculated for astationary source 100dB
 spl_norm = 10*np.log10((((abs(w_rec))*rho*(c0**2))/(pRef**2)) / np.max(((abs(w_rec))*rho*(c0**2))/(pRef**2))) #normalised to maximum to 0dB
 
 #Schroeder integration
@@ -416,8 +441,12 @@ plt.show()
 #TRIAL CALCULATION PICAUT 1997
 ##############################################################################
 
-w_inf = w_rec[idx_w_rec]*lzmax/lxmax
-Q = abs(w_rec/w_inf - 1)
+sigma = c0*alpha_1/lambda_path
+mean_w_t0 = np.mean(w_t0)
+summation=np.sum(w_t0)
+#w_inf = np.sum(w_t0)*(dx*dy*dz)/V
+w_inf = np.sum(w_t0)/((Nx-1)*(Ny-1)*(Nz-1))
+Q = abs((w_rec/w_inf)*np.exp(sigma*t) - 1)
 phi = np.log10(Q)
 A_x = np.log10(abs((2*np.cos(np.pi*x/lxmax)))) 
 
@@ -433,14 +462,17 @@ phi_off = phi[idx_phi:]
 # Linregress approach
 slope,intercept = stats.linregress(t[idx_phi:],phi_off)[0:2] 
 
-Diff = -((slope*lxmax**2)/(np.pi**2))
+Diff = ((slope*lxmax**2)/(np.pi**2))
 
 # Poly-based Approach y = Ax + B
 CoefAlpha = np.polyfit(t[idx_phi:], phi_off, 1) ##calculating the slope and the interception of the line connecting the two points
 slope2 = CoefAlpha[0]
 
-Diffusion = (np.subtract(A_x[4], phi)*lxmax**2)/(np.pi**2*t)
-Aminusphi =np.subtract(A_x[4], phi)
+#Diffusion = (np.subtract(A_x[70], phi)*lxmax**2)/(np.pi**2*t)
+#Aminusphi =np.subtract(A_x[70], phi)
+
+D_3D = ((6*math.log(10)/t60) * ((4*lxmax*lzmax)/(np.pi**2*(lxmax+4*lzmax))))*lxmax #not applicable for rooms; only for streets
+D_2D = ((6*np.log10(10)/t60) * ((lxmax)/(np.pi**2))) #not applicable for rooms; only for streets
 
 plt.figure(9)
 plt.plot(x/lxmax,A_x)
@@ -450,10 +482,10 @@ plt.ylabel("A{x}")
 plt.ylim([-4, 1])
 plt.yticks(np.arange(-4, 1, 1))
 
-plt.figure(10)
-plt.plot(t,Diffusion)
-plt.title("Diffusion coefficient over time")
-plt.xlabel("t [s]")
-plt.ylabel("Diffusion coefficient [m^2/s]")
+#plt.figure(10)
+#plt.plot(t,Diffusion)
+#plt.title("Diffusion coefficient over time")
+#plt.xlabel("t [s]")
+#plt.ylabel("Diffusion coefficient [m^2/s]")
 #plt.ylim([0,20000])
 #plt.yticks(np.arange(-4, 1, 1))

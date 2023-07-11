@@ -12,7 +12,7 @@ import numpy as np
 from scipy.integrate import simps
 from scipy import linalg
 import sys
-# MH: uncomment this
+#uncomment this if you need drawnow
 #from drawnow import drawnow
 from math import ceil
 from math import log
@@ -31,8 +31,10 @@ from scipy import stats
 from scipy.interpolate import griddata
 from matplotlib.animation import FuncAnimation
 
-# MH: are you recording the total calculation time and is this the start of that?
 st = time.time() #start time
+
+#%%
+#Input variables
 
 # I advice to make a section of input variables, the things that the user can change.
 # You may then decide to make that a separate .py file, like I did in PSTDbox.

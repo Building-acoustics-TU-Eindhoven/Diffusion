@@ -25,7 +25,6 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator
-import numpy as np
 import time as time
 from scipy import stats
 from scipy.interpolate import griddata
@@ -43,22 +42,21 @@ st = time.time() #start time
 #General settings
 # MH: you could also ask users to set a temperature, and then calculate the speed of sound based on in
 c0= 343 #adiabatic speed of sound [m.s^-1]
-m_atm = 0.1 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
-
+m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
 #Room dimensions
 # MH: Your coordinate system starts in the corner, so basically users only need to enter the width, length and height of the room
 lxmin = 0 #point x starts at zero [m]
-lxmax = 30.0 #point x finish at the length of the room in the x direction [m] %Length
+lxmax = 8.0 #point x finish at the length of the room in the x direction [m] %Length
 lymin = 0 #point y starts at zero [m]
-lymax = 40.0 #point y finish at the length of the room in the y direction [m] %Width
+lymax = 8.0 #point y finish at the length of the room in the y direction [m] %Width
 lzmin = 0 #point z starts at zero [m]
-lzmax = 4.0 #point z finish at the length of the room in the x direction [m] %Height
+lzmax = 8.0 #point z finish at the length of the room in the x direction [m] %Height
 
 # Source position
-x_source = 20.0  #position of the source in the x direction [m]
-y_source = 1.0  #position of the source in the y direction [m]
-z_source = 3.0  #position of the source in the z direction [m]
+x_source = 4.0  #position of the source in the x direction [m]
+y_source = 4.0  #position of the source in the y direction [m]
+z_source = 4.0  #position of the source in the z direction [m]
 
 # Receier position
 x_rec = 2.0 #position of the receiver in the x direction [m]
@@ -73,7 +71,7 @@ dz = dx #distance between grid points z direction [m]
 #Time discretization
 # MH: Do you have directions for the user on how to chose this dt value?
 dt = 1/8000 #distance between grid points on the time discretization [s]
-recording_time = 1.00 #time recorded for the source [s]
+recording_time = 2.00 #time recorded for the source [s]
 
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
@@ -87,7 +85,7 @@ alpha_6 = 0.17 #Absorption coefficient for Surface6 - Wall Right
 #Set initial condition - Source Info (interrupted method)
 Ws=0.005 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
 Vs=0.2  #MH WHAT IS Vs?
-sourceon_time =  0.1 #time that the source is on before interrupting [s]
+sourceon_time =  1 #time that the source is on before interrupting [s]
 
 ## MH: here the fixed input section starts
 #Frequency resolution & spatial parameters

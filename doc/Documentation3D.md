@@ -58,7 +58,7 @@ The term n indicates the vector normal to the surface and the term A_{x} is depe
 
 ### Diffusion Equation
 The software is implemented using the explicit unconditionally stable numerical Finite Different Method called Du Fort and Frankel to solve the diffusion equation (Navarro et al., 2012).
-The Dufort and Frankel method is an expansion of the FTCS method with a truncation order of O[(∆t)^2] + O[(∆v)^2] + O[(∆t)^2 x (∆v)^2]. It is an explicit and unconditionally stable method with ∆t as time step discretization and ∆v=∆x=∆y=∆z as spatial discretization. The ∆v and ∆t are to define depending on the room in order for the results to converge to the exact one (Navarro et al. 2012).
+The Dufort and Frankel method is an expansion of the FTCS method with a truncation order of O[(∆t)^2] + O[(∆v)^2] + O[(∆t)^2 x (∆v)^2]. It is an explicit and unconditionally stable method with ∆t as time step discretization and ∆v=∆x=∆y=∆z as spatial discretization. The ∆v and ∆t are to define depending on the room in order for the results to converge to the exact one (Navarro et al. 2012). Generally a ∆v < 0.5 and ∆t > 1/32000 is sufficient, but it depends on the time of room and the precision to obtain. The smaller the two values the more accurate the calculation will be however, with an increase in computational time.
 
 According to the Dufort and Frankel method, the discretization is based on the following:
 

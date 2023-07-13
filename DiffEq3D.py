@@ -30,49 +30,41 @@ from scipy import stats
 from scipy.interpolate import griddata
 from matplotlib.animation import FuncAnimation
 
-st = time.time() #start time
+st = time.time() #start time of calculation
 
 #%%
-#Input variables
-
-# I advice to make a section of input variables, the things that the user can change.
-# You may then decide to make that a separate .py file, like I did in PSTDbox.
-# All operations that are working wit the input, or are fixed values (like the reference pressure value), I would keep in this file.
+###############################################################################
+#INPUT VARIABLES
+###############################################################################
 
 #General settings
-# MH: you could also ask users to set a temperature, and then calculate the speed of sound based on in
 c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
 #Room dimensions
-# MH: Your coordinate system starts in the corner, so basically users only need to enter the width, length and height of the room
-lxmin = 0 #point x starts at zero [m]
-lxmax = 8.0 #point x finish at the length of the room in the x direction [m] %Length
-lymin = 0 #point y starts at zero [m]
-lymax = 8.0 #point y finish at the length of the room in the y direction [m] %Width
-lzmin = 0 #point z starts at zero [m]
-lzmax = 8.0 #point z finish at the length of the room in the x direction [m] %Height
+length = 8.0 #point x finish at the length of the room in the x direction [m] %Length
+width = 8.0 #point y finish at the length of the room in the y direction [m] %Width
+height = 8.0 #point z finish at the length of the room in the x direction [m] %Height
 
 # Source position
 x_source = 4.0  #position of the source in the x direction [m]
 y_source = 4.0  #position of the source in the y direction [m]
 z_source = 4.0  #position of the source in the z direction [m]
 
-# Receier position
+# Receiver position
 x_rec = 2.0 #position of the receiver in the x direction [m]
 y_rec = 2.0 #position of the receiver in the y direction [m]
 z_rec = 2.0 #position of the receiver in the z direction [m]
 
 #Spatial discretization
-dx = 0.5 #distance between grid points x direction [m]
+dx = 0.5 #distance between grid points x direction [m] #See Documentation for more insight about dt and dx
 dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
 #Time discretization
-# MH: Do you have directions for the user on how to chose this dt value?
-dt = 1/8000 #distance between grid points on the time discretization [s]
-recording_time = 2.00 #time recorded for the source [s]
+dt = 1/8000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
 
+#Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
 alpha_1 = 0.17 #Absorption coefficient for Surface1 - Floor
@@ -84,36 +76,44 @@ alpha_6 = 0.17 #Absorption coefficient for Surface6 - Wall Right
 
 #Set initial condition - Source Info (interrupted method)
 Ws=0.005 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
-Vs=0.2  #MH WHAT IS Vs?
-sourceon_time =  1 #time that the source is on before interrupting [s]
+Vs=0.2  #Volume of the source
+sourceon_time =  1.00 #time that the source is ON before interrupting [s]
+recording_time = 2.00 #total time recorded for the calculation [s]
 
-## MH: here the fixed input section starts
+#%%
+###############################################################################
+#CALCULATION SECTION
+###############################################################################
+
+#Fixed inputs
+pRef = 2 * (10**-5) #Reference pressure in Pa
+rho = 1.21 #air density [kg.m^-3] at 20°C
+
 #Frequency resolution & spatial parameters
 fsample = 1/dt #frequency spatial resolution (sampling period)
 
-pRef = 2 * (10**-5) #Reference pressure in Pa
-rho = 1.21 #air density [kg.m^-3] at 20°C
+#Time resolution
 t = np.arange(0, recording_time, dt) #mesh point in time
 recording_steps = ceil(recording_time/dt) #number of time steps to consider in the calculation
 
-S1,S2 = lxmax*lymax, lxmax*lymax #xy planes
-S3,S4 = lxmax*lzmax, lxmax*lzmax #xz planes
-S5,S6 = lymax*lzmax, lymax*lzmax #yz planes
+#Room characteristics
+S1,S2 = length*width, length*width #xy planes
+S3,S4 = length*height, length*height #xz planes
+S5,S6 = width*height, width*height #yz planes
+S = length*width*2 + length*height*2 + width*height*2 #Total Surface Area[m2]
+V = length*width*height #Volume of the room [m^3]
 
-S = lxmax*lymax*2 + lxmax*lzmax*2 + lymax*lzmax*2 #Total Surface Area[m2]
-V = lxmax*lymax*lzmax #Volume of the room [m^3]
-
-x = np.arange(lxmin, lxmax+dx, dx) #mesh points in space x direction
-y = np.arange(lymin, lymax+dy, dy) #mesh points in space y direction
-z = np.arange(lzmin, lzmax+dz, dz) #mesh points in space z direction
-
+#Creating of meshgrid
+x = np.arange(0, length+dx, dx) #mesh points in space x direction
+y = np.arange(0, width+dy, dy) #mesh points in space y direction
+z = np.arange(0, height+dz, dz) #mesh points in space z direction
 Nx = len(x) #number of point in the x direction
 Ny = len(y) #number of point in the y direction
 Nz = len(z) #number of point in the z direction
 
 yy, xx , zz = np.meshgrid(y,x,z) #Return coordinate matrices from coordinate vectors; create the 3D grid
 
-# MH: uncoment this when using drawnow
+#uncoment this when using drawnow
 ##Visualization of 3D meshgrid
 ##fig = plt.figure()
 ##ax = plt.axes(projection='3d')
@@ -137,6 +137,7 @@ Abs_4 = abs_term(th,alpha_4) #absorption term for S4
 Abs_5 = abs_term(th,alpha_5) #absorption term for S5
 Abs_6 = abs_term(th,alpha_6) #absorption term for S6
 
+#Absorption parameters for room
 alpha_average = (alpha_1*S1 + alpha_2*S2 + alpha_3*S3 + alpha_4*S4 + alpha_5*S5 + alpha_6*S6)/S #average absorption
 Eq_A = alpha_1*S1 + alpha_2*S2 + alpha_3*S3 + alpha_4*S4 + alpha_5*S5 + alpha_6*S6 #equivalent absorption area of the room
 
@@ -146,6 +147,7 @@ Dx = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms x directi
 Dy = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms y direction
 Dz = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms z direction
 
+#Mesh numbers
 beta_zero_x = (2*Dx*dt)/(dx**2) #mesh number in x direction
 beta_zero_y = (2*Dy*dt)/(dy**2) #mesh number in x direction
 beta_zero_z = (2*Dz*dt)/(dz**2) #mesh number in x direction
@@ -156,15 +158,15 @@ beta_zero_condition = ((beta_zero**2) - 1)/(1+(beta_zero**2)+(2*beta_zero)) #fro
 if beta_zero_condition >1:
     print("aa! error! Check beta condition")
 
-#Set initial condition - Source Info (interrupted method)
+#Initial condition - Source Info (interrupted method)
 w1=Ws #w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
 sourceon_steps = ceil(sourceon_time/dt) #time steps at which the source is calculated/considered in the calculation
 s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position
 source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
 
-#############################################################################
+###############################################################################
 #SOURCE INTERPOLATION
-#############################################################################
+###############################################################################
 #Finding index in meshgrid of the source position
 coord_source = [x_source,y_source,z_source] #coordinates of the receiver position in an list
 
@@ -196,9 +198,9 @@ s[row_upper, col_lower, depth_upper] += source1[1] * weight_row_upper * weight_c
 s[row_upper, col_upper, depth_lower] += source1[1] * weight_row_upper * weight_col_upper * weight_depth_lower
 s[row_upper, col_upper, depth_upper] += source1[1] * weight_row_upper * weight_col_upper * weight_depth_upper
 
-#############################################################################
+###############################################################################
 #RECEIVER INTERPOLATION
-#############################################################################
+###############################################################################
 #Finding index in meshgrid of the receiver position
 coord_receiver = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
 
@@ -218,13 +220,9 @@ weight_col_lr = 1 - weight_col_ur #weight y lower
 weight_depth_ur = (z_rec / dz) - depth_lr #weight z upper
 weight_depth_lr = 1 - weight_depth_ur #weight z lower
 
+
+#distance between source and receiver
 dist_sr = math.sqrt((abs(x_rec - x_source))**2 + (abs(y_rec - y_source))**2 + (abs(z_rec - z_source))**2) #distance between source and receiver
-
-w_new = np.zeros((Nx,Ny,Nz)) #unknown w at new time level (n+1)
-w = w_new #w at n level
-w_old = w #w_old at n-1 level
-
-w_rec = np.arange(0,recording_time,dt) #energy density at the receiver
 
 #Function to draw figure
 def draw_fig():
@@ -234,7 +232,7 @@ def draw_fig():
         plt.show()  # Display each slice separately
 
 ############################################################################
-#TRIAL 4D PLOT - INITIALIZATION (main part within the for loop)
+#TRIAL 4D PLOT
 ############################################################################
 #Initialize the figure and axes
 fig = plt.figure()
@@ -243,9 +241,17 @@ ax = fig.add_subplot(111, projection='3d')
 # Set the initial view angle
 ax.view_init(elev=30, azim=45)
 
-############################################################################
+#%%
+###############################################################################
 #MAIN CALCULATION - COMPUTING ENERGY DENSITY
-############################################################################ 
+############################################################################### 
+
+w_new = np.zeros((Nx,Ny,Nz)) #unknown w at new time level (n+1)
+w = w_new #w at n level
+w_old = w #w_old at n-1 level
+
+w_rec = np.arange(0,recording_time,dt) #energy density at the receiver
+
 #Computing w;
 for steps in range(0, recording_steps):
     #Compute w at inner mesh points
@@ -294,19 +300,19 @@ for steps in range(0, recording_steps):
     
     #Insert boundary conditions  
     w_new[0,:,:] = np.divide((4*w_new[1,:,:] - w_new[2,:,:]),(3+((2*Abs_5*dx)/Dx))) #boundary condition at x=0, any y, any z
-    w_new[-1,:,:] = np.divide((4*w_new[-2,:,:] - w_new[-3,:,:]),(3+((2*Abs_6*dx)/Dx))) #boundary condition at lx=lxmax, any y, any z
+    w_new[-1,:,:] = np.divide((4*w_new[-2,:,:] - w_new[-3,:,:]),(3+((2*Abs_6*dx)/Dx))) #boundary condition at lx=length, any y, any z
 
 
     w_new[:,0,:] = np.divide((4*w_new[:,1,:] - w_new[:,2,:]),(3+((2*Abs_3*dx)/Dy))) #boundary condition at y=0, any x, any z
-    w_new[:,-1,:] = np.divide((4*w_new[:,-2,:] - w_new[:,-3,:]),(3+((2*Abs_4*dx)/Dy))) #boundary condition at at ly=lymax, any x, any z
+    w_new[:,-1,:] = np.divide((4*w_new[:,-2,:] - w_new[:,-3,:]),(3+((2*Abs_4*dx)/Dy))) #boundary condition at at ly=width, any x, any z
  
     
     w_new[:,:,0] = np.divide((4*w_new[:,:,1] - w_new[:,:,2]),(3+((2*Abs_1*dx)/Dz))) #boundary condition at z=0, any x, any y
-    w_new[:,:,-1] = np.divide((4*w_new[:,:,-2] - w_new[:,:,-3]),(3+((2*Abs_2*dx)/Dz))) #boundary condition at at lz=lzmax, any x, any y
+    w_new[:,:,-1] = np.divide((4*w_new[:,:,-2] - w_new[:,:,-3]),(3+((2*Abs_2*dx)/Dz))) #boundary condition at at lz=height, any x, any y
     
     sdl = 10*np.log10(abs(w_new),where=abs(w_new)>0) #sound density level
     
- # MH uncomment when activating the drawnow library   
+   #uncomment when activating the drawnow library   
     ##Visualization of the energy density changes while the calculation is progressing
    # if (steps % 100 == 0): #draw only on certain steps and not all the steps
    #     print("A")
@@ -329,8 +335,7 @@ for steps in range(0, recording_steps):
     if steps == sourceon_steps:
         print("Steps for source:",steps)
         w_t0 = w_new
-    
-    # MH if the commented secionts are not needed, remove them from this script. 
+
     
     #Flatten the coordinates and w_new values for scatter plot
     ##coords = np.column_stack([xx.ravel(), yy.ravel(), zz.ravel()])
@@ -353,9 +358,9 @@ for steps in range(0, recording_steps):
     ##ax.set_zlabel('Z')
 
     #Adjust the plot limits
-    ##ax.set_xlim(lxmin, lxmax)
-    ##ax.set_ylim(lymin, lymax)
-    ##ax.set_zlim(lzmin, lzmax)
+    ##ax.set_xlim(0, length)
+    ##ax.set_ylim(0, width)
+    ##ax.set_zlim(0, height)
 
     # Add a colorbar and legend
     #cbar = fig.colorbar(scatter, ax=ax,fraction=0.04, pad=0.1)
@@ -379,6 +384,11 @@ for steps in range(0, recording_steps):
 
 plt.show()
 
+#%%
+
+###############################################################################
+#RESULTS
+###############################################################################
 press_r = ((abs(w_rec))*rho*(c0**2)) #pressure
 spl = 10*np.log10(((abs(w_rec))*rho*(c0**2))/(pRef**2)) #,where=press_r>0
 spl_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_sr) + ((abs(w_rec))*c0)/(pRef**2))) #spl total (including direct field) at the receiver position????? but it will need to be calculated for astationary source 100dB
@@ -404,7 +414,9 @@ et = time.time() #end time
 elapsed_time = et - st
 
 #%%
-###Figures###
+###############################################################################
+#FIGURES
+###############################################################################
 
 #Figure 3: Decay of SPL in the recording_time
 plt.figure(3) 
@@ -473,7 +485,7 @@ summation=np.sum(w_t0)
 w_inf = np.sum(w_t0)/((Nx-1)*(Ny-1)*(Nz-1))
 Q = abs((w_rec/w_inf)*np.exp(sigma*t) - 1)
 phi = np.log10(Q)
-A_x = np.log10(abs((2*np.cos(np.pi*x/lxmax)))) 
+A_x = np.log10(abs((2*np.cos(np.pi*x/length)))) 
 
 #phi_norm = phi / np.max(phi)
 two_lambda_time = 2*lambda_path/c0
@@ -487,20 +499,20 @@ phi_off = phi[idx_phi:]
 # Linregress approach
 slope,intercept = stats.linregress(t[idx_phi:],phi_off)[0:2] 
 
-Diff = ((slope*lxmax**2)/(np.pi**2))
+Diff = ((slope*length**2)/(np.pi**2))
 
 # Poly-based Approach y = Ax + B
 CoefAlpha = np.polyfit(t[idx_phi:], phi_off, 1) ##calculating the slope and the interception of the line connecting the two points
 slope2 = CoefAlpha[0]
 
-#Diffusion = (np.subtract(A_x[70], phi)*lxmax**2)/(np.pi**2*t)
+#Diffusion = (np.subtract(A_x[70], phi)*length**2)/(np.pi**2*t)
 #Aminusphi =np.subtract(A_x[70], phi)
 
-D_3D = ((6*math.log(10)/t60) * ((4*lxmax*lzmax)/(np.pi**2*(lxmax+4*lzmax))))*lxmax #not applicable for rooms; only for streets
-D_2D = ((6*np.log10(10)/t60) * ((lxmax)/(np.pi**2))) #not applicable for rooms; only for streets
+D_3D = ((6*math.log(10)/t60) * ((4*length*height)/(np.pi**2*(length+4*height))))*length #not applicable for rooms; only for streets
+D_2D = ((6*np.log10(10)/t60) * ((length)/(np.pi**2))) #not applicable for rooms; only for streets
 
 plt.figure(9)
-plt.plot(x/lxmax,A_x)
+plt.plot(x/length,A_x)
 plt.title("Representation of A{x}")
 plt.xlabel("x/L")
 plt.ylabel("A{x}")

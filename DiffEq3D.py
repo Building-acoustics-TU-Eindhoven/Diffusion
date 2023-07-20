@@ -7,7 +7,7 @@ Created on Tue Feb 28 10:39:42 2023
 #Code developed by Ilaria Fichera for the analysis of the FDM method Du Fort & Frankel solving the 3D diffusion equation with one intermittent omnidirectional sound source
 import math
 import matplotlib
-import matplotlib.pyplot as plt #import matplotlib as mpl
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import simps
 from scipy import linalg
@@ -42,19 +42,19 @@ c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
 #Room dimensions
-length = 8.0 #point x finish at the length of the room in the x direction [m] %Length
-width = 8.0 #point y finish at the length of the room in the y direction [m] %Width
-height = 8.0 #point z finish at the length of the room in the x direction [m] %Height
+length = 40.0 #point x finish at the length of the room in the x direction [m] %Length
+width = 3.0 #point y finish at the length of the room in the y direction [m] %Width
+height = 3.0 #point z finish at the length of the room in the x direction [m] %Height
 
 # Source position
-x_source = 4.0  #position of the source in the x direction [m]
-y_source = 4.0  #position of the source in the y direction [m]
-z_source = 4.0  #position of the source in the z direction [m]
+x_source = 0.5  #position of the source in the x direction [m]
+y_source = 0.7  #position of the source in the y direction [m]
+z_source = 1.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 2.0 #position of the receiver in the x direction [m]
-y_rec = 2.0 #position of the receiver in the y direction [m]
-z_rec = 2.0 #position of the receiver in the z direction [m]
+x_rec = 30.0 #position of the receiver in the x direction [m]
+y_rec = 0.7 #position of the receiver in the y direction [m]
+z_rec = 1.0 #position of the receiver in the z direction [m]
 
 #Spatial discretization
 dx = 0.5 #distance between grid points x direction [m] #See Documentation for more insight about dt and dx
@@ -62,22 +62,22 @@ dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
 #Time discretization
-dt = 1/8000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
+dt = 1/24000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
-alpha_1 = 0.17 #Absorption coefficient for Surface1 - Floor
-alpha_2 = 0.17 #Absorption coefficient for Surface2 - Ceiling
-alpha_3 = 0.17 #Absorption coefficient for Surface3 - Wall Front
-alpha_4 = 0.17 #Absorption coefficient for Surface4 - Wall Back
-alpha_5 = 0.17 #Absorption coefficient for Surface5 - Wall Left
-alpha_6 = 0.17 #Absorption coefficient for Surface6 - Wall Right
+alpha_1 = 1/6 #Absorption coefficient for Surface1 - Floor
+alpha_2 = 1/6 #Absorption coefficient for Surface2 - Ceiling
+alpha_3 = 1/6 #Absorption coefficient for Surface3 - Wall Front
+alpha_4 = 1/6 #Absorption coefficient for Surface4 - Wall Back
+alpha_5 = 1/6 #Absorption coefficient for Surface5 - Wall Left
+alpha_6 = 1/6 #Absorption coefficient for Surface6 - Wall Right
 
 #Set initial condition - Source Info (interrupted method)
-Ws=0.005 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
-Vs=0.2  #Volume of the source
-sourceon_time =  1.00 #time that the source is ON before interrupting [s]
+Ws=0.443 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
+Vs=dx*dy*dz  #Volume of the source
+sourceon_time =  0.50 #time that the source is ON before interrupting [s]
 recording_time = 2.00 #total time recorded for the calculation [s]
 
 #%%
@@ -311,6 +311,7 @@ for steps in range(0, recording_steps):
     w_new[:,:,-1] = np.divide((4*w_new[:,:,-2] - w_new[:,:,-3]),(3+((2*Abs_2*dx)/Dz))) #boundary condition at at lz=height, any x, any y
     
     sdl = 10*np.log10(abs(w_new),where=abs(w_new)>0) #sound density level
+    spl = 10*np.log10(((abs(w_new))*rho*(c0**2))/(pRef**2)) #,where=press_r>0, sound pressure level in the 3D space
     
    #uncomment when activating the drawnow library   
     ##Visualization of the energy density changes while the calculation is progressing
@@ -389,20 +390,21 @@ plt.show()
 ###############################################################################
 #RESULTS
 ###############################################################################
-press_r = ((abs(w_rec))*rho*(c0**2)) #pressure
-spl = 10*np.log10(((abs(w_rec))*rho*(c0**2))/(pRef**2)) #,where=press_r>0
-spl_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_sr) + ((abs(w_rec))*c0)/(pRef**2))) #spl total (including direct field) at the receiver position????? but it will need to be calculated for astationary source 100dB
-spl_norm = 10*np.log10((((abs(w_rec))*rho*(c0**2))/(pRef**2)) / np.max(((abs(w_rec))*rho*(c0**2))/(pRef**2))) #normalised to maximum to 0dB
+
+press_r = ((abs(w_rec))*rho*(c0**2)) #pressure at the receiver
+spl_r = 10*np.log10(((abs(w_rec))*rho*(c0**2))/(pRef**2)) #,where=press_r>0, sound pressure level at the receiver
+spl_r_norm = 10*np.log10((((abs(w_rec))*rho*(c0**2))/(pRef**2)) / np.max(((abs(w_rec))*rho*(c0**2))/(pRef**2))) #normalised to maximum to 0dB
+spl_r_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_sr) + ((abs(w_rec))*c0)/(pRef**2))) #spl total (including direct field) at the receiver position????? but it will need to be calculated for a stationary source 100dB
 
 #Schroeder integration
 idx_w_rec = np.where(t == sourceon_time)[0][0] #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
-w_rec_off = w_rec[idx_w_rec:] #cutting the energy density array at the receiver from the idx_w_rec to the end   
+w_rec_off = w_rec[idx_w_rec:] #cutting the energy density array at the receiver from the idx_w_rec to the end
 energy_r_rev = (w_rec_off)[::-1] #reverting the array
 
 #The energy density is related to the pressure with the following relation: w = p^2
 energy_r_rev_cum = np.cumsum(energy_r_rev) #cumulative summation of all the item in the array
 schroeder = energy_r_rev_cum[::-1] #reverting the array again -> creating the schroder decay
-sch_db = 10.0 * np.log10(schroeder / np.max(schroeder)) #level of the array: schroeder decay
+sch_db = 10.0 * np.log10(schroeder / max(schroeder)) #level of the array: schroeder decay
 
 t60 = t60_decay(t, sch_db, idx_w_rec) #called function for calculation of t60 [s]
 edt = edt_decay(t, sch_db, idx_w_rec) #called function for calculation of edt [s]
@@ -420,7 +422,7 @@ elapsed_time = et - st
 
 #Figure 3: Decay of SPL in the recording_time
 plt.figure(3) 
-plt.plot(t,spl) #plot sound pressure level with Pref = (2e-5)**5
+plt.plot(t,spl_r) #plot sound pressure level with Pref = (2e-5)**5
 plt.title("SPL over time at the receiver")
 plt.xlabel("t [s]")
 plt.ylabel("SPL [dB]")
@@ -431,7 +433,7 @@ plt.yticks(np.arange(0, 120, 20))
 
 #Figure 4: Decay of SPL in the recording_time normalised to maximum 0dB
 plt.figure(4)
-plt.plot(t,spl_norm)
+plt.plot(t,spl_r_norm)
 plt.title("Normalised SPL over time at the receiver")
 plt.xlabel("t [s]")
 plt.ylabel("SPL [dB]")
@@ -453,25 +455,41 @@ plt.xticks(np.arange(0, recording_time +0.1, 0.1))
 #Figure 6: Schroeder decay
 plt.figure(6)
 plt.plot(t[idx_w_rec:],sch_db)
-plt.title("Schroeder decay")
+plt.title("Schroeder decay (Energy Decay Curve)")
 plt.xlabel("t [s]")
 plt.ylabel("Energy decay [dB]")
 plt.xlim()
 plt.ylim()
 plt.xticks(np.arange(t[idx_w_rec], recording_time +0.1, 0.1))
 
-# MH please write a caption of this figure to help the reader what they see. I suggest to make a 2D colorpolot here, 
-# I think that it gives a better picture on the distribution of the energy over space. Also, at what time is w shown?
-#Figure 7: 3D image of the energy density in the room
+#Figure 7: 2D image of the energy density in the room
+w_new_2d = w_new[:,:,depth_ur] #The 3D w_new array is slised at the the desired z level
 plt.figure(7)
-fig = plt.figure(7)
-ax = fig.add_subplot(111, projection='3d')
-ax.set_box_aspect([0.5, 0.5, 0.5])  # Set the aspect ratio of the plot
-X, Y= np.meshgrid(x, y)
-X = X.T
-Y = Y.T
-ax.contourf(X, Y, w_new[:, :, 4], cmap='hot', alpha=0.8)
-ax.view_init(azim=-120, elev=30)  # Set the viewing angle
+plt.imshow(w_new_2d, origin='lower', extent=[x[0], x[-1], y[0], y[-1]], aspect='equal') #plot with the extent being the room dimension x and y 
+plt.colorbar(label='Energy Density')
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.title('Energy Density at Z = z_rec and t = recording_time')
+plt.show()
+
+#Figure 8: 2D image of the SDL in the room
+sdl_2d = sdl[:,:,depth_ur] #The 3D w_new array is slised at the the desired z level
+plt.figure(8)
+plt.imshow(sdl_2d, origin='lower', extent=[x[0], x[-1], y[0], y[-1]], aspect='equal') #plot with the extent being the room dimension x and y 
+plt.colorbar(label='Sound Density Level')
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.title('Sound Density level at Z = z_rec and t = recording_time')
+plt.show()
+
+#Figure 9: 2D image of the SPL in the room
+spl_2d = spl[:,:,depth_ur] #The 3D w_new array is slised at the the desired z level
+plt.figure(9)
+plt.imshow(spl_2d, origin='lower', extent=[x[0], x[-1], y[0], y[-1]], aspect='equal') #plot with the extent being the room dimension x and y 
+plt.colorbar(label='Sound Pressure Level')
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.title('Sound Pressure level at Z = z_rec and t = recording_time')
 plt.show()
 
 ##############################################################################
@@ -481,13 +499,24 @@ plt.show()
 sigma = c0*alpha_1/lambda_path
 mean_w_t0 = np.mean(w_t0)
 summation=np.sum(w_t0)
-#w_inf = np.sum(w_t0)*(dx*dy*dz)/V
-w_inf = np.sum(w_t0)/((Nx-1)*(Ny-1)*(Nz-1))
+
+#Trial with Cedric paper calculating the total amount energy being in the room at t=0
+omega = 1
+eta = alpha_average
+kp = (2*rho*c0**2/(omega*eta*V))*np.mean(w_t0) #Cedric paper E[Win] = Ws or E[Win] = w_t0???
+E_tot = kp/2 #Cedric paper
+w_inf = E_tot/((Nx-1)*(Ny-1)*(Nz-1))
+
+#Trial email Cedric about w_inf beeing the integral of energy at t=0
+#w_inf = np.sum(w_t0)*(dx*dy*dz)/V #Option 1 Cedric email
+#w_inf = np.sum(w_t0)/((Nx-1)*(Ny-1)*(Nz-1)) #Option 2 Cedric email
+
+
 Q = abs((w_rec/w_inf)*np.exp(sigma*t) - 1)
 phi = np.log10(Q)
 A_x = np.log10(abs((2*np.cos(np.pi*x/length)))) 
 
-#phi_norm = phi / np.max(phi)
+phi_norm = phi / np.max(phi)
 two_lambda_time = 2*lambda_path/c0
 
 difference = np.abs(t-(sourceon_time+two_lambda_time))

@@ -21,13 +21,13 @@ def edt_decay(t, sch_db, idx_w_rec):
     factor = 6.0 #factor of 2 since I need the edt
     
     #Linear regression
-    idxL1 = np.where(sch_db <= init)[0][0] #index at which the rtdecay is equal to -5
-    idxL2 = np.where(sch_db <= end)[0][0] #index at which the rtdecay is equal to -35
+    idxL1 = np.where(sch_db <= init)[0][0] #index at which the rtdecay is equal to 0
+    idxL2 = np.where(sch_db <= end)[0][0] #index at which the rtdecay is equal to -10
        
     timeL1 = t[idxL1] #index at which the time vector is equal to the idxL1
     timeL2 = t[idxL2] #index at which the time vector is equal to the idxL2
     
-    # Classical Approach (T30 = 2*(t[-35dB]-t[-5dB])
+    # Classical Approach (T30 = 2*(t[-10dB]-t[0dB])
     RTCalc = factor*(timeL2 - timeL1)
     
     # Linregress approach

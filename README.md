@@ -61,4 +61,4 @@ Software is being developed by Ilaria Fichera at Eindhoven University of Technol
 The project is funded by <u>[NWO](https://www.nwo.nl/projecten/19430), in the Netherlands.
 
 ## Licence
-Diffusion Code is licenced under MIT licence. See LICENCE.md for more details.
+Diffusion Code is licenced under GNU General Public License v2.0. See LICENCE.md for more details.

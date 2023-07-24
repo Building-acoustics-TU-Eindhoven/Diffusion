@@ -13,7 +13,7 @@ from scipy.integrate import simps
 from scipy import linalg
 import sys
 #uncomment this if you need drawnow
-#from drawnow import drawnow
+from drawnow import drawnow
 from math import ceil
 from math import log
 from FunctionRT import *
@@ -42,19 +42,19 @@ c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
 #Room dimensions
-length = 40.0 #point x finish at the length of the room in the x direction [m] %Length
-width = 3.0 #point y finish at the length of the room in the y direction [m] %Width
+length = 30.0 #point x finish at the length of the room in the x direction [m] %Length
+width = 8.0 #point y finish at the length of the room in the y direction [m] %Width
 height = 3.0 #point z finish at the length of the room in the x direction [m] %Height
 
 # Source position
-x_source = 0.5  #position of the source in the x direction [m]
-y_source = 0.7  #position of the source in the y direction [m]
-z_source = 1.0  #position of the source in the z direction [m]
+x_source = 2.0  #position of the source in the x direction [m]
+y_source = 4.0  #position of the source in the y direction [m]
+z_source = 2.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 30.0 #position of the receiver in the x direction [m]
-y_rec = 0.7 #position of the receiver in the y direction [m]
-z_rec = 1.0 #position of the receiver in the z direction [m]
+x_rec = 3.5 #position of the receiver in the x direction [m]
+y_rec = 4.0 #position of the receiver in the y direction [m]
+z_rec = 1.5 #position of the receiver in the z direction [m]
 
 #Spatial discretization
 dx = 0.5 #distance between grid points x direction [m] #See Documentation for more insight about dt and dx
@@ -62,23 +62,27 @@ dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
 #Time discretization
-dt = 1/24000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
+dt = 1/32000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
-alpha_1 = 1/6 #Absorption coefficient for Surface1 - Floor
-alpha_2 = 1/6 #Absorption coefficient for Surface2 - Ceiling
-alpha_3 = 1/6 #Absorption coefficient for Surface3 - Wall Front
-alpha_4 = 1/6 #Absorption coefficient for Surface4 - Wall Back
-alpha_5 = 1/6 #Absorption coefficient for Surface5 - Wall Left
-alpha_6 = 1/6 #Absorption coefficient for Surface6 - Wall Right
+alpha_1 = 0.2 #Absorption coefficient for Surface1 - Floor
+alpha_2 = 0.2 #Absorption coefficient for Surface2 - Ceiling
+alpha_3 = 0.2 #Absorption coefficient for Surface3 - Wall Front
+alpha_4 = 0.8 #Absorption coefficient for Surface4 - Wall Back
+alpha_5 = 0.2 #Absorption coefficient for Surface5 - Wall Left
+alpha_6 = 0.2 #Absorption coefficient for Surface6 - Wall Right
+
+#Type of Calculation
+#Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
+#Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
+tcalc = "stationarysource"
 
 #Set initial condition - Source Info (interrupted method)
-Ws=0.443 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
-Vs=dx*dy*dz  #Volume of the source
+Ws=0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
 sourceon_time =  0.50 #time that the source is ON before interrupting [s]
-recording_time = 2.00 #total time recorded for the calculation [s]
+recording_time = 1.00 #total time recorded for the calculation [s]
 
 #%%
 ###############################################################################
@@ -114,11 +118,11 @@ Nz = len(z) #number of point in the z direction
 yy, xx , zz = np.meshgrid(y,x,z) #Return coordinate matrices from coordinate vectors; create the 3D grid
 
 #uncoment this when using drawnow
-##Visualization of 3D meshgrid
-##fig = plt.figure()
-##ax = plt.axes(projection='3d')
-##ax = ax.scatter3D(xx, yy, zz, c=zz, cmap='Greens')
-##plt.title("Visualization of 3D meshgrid")
+#Figure 1: Visualization of 3D meshgrid
+fig = plt.figure(1)
+ax = plt.axes(projection ="3d")
+ax.scatter(xx, yy, zz, c=zz, cmap='Greens')
+plt.title("Figure 1: Visualization of 3D meshgrid")
 
 #Absorption term for boundary conditions 
 def abs_term(th,alpha):
@@ -159,7 +163,8 @@ if beta_zero_condition >1:
     print("aa! error! Check beta condition")
 
 #Initial condition - Source Info (interrupted method)
-w1=Ws #w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
+Vs=dx*dy*dz  #Volume of the source
+w1=Ws/Vs #w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
 sourceon_steps = ceil(sourceon_time/dt) #time steps at which the source is calculated/considered in the calculation
 s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position
 source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
@@ -224,22 +229,76 @@ weight_depth_lr = 1 - weight_depth_ur #weight z lower
 #distance between source and receiver
 dist_sr = math.sqrt((abs(x_rec - x_source))**2 + (abs(y_rec - y_source))**2 + (abs(z_rec - z_source))**2) #distance between source and receiver
 
+#distance between source and each mesh point in the x direction 
+dist_x = np.sqrt((((xx[:, col_lr, depth_lr]*(weight_row_lr * weight_col_lr * weight_depth_lr))+\
+    (xx[:, col_lr, depth_ur]*(weight_row_lr * weight_col_lr * weight_depth_ur))+\
+        (xx[:, col_ur, depth_lr]*(weight_row_lr * weight_col_ur * weight_depth_lr))+\
+            (xx[:, col_ur, depth_ur]*(weight_row_lr * weight_col_ur * weight_depth_ur))+\
+                (xx[:, col_lr, depth_lr]*(weight_row_ur * weight_col_lr * weight_depth_lr))+\
+                    (xx[:, col_lr, depth_ur]*(weight_row_ur * weight_col_lr * weight_depth_ur))+\
+                        (xx[:, col_ur, depth_lr]*(weight_row_ur * weight_col_ur * weight_depth_lr))+\
+                            (xx[:, col_ur, depth_ur]*(weight_row_ur * weight_col_ur * weight_depth_ur))) - x_source)**2 +\
+                 (((yy[row_lr, col_lr, depth_lr]*(weight_row_lr * weight_col_lr * weight_depth_lr))+\
+                     (yy[row_lr, col_lr, depth_ur]*(weight_row_lr * weight_col_lr * weight_depth_ur))+\
+                         (yy[row_lr, col_ur, depth_lr]*(weight_row_lr * weight_col_ur * weight_depth_lr))+\
+                             (yy[row_lr, col_ur, depth_ur]*(weight_row_lr * weight_col_ur * weight_depth_ur))+\
+                                 (yy[row_ur, col_lr, depth_lr]*(weight_row_ur * weight_col_lr * weight_depth_lr))+\
+                                     (yy[row_ur, col_lr, depth_ur]*(weight_row_ur * weight_col_lr * weight_depth_ur))+\
+                                         (yy[row_ur, col_ur, depth_lr]*(weight_row_ur * weight_col_ur * weight_depth_lr))+\
+                                             (yy[row_ur, col_ur, depth_ur]*(weight_row_ur * weight_col_ur * weight_depth_ur))) - y_source)**2 +\
+                     (((zz[row_lr, col_lr, depth_lr]*(weight_row_lr * weight_col_lr * weight_depth_lr))+\
+                         (zz[row_lr, col_lr, depth_ur]*(weight_row_lr * weight_col_lr * weight_depth_ur))+\
+                             (zz[row_lr, col_ur, depth_lr]*(weight_row_lr * weight_col_ur * weight_depth_lr))+\
+                                 (zz[row_lr, col_ur, depth_ur]*(weight_row_lr * weight_col_ur * weight_depth_ur))+\
+                                     (zz[row_ur, col_lr, depth_lr]*(weight_row_ur * weight_col_lr * weight_depth_lr))+\
+                                         (zz[row_ur, col_lr, depth_ur]*(weight_row_ur * weight_col_lr * weight_depth_ur))+\
+                                             (zz[row_ur, col_ur, depth_lr]*(weight_row_ur * weight_col_ur * weight_depth_lr))+\
+                                                 (zz[row_ur, col_ur, depth_ur]*(weight_row_ur * weight_col_ur * weight_depth_ur))) - z_source)**2)
+
+
+
+#distance between source and each mesh point in the y direction 
+dist_y = np.sqrt((((xx[row_lr, col_lr, depth_lr]*(weight_row_lr * weight_col_lr * weight_depth_lr))+\
+    (xx[row_lr, col_lr, depth_ur]*(weight_row_lr * weight_col_lr * weight_depth_ur))+\
+        (xx[row_lr, col_ur, depth_lr]*(weight_row_lr * weight_col_ur * weight_depth_lr))+\
+            (xx[row_lr, col_ur, depth_ur]*(weight_row_lr * weight_col_ur * weight_depth_ur))+\
+                (xx[row_ur, col_lr, depth_lr]*(weight_row_ur * weight_col_lr * weight_depth_lr))+\
+                    (xx[row_ur, col_lr, depth_ur]*(weight_row_ur * weight_col_lr * weight_depth_ur))+\
+                        (xx[row_ur, col_ur, depth_lr]*(weight_row_ur * weight_col_ur * weight_depth_lr))+\
+                            (xx[row_ur, col_ur, depth_ur]*(weight_row_ur * weight_col_ur * weight_depth_ur))) - x_source)**2 +\
+                 (((yy[row_lr, :, depth_lr]*(weight_row_lr * weight_col_lr * weight_depth_lr))+\
+                     (yy[row_lr, :, depth_ur]*(weight_row_lr * weight_col_lr * weight_depth_ur))+\
+                         (yy[row_lr, :, depth_lr]*(weight_row_lr * weight_col_ur * weight_depth_lr))+\
+                             (yy[row_lr, :, depth_ur]*(weight_row_lr * weight_col_ur * weight_depth_ur))+\
+                                 (yy[row_ur, :, depth_lr]*(weight_row_ur * weight_col_lr * weight_depth_lr))+\
+                                     (yy[row_ur, :, depth_ur]*(weight_row_ur * weight_col_lr * weight_depth_ur))+\
+                                         (yy[row_ur, :, depth_lr]*(weight_row_ur * weight_col_ur * weight_depth_lr))+\
+                                             (yy[row_ur, :, depth_ur]*(weight_row_ur * weight_col_ur * weight_depth_ur))) - y_source)**2 +\
+                     (((zz[row_lr, col_lr, depth_lr]*(weight_row_lr * weight_col_lr * weight_depth_lr))+\
+                         (zz[row_lr, col_lr, depth_ur]*(weight_row_lr * weight_col_lr * weight_depth_ur))+\
+                             (zz[row_lr, col_ur, depth_lr]*(weight_row_lr * weight_col_ur * weight_depth_lr))+\
+                                 (zz[row_lr, col_ur, depth_ur]*(weight_row_lr * weight_col_ur * weight_depth_ur))+\
+                                     (zz[row_ur, col_lr, depth_lr]*(weight_row_ur * weight_col_lr * weight_depth_lr))+\
+                                         (zz[row_ur, col_lr, depth_ur]*(weight_row_ur * weight_col_lr * weight_depth_ur))+\
+                                             (zz[row_ur, col_ur, depth_lr]*(weight_row_ur * weight_col_ur * weight_depth_lr))+\
+                                                 (zz[row_ur, col_ur, depth_ur]*(weight_row_ur * weight_col_ur * weight_depth_ur))) - z_source)**2)
+
 #Function to draw figure
-def draw_fig():
-    for i in range(w_new.shape[2]):
-        print(i)
-        plt.imshow(w_new[:, :, i], cmap='hot', vmin=w_new.min(), vmax=w_new.max())
-        plt.show()  # Display each slice separately
+##def draw_fig():
+##    for i in range(w_new.shape[2]):
+##        print(i)
+##        plt.figure(2)
+##        plt.imshow(w_new[:, :, i], cmap='hot', vmin=w_new.min(), vmax=w_new.max())
 
 ############################################################################
 #TRIAL 4D PLOT
 ############################################################################
 #Initialize the figure and axes
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-
-# Set the initial view angle
-ax.view_init(elev=30, azim=45)
+##if tcalc == "decay":
+##    plt.figure()
+##    ax = fig.add_subplot(111, projection='3d')
+##    plt.title("4D plot")
+##    ax.view_init(elev=30, azim=45) #Set the initial view angle
 
 #%%
 ###############################################################################
@@ -314,10 +373,10 @@ for steps in range(0, recording_steps):
     spl = 10*np.log10(((abs(w_new))*rho*(c0**2))/(pRef**2)) #,where=press_r>0, sound pressure level in the 3D space
     
    #uncomment when activating the drawnow library   
-    ##Visualization of the energy density changes while the calculation is progressing
-   # if (steps % 100 == 0): #draw only on certain steps and not all the steps
-   #     print("A")
-   #     drawnow(draw_fig)
+   #Visualization of the energy density changes while the calculation is progressing
+    ##if (steps % 100 == 0): #draw only on certain steps and not all the steps
+    ##    print("A")
+    ##    drawnow(draw_fig)
     
     #Update w before next step
     w_old = w #The w at n step becomes the w at n-1 step
@@ -334,10 +393,10 @@ for steps in range(0, recording_steps):
                                 (w_new[row_ur, col_ur, depth_ur]*(weight_row_ur * weight_col_ur * weight_depth_ur)))
 
     if steps == sourceon_steps:
-        print("Steps for source:",steps)
+        #print("Steps for source:",steps)
         w_t0 = w_new
 
-    
+    #4D Visualization????
     #Flatten the coordinates and w_new values for scatter plot
     ##coords = np.column_stack([xx.ravel(), yy.ravel(), zz.ravel()])
     ##w_new_flat = w_new.ravel()
@@ -353,7 +412,7 @@ for steps in range(0, recording_steps):
     ##    scatter.set_array(w_new_flat)
         
     #Set a suitable title and labels
-    ##ax.set_title('Time Step: ', time_steps)
+    ##ax.set_title("Time Step: 'time_steps'")
     ##ax.set_xlabel('X')
     ##ax.set_ylabel('Y')
     ##ax.set_zlabel('Z')
@@ -363,24 +422,35 @@ for steps in range(0, recording_steps):
     ##ax.set_ylim(0, width)
     ##ax.set_zlim(0, height)
 
-    # Add a colorbar and legend
-    #cbar = fig.colorbar(scatter, ax=ax,fraction=0.04, pad=0.1)
-    #cbar.set_label('Energy Density')
-    #cbar.ax.yaxis.set_ticks_position('left')
+    #Add a colorbar and legend
+    ##cbar = fig.colorbar(scatter, ax=ax,fraction=0.04, pad=0.1)
+    ##cbar.set_label('Energy Density')
+    ##cbar.ax.yaxis.set_ticks_position('left')
 
-    # Pause to create an animated effect
+    #Pause to create an animated effect
     ##plt.pause(0.01)  # Adjust the pause duration as needed
     
     #Updating the source term
-    s[row_lower, col_lower, depth_lower] = source1[steps] * weight_row_lower * weight_col_lower * weight_depth_lower
-    s[row_lower, col_lower, depth_upper] = source1[steps] * weight_row_lower * weight_col_lower * weight_depth_upper
-    s[row_lower, col_upper, depth_lower] = source1[steps] * weight_row_lower * weight_col_upper * weight_depth_lower
-    s[row_lower, col_upper, depth_upper] = source1[steps] * weight_row_lower * weight_col_upper * weight_depth_upper
-    s[row_upper, col_lower, depth_lower] = source1[steps] * weight_row_upper * weight_col_lower * weight_depth_lower
-    s[row_upper, col_lower, depth_upper] = source1[steps] * weight_row_upper * weight_col_lower * weight_depth_upper
-    s[row_upper, col_upper, depth_lower] = source1[steps] * weight_row_upper * weight_col_upper * weight_depth_lower
-    s[row_upper, col_upper, depth_upper] = source1[steps] * weight_row_upper * weight_col_upper * weight_depth_upper
-     
+    if tcalc == "decay":
+        s[row_lower, col_lower, depth_lower] = source1[steps] * weight_row_lower * weight_col_lower * weight_depth_lower
+        s[row_lower, col_lower, depth_upper] = source1[steps] * weight_row_lower * weight_col_lower * weight_depth_upper
+        s[row_lower, col_upper, depth_lower] = source1[steps] * weight_row_lower * weight_col_upper * weight_depth_lower
+        s[row_lower, col_upper, depth_upper] = source1[steps] * weight_row_lower * weight_col_upper * weight_depth_upper
+        s[row_upper, col_lower, depth_lower] = source1[steps] * weight_row_upper * weight_col_lower * weight_depth_lower
+        s[row_upper, col_lower, depth_upper] = source1[steps] * weight_row_upper * weight_col_lower * weight_depth_upper
+        s[row_upper, col_upper, depth_lower] = source1[steps] * weight_row_upper * weight_col_upper * weight_depth_lower
+        s[row_upper, col_upper, depth_upper] = source1[steps] * weight_row_upper * weight_col_upper * weight_depth_upper
+    if tcalc == "stationarysource":
+        s[row_lower, col_lower, depth_lower] = source1[0] * weight_row_lower * weight_col_lower * weight_depth_lower
+        s[row_lower, col_lower, depth_upper] = source1[0] * weight_row_lower * weight_col_lower * weight_depth_upper
+        s[row_lower, col_upper, depth_lower] = source1[0] * weight_row_lower * weight_col_upper * weight_depth_lower
+        s[row_lower, col_upper, depth_upper] = source1[0] * weight_row_lower * weight_col_upper * weight_depth_upper
+        s[row_upper, col_lower, depth_lower] = source1[0] * weight_row_upper * weight_col_lower * weight_depth_lower
+        s[row_upper, col_lower, depth_upper] = source1[0] * weight_row_upper * weight_col_lower * weight_depth_upper
+        s[row_upper, col_upper, depth_lower] = source1[0] * weight_row_upper * weight_col_upper * weight_depth_lower
+        s[row_upper, col_upper, depth_upper] = source1[0] * weight_row_upper * weight_col_upper * weight_depth_upper
+        
+    
     print(time_steps)
 
 plt.show()
@@ -406,91 +476,174 @@ energy_r_rev_cum = np.cumsum(energy_r_rev) #cumulative summation of all the item
 schroeder = energy_r_rev_cum[::-1] #reverting the array again -> creating the schroder decay
 sch_db = 10.0 * np.log10(schroeder / max(schroeder)) #level of the array: schroeder decay
 
-t60 = t60_decay(t, sch_db, idx_w_rec) #called function for calculation of t60 [s]
-edt = edt_decay(t, sch_db, idx_w_rec) #called function for calculation of edt [s]
-c80 = clarity(t60, V, Eq_A, S, c0, dist_sr) #called function for calculation of c80 [dB]
-d50 = definition(t60, V, Eq_A, S, c0, dist_sr) #called function for calculation of d50 [%]
-ts = centretime(t60, Eq_A, S) #called function for calculation of ts [ms]
+if tcalc == "decay":
+    t60 = t60_decay(t, sch_db, idx_w_rec) #called function for calculation of t60 [s]
+    edt = edt_decay(t, sch_db, idx_w_rec) #called function for calculation of edt [s]
+    c80 = clarity(t60, V, Eq_A, S, c0, dist_sr) #called function for calculation of c80 [dB]
+    d50 = definition(t60, V, Eq_A, S, c0, dist_sr) #called function for calculation of d50 [%]
+    ts = centretime(t60, Eq_A, S) #called function for calculation of ts [ms]
 
 et = time.time() #end time
 elapsed_time = et - st
 
 #%%
 ###############################################################################
-#FIGURES
+#FIGURES & POST-PROCESSING
 ###############################################################################
 
-#Figure 3: Decay of SPL in the recording_time
-plt.figure(3) 
-plt.plot(t,spl_r) #plot sound pressure level with Pref = (2e-5)**5
-plt.title("SPL over time at the receiver")
-plt.xlabel("t [s]")
-plt.ylabel("SPL [dB]")
-plt.xlim()
-plt.ylim()
-plt.xticks(np.arange(0, recording_time +0.1, 0.5))
-plt.yticks(np.arange(0, 120, 20))
+if tcalc == "decay":
+    #Figure 5: Decay of SPL in the recording_time
+    plt.figure(5)
+    plt.plot(t, spl_r)  # plot sound pressure level with Pref = (2e-5)**5
+    plt.title("Figure 5 :SPL over time at the receiver")
+    plt.xlabel("t [s]")
+    plt.ylabel("SPL [dB]")
+    plt.xlim()
+    plt.ylim()
+    plt.xticks(np.arange(0, recording_time + 0.1, 0.5))
+    plt.yticks(np.arange(0, 120, 20))
 
-#Figure 4: Decay of SPL in the recording_time normalised to maximum 0dB
-plt.figure(4)
-plt.plot(t,spl_r_norm)
-plt.title("Normalised SPL over time at the receiver")
-plt.xlabel("t [s]")
-plt.ylabel("SPL [dB]")
-plt.xlim()
-plt.ylim()
-plt.xticks(np.arange(0, recording_time +0.1, 0.1))
-plt.yticks(np.arange(0, -60, -10))
+    #Figure 6: Decay of SPL in the recording_time normalised to maximum 0dB
+    plt.figure(6)
+    plt.plot(t,spl_r_norm)
+    plt.title("Figure 6: Normalised SPL over time at the receiver")
+    plt.xlabel("t [s]")
+    plt.ylabel("SPL [dB]")
+    plt.xlim()
+    plt.ylim()
+    plt.xticks(np.arange(0, recording_time +0.1, 0.1))
+    plt.yticks(np.arange(0, -60, -10))
+    
+    #Figure 7: Energy density at the receiver over time
+    plt.figure(7)
+    plt.plot(t,w_rec)
+    plt.title("Figure 7: Energy density over time at the receiver")
+    plt.xlabel("t [s]")
+    plt.ylabel("Energy density [kg m^-1 s^-2]")
+    plt.xlim()
+    plt.ylim()
+    plt.xticks(np.arange(0, recording_time +0.1, 0.1))
+    
+    #Figure 8: Schroeder decay
+    plt.figure(8)
+    plt.plot(t[idx_w_rec:],sch_db)
+    plt.title("Figure 8: Schroeder decay (Energy Decay Curve)")
+    plt.xlabel("t [s]")
+    plt.ylabel("Energy decay [dB]")
+    plt.xlim()
+    plt.ylim()
+    plt.xticks(np.arange(t[idx_w_rec], recording_time +0.1, 0.1))
+    
+    #Figure 9: 2D image of the energy density in the room
+    w_new_2d = w_new[:,:,depth_ur] #The 3D w_new array is slised at the the desired z level
+    plt.figure(9)
+    plt.imshow(w_new_2d, origin='lower', extent=[x[0], x[-1], y[0], y[-1]], aspect='equal') #plot with the extent being the room dimension x and y 
+    plt.colorbar(label='Energy Density')
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.title('Figure 9: Energy Density at Z = z_rec and t = recording_time')
+    plt.show()
+    
+    #Figure 10: 2D image of the SDL in the room
+    sdl_2d = sdl[:,:,depth_ur] #The 3D w_new array is slised at the the desired z level
+    plt.figure(10)
+    plt.imshow(sdl_2d, origin='lower', extent=[x[0], x[-1], y[0], y[-1]], aspect='equal') #plot with the extent being the room dimension x and y 
+    plt.colorbar(label='Sound Density Level')
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.title('Figure 10: Sound Density level at Z = z_rec and t = recording_time')
+    plt.show()
+    
+    #Figure 11: 2D image of the SPL in the room
+    spl_2d = spl[:,:,depth_ur] #The 3D w_new array is slised at the the desired z level
+    plt.figure(11)
+    plt.imshow(spl_2d, origin='lower', extent=[x[0], x[-1], y[0], y[-1]], aspect='equal') #plot with the extent being the room dimension x and y 
+    plt.colorbar(label='Sound Pressure Level')
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.title('Figure 11: Sound Pressure level at Z = z_rec and t = recording_time')
+    plt.show()
 
-#Figure 5: Energy density at the receiver over time
-plt.figure(5)
-plt.plot(t,w_rec)
-plt.title("Energy density over time at the receiver")
-plt.xlabel("t [s]")
-plt.ylabel("Energy density [kg m^-1 s^-2]")
-plt.xlim()
-plt.ylim()
-plt.xticks(np.arange(0, recording_time +0.1, 0.1))
+if tcalc == "stationarysource":
+    w_rec_x = ((w_new[:, col_lr, depth_lr]*(weight_row_lr * weight_col_lr * weight_depth_lr))+\
+        (w_new[:, col_lr, depth_ur]*(weight_row_lr * weight_col_lr * weight_depth_ur))+\
+            (w_new[:, col_ur, depth_lr]*(weight_row_lr * weight_col_ur * weight_depth_lr))+\
+                (w_new[:, col_ur, depth_ur]*(weight_row_lr * weight_col_ur * weight_depth_ur))+\
+                    (w_new[:, col_lr, depth_lr]*(weight_row_ur * weight_col_lr * weight_depth_lr))+\
+                        (w_new[:, col_lr, depth_ur]*(weight_row_ur * weight_col_lr * weight_depth_ur))+\
+                            (w_new[:, col_ur, depth_lr]*(weight_row_ur * weight_col_ur * weight_depth_lr))+\
+                                (w_new[:, col_ur, depth_ur]*(weight_row_ur * weight_col_ur * weight_depth_ur)))
+    
+    w_rec_y = ((w_new[row_lr, :, depth_lr]*(weight_row_lr * weight_col_lr * weight_depth_lr))+\
+        (w_new[row_lr, :, depth_ur]*(weight_row_lr * weight_col_lr * weight_depth_ur))+\
+            (w_new[row_lr, :, depth_lr]*(weight_row_lr * weight_col_ur * weight_depth_lr))+\
+                (w_new[row_lr, :, depth_ur]*(weight_row_lr * weight_col_ur * weight_depth_ur))+\
+                    (w_new[row_ur, :, depth_lr]*(weight_row_ur * weight_col_lr * weight_depth_lr))+\
+                        (w_new[row_ur, :, depth_ur]*(weight_row_ur * weight_col_lr * weight_depth_ur))+\
+                            (w_new[row_ur, :, depth_lr]*(weight_row_ur * weight_col_ur * weight_depth_lr))+\
+                                (w_new[row_ur, :, depth_ur]*(weight_row_ur * weight_col_ur * weight_depth_ur)))
 
-#Figure 6: Schroeder decay
-plt.figure(6)
-plt.plot(t[idx_w_rec:],sch_db)
-plt.title("Schroeder decay (Energy Decay Curve)")
-plt.xlabel("t [s]")
-plt.ylabel("Energy decay [dB]")
-plt.xlim()
-plt.ylim()
-plt.xticks(np.arange(t[idx_w_rec], recording_time +0.1, 0.1))
+    spl_stat_x = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_x**2))) + ((abs(w_rec_x)*c0)))/(pRef**2))
+    spl_stat_y = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_y**2))) + ((abs(w_rec_y)*c0)))/(pRef**2)) #It should be the spl stationary
+    #spl_stat_norm = 10*np.log10(rho*c0*((P/(4*math.pi*dist**2)) + ((abs(w_new))*c0)/(pRef**2))/ np.max(rho*c0*((P/(4*math.pi*dist**2)) + ((abs(w_new))*c0)/(pRef**2)))) #It should be the spl stationary
 
-#Figure 7: 2D image of the energy density in the room
-w_new_2d = w_new[:,:,depth_ur] #The 3D w_new array is slised at the the desired z level
-plt.figure(7)
-plt.imshow(w_new_2d, origin='lower', extent=[x[0], x[-1], y[0], y[-1]], aspect='equal') #plot with the extent being the room dimension x and y 
-plt.colorbar(label='Energy Density')
-plt.xlabel('X')
-plt.ylabel('Y')
-plt.title('Energy Density at Z = z_rec and t = recording_time')
-plt.show()
+    #Figure 3: Decay of SPL in the recording_time at the receiver
+    plt.figure(3)
+    plt.plot(t,spl_r) #plot sound pressure level with Pref = (2e-5)**5
+    plt.title("Figure 3: SPL over time at the receiver")
+    plt.xlabel("t")
+    plt.ylabel("SPL")
+    plt.xlim()
+    plt.ylim()
+    plt.xticks(np.arange(0, recording_time +0.1, 0.5))
+    #plt.yticks(np.arange(0, 120, 20))
 
-#Figure 8: 2D image of the SDL in the room
-sdl_2d = sdl[:,:,depth_ur] #The 3D w_new array is slised at the the desired z level
-plt.figure(8)
-plt.imshow(sdl_2d, origin='lower', extent=[x[0], x[-1], y[0], y[-1]], aspect='equal') #plot with the extent being the room dimension x and y 
-plt.colorbar(label='Sound Density Level')
-plt.xlabel('X')
-plt.ylabel('Y')
-plt.title('Sound Density level at Z = z_rec and t = recording_time')
-plt.show()
+    #Figure 4: Decay of SPL in the recording_time normalised to maximum 0dB
+    plt.figure(4)
+    plt.title("Figure 4: Normalised SPL over time at the receiver")
+    plt.plot(t,spl_r_norm)
+    plt.xlabel("t")
+    plt.ylabel("SPL")
+    plt.xlim()
+    plt.ylim()
+    plt.xticks(np.arange(0, recording_time +0.1, 0.1))
+    plt.yticks(np.arange(0, -60, -10))
 
-#Figure 9: 2D image of the SPL in the room
-spl_2d = spl[:,:,depth_ur] #The 3D w_new array is slised at the the desired z level
-plt.figure(9)
-plt.imshow(spl_2d, origin='lower', extent=[x[0], x[-1], y[0], y[-1]], aspect='equal') #plot with the extent being the room dimension x and y 
-plt.colorbar(label='Sound Pressure Level')
-plt.xlabel('X')
-plt.ylabel('Y')
-plt.title('Sound Pressure level at Z = z_rec and t = recording_time')
-plt.show()
+    #Figure 5: Energy density over time at the receiver
+    plt.figure(5)
+    plt.title("Figure 5: Energy density over time at the receiver")
+    plt.plot(t,w_rec)
+
+    #Figure 6: Sound pressure level stationary over the space y.
+    plt.figure(6)
+    t_dim = len(t)
+    last_time_index = t_dim-1
+    #spl_y = spl_stat[rows_r,:,dept_r]
+    spl_y = spl_stat_y
+    data_y = spl_y
+    plt.title("Figure 6: SPL over the y axis")
+    plt.plot(y,data_y)
+    plt.xticks(np.arange(0, 20, 5))
+    plt.yticks(np.arange(75, 105, 5))
+    plt.ylabel('$\mathrm{Sound \ Pressure\ Level \ [dB]}$')
+    plt.xlabel('$\mathrm{Distance \ along \ y \ axis \ [m]}$')
+
+    #Figure 7: Sound pressure level stationary over the space x.
+    plt.figure(7)
+    t_dim = len(t)
+    last_time_index = t_dim-1
+    spl_x = spl_stat_x
+    data_x = spl_x
+    plt.title("Figure 7: SPL over the x axis")
+    plt.plot(x,data_x)
+    plt.xticks(np.arange(0, 35, 5))
+    plt.yticks(np.arange(65, 105, 5))
+    plt.ylabel('$\mathrm{Sound \ Pressure \ Level \ [dB]}$')
+    plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')
+
+
+
+
 
 ##############################################################################
 #TRIAL CALCULATION PICAUT 1997

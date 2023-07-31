@@ -42,19 +42,19 @@ c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
 #Room dimensions
-length = 30.0 #point x finish at the length of the room in the x direction [m] %Length
+length = 8.0 #point x finish at the length of the room in the x direction [m] %Length
 width = 8.0 #point y finish at the length of the room in the y direction [m] %Width
-height = 3.0 #point z finish at the length of the room in the x direction [m] %Height
+height = 8.0 #point z finish at the length of the room in the x direction [m] %Height
 
 # Source position
-x_source = 2.0  #position of the source in the x direction [m]
+x_source = 4.0  #position of the source in the x direction [m]
 y_source = 4.0  #position of the source in the y direction [m]
-z_source = 2.0  #position of the source in the z direction [m]
+z_source = 4.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 3.5 #position of the receiver in the x direction [m]
-y_rec = 4.0 #position of the receiver in the y direction [m]
-z_rec = 1.5 #position of the receiver in the z direction [m]
+x_rec = 2.0 #position of the receiver in the x direction [m]
+y_rec = 2.0 #position of the receiver in the y direction [m]
+z_rec = 2.0 #position of the receiver in the z direction [m]
 
 #Spatial discretization
 dx = 0.5 #distance between grid points x direction [m] #See Documentation for more insight about dt and dx
@@ -62,27 +62,27 @@ dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
 #Time discretization
-dt = 1/32000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
+dt = 1/24000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
-alpha_1 = 0.2 #Absorption coefficient for Surface1 - Floor
-alpha_2 = 0.2 #Absorption coefficient for Surface2 - Ceiling
-alpha_3 = 0.2 #Absorption coefficient for Surface3 - Wall Front
-alpha_4 = 0.8 #Absorption coefficient for Surface4 - Wall Back
-alpha_5 = 0.2 #Absorption coefficient for Surface5 - Wall Left
-alpha_6 = 0.2 #Absorption coefficient for Surface6 - Wall Right
+alpha_1 = 1/6 #Absorption coefficient for Surface1 - Floor
+alpha_2 = 1/6 #Absorption coefficient for Surface2 - Ceiling
+alpha_3 = 1/6 #Absorption coefficient for Surface3 - Wall Front
+alpha_4 = 1/6 #Absorption coefficient for Surface4 - Wall Back
+alpha_5 = 1/6 #Absorption coefficient for Surface5 - Wall Left
+alpha_6 = 1/6 #Absorption coefficient for Surface6 - Wall Right
 
 #Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
 #Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
-tcalc = "stationarysource"
+tcalc = "decay"
 
 #Set initial condition - Source Info (interrupted method)
 Ws=0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
 sourceon_time =  0.50 #time that the source is ON before interrupting [s]
-recording_time = 1.00 #total time recorded for the calculation [s]
+recording_time = 2.00 #total time recorded for the calculation [s]
 
 #%%
 ###############################################################################
@@ -640,71 +640,3 @@ if tcalc == "stationarysource":
     plt.yticks(np.arange(65, 105, 5))
     plt.ylabel('$\mathrm{Sound \ Pressure \ Level \ [dB]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')
-
-
-
-
-
-##############################################################################
-#TRIAL CALCULATION PICAUT 1997
-##############################################################################
-
-sigma = c0*alpha_1/lambda_path
-mean_w_t0 = np.mean(w_t0)
-summation=np.sum(w_t0)
-
-#Trial with Cedric paper calculating the total amount energy being in the room at t=0
-omega = 1
-eta = alpha_average
-kp = (2*rho*c0**2/(omega*eta*V))*np.mean(w_t0) #Cedric paper E[Win] = Ws or E[Win] = w_t0???
-E_tot = kp/2 #Cedric paper
-w_inf = E_tot/((Nx-1)*(Ny-1)*(Nz-1))
-
-#Trial email Cedric about w_inf beeing the integral of energy at t=0
-#w_inf = np.sum(w_t0)*(dx*dy*dz)/V #Option 1 Cedric email
-#w_inf = np.sum(w_t0)/((Nx-1)*(Ny-1)*(Nz-1)) #Option 2 Cedric email
-
-
-Q = abs((w_rec/w_inf)*np.exp(sigma*t) - 1)
-phi = np.log10(Q)
-A_x = np.log10(abs((2*np.cos(np.pi*x/length)))) 
-
-phi_norm = phi / np.max(phi)
-two_lambda_time = 2*lambda_path/c0
-
-difference = np.abs(t-(sourceon_time+two_lambda_time))
-index_diff = difference.argmin()
-
-idx_phi = np.where(t == t[index_diff])[0][0] 
-phi_off = phi[idx_phi:]  
-
-# Linregress approach
-slope,intercept = stats.linregress(t[idx_phi:],phi_off)[0:2] 
-
-Diff = ((slope*length**2)/(np.pi**2))
-
-# Poly-based Approach y = Ax + B
-CoefAlpha = np.polyfit(t[idx_phi:], phi_off, 1) ##calculating the slope and the interception of the line connecting the two points
-slope2 = CoefAlpha[0]
-
-#Diffusion = (np.subtract(A_x[70], phi)*length**2)/(np.pi**2*t)
-#Aminusphi =np.subtract(A_x[70], phi)
-
-D_3D = ((6*math.log(10)/t60) * ((4*length*height)/(np.pi**2*(length+4*height))))*length #not applicable for rooms; only for streets
-D_2D = ((6*np.log10(10)/t60) * ((length)/(np.pi**2))) #not applicable for rooms; only for streets
-
-plt.figure(9)
-plt.plot(x/length,A_x)
-plt.title("Representation of A{x}")
-plt.xlabel("x/L")
-plt.ylabel("A{x}")
-plt.ylim([-4, 1])
-plt.yticks(np.arange(-4, 1, 1))
-
-#plt.figure(10)
-#plt.plot(t,Diffusion)
-#plt.title("Diffusion coefficient over time")
-#plt.xlabel("t [s]")
-#plt.ylabel("Diffusion coefficient [m^2/s]")
-#plt.ylim([0,20000])
-#plt.yticks(np.arange(-4, 1, 1))

@@ -26,7 +26,7 @@ from matplotlib.ticker import LinearLocator
 import numpy as np
 import time as time
 from scipy import stats
-from numpy import inf
+#from numpy import inf
 
 st = time.time() #start time
 
@@ -43,11 +43,11 @@ dz = dx #distance between grid points z direction [m]
 
 #Room dimensions
 lxmin = 0 #point x starts at zero [m]
-lxmax = 27.0 #point x finish at the length of the room in the x direction [m] %Length
+lxmax = 15.0 #point x finish at the length of the room in the x direction [m] %Length
 lymin = 0 #point y starts at zero [m]
-lymax = 3.0 #point y finish at the length of the room in the y direction [m] %Width
+lymax = 15.0 #point y finish at the length of the room in the y direction [m] %Width
 lzmin = 0 #point z starts at zero [m]
-lzmax = 3.0 #point z finish at the length of the room in the x direction [m] %Height
+lzmax = 2.0 #point z finish at the length of the room in the x direction [m] %Height
 
 S1,S2 = lxmax*lymax, lxmax*lymax #xy planes
 S3,S4 = lxmax*lzmax, lxmax*lzmax #xz planes
@@ -79,13 +79,13 @@ def abs_term(th,alpha):
         Absx = (c0*alpha)/(2*(2-alpha)) #Modified by Xiang
     return Absx
 
-th = 3 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 just to understand the type of boundary chosen
-alpha_1 = 1/6 #Absorption coefficient for Surface1
-alpha_2 = 1/6 #Absorption coefficient for Surface2
-alpha_3 = 1/6 #Absorption coefficient for Surface3
-alpha_4 = 1/6 #Absorption coefficient for Surface4
-alpha_5 = 1/6 #Absorption coefficient for Surface5
-alpha_6 = 1/6 #Absorption coefficient for Surface6
+th = 2 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 just to understand the type of boundary chosen
+alpha_1 = 0.3 #Absorption coefficient for Surface1 - Floor
+alpha_2 = 0.3 #Absorption coefficient for Surface2 - Ceiling
+alpha_3 = 0.3 #Absorption coefficient for Surface3 - Wall Front
+alpha_4 = 0.8 #Absorption coefficient for Surface4 - Wall Back
+alpha_5 = 0.3 #Absorption coefficient for Surface5 - Wall Left
+alpha_6 = 0.3 #Absorption coefficient for Surface6 - Wall Right
 
 Abs_1 = abs_term(th,alpha_1) #absorption term for S1
 Abs_2 = abs_term(th,alpha_2) #absorption term for S2
@@ -104,8 +104,8 @@ Dy = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms y directi
 Dz = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms z direction
 
 #Time discretization
-dt = 1/8000 #distance between grid points on the time discretization [s]
-recording_time = 2 #time recorded for the source [s]
+dt = 1/32000 #distance between grid points on the time discretization [s]
+recording_time = 4 #time recorded for the source [s]
 recording_steps = ceil(recording_time/dt) #number of time steps to consider in the calculation
 t = np.arange(0, recording_time, dt) #mesh point in time
 
@@ -123,8 +123,8 @@ if beta_zero_condition >1:
 fsample = 1/dt #frequency spatial resolution (sampling period)
 
 #Finding index in meshgrid of the source position
-x_source = 0.5 #int(ceil(Nx/2))#4 #position of the source in the x direction [m]
-y_source = 0.7 #int(ceil(Ny/2))#4 #position of the source in the y direction [m]
+x_source = 2.0 #int(ceil(Nx/2))#4 #position of the source in the x direction [m]
+y_source = 5.0 #int(ceil(Ny/2))#4 #position of the source in the y direction [m]
 z_source = 1.0 #int(ceil(Nz/2))#4 #position of the source in the z direction [m]
 coord_source = [x_source , y_source, z_source] #coordinates of the source position in an list
 rows_s = np.argmin(abs(xx[:,0,0] - coord_source[0])) #Find index of grid point with minimum distance from source along x direction
@@ -132,8 +132,8 @@ cols_s = np.argmin(abs(yy[0,:,0] - coord_source[1])) #Find index of grid point w
 dept_s = np.argmin(abs(zz[0,0,:] - coord_source[2])) #Find index of grid point with minimum distance from source along z direction
 
 #Finding index in meshgrid of the receiver position
-x_rec = 26.0#int(ceil(Nx/4)) #position of the receiver in the x direction [m]
-y_rec = 0.7#int(ceil(Nx/4)) #position of the receiver in the y direction [m]
+x_rec = 2.5#int(ceil(Nx/4)) #position of the receiver in the x direction [m]
+y_rec = 2.5#int(ceil(Nx/4)) #position of the receiver in the y direction [m]
 z_rec = 1.0#int(ceil(Nx/4)) #position of the receiver in the z direction [m]
 coord_receiver = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
 rows_r = np.argmin(abs(xx[:,0,0] - coord_receiver[0])) #Find index of grid point with minimum distance from receiver along x direction
@@ -152,7 +152,7 @@ dept_r = np.argmin(abs(zz[0,0,:] - coord_receiver[2])) #Find index of grid point
 P = np.zeros((Nx,Ny,Nz)) #matrix of zeros for source
 radius_s = 0.62 #[m]
 Vs = dx*dy*dz #4/3*math.pi*(radius_s**3) #????????????????????????????
-Ws = 0.443 # power of the source in [W]
+Ws = 0.01 # power of the source in [W]
 P[rows_s, cols_s, dept_s] = Ws/Vs
 
 dist = math.sqrt((abs(x_rec - x_source))**2 + (abs(y_rec - y_source))**2 + (abs(z_rec - z_source))**2) #distance between source and receiver

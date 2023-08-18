@@ -42,7 +42,7 @@ c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
 #Room dimensions
-length = 27.0 #point x finish at the length of the room in the x direction [m] %Length
+length = 39.0 #point x finish at the length of the room in the x direction [m] %Length
 width = 3.0 #point y finish at the length of the room in the y direction [m] %Width
 height = 3.0 #point z finish at the length of the room in the x direction [m] %Height
 
@@ -52,7 +52,7 @@ y_source = 0.5  #position of the source in the y direction [m]
 z_source = 1.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 26.0 #position of the receiver in the x direction [m]
+x_rec = 38.0 #position of the receiver in the x direction [m]
 y_rec = 0.5 #position of the receiver in the y direction [m]
 z_rec = 1.0 #position of the receiver in the z direction [m]
 
@@ -312,6 +312,7 @@ w = w_new #w at n level
 w_old = w #w_old at n-1 level
 
 w_rec = np.arange(0,recording_time,dt) #energy density at the receiver
+w_rec_all = np.zeros((1,len(x))) #energy density at the receiver
 
 #Computing w;
 for steps in range(0, recording_steps):
@@ -393,13 +394,14 @@ for steps in range(0, recording_steps):
                         (w_new[row_ur, col_lr, depth_ur]*(weight_row_ur * weight_col_lr * weight_depth_ur))+\
                             (w_new[row_ur, col_ur, depth_lr]*(weight_row_ur * weight_col_ur * weight_depth_lr))+\
                                 (w_new[row_ur, col_ur, depth_ur]*(weight_row_ur * weight_col_ur * weight_depth_ur)))
-
+            
     if steps == sourceon_steps:
         #print("Steps for source:",steps)
         w_t0 = w_new
 
     if steps == 5*lambda_time_step + sourceon_steps:
         w_5l = w_new
+        
     
     #4D Visualization????
     #Flatten the coordinates and w_new values for scatter plot
@@ -460,6 +462,8 @@ for steps in range(0, recording_steps):
 
 plt.show()
 
+w_x = sum(w_rec)
+
 w_rec_x = ((w_new[:, col_lr, depth_lr]*(weight_row_lr * weight_col_lr * weight_depth_lr))+\
         (w_new[:, col_lr, depth_ur]*(weight_row_lr * weight_col_lr * weight_depth_ur))+\
             (w_new[:, col_ur, depth_lr]*(weight_row_lr * weight_col_ur * weight_depth_lr))+\
@@ -504,6 +508,15 @@ spl_r_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_s
 #Schroeder integration
 idx_w_rec = np.where(t == sourceon_time)[0][0] #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
 w_rec_off = w_rec[idx_w_rec:] #cutting the energy density array at the receiver from the idx_w_rec to the end
+
+
+w_rec_off_2 = w_rec_off
+w_rec_off_2 = np.delete(w_rec_off_2, 0)
+w_rec_off_2 = np.append(w_rec_off_2,0)
+imp = w_rec_off - w_rec_off_2
+
+
+
 energy_r_rev = (w_rec_off)[::-1] #reverting the array
 
 #The energy density is related to the pressure with the following relation: w = p^2

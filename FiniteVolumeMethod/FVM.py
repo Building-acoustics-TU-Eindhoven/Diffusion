@@ -116,9 +116,6 @@ for e_type in elemTypes:
         
 velemNodes = elemNodeTags[2].reshape((-1,4)) #nodes per each tetrahedron 
 belemNodes = elemNodeTags[1].reshape((-1,3)) #nodes per each surface boundary 
-#edgeEl = elemTags(0)
-#bounEl = elemTags(1)
-#voluEl = elemTags(2)
 
 eelement = 0
 for elem in range(len(edgeEl)):
@@ -132,52 +129,79 @@ velement = 0
 for elem in range(len(voluEl)):
     velement = velement + 1 #scalar number of the volume elements
 
+
+#Volume Element dictionary + nodes of each volume elements (4 nodes per element)
 volumeEl_dict = {} #Dictionary of volumelements + its nodes
-for i in range(velement):
-    volumeEl_dict[i] = velemNodes[i]
+for i in range(len(voluEl)):
+    #print(i)
+    volumeEl_dict[voluEl[i]] = velemNodes[i]
+  
+#Each element has 4 nodes, each node has three coordinates; here we store the coordinates per each node    
+vnodeCoord_dict = {}
+for i in range(len(elemNodeTags[2])):
+    if not elemNodeTags[2][i] in vnodeCoord_dict.keys(): 
+        vnodeCoord_dict[elemNodeTags[2][i]] = nodecoords[int(elemNodeTags[2][i])-1]
+    #print(nodes)
     
+#Boundary Element dictionary + node per each surface elements (3 nodes per element)
 boundaryEl_dict = {} #Dictionary of boundary elements + its nodes
-for i in range(belement):
-    boundaryEl_dict[i] = belemNodes[i]
+for i in range(len(bounEl)):
+    boundaryEl_dict[bounEl[i]] = belemNodes[i]    
+
+bnodeCoord_dict = {}
+for i in range(len(elemNodeTags[1])):
+    if not elemNodeTags[1][i] in bnodeCoord_dict.keys(): 
+        bnodeCoord_dict[elemNodeTags[1][i]] = nodecoords[int(elemNodeTags[1][i])-1]
+    #print(nodes)
+
+#volumeEl_dict = {} #Dictionary of volumelements + its nodes
+#for i in range(velement):
+#    volumeEl_dict[i] = velemNodes[i]
+    
+#boundaryEl_dict = {} #Dictionary of boundary elements + its nodes
+#for i in range(belement):
+#    boundaryEl_dict[i] = belemNodes[i]
 
 
 #Calculation of volume cells and centre of volume    
-vcell = np.zeros(velement) #volume of each element tetrahedron initialization
-centre_cell = np.zeros((velement,3)) #centre of the element tetrahedron initialization
-for i in range(velement):
+vcell_dict = {} #volume of each element tetrahedron initialization
+centre_cell = {} #centre of the element tetrahedron initialization
+for i in volumeEl_dict.keys():
+    coord_centre_cell = np.zeros(3)
+    centre_cell[i] = []
     #print(i)
-    nc0 = nodecoords[int(volumeEl_dict[i][0])-1] #Coordinates of the node number zero of the volume element i
+    vc0 = vnodeCoord_dict[volumeEl_dict[i][0]] #Coordinates of the node number zero of the volume element i
     #print(nc0)
-    nc1 = nodecoords[int(volumeEl_dict[i][1])-1] #Coordinates of the node number one of the volume element i
+    vc1 = vnodeCoord_dict[volumeEl_dict[i][1]] #Coordinates of the node number one of the volume element i
     #print(nc1)
-    nc2 = nodecoords[int(volumeEl_dict[i][2])-1] #Coordinates of the node number two of the volume element i
+    vc2 = vnodeCoord_dict[volumeEl_dict[i][2]] #Coordinates of the node number two of the volume element i
     #print(nc2)
-    nc3 = nodecoords[int(volumeEl_dict[i][3])-1] #Coordinates of the node number three of the volume element i
+    vc3 = vnodeCoord_dict[volumeEl_dict[i][3]] #Coordinates of the node number three of the volume element i
     #print(nc3)
     for j in range(3):
-        centre_cell[i,j] = (nc0[j]+nc1[j]+nc2[j]+nc3[j])/4; #coordinates of the centre of each volume element
-    vcell[i] = abs(np.dot(np.cross(nc1-nc3,nc2-nc3),nc0-nc3))/6 #volume of each volume element
+        coord_centre_cell[j] = (vc0[j]+vc1[j]+vc2[j]+vc3[j])/4
+        centre_cell[i].append(coord_centre_cell[j])
+        #centre_cell[i,j] = (vc0[j]+vc1[j]+vc2[j]+vc3[j])/4; #coordinates of the centre of each volume element
+    vcell_dict[i] = abs(np.dot(np.cross(vc1-vc3,vc2-vc3),vc0-vc3))/6 #volume of each volume element
 
 
 #Calculation of boundary elements area and centre   
-barea = np.zeros(belement) #surface of each element boundary initialization
-centre_area = np.zeros((belement,3)) #centre of the element tetrahedron initialization
-for i in range(belement):
+barea_dict = {} #surface of each element boundary initialization
+centre_area = {} #centre of the element tetrahedron initialization
+for i in boundaryEl_dict.keys():
+    coord_centre_area = np.zeros(3)
+    centre_area[i] = []
     #print(i)
-    bc0 = nodecoords[int(volumeEl_dict[i][0])-1] #Coordinates of the node number zero of the volume element i
+    bc0 = bnodeCoord_dict[boundaryEl_dict[i][0]] #Coordinates of the node number zero of the volume element i
     #print(nc0)
-    bc1 = nodecoords[int(volumeEl_dict[i][1])-1] #Coordinates of the node number one of the volume element i
+    bc1 = bnodeCoord_dict[boundaryEl_dict[i][1]] #Coordinates of the node number one of the volume element i
     #print(nc1)
-    bc2 = nodecoords[int(volumeEl_dict[i][2])-1] #Coordinates of the node number two of the volume element i
+    bc2 = bnodeCoord_dict[boundaryEl_dict[i][2]] #Coordinates of the node number two of the volume element i
     #print(nc2)
-    #nc3 = nodecoords[int(volumeEl_dict[i][3])-1] #Coordinates of the node number three of the volume element i
-    #print(nc3)
     for j in range(3):
-        centre_area[i,j] = (bc0[j]+bc1[j]+bc2[j])/3 #coordinates of the centre of each volume element
-    barea[i] = abs(sum(np.cross(bc2-bc1,bc1-bc0)))/2 #volume of each volume element
-
-
-
+        coord_centre_area[j] = (bc0[j]+bc1[j]+bc2[j])/3 #coordinates of the centre of each volume element
+        centre_area[i].append(coord_centre_area[j])
+    barea_dict[i] = abs(sum(np.cross(bc2-bc1,bc1-bc0)))/2 #volume of each volume element
 
 
 #distance between volume elements
@@ -185,7 +209,6 @@ for i in range(belement):
 #    for k in range(velement):
 #        if j != k:
 #            dist_jk = math.sqrt((abs(centre_cell[i][0] - centre_cell[j][0]))**2 + (abs(centre_cell[i][1] - centre_cell[j][1]))**2 + (abs(centre_cell[i][2] - centre_cell[j][2]))**2) #distance between volume elements
-
 
 ##################
 #This is for each volume element with its own numbering
@@ -196,9 +219,9 @@ facenodes = gmsh.model.mesh.getElementFaceNodes(4, 3) #4 is the element type (te
 #Computing face x tetrahedon incidence
 faces = []
 fxt = {} #dictionary with keys as the nodes of each face and values the volume elements of which this face is neighbour
-for i in range(0, len(facenodes), 3):
+for i in range(0, len(facenodes), 3): # per ecah element basically, goes trhough the nodes of each face 3by3
     #print(i)
-    f = tuple(sorted(facenodes[i:i + 3])) #nodes of each face
+    f = tuple(sorted(facenodes[i:i + 3])) #nodes of each face put in a tuple from node i to node i plus 3
     faces.append(f)
     t = voluEl[i // 12] #volume element number at which the faces are associated?
     if not f in fxt: #if the face f (with its node) is alrady in the dictionary, just append the volume element neighbour to
@@ -213,29 +236,30 @@ for i in range(0, len(faces)):
     f = faces[i]
     t = voluEl[i // 4]
     if not t in txt:
-        txt[t] = set()
+        txt[t] = []
     for tt in fxt[f]:
         if tt != t:
-            txt[t].add(tt) #volumes neighbours to each volume
+            txt[t].append(tt) #volumes neighbours to each volume
 
 #print("--- done: neighbors by face =", txt)
 
+dist_dict = {}
 #distance between neighbour volume elements
-for j in range(len(txt)):
+for j in txt.keys():
+    #print(j)
     centre_cell_j = centre_cell[j]
-    for value in txt.values():
-        for k in value:
-            centre_cell_k = centre_cell[k]
-            if j != k:
-                dist_jk = math.sqrt((abs(centre_cell[j][0] - centre_cell[k][0]))**2 + (abs(centre_cell[j][1] - centre_cell[k][1]))**2 + (abs(centre_cell[j][2] - centre_cell[k][2]))**2) #distance between volume elements
-               
-    print(j)
+    distances = []
+    for k in txt[j]:
+        #print(k)
+        centre_cell_k = centre_cell[k]
+        if j != k:
+            dist_jk = math.sqrt((abs(centre_cell[j][0] - centre_cell[k][0]))**2 + (abs(centre_cell[j][1] - centre_cell[k][1]))**2 + (abs(centre_cell[j][2] - centre_cell[k][2]))**2) #distance between volume elements
+        distances.append(dist_jk)
+    dist_dict[j] = distances
+
 #    for k in range(velement):
 #        if j != k:
 #            dist_jk = math.sqrt((abs(centre_cell[i][0] - centre_cell[j][0]))**2 + (abs(centre_cell[i][1] - centre_cell[j][1]))**2 + (abs(centre_cell[i][2] - centre_cell[j][2]))**2) #distance between volume elements
-
-
-
 
 
 #namGroup = gmsh.model.getPhysicalName(dimGroup, tagGroup)
@@ -264,37 +288,83 @@ for el in vGroupsNames:
 
 
 
-###############################################################################
-###############################################################################
-#Dictionary of volumelements
-#velement = 0
-#volumeElements = {} #dictionary with each element number as key and nodes as a list
-#for elem in range(len(voluEl)):
-#    velement = velement + 1
-#    #print(elem)
-#    volumeElements[voluEl[elem]] = [voluNode[elem]]
 
-##Calculation of volume cells and centre of volume    
-#vcell = np.zeros(velement)
-#centre_cell = np.zeros((velement,3))
-#for i in voluEl:
-#    #print(i)
-#    nc0 = nodecoords[int((volumeElements[i][0][0])-1)] #This is the coordinates of the node number zero of the volume element i
-#    nc1 = nodecoords[int((volumeElements[i][0][1])-1)] #This is the coordinates of the node number zero of the volume element i
-#    nc2 = nodecoords[int((volumeElements[i][0][2])-1)] #This is the coordinates of the node number zero of the volume element i
-#    nc3 = nodecoords[int((volumeElements[i][0][3])-1)] #This is the coordinates of the node number zero of the volume element i
-#    for j in range(3):
-#        centre_cell[int(i-1),j] = (nc0[j]+nc1[j]+nc2[j]+nc3[j])/4;   
-#    #print(nc0)
-#    vcell[int(i-1)] = abs(np.dot(np.cross(nc1-nc3,nc2-nc3),nc0-nc3))/6
-#nodeTagstype = nodeTagstype.reshape((-1,3))
 
-#Number of mesh nodes and elements:
-#numElem = sum(len(i) for i in elemTags)
-#print(" - Mesh has " + str(len(nodeTags)) + " nodes and " + str(numElem) + " elements")
-###############################################################################
-###############################################################################
+farea_dict = {}
 
+for tetrahedron, neighbors in txt.items():
+    tetrahedron_faces = fxt.keys()
+    fareas = []
+
+    for neighbor in neighbors:
+        shared_faces = [face for face, tetrahedron_list in fxt.items() if tetrahedron in tetrahedron_list and neighbor in tetrahedron_list]
+
+        for shared_face in shared_faces:
+            fc0 = vnodeCoord_dict[shared_face[0]]
+            fc1 = vnodeCoord_dict[shared_face[1]]
+            fc2 = vnodeCoord_dict[shared_face[2]]
+            farea = abs(np.dot(np.cross(fc2 - fc0, fc1 - fc0), fc2 - fc0)) / 2.0
+            fareas.append(farea)
+
+    farea_dict[tetrahedron] = fareas
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#farea_dict = {}
+#for i in txt.keys():
+#    print(i)
+#    fareas = []
+#    for value in txt[i]:
+#        print(value)
+#        thelist = [i,value]
+#        for j in fxt.values():
+#            if j == thelist:
+#                face = #this needs to be the key correspondent to the value j
+#                fc0 = vnodeCoord_dict[face[0]] #Coordinates of the node number zero of the volume element i
+#                #print(nc0)
+#                fc1 = vnodeCoord_dict[face[1]] #Coordinates of the node number one of the volume element i
+#                #print(nc1)
+#                fc2 = vnodeCoord_dict[face[2]] #Coordinates of the node number two of the volume element i
+#                #print(nc2)
+#                farea = abs(sum(np.cross(fc2-fc1,fc1-fc0)))/2 #volume of each volume element
+#        fareas.append(farea)
+#    farea_dict[i] = fareas        
+            
+            
+            
+            
+#        for key in fxt.keys():
+#            print(key)
+#            if fxt[key] == thelist:
+#                face = key
+#                fc0 = vnodeCoord_dict[face[0]] #Coordinates of the node number zero of the volume element i
+#                #print(nc0)
+#                fc1 = vnodeCoord_dict[face[1]] #Coordinates of the node number one of the volume element i
+#                #print(nc1)
+#                fc2 = vnodeCoord_dict[face[2]] #Coordinates of the node number two of the volume element i
+#                #print(nc2)
+#                farea = abs(sum(np.cross(fc2-fc1,fc1-fc0)))/2 #volume of each volume element
+#            flist.append(farea)
+#    farea_dict[i] = flist
+
+       # face = {i for i in fxt if fxt[i]==thelist}
+        
+        
 
 gmsh.finalize()
 
@@ -327,7 +397,7 @@ Vs = 4 #Volume of the cell #volume of the source = to volume of cells ###?????
 sourceon_time =  0.50 #time that the source is ON before interrupting [s]
 recording_time = 2.00 #total time recorded for the calculation [s]
 
-V = 80 #room volume ####???
+V = sum(vcell_dict.values())
 S = 100 # surface area of the room ###???
 
 #%%
@@ -358,7 +428,7 @@ Dz = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms z directi
 Sjk =  10#area face between two adjacent tetrahedron shapes ###?????
 hjk = 10 #distance between the central nodes of two adjacent tetrahedron shapes ###?????
 
-beta_zero = (dt*(Dx*Sjk/hjk - hjk*Abs_terms))/vcell ###????? my interpretation of the beta_zero
+beta_zero = np.divide((dt*(Dx*Sjk/hjk - hjk*Abs_terms)),vcell_dict.values()) ###????? my interpretation of the beta_zero
 
 #Finding index in meshgrid of the source position
 coord_source = [x_source,y_source,z_source] #coordinates of the receiver position in an list
@@ -388,7 +458,7 @@ for steps in range(0, recording_steps):
     #Computing w_new (w at n+1 time step)
     w_new = np.divide((np.multiply(w_old,(1-beta_zero))),(1+beta_zero)) - \
         np.divide((2*dt*c0*m_atm*w),(1+beta_zero)) + \
-            np.divide((np.divide((2*dt*Dx*(Sjk/hjk)*w),vcell)),(1+beta_zero)) + \
+            np.divide((np.divide((2*dt*Dx*(Sjk/hjk)*w),vcell_dict.values())),(1+beta_zero)) + \
                 np.divide((2*dt*s),(1+beta_zero)) #The absorption term is part of beta_zero
                  ###?????
                  

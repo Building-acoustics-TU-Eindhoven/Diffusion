@@ -239,23 +239,29 @@ for i in range(0, len(faces)):
         txt[t] = []
     for tt in fxt[f]:
         if tt != t:
-            txt[t].append(tt) #volumes neighbours to each volume
+            txt[t].append(int(tt-(voluEl[0]-1))) #volumes neighbours to each volume
+for values in txt.values():
+    if len(values)==2:
+        values.append(0)
+        values.append(0)
+    if len(values) == 3:
+        values.append(0)
 
 #print("--- done: neighbors by face =", txt)
 
 dist_dict = {}
 #distance between neighbour volume elements
-for j in txt.keys():
+#for j in txt.keys():
     #print(j)
-    centre_cell_j = centre_cell[j]
-    distances = []
-    for k in txt[j]:
+#    centre_cell_j = centre_cell[j]
+#    distances = []
+#    for k in txt[j]:
         #print(k)
-        centre_cell_k = centre_cell[k]
-        if j != k:
-            dist_jk = math.sqrt((abs(centre_cell[j][0] - centre_cell[k][0]))**2 + (abs(centre_cell[j][1] - centre_cell[k][1]))**2 + (abs(centre_cell[j][2] - centre_cell[k][2]))**2) #distance between volume elements
-        distances.append(dist_jk)
-    dist_dict[j] = distances
+#        centre_cell_k = centre_cell[k]
+#        if j != k:
+#            dist_jk = math.sqrt((abs(centre_cell[j][0] - centre_cell[k][0]))**2 + (abs(centre_cell[j][1] - centre_cell[k][1]))**2 + (abs(centre_cell[j][2] - centre_cell[k][2]))**2) #distance between volume elements
+#        distances.append(dist_jk)
+#    dist_dict[j] = distances
 
 #    for k in range(velement):
 #        if j != k:
@@ -286,45 +292,168 @@ for el in vGroupsNames:
 
         #vGroupsNames[el].append(abscoeff)
 
+#Area faces
+
+#farea_dict = {}
+
+#for tetrahedron, neighbors in txt.items():
+#    tetrahedron_faces = fxt.keys()
+#    fareas = []
+
+#    for neighbor in neighbors:
+#        shared_faces = [face for face, tetrahedron_list in fxt.items() if tetrahedron in tetrahedron_list and neighbor in tetrahedron_list]
+
+#        for shared_face in shared_faces:
+#            fc0 = vnodeCoord_dict[shared_face[0]]
+#            fc1 = vnodeCoord_dict[shared_face[1]]
+#            fc2 = vnodeCoord_dict[shared_face[2]]
+#            farea = abs(np.dot(np.cross(fc2 - fc0, fc1 - fc0), fc2 - fc0)) / 2.0
+#            fareas.append(farea)
+#
+#    farea_dict[tetrahedron] = fareas
+
+
+#for tetraj in range(velement):
+#    print(tetraj)
+#    for tetrak in range(velement):
+#        print(tetrak)
+
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+
+
+
+cell_center = np.array(())
+for key in centre_cell:
+    cell_center = np.append(cell_center,centre_cell[key])
+cell_center = cell_center.reshape((-1,3))
+
+
+neighbourVolume = np.array(())
+for key in txt:
+    neighbourVolume = np.append(neighbourVolume,txt[key])
+for item in neighbourVolume:
+        item = int(item)   
+    
+neighbourVolume = neighbourVolume.reshape((-1,4))
+
+# Create a boolean array indicating non-boundary elements
+nonBoundaryIndex = neighbourVolume != 0
+# Convert True values to 1 and False values to 0
+nonBoundaryIndex = nonBoundaryIndex.astype(int)
+#nodeOrder = np.array([[3, 1, 2, 1],
+#                      [4, 2, 3, 2],
+#                      [4, 1, 2, 1],
+#                      [4, 1, 3, 1]])
+
+import numpy as np
+from scipy.sparse import lil_matrix
+
+# Assuming you have defined the required arrays and functions (nodePositions, Cell_center, nonBoundaryIndex, nodeOrder, Velements, triangleArea, boundaryV) before this code
+
+#velement = len(nodesVolume)
+nNode = 4  # Assuming tetrahedral elements have 4 nodes
+
+volumeNodePos0 = np.zeros((velement, 3))
+volumeNodePos1 = np.zeros((velement, 3))
+volumeNodePos2 = np.zeros((velement, 3))
+volumeNodePos3 = np.zeros((velement, 3))
+
+interior = np.zeros((velement, velement))
+#nodeNo = np.array([0, 1, 2, 3])
+#nodeArray = np.array(())
+
+for iElement in range(velement):
+    thisIndex0 = velemNodes[iElement, 0] #node number 0
+    thisIndex1 = velemNodes[iElement, 1] #node number 1
+    thisIndex2 = velemNodes[iElement, 2] #node number 2
+    thisIndex3 = velemNodes[iElement, 3] #node number 3
+
+    volumeNodePos0[iElement, :] = nodecoords[int(thisIndex0-1), :] #coordinates of node 0
+    volumeNodePos1[iElement, :] = nodecoords[int(thisIndex1-1), :] #coordinates of node 1
+    volumeNodePos2[iElement, :] = nodecoords[int(thisIndex2-1), :] #coordinates of node 2
+    volumeNodePos3[iElement, :] = nodecoords[int(thisIndex3-1), :] #coordinates of node 3
+
+for iElement in range(velement):
+    thisElementPos = np.zeros((nNode, 3))
+    thisElementPos[0, :] = volumeNodePos0[iElement, :] #coordinates of node 0
+    thisElementPos[1, :] = volumeNodePos1[iElement, :] #coordinates of node 1
+    thisElementPos[2, :] = volumeNodePos2[iElement, :] #coordinates of node 2
+    thisElementPos[3, :] = volumeNodePos3[iElement, :] #coordinates of node 3
+
+    thisCellCenter = cell_center[iElement, :] #centre coordinates of the ielement
+    thisBoundaryIndex = nonBoundaryIndex[iElement, :] #is a list, if all of them are 1 it means that it is a internal tetrahedron
+    nNeighbour = np.sum(thisBoundaryIndex) #number of neighbours
+    #nodeArray = np.nonzero(thisBoundaryIndex)[0] #chat
+    #for i in range(len(thisBoundaryIndex)):
+    #    print(i)
+    #    nodeArray = np.append(nodeArray,nodeNo[i])
+
+    for iNeighbour in range(nNeighbour):
+        #thisNeighbourNo = int(nodeArray[iNeighbour])
+        #thisNodeOrder = nodeOrder[iNeighbour, :]
+        thisNeighbour = int(neighbourVolume[iElement][iNeighbour])-1
+        thisCellCenterNeighbour = cell_center[int(thisNeighbour-1), :]
+        
+#shared_nodes = []
+#count = 0
+for i in range(velement):
+    print(i)
+    for j in range(velement):
+        print(j)
+        if i != j:
+            shared_nodes = []
+            count = 0
+            for node in velemNodes[i]: #for each node in tetrahedron i
+                print(node)
+                if node in velemNodes[j]: #if each node of the tetrahedron i is in nodelist of tetrahedron j
+                    count += 1
+                    shared_nodes.append(node)
+            if count == 3:
+                sc0 = nodecoords[int(shared_nodes[0]-1)]
+                sc1 = nodecoords[int(shared_nodes[1]-1)]
+                sc2 = nodecoords[int(shared_nodes[2]-1)]
+                shared_area = np.linalg.norm(np.cross(sc2-sc0,sc1-sc0))/2
+                interior[i, j] = shared_area
+            else:
+                shared_area = 0
+                interior[i, j] = shared_area
+        
+        
+#        for node in tetra:
+#            if node in [neighbournode]:
+#                count +=1
+#                if count == 3:
+#                    calculate area of face
+
+
+
+#        v1 = thisElementPos[iNeighbour, :] - thisElementPos[iNeighbour+1, :]
+#        v2 = thisElementPos[iNeighbour+2, :] - thisElementPos[iNeighbour+3, :]
+
+#       thisFaceArea = (np.linalg.norm(np.cross(v1, v2)))/2
+#        thisDistance = np.linalg.norm(thisCellCenter - thisCellCenterNeighbour)
+
+#        interior[iElement, thisNeighbour] = thisFaceArea / thisDistance
+
+Fmat = lil_matrix(interior)
+#fb = boundaryV
+fel = np.sum(interior, axis=1)
 
 
 
 
-farea_dict = {}
-
-for tetrahedron, neighbors in txt.items():
-    tetrahedron_faces = fxt.keys()
-    fareas = []
-
-    for neighbor in neighbors:
-        shared_faces = [face for face, tetrahedron_list in fxt.items() if tetrahedron in tetrahedron_list and neighbor in tetrahedron_list]
-
-        for shared_face in shared_faces:
-            fc0 = vnodeCoord_dict[shared_face[0]]
-            fc1 = vnodeCoord_dict[shared_face[1]]
-            fc2 = vnodeCoord_dict[shared_face[2]]
-            farea = abs(np.dot(np.cross(fc2 - fc0, fc1 - fc0), fc2 - fc0)) / 2.0
-            fareas.append(farea)
-
-    farea_dict[tetrahedron] = fareas
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
 #farea_dict = {}
 #for i in txt.keys():
 #    print(i)

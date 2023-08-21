@@ -312,7 +312,7 @@ w = w_new #w at n level
 w_old = w #w_old at n-1 level
 
 w_rec = np.arange(0,recording_time,dt) #energy density at the receiver
-w_rec_all = np.zeros((1,len(x))) #energy density at the receiver
+w_rec_all = np.zeros((1,len(x))) 
 
 #Computing w;
 for steps in range(0, recording_steps):
@@ -402,7 +402,6 @@ for steps in range(0, recording_steps):
     if steps == 5*lambda_time_step + sourceon_steps:
         w_5l = w_new
         
-    
     #4D Visualization????
     #Flatten the coordinates and w_new values for scatter plot
     ##coords = np.column_stack([xx.ravel(), yy.ravel(), zz.ravel()])
@@ -462,9 +461,7 @@ for steps in range(0, recording_steps):
 
 plt.show()
 
-w_x = sum(w_rec)
-
-w_rec_x = ((w_new[:, col_lr, depth_lr]*(weight_row_lr * weight_col_lr * weight_depth_lr))+\
+w_rec_x_end = ((w_new[:, col_lr, depth_lr]*(weight_row_lr * weight_col_lr * weight_depth_lr))+\
         (w_new[:, col_lr, depth_ur]*(weight_row_lr * weight_col_lr * weight_depth_ur))+\
             (w_new[:, col_ur, depth_lr]*(weight_row_lr * weight_col_ur * weight_depth_lr))+\
                 (w_new[:, col_ur, depth_ur]*(weight_row_lr * weight_col_ur * weight_depth_ur))+\
@@ -482,7 +479,7 @@ w_rec_x_5l = ((w_5l[:, col_lr, depth_lr]*(weight_row_lr * weight_col_lr * weight
                                 (w_5l[:, col_ur, depth_lr]*(weight_row_ur * weight_col_ur * weight_depth_lr))+\
                                     (w_5l[:, col_ur, depth_ur]*(weight_row_ur * weight_col_ur * weight_depth_ur)))
     
-w_rec_y = ((w_new[row_lr, :, depth_lr]*(weight_row_lr * weight_col_lr * weight_depth_lr))+\
+w_rec_y_end = ((w_new[row_lr, :, depth_lr]*(weight_row_lr * weight_col_lr * weight_depth_lr))+\
         (w_new[row_lr, :, depth_ur]*(weight_row_lr * weight_col_lr * weight_depth_ur))+\
             (w_new[row_lr, :, depth_lr]*(weight_row_lr * weight_col_ur * weight_depth_lr))+\
                 (w_new[row_lr, :, depth_ur]*(weight_row_lr * weight_col_ur * weight_depth_ur))+\
@@ -497,28 +494,27 @@ w_rec_y = ((w_new[row_lr, :, depth_lr]*(weight_row_lr * weight_col_lr * weight_d
 #RESULTS
 ###############################################################################
 
-spl_stat_x = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_x**2))) + ((abs(w_rec_x)*c0)))/(pRef**2))
-spl_stat_y = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_y**2))) + ((abs(w_rec_y)*c0)))/(pRef**2)) #It should be the spl stationary
+spl_stat_x = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_x**2))) + ((abs(w_rec_x_end)*c0)))/(pRef**2))
+spl_stat_y = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_y**2))) + ((abs(w_rec_y_end)*c0)))/(pRef**2)) #It should be the spl stationary
 
 press_r = ((abs(w_rec))*rho*(c0**2)) #pressure at the receiver
 spl_r = 10*np.log10(((abs(w_rec))*rho*(c0**2))/(pRef**2)) #,where=press_r>0, sound pressure level at the receiver
 spl_r_norm = 10*np.log10((((abs(w_rec))*rho*(c0**2))/(pRef**2)) / np.max(((abs(w_rec))*rho*(c0**2))/(pRef**2))) #normalised to maximum to 0dB
 spl_r_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_sr) + ((abs(w_rec))*c0)/(pRef**2))) #spl total (including direct field) at the receiver position????? but it will need to be calculated for a stationary source 100dB
 
-#Schroeder integration
+#Find the energy decay part of the overal calculation
 idx_w_rec = np.where(t == sourceon_time)[0][0] #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
 w_rec_off = w_rec[idx_w_rec:] #cutting the energy density array at the receiver from the idx_w_rec to the end
 
+#Impulse response from the energy density
+w_rec_off_deriv = w_rec_off #initialising an array of derivative equal to the w_rec_off -> this will be the impulse response after modifying it
+w_rec_off_deriv = np.delete(w_rec_off_deriv, 0) #delete the first element of the array -> this means shifting the array one step before and therefore do a derivation
+w_rec_off_deriv = np.append(w_rec_off_deriv,0) #add a zero in the last element of the array -> for derivation and to have the same length as previously
+impulse = w_rec_off - w_rec_off_deriv #This is the difference between the the energy density and the impulse response 
+#IMPORTANT NOTE: The "impulse" variable should be divided by dt in theory according to Schroeder 1965 but this is not done because otherwise it does not match the results of the radiosity method.
 
-w_rec_off_2 = w_rec_off
-w_rec_off_2 = np.delete(w_rec_off_2, 0)
-w_rec_off_2 = np.append(w_rec_off_2,0)
-imp = w_rec_off - w_rec_off_2
-
-
-
+#Schroeder integration
 energy_r_rev = (w_rec_off)[::-1] #reverting the array
-
 #The energy density is related to the pressure with the following relation: w = p^2
 energy_r_rev_cum = np.cumsum(energy_r_rev) #cumulative summation of all the item in the array
 schroeder = energy_r_rev_cum[::-1] #reverting the array again -> creating the schroder decay
@@ -615,7 +611,7 @@ if tcalc == "decay":
     #Figure 12: Energy density at t=recording_time over the space x.
     plt.figure(12)
     plt.title("Figure 12: Energy density over the x axis at t=recording_time")
-    plt.plot(x,w_rec_x)
+    plt.plot(x,w_rec_x_end)
     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')
     
@@ -687,7 +683,7 @@ if tcalc == "stationarysource":
     #Figure 8: Energy density at t=recording_time over the space x.
     plt.figure(8)
     plt.title("Figure 8: Energy density over the x axis at t=recording_time")
-    plt.plot(x,w_rec_x)
+    plt.plot(x,w_rec_x_end)
     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')
     
@@ -697,6 +693,6 @@ if tcalc == "stationarysource":
 ###############################################################################
 np.save('w_rec',w_rec)
 np.save('w_rec_off',w_rec_off)
-np.save('w_rec_x',w_rec_x)
-np.save('w_rec_y',w_rec_y)
+np.save('w_rec_x',w_rec_x_end)
+np.save('w_rec_y',w_rec_y_end)
 np.save('D0',Dx)

@@ -401,7 +401,7 @@ def calculate_energy_density_diffusion(D):
             s[row_upper, col_upper, depth_upper] = source1[0] * weight_row_upper * weight_col_upper * weight_depth_upper
             
         
-        print(time_steps)
+        #print(time_steps)
     
     plt.show()
     print(D)

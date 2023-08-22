@@ -42,18 +42,18 @@ c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
 #Room dimensions
-length = 3.0 #point x finish at the length of the room in the x direction [m] %Length
+length = 39.0 #point x finish at the length of the room in the x direction [m] %Length
 width = 3.0 #point y finish at the length of the room in the y direction [m] %Width
 height = 3.0 #point z finish at the length of the room in the x direction [m] %Height
 
 # Source position
 x_source = 0.5  #position of the source in the x direction [m]
-y_source = 0.5  #position of the source in the y direction [m]
+y_source = 0.7  #position of the source in the y direction [m]
 z_source = 1.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 2.0 #position of the receiver in the x direction [m]
-y_rec = 0.5 #position of the receiver in the y direction [m]
+x_rec = 38.0 #position of the receiver in the x direction [m]
+y_rec = 0.7 #position of the receiver in the y direction [m]
 z_rec = 1.0 #position of the receiver in the z direction [m]
 
 #Spatial discretization
@@ -62,17 +62,17 @@ dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
 #Time discretization
-dt = 1/8000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
+dt = 0.001#1/8000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
-alpha_1 = 1/6 #Absorption coefficient for Surface1 - Floor
-alpha_2 = 1/6 #Absorption coefficient for Surface2 - Ceiling
-alpha_3 = 1/6 #Absorption coefficient for Surface3 - Wall Front
-alpha_4 = 1/6 #Absorption coefficient for Surface4 - Wall Back
-alpha_5 = 1/6 #Absorption coefficient for Surface5 - Wall Left
-alpha_6 = 1/6 #Absorption coefficient for Surface6 - Wall Right
+alpha_1 = 0.16 #Absorption coefficient for Surface1 - Floor
+alpha_2 = 0.16 #Absorption coefficient for Surface2 - Ceiling
+alpha_3 = 0.16 #Absorption coefficient for Surface3 - Wall Front
+alpha_4 = 0.16 #Absorption coefficient for Surface4 - Wall Back
+alpha_5 = 1 #Absorption coefficient for Surface5 - Wall Left
+alpha_6 = 1 #Absorption coefficient for Surface6 - Wall Right
 
 #Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
@@ -82,7 +82,7 @@ tcalc = "decay"
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
 sourceon_time =  0.50 #time that the source is ON before interrupting [s]
-recording_time = 2.00 #total time recorded for the calculation [s]
+recording_time = 1.00 #total time recorded for the calculation [s]
 
 #%%
 ###############################################################################
@@ -150,8 +150,8 @@ lambda_path = (4*V)/S #mean free path for 3D
 lambda_time= lambda_path/c0 #mean free time for 3D
 lambda_time_step = int(lambda_time/dt)
 Dx = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms x direction
-Dy = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms y direction
-Dz = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms z direction
+Dy = np.pi*c0*width/8 #(lambda_path*c0)/3 #diffusion coefficient for proportionate rooms y direction
+Dz = np.pi*c0*height/8 #(lambda_path*c0)/3 #diffusion coefficient for proportionate rooms z direction
 
 #Mesh numbers
 beta_zero_x = (2*Dx*dt)/(dx**2) #mesh number in x direction
@@ -172,10 +172,10 @@ s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 
 source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
 
 #Impulse source from the intermittent source
-source1_deriv = source1 #initialising an array of derivative equal to the source1 -> this will be the impulse response after modifying it
-source1_deriv = np.delete(source1_deriv, 0) #delete the first element of the array -> this means shifting the array one step before and therefore do a derivation
-source1_deriv = np.append(source1_deriv,0) #add a zero in the last element of the array -> for derivation and to have the same length as previously
-impulse_source = source1 - source1_deriv #This is the difference between the intermittend source and the impulse source 
+#source1_deriv = source1 #initialising an array of derivative equal to the source1 -> this will be the impulse response after modifying it
+#source1_deriv = np.delete(source1_deriv, 0) #delete the first element of the array -> this means shifting the array one step before and therefore do a derivation
+#source1_deriv = np.append(source1_deriv,0) #add a zero in the last element of the array -> for derivation and to have the same length as previously
+#impulse_source = source1 - source1_deriv #This is the difference between the intermittend source and the impulse source 
 #IMPORTANT NOTE: The "impulse_source" variable should be divided by dt in theory according to Schroeder 1965 but this is not done because otherwise it does not match the results of the radiosity method.
 
 
@@ -204,14 +204,14 @@ weight_depth_lower = 1 - weight_depth_upper
 s = np.zeros((Nx,Ny,Nz)) #matrix of zeros for source
 
 # Perform linear interpolation
-s[row_lower, col_lower, depth_lower] += impulse_source[1] * weight_row_lower * weight_col_lower * weight_depth_lower
-s[row_lower, col_lower, depth_upper] += impulse_source[1] * weight_row_lower * weight_col_lower * weight_depth_upper
-s[row_lower, col_upper, depth_lower] += impulse_source[1] * weight_row_lower * weight_col_upper * weight_depth_lower
-s[row_lower, col_upper, depth_upper] += impulse_source[1] * weight_row_lower * weight_col_upper * weight_depth_upper
-s[row_upper, col_lower, depth_lower] += impulse_source[1] * weight_row_upper * weight_col_lower * weight_depth_lower
-s[row_upper, col_lower, depth_upper] += impulse_source[1] * weight_row_upper * weight_col_lower * weight_depth_upper
-s[row_upper, col_upper, depth_lower] += impulse_source[1] * weight_row_upper * weight_col_upper * weight_depth_lower
-s[row_upper, col_upper, depth_upper] += impulse_source[1] * weight_row_upper * weight_col_upper * weight_depth_upper
+s[row_lower, col_lower, depth_lower] += source1[1] * weight_row_lower * weight_col_lower * weight_depth_lower
+s[row_lower, col_lower, depth_upper] += source1[1] * weight_row_lower * weight_col_lower * weight_depth_upper
+s[row_lower, col_upper, depth_lower] += source1[1] * weight_row_lower * weight_col_upper * weight_depth_lower
+s[row_lower, col_upper, depth_upper] += source1[1] * weight_row_lower * weight_col_upper * weight_depth_upper
+s[row_upper, col_lower, depth_lower] += source1[1] * weight_row_upper * weight_col_lower * weight_depth_lower
+s[row_upper, col_lower, depth_upper] += source1[1] * weight_row_upper * weight_col_lower * weight_depth_upper
+s[row_upper, col_upper, depth_lower] += source1[1] * weight_row_upper * weight_col_upper * weight_depth_lower
+s[row_upper, col_upper, depth_upper] += source1[1] * weight_row_upper * weight_col_upper * weight_depth_upper
 
 ###############################################################################
 #RECEIVER INTERPOLATION
@@ -427,30 +427,30 @@ for i in range(len(x)):
         
         #Updating the source term
         if tcalc == "decay":
-            s[row_lower, col_lower, depth_lower] = impulse_source[steps] * weight_row_lower * weight_col_lower * weight_depth_lower
-            s[row_lower, col_lower, depth_upper] = impulse_source[steps] * weight_row_lower * weight_col_lower * weight_depth_upper
-            s[row_lower, col_upper, depth_lower] = impulse_source[steps] * weight_row_lower * weight_col_upper * weight_depth_lower
-            s[row_lower, col_upper, depth_upper] = impulse_source[steps] * weight_row_lower * weight_col_upper * weight_depth_upper
-            s[row_upper, col_lower, depth_lower] = impulse_source[steps] * weight_row_upper * weight_col_lower * weight_depth_lower
-            s[row_upper, col_lower, depth_upper] = impulse_source[steps] * weight_row_upper * weight_col_lower * weight_depth_upper
-            s[row_upper, col_upper, depth_lower] = impulse_source[steps] * weight_row_upper * weight_col_upper * weight_depth_lower
-            s[row_upper, col_upper, depth_upper] = impulse_source[steps] * weight_row_upper * weight_col_upper * weight_depth_upper
+            s[row_lower, col_lower, depth_lower] = source1[steps] * weight_row_lower * weight_col_lower * weight_depth_lower
+            s[row_lower, col_lower, depth_upper] = source1[steps] * weight_row_lower * weight_col_lower * weight_depth_upper
+            s[row_lower, col_upper, depth_lower] = source1[steps] * weight_row_lower * weight_col_upper * weight_depth_lower
+            s[row_lower, col_upper, depth_upper] = source1[steps] * weight_row_lower * weight_col_upper * weight_depth_upper
+            s[row_upper, col_lower, depth_lower] = source1[steps] * weight_row_upper * weight_col_lower * weight_depth_lower
+            s[row_upper, col_lower, depth_upper] = source1[steps] * weight_row_upper * weight_col_lower * weight_depth_upper
+            s[row_upper, col_upper, depth_lower] = source1[steps] * weight_row_upper * weight_col_upper * weight_depth_lower
+            s[row_upper, col_upper, depth_upper] = source1[steps] * weight_row_upper * weight_col_upper * weight_depth_upper
         if tcalc == "stationarysource":
-            s[row_lower, col_lower, depth_lower] = impulse_source[0] * weight_row_lower * weight_col_lower * weight_depth_lower
-            s[row_lower, col_lower, depth_upper] = impulse_source[0] * weight_row_lower * weight_col_lower * weight_depth_upper
-            s[row_lower, col_upper, depth_lower] = impulse_source[0] * weight_row_lower * weight_col_upper * weight_depth_lower
-            s[row_lower, col_upper, depth_upper] = impulse_source[0] * weight_row_lower * weight_col_upper * weight_depth_upper
-            s[row_upper, col_lower, depth_lower] = impulse_source[0] * weight_row_upper * weight_col_lower * weight_depth_lower
-            s[row_upper, col_lower, depth_upper] = impulse_source[0] * weight_row_upper * weight_col_lower * weight_depth_upper
-            s[row_upper, col_upper, depth_lower] = impulse_source[0] * weight_row_upper * weight_col_upper * weight_depth_lower
-            s[row_upper, col_upper, depth_upper] = impulse_source[0] * weight_row_upper * weight_col_upper * weight_depth_upper
+            s[row_lower, col_lower, depth_lower] = source1[0] * weight_row_lower * weight_col_lower * weight_depth_lower
+            s[row_lower, col_lower, depth_upper] = source1[0] * weight_row_lower * weight_col_lower * weight_depth_upper
+            s[row_lower, col_upper, depth_lower] = source1[0] * weight_row_lower * weight_col_upper * weight_depth_lower
+            s[row_lower, col_upper, depth_upper] = source1[0] * weight_row_lower * weight_col_upper * weight_depth_upper
+            s[row_upper, col_lower, depth_lower] = source1[0] * weight_row_upper * weight_col_lower * weight_depth_lower
+            s[row_upper, col_lower, depth_upper] = source1[0] * weight_row_upper * weight_col_lower * weight_depth_upper
+            s[row_upper, col_upper, depth_lower] = source1[0] * weight_row_upper * weight_col_upper * weight_depth_lower
+            s[row_upper, col_upper, depth_upper] = source1[0] * weight_row_upper * weight_col_upper * weight_depth_upper
         
     
         print(time_steps)
         #w_rec_sum[i] = w_rec_x + sum(w_rec_x)*dt
     w_rec_sum[i] = sum(w_rec_x)*dt
         #w_rec_sum_tot = np.append(w_rec_sum[i])
-    print(w_rec_sum)
+    #print(w_rec_sum)
 
 plt.show()
 
@@ -614,6 +614,13 @@ if tcalc == "decay":
     plt.figure(13)
     plt.title("Figure 13: Energy density over the x axis at t=5*lambda_time")
     plt.plot(x,w_rec_x_5l)
+    plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
+    plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
+    
+    #Figure 14: Total Energy density over the space x.
+    plt.figure(14)
+    plt.title("Figure 14: Total Energy density over the x axis")
+    plt.plot(x,w_rec_sum)
     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
     

@@ -401,7 +401,9 @@ for iElement in range(velement):
 #count = 0
 for i in range(velement):
     print(i)
+    cell_center_i = cell_center[i]
     for j in range(velement):
+        cell_center_j = cell_center[j]
         print(j)
         if i != j:
             shared_nodes = []
@@ -416,7 +418,8 @@ for i in range(velement):
                 sc1 = nodecoords[int(shared_nodes[1]-1)]
                 sc2 = nodecoords[int(shared_nodes[2]-1)]
                 shared_area = np.linalg.norm(np.cross(sc2-sc0,sc1-sc0))/2
-                interior[i, j] = shared_area
+                shared_distance = math.sqrt((abs(cell_center_i[0] - cell_center_j[0]))**2 + (abs(cell_center_i[1] - cell_center_j[1]))**2 + (abs(cell_center_i[2] - cell_center_j[2]))**2) #distance between volume elements
+                interior[i, j] = shared_area/shared_distance
             else:
                 shared_area = 0
                 interior[i, j] = shared_area

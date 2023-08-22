@@ -171,6 +171,16 @@ sourceon_steps = ceil(sourceon_time/dt) #time steps at which the source is calcu
 s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position
 source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
 
+##########################################
+###############Is this right??????########
+##########################################
+#Impulse source from the intermittent source
+#source1_deriv = source1 #initialising an array of derivative equal to the source1 -> this will be the impulse response after modifying it
+#source1_deriv = np.delete(source1_deriv, 0) #delete the first element of the array -> this means shifting the array one step before and therefore do a derivation
+#source1_deriv = np.append(source1_deriv,0) #add a zero in the last element of the array -> for derivation and to have the same length as previously
+#impulse_source = source1 - source1_deriv #This is the difference between the intermittend source and the impulse source 
+#IMPORTANT NOTE: The "impulse_source" variable should be divided by dt in theory according to Schroeder 1965 but this is not done because otherwise it does not match the results of the radiosity method.
+
 ###############################################################################
 #SOURCE INTERPOLATION
 ###############################################################################
@@ -479,6 +489,15 @@ w_rec_x_5l = ((w_5l[:, col_lr, depth_lr]*(weight_row_lr * weight_col_lr * weight
                                 (w_5l[:, col_ur, depth_lr]*(weight_row_ur * weight_col_ur * weight_depth_lr))+\
                                     (w_5l[:, col_ur, depth_ur]*(weight_row_ur * weight_col_ur * weight_depth_ur)))
     
+w_rec_x_t0 = ((w_t0[:, col_lr, depth_lr]*(weight_row_lr * weight_col_lr * weight_depth_lr))+\
+            (w_t0[:, col_lr, depth_ur]*(weight_row_lr * weight_col_lr * weight_depth_ur))+\
+                (w_t0[:, col_ur, depth_lr]*(weight_row_lr * weight_col_ur * weight_depth_lr))+\
+                    (w_t0[:, col_ur, depth_ur]*(weight_row_lr * weight_col_ur * weight_depth_ur))+\
+                        (w_t0[:, col_lr, depth_lr]*(weight_row_ur * weight_col_lr * weight_depth_lr))+\
+                            (w_t0[:, col_lr, depth_ur]*(weight_row_ur * weight_col_lr * weight_depth_ur))+\
+                                (w_t0[:, col_ur, depth_lr]*(weight_row_ur * weight_col_ur * weight_depth_lr))+\
+                                    (w_t0[:, col_ur, depth_ur]*(weight_row_ur * weight_col_ur * weight_depth_ur)))    
+    
 w_rec_y_end = ((w_new[row_lr, :, depth_lr]*(weight_row_lr * weight_col_lr * weight_depth_lr))+\
         (w_new[row_lr, :, depth_ur]*(weight_row_lr * weight_col_lr * weight_depth_ur))+\
             (w_new[row_lr, :, depth_lr]*(weight_row_lr * weight_col_ur * weight_depth_lr))+\
@@ -493,6 +512,11 @@ w_rec_y_end = ((w_new[row_lr, :, depth_lr]*(weight_row_lr * weight_col_lr * weig
 ###############################################################################
 #RESULTS
 ###############################################################################
+
+
+spl_stat_x_t0 = 10*np.log10(rho*c0**2*w_rec_x_t0/pRef**2)
+spl_stat_x_5l = 10*np.log10(rho*c0**2*w_rec_x_5l/pRef**2)
+
 
 spl_stat_x = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_x**2))) + ((abs(w_rec_x_end)*c0)))/(pRef**2))
 spl_stat_y = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_y**2))) + ((abs(w_rec_y_end)*c0)))/(pRef**2)) #It should be the spl stationary
@@ -510,7 +534,7 @@ w_rec_off = w_rec[idx_w_rec:] #cutting the energy density array at the receiver 
 w_rec_off_deriv = w_rec_off #initialising an array of derivative equal to the w_rec_off -> this will be the impulse response after modifying it
 w_rec_off_deriv = np.delete(w_rec_off_deriv, 0) #delete the first element of the array -> this means shifting the array one step before and therefore do a derivation
 w_rec_off_deriv = np.append(w_rec_off_deriv,0) #add a zero in the last element of the array -> for derivation and to have the same length as previously
-impulse = w_rec_off - w_rec_off_deriv #This is the difference between the the energy density and the impulse response 
+impulse = ((w_rec_off - w_rec_off_deriv)/dt)/(rho*c0**2) #This is the difference between the the energy density and the impulse response 
 #IMPORTANT NOTE: The "impulse" variable should be divided by dt in theory according to Schroeder 1965 but this is not done because otherwise it does not match the results of the radiosity method.
 
 #Schroeder integration

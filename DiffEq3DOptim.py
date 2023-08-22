@@ -404,7 +404,7 @@ def calculate_energy_density_diffusion(D):
         #print(time_steps)
     
     plt.show()
-    print(D)
+    #print(D)
     
     w_rec_x = ((w_new[:, col_lr, depth_lr]*(weight_row_lr * weight_col_lr * weight_depth_lr))+\
             (w_new[:, col_lr, depth_ur]*(weight_row_lr * weight_col_lr * weight_depth_ur))+\

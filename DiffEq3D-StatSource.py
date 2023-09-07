@@ -43,11 +43,11 @@ dz = dx #distance between grid points z direction [m]
 
 #Room dimensions
 lxmin = 0 #point x starts at zero [m]
-lxmax = 15.0 #point x finish at the length of the room in the x direction [m] %Length
+lxmax = 5.0 #point x finish at the length of the room in the x direction [m] %Length
 lymin = 0 #point y starts at zero [m]
-lymax = 15.0 #point y finish at the length of the room in the y direction [m] %Width
+lymax = 5.0 #point y finish at the length of the room in the y direction [m] %Width
 lzmin = 0 #point z starts at zero [m]
-lzmax = 2.0 #point z finish at the length of the room in the x direction [m] %Height
+lzmax = 5.0 #point z finish at the length of the room in the x direction [m] %Height
 
 S1,S2 = lxmax*lymax, lxmax*lymax #xy planes
 S3,S4 = lxmax*lzmax, lxmax*lzmax #xz planes
@@ -79,13 +79,13 @@ def abs_term(th,alpha):
         Absx = (c0*alpha)/(2*(2-alpha)) #Modified by Xiang
     return Absx
 
-th = 2 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 just to understand the type of boundary chosen
-alpha_1 = 0.3 #Absorption coefficient for Surface1 - Floor
-alpha_2 = 0.3 #Absorption coefficient for Surface2 - Ceiling
-alpha_3 = 0.3 #Absorption coefficient for Surface3 - Wall Front
-alpha_4 = 0.8 #Absorption coefficient for Surface4 - Wall Back
-alpha_5 = 0.3 #Absorption coefficient for Surface5 - Wall Left
-alpha_6 = 0.3 #Absorption coefficient for Surface6 - Wall Right
+th = 3 #int(input("Enter type Asbortion conditions (option 1,2,3):")) #input 1,2,3 just to understand the type of boundary chosen
+alpha_1 = 0.5 #Absorption coefficient for Surface1 - Floor
+alpha_2 = 0.5 #Absorption coefficient for Surface2 - Ceiling
+alpha_3 = 0.5 #Absorption coefficient for Surface3 - Wall Front
+alpha_4 = 0.5 #Absorption coefficient for Surface4 - Wall Back
+alpha_5 = 1.0 #Absorption coefficient for Surface5 - Wall Left
+alpha_6 = 0.5 #Absorption coefficient for Surface6 - Wall Right
 
 Abs_1 = abs_term(th,alpha_1) #absorption term for S1
 Abs_2 = abs_term(th,alpha_2) #absorption term for S2
@@ -123,9 +123,9 @@ if beta_zero_condition >1:
 fsample = 1/dt #frequency spatial resolution (sampling period)
 
 #Finding index in meshgrid of the source position
-x_source = 2.0 #int(ceil(Nx/2))#4 #position of the source in the x direction [m]
-y_source = 5.0 #int(ceil(Ny/2))#4 #position of the source in the y direction [m]
-z_source = 1.0 #int(ceil(Nz/2))#4 #position of the source in the z direction [m]
+x_source = 2.5 #int(ceil(Nx/2))#4 #position of the source in the x direction [m]
+y_source = 2.5 #int(ceil(Ny/2))#4 #position of the source in the y direction [m]
+z_source = 2.5 #int(ceil(Nz/2))#4 #position of the source in the z direction [m]
 coord_source = [x_source , y_source, z_source] #coordinates of the source position in an list
 rows_s = np.argmin(abs(xx[:,0,0] - coord_source[0])) #Find index of grid point with minimum distance from source along x direction
 cols_s = np.argmin(abs(yy[0,:,0] - coord_source[1])) #Find index of grid point with minimum distance from source along y direction
@@ -133,7 +133,7 @@ dept_s = np.argmin(abs(zz[0,0,:] - coord_source[2])) #Find index of grid point w
 
 #Finding index in meshgrid of the receiver position
 x_rec = 2.5#int(ceil(Nx/4)) #position of the receiver in the x direction [m]
-y_rec = 2.5#int(ceil(Nx/4)) #position of the receiver in the y direction [m]
+y_rec = 1.0#int(ceil(Nx/4)) #position of the receiver in the y direction [m]
 z_rec = 1.0#int(ceil(Nx/4)) #position of the receiver in the z direction [m]
 coord_receiver = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
 rows_r = np.argmin(abs(xx[:,0,0] - coord_receiver[0])) #Find index of grid point with minimum distance from receiver along x direction

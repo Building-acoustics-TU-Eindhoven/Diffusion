@@ -42,19 +42,19 @@ c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
 #Room dimensions
-length = 39.0 #point x finish at the length of the room in the x direction [m] %Length
-width = 3.0 #point y finish at the length of the room in the y direction [m] %Width
-height = 3.0 #point z finish at the length of the room in the x direction [m] %Height
+length = 5.0 #point x finish at the length of the room in the x direction [m] %Length
+width = 5.0 #point y finish at the length of the room in the y direction [m] %Width
+height = 5.0 #point z finish at the length of the room in the x direction [m] %Height
 
 # Source position
-x_source = 0.5  #position of the source in the x direction [m]
-y_source = 0.5  #position of the source in the y direction [m]
-z_source = 1.0  #position of the source in the z direction [m]
+x_source = 2.5  #position of the source in the x direction [m]
+y_source = 2.5  #position of the source in the y direction [m]
+z_source = 2.5  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 38.0 #position of the receiver in the x direction [m]
-y_rec = 0.5 #position of the receiver in the y direction [m]
-z_rec = 1.0 #position of the receiver in the z direction [m]
+x_rec = 1.5 #position of the receiver in the x direction [m]
+y_rec = 1.5 #position of the receiver in the y direction [m]
+z_rec = 1.5 #position of the receiver in the z direction [m]
 
 #Spatial discretization
 dx = 0.5 #distance between grid points x direction [m] #See Documentation for more insight about dt and dx
@@ -62,17 +62,17 @@ dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
 #Time discretization
-dt = 1/8000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
+dt = 1/32000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
 
 #Absorption term and Absorption coefficients
-th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
+th = 2 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
-alpha_1 = 1/6 #Absorption coefficient for Surface1 - Floor
-alpha_2 = 1/6 #Absorption coefficient for Surface2 - Ceiling
-alpha_3 = 1/6 #Absorption coefficient for Surface3 - Wall Front
-alpha_4 = 1/6 #Absorption coefficient for Surface4 - Wall Back
-alpha_5 = 1/6 #Absorption coefficient for Surface5 - Wall Left
-alpha_6 = 1/6 #Absorption coefficient for Surface6 - Wall Right
+alpha_1 = 0.5 #Absorption coefficient for Surface1 - Floor
+alpha_2 = 0.5 #Absorption coefficient for Surface2 - Ceiling
+alpha_3 = 0.5 #Absorption coefficient for Surface3 - Wall Front
+alpha_4 = 0.5 #Absorption coefficient for Surface4 - Wall Back
+alpha_5 = 0.5 #Absorption coefficient for Surface5 - Wall Left
+alpha_6 = 0.5 #Absorption coefficient for Surface6 - Wall Right
 
 #Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
@@ -80,9 +80,9 @@ alpha_6 = 1/6 #Absorption coefficient for Surface6 - Wall Right
 tcalc = "decay"
 
 #Set initial condition - Source Info (interrupted method)
-Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
-sourceon_time =  0.50 #time that the source is ON before interrupting [s]
-recording_time = 2.00 #total time recorded for the calculation [s]
+Ws = 0.02 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
+sourceon_time =  1.00 #time that the source is ON before interrupting [s]
+recording_time = 2.50 #total time recorded for the calculation [s]
 
 #%%
 ###############################################################################
@@ -497,6 +497,8 @@ w_rec_x_t0 = ((w_t0[:, col_lr, depth_lr]*(weight_row_lr * weight_col_lr * weight
                             (w_t0[:, col_lr, depth_ur]*(weight_row_ur * weight_col_lr * weight_depth_ur))+\
                                 (w_t0[:, col_ur, depth_lr]*(weight_row_ur * weight_col_ur * weight_depth_lr))+\
                                     (w_t0[:, col_ur, depth_ur]*(weight_row_ur * weight_col_ur * weight_depth_ur)))    
+
+spl_rec_x_t0 = 10*np.log10(rho*c0**2*w_rec_x_t0/pRef**2)
     
 w_rec_y_end = ((w_new[row_lr, :, depth_lr]*(weight_row_lr * weight_col_lr * weight_depth_lr))+\
         (w_new[row_lr, :, depth_ur]*(weight_row_lr * weight_col_lr * weight_depth_ur))+\
@@ -514,7 +516,7 @@ w_rec_y_end = ((w_new[row_lr, :, depth_lr]*(weight_row_lr * weight_col_lr * weig
 ###############################################################################
 
 
-spl_stat_x_t0 = 10*np.log10(rho*c0**2*w_rec_x_t0/pRef**2)
+spl_stat_x_t0 = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_x**2))) + ((abs(w_rec_x_t0)*c0)))/(pRef**2)) #with direct sound
 spl_stat_x_5l = 10*np.log10(rho*c0**2*w_rec_x_5l/pRef**2)
 
 
@@ -534,14 +536,14 @@ w_rec_off = w_rec[idx_w_rec:] #cutting the energy density array at the receiver 
 w_rec_off_deriv = w_rec_off #initialising an array of derivative equal to the w_rec_off -> this will be the impulse response after modifying it
 w_rec_off_deriv = np.delete(w_rec_off_deriv, 0) #delete the first element of the array -> this means shifting the array one step before and therefore do a derivation
 w_rec_off_deriv = np.append(w_rec_off_deriv,0) #add a zero in the last element of the array -> for derivation and to have the same length as previously
-impulse = ((w_rec_off - w_rec_off_deriv)/dt)/(rho*c0**2) #This is the difference between the the energy density and the impulse response 
+impulse = (((w_rec_off) - w_rec_off_deriv)/(dt))#/(rho*c0**2) #This is the difference between the the energy density and the impulse response 
 #IMPORTANT NOTE: The "impulse" variable should be divided by dt in theory according to Schroeder 1965 but this is not done because otherwise it does not match the results of the radiosity method.
 
 #Schroeder integration
-energy_r_rev = (w_rec_off)[::-1] #reverting the array
+#energy_r_rev = (w_rec_off)[::-1] #reverting the array
 #The energy density is related to the pressure with the following relation: w = p^2
-energy_r_rev_cum = np.cumsum(energy_r_rev) #cumulative summation of all the item in the array
-schroeder = energy_r_rev_cum[::-1] #reverting the array again -> creating the schroder decay
+#energy_r_rev_cum = np.cumsum(energy_r_rev) #cumulative summation of all the item in the array
+schroeder = w_rec_off #energy_r_rev_cum[::-1] #reverting the array again -> creating the schroder decay
 sch_db = 10.0 * np.log10(schroeder / max(schroeder)) #level of the array: schroeder decay
 
 if tcalc == "decay":
@@ -646,6 +648,27 @@ if tcalc == "decay":
     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
     
+    #Figure 14: Energy density at t=sourceoff_step over the space x.
+    plt.figure(14)
+    plt.title("Figure 14: Energy density over the x axis at t=0")
+    plt.plot(x,w_rec_x_t0)
+    plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
+    plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
+    
+    #Figure 15: SPL at t=sourceoff_step over the space x. reverb sound only
+    plt.figure(15)
+    plt.title("Figure 15: SPL REVERB over the x axis at t=0")
+    plt.plot(x,spl_rec_x_t0)
+    plt.ylabel('$\mathrm{SPL \ [dB]}$')
+    plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
+    
+    #Figure 16: SPL at t=sourceoff_step over the space x. direct + reverb sound
+    plt.figure(16)
+    plt.title("Figure 16: SPL DIRECT over the x axis at t=0")
+    plt.plot(x,spl_stat_x_t0)
+    plt.ylabel('$\mathrm{SPL \ [dB]}$')
+    plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
+    
 if tcalc == "stationarysource":
 
     #Figure 3: Decay of SPL in the recording_time at the receiver
@@ -686,8 +709,8 @@ if tcalc == "stationarysource":
     data_y = spl_y
     plt.title("Figure 6: SPL over the y axis")
     plt.plot(y,data_y)
-    plt.xticks(np.arange(0, 20, 5))
-    plt.yticks(np.arange(75, 105, 5))
+    #plt.xticks(np.arange(0, 20, 5))
+    #plt.yticks(np.arange(75, 105, 5))
     plt.ylabel('$\mathrm{Sound \ Pressure\ Level \ [dB]}$')
     plt.xlabel('$\mathrm{Distance \ along \ y \ axis \ [m]}$')
 
@@ -699,8 +722,8 @@ if tcalc == "stationarysource":
     data_x = spl_x
     plt.title("Figure 7: SPL over the x axis")
     plt.plot(x,data_x)
-    plt.xticks(np.arange(0, 35, 5))
-    plt.yticks(np.arange(65, 105, 5))
+    #plt.xticks(np.arange(0, 35, 5))
+    #plt.yticks(np.arange(65, 105, 5))
     plt.ylabel('$\mathrm{Sound \ Pressure \ Level \ [dB]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')
     

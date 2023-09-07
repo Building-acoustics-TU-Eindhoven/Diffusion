@@ -18,6 +18,7 @@ import sys
 from drawnow import drawnow
 from math import ceil
 from math import log
+from math import sqrt
 from FunctionRT import *
 from FunctionEDT import *
 from FunctionClarity import *
@@ -31,6 +32,7 @@ import time as time
 from scipy import stats
 from scipy.interpolate import griddata
 from matplotlib.animation import FuncAnimation
+from scipy.sparse import lil_matrix
 
 import gmsh
 import sys
@@ -323,8 +325,6 @@ for el in vGroupsNames:
 #######################################################################################################
 #######################################################################################################
 
-
-
 cell_center = np.array(())
 for key in centre_cell:
     cell_center = np.append(cell_center,centre_cell[key])
@@ -339,66 +339,182 @@ for item in neighbourVolume:
     
 neighbourVolume = neighbourVolume.reshape((-1,4))
 
-# Create a boolean array indicating non-boundary elements
-nonBoundaryIndex = neighbourVolume != 0
-# Convert True values to 1 and False values to 0
-nonBoundaryIndex = nonBoundaryIndex.astype(int)
-#nodeOrder = np.array([[3, 1, 2, 1],
-#                      [4, 2, 3, 2],
-#                      [4, 1, 2, 1],
-#                      [4, 1, 3, 1]])
 
-import numpy as np
-from scipy.sparse import lil_matrix
+faces = np.array(())
+for key in centre_cell:
+    cell_center = np.append(cell_center,centre_cell[key])
+cell_center = cell_center.reshape((-1,3))
 
-# Assuming you have defined the required arrays and functions (nodePositions, Cell_center, nonBoundaryIndex, nodeOrder, Velements, triangleArea, boundaryV) before this code
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
 
-#velement = len(nodesVolume)
-nNode = 4  # Assuming tetrahedral elements have 4 nodes
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
 
-volumeNodePos0 = np.zeros((velement, 3))
-volumeNodePos1 = np.zeros((velement, 3))
-volumeNodePos2 = np.zeros((velement, 3))
-volumeNodePos3 = np.zeros((velement, 3))
+
+#Boundary face areas
+face_areas = []
+total_boundArea = 0
+#for i in range(velement):
+#    nodes_on_boundary = 0
+#    print(i)
+    # Count the number of nodes from the current tetrahedron that are on the boundary
+#    node_bound = []
+#    for node in velemNodes[i][:]:
+        #print(velemNodes[i][:])
+#        if node in bounNode:
+#            nodes_on_boundary += 1
+#            node_bound.append(node)
+   # If exactly 3 nodes from this tetrahedron are on the boundary, calculate the area
+#    if nodes_on_boundary == 3:
+        # Calculate the face area using the appropriate formula
+#        bc0 = nodecoords[int(node_bound[0]-1)]
+#        bc1 = nodecoords[int(node_bound[1]-1)]
+#        bc2 = nodecoords[int(node_bound[2]-1)]
+#        face_area = np.linalg.norm(np.cross(bc2-bc0,bc1-bc0))/2  # Calculate the area based on the coordinates of the nodes
+#        face_areas.append(face_area)
+#        total_boundArea += face_area
+#    else:
+#        face_areas.append(0)  # No boundary face, so area is zero
+
+
+
+##############This might be right
+#face_areas = np.zeros(len(velemNodes))
+#for idx, element in enumerate(velemNodes):
+#    print(idx)
+#    nodes = element[:3]  # Take the first 3 nodes for a face
+        
+        # Check if the nodes are in any order in bounNode
+#    is_boundary = False
+#    for surface in bounNode:
+#        surface_set = set(surface)
+#        nodes_set = set(nodes)
+#        if nodes_set.issubset(surface_set):
+#            is_boundary = True
+#            break
+        
+#    if is_boundary:
+#        bc0 = nodecoords[int(nodes[0]-1)]
+#        bc1 = nodecoords[int(nodes[1]-1)]
+#        bc2 = nodecoords[int(nodes[2]-1)]
+#        face_area = np.linalg.norm(np.cross(bc2-bc0,bc1-bc0))/2 # Calculate area for the triangle
+#        face_areas[idx] = face_area
+
+import itertools
+face_areas = np.zeros(len(velemNodes))
+for idx, element in enumerate(velemNodes):
+    print(idx)
+    node_combinations = [list(nodes) for nodes in itertools.combinations(element, 3)]
+    #nodes = element[:3]  # Take the first 3 nodes for a face
+        
+        # Check if the nodes are in any order in bounNode
+    is_boundary = False
+    for nodes in node_combinations:
+        for surface in bounNode:
+            surface_set = set(surface)
+            nodes_set = set(nodes)
+            if nodes_set.issubset(surface_set):
+                is_boundary = True
+                break
+        
+    if is_boundary:
+        bc0 = nodecoords[int(nodes[0]-1)]
+        bc1 = nodecoords[int(nodes[1]-1)]
+        bc2 = nodecoords[int(nodes[2]-1)]
+        face_area = np.linalg.norm(np.cross(bc2-bc0,bc1-bc0))/2 # Calculate area for the triangle
+        face_areas[idx] = face_area
+        total_boundArea += face_area
+
+
+
+
+
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+
+
+#Absorption term for boundary conditions 
+def abs_term(th,alpha):
+    if th == 1:
+        Absx = (c0*alpha)/4 #Sabine
+    elif th == 2:
+        Absx = (c0*(-log(1-alpha)))/4 #Eyring
+    elif th == 3:
+        Absx = (c0*alpha)/(2*(2-alpha)) #Modified by Xiang
+    return Absx
+
+Abs_1 = abs_term(th,alpha_1) #absorption term for S1
+Abs_2 = abs_term(th,alpha_2) #absorption term for S2
+Abs_3 = abs_term(th,alpha_3) #absorption term for S3
+Abs_4 = abs_term(th,alpha_4) #absorption term for S4
+Abs_5 = abs_term(th,alpha_5) #absorption term for S5
+Abs_6 = abs_term(th,alpha_6) #absorption term for S6
+
+Abs_terms = []
+vGroups = gmsh.model.getPhysicalGroups(-1)
+vGroupsNames = []
+for iGroup in vGroups:
+    dimGroup = iGroup[0]  #entity tag: 1 lines, 2 surfaces, 3 volumes (1D, 2D or 3D)
+    tagGroup = iGroup[1]  #physical tag group 
+    namGroup = gmsh.model.getPhysicalName(dimGroup, tagGroup)         
+    alist = [dimGroup,tagGroup,namGroup]
+    print(alist)
+    vGroupsNames.append(alist)
+    vEntities = gmsh.model.getEntitiesForPhysicalGroup(dimGroup, tagGroup)
+    print(vEntities)
+
+# Initialize a list to store surface tags and their absorption coefficients
+surface_absorption = []
+triangle_face_absorption = []
+
+for group in vGroupsNames:
+    if group[0] != 2:
+        continue
+
+    # Get the physical group tag
+    physical_tag = group[1]
+
+    # Retrieve all the entities in this physical group
+    entities = gmsh.model.getEntitiesForPhysicalGroup(2, physical_tag)
+
+    abscoeff = float(input(f"Enter absorption coefficient input for {group[2]}:"))
+    Abs_term = abs_term(th, abscoeff)
+
+    for entity in entities:
+        surface_absorption.append((entity, Abs_term))
+        # Get all the triangle faces for the current surface
+        triangle_faces, _ = gmsh.model.mesh.getElementsByType(2, entity)
+        
+        # Append the Abs_term value for each triangle face
+        triangle_face_absorption.extend([Abs_term] * len(triangle_faces))
+
+
+
+
+
+
+
+
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+
+
 
 interior = np.zeros((velement, velement))
-#nodeNo = np.array([0, 1, 2, 3])
-#nodeArray = np.array(())
 
-for iElement in range(velement):
-    thisIndex0 = velemNodes[iElement, 0] #node number 0
-    thisIndex1 = velemNodes[iElement, 1] #node number 1
-    thisIndex2 = velemNodes[iElement, 2] #node number 2
-    thisIndex3 = velemNodes[iElement, 3] #node number 3
-
-    volumeNodePos0[iElement, :] = nodecoords[int(thisIndex0-1), :] #coordinates of node 0
-    volumeNodePos1[iElement, :] = nodecoords[int(thisIndex1-1), :] #coordinates of node 1
-    volumeNodePos2[iElement, :] = nodecoords[int(thisIndex2-1), :] #coordinates of node 2
-    volumeNodePos3[iElement, :] = nodecoords[int(thisIndex3-1), :] #coordinates of node 3
-
-for iElement in range(velement):
-    thisElementPos = np.zeros((nNode, 3))
-    thisElementPos[0, :] = volumeNodePos0[iElement, :] #coordinates of node 0
-    thisElementPos[1, :] = volumeNodePos1[iElement, :] #coordinates of node 1
-    thisElementPos[2, :] = volumeNodePos2[iElement, :] #coordinates of node 2
-    thisElementPos[3, :] = volumeNodePos3[iElement, :] #coordinates of node 3
-
-    thisCellCenter = cell_center[iElement, :] #centre coordinates of the ielement
-    thisBoundaryIndex = nonBoundaryIndex[iElement, :] #is a list, if all of them are 1 it means that it is a internal tetrahedron
-    nNeighbour = np.sum(thisBoundaryIndex) #number of neighbours
-    #nodeArray = np.nonzero(thisBoundaryIndex)[0] #chat
-    #for i in range(len(thisBoundaryIndex)):
-    #    print(i)
-    #    nodeArray = np.append(nodeArray,nodeNo[i])
-
-    for iNeighbour in range(nNeighbour):
-        #thisNeighbourNo = int(nodeArray[iNeighbour])
-        #thisNodeOrder = nodeOrder[iNeighbour, :]
-        thisNeighbour = int(neighbourVolume[iElement][iNeighbour])-1
-        thisCellCenterNeighbour = cell_center[int(thisNeighbour-1), :]
-        
-#shared_nodes = []
-#count = 0
 for i in range(velement):
     print(i)
     cell_center_i = cell_center[i]
@@ -418,28 +534,11 @@ for i in range(velement):
                 sc1 = nodecoords[int(shared_nodes[1]-1)]
                 sc2 = nodecoords[int(shared_nodes[2]-1)]
                 shared_area = np.linalg.norm(np.cross(sc2-sc0,sc1-sc0))/2
-                shared_distance = math.sqrt((abs(cell_center_i[0] - cell_center_j[0]))**2 + (abs(cell_center_i[1] - cell_center_j[1]))**2 + (abs(cell_center_i[2] - cell_center_j[2]))**2) #distance between volume elements
+                shared_distance = sqrt((abs(cell_center_i[0] - cell_center_j[0]))**2 + (abs(cell_center_i[1] - cell_center_j[1]))**2 + (abs(cell_center_i[2] - cell_center_j[2]))**2) #distance between volume elements
                 interior[i, j] = shared_area/shared_distance
             else:
                 shared_area = 0
                 interior[i, j] = shared_area
-        
-        
-#        for node in tetra:
-#            if node in [neighbournode]:
-#                count +=1
-#                if count == 3:
-#                    calculate area of face
-
-
-
-#        v1 = thisElementPos[iNeighbour, :] - thisElementPos[iNeighbour+1, :]
-#        v2 = thisElementPos[iNeighbour+2, :] - thisElementPos[iNeighbour+3, :]
-
-#       thisFaceArea = (np.linalg.norm(np.cross(v1, v2)))/2
-#        thisDistance = np.linalg.norm(thisCellCenter - thisCellCenterNeighbour)
-
-#        interior[iElement, thisNeighbour] = thisFaceArea / thisDistance
 
 Fmat = lil_matrix(interior)
 #fb = boundaryV
@@ -457,6 +556,8 @@ fel = np.sum(interior, axis=1)
 #######################################################################################################
 #######################################################################################################
 #######################################################################################################
+#OLD
+
 #farea_dict = {}
 #for i in txt.keys():
 #    print(i)
@@ -503,24 +604,6 @@ gmsh.finalize()
 
 #%%
 
-#Absorption term for boundary conditions 
-def abs_term(th,alpha):
-    if th == 1:
-        Absx = (c0*alpha)/4 #Sabine
-    elif th == 2:
-        Absx = (c0*(-log(1-alpha)))/4 #Eyring
-    elif th == 3:
-        Absx = (c0*alpha)/(2*(2-alpha)) #Modified by Xiang
-    return Absx
-
-Abs_1 = abs_term(th,alpha_1) #absorption term for S1
-Abs_2 = abs_term(th,alpha_2) #absorption term for S2
-Abs_3 = abs_term(th,alpha_3) #absorption term for S3
-Abs_4 = abs_term(th,alpha_4) #absorption term for S4
-Abs_5 = abs_term(th,alpha_5) #absorption term for S5
-Abs_6 = abs_term(th,alpha_6) #absorption term for S6
-
-Abs_terms = 10
 
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB

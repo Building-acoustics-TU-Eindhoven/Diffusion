@@ -62,7 +62,7 @@ dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
 #Time discretization
-dt = 0.001#1/8000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
+dt = 3.36*10**(-6) #1/8000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
@@ -71,8 +71,8 @@ alpha_1 = 0.16 #Absorption coefficient for Surface1 - Floor
 alpha_2 = 0.16 #Absorption coefficient for Surface2 - Ceiling
 alpha_3 = 0.16 #Absorption coefficient for Surface3 - Wall Front
 alpha_4 = 0.16 #Absorption coefficient for Surface4 - Wall Back
-alpha_5 = 1 #Absorption coefficient for Surface5 - Wall Left
-alpha_6 = 1 #Absorption coefficient for Surface6 - Wall Right
+alpha_5 = 0.16 #Absorption coefficient for Surface5 - Wall Left
+alpha_6 = 0.16 #Absorption coefficient for Surface6 - Wall Right
 
 #Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
@@ -150,8 +150,8 @@ lambda_path = (4*V)/S #mean free path for 3D
 lambda_time= lambda_path/c0 #mean free time for 3D
 lambda_time_step = int(lambda_time/dt)
 Dx = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms x direction
-Dy = np.pi*c0*width/8 #(lambda_path*c0)/3 #diffusion coefficient for proportionate rooms y direction
-Dz = np.pi*c0*height/8 #(lambda_path*c0)/3 #diffusion coefficient for proportionate rooms z direction
+Dy = (lambda_path*c0)/3 #np.pi*c0*width/8 #(lambda_path*c0)/3 #diffusion coefficient for proportionate rooms y direction
+Dz = (lambda_path*c0)/3 #np.pi*c0*height/8 #(lambda_path*c0)/3 #diffusion coefficient for proportionate rooms z direction
 
 #Mesh numbers
 beta_zero_x = (2*Dx*dt)/(dx**2) #mesh number in x direction
@@ -474,6 +474,15 @@ w_rec_x_5l = ((w_5l[:, col_lr, depth_lr]*(weight_row_lr * weight_col_lr * weight
                                 (w_5l[:, col_ur, depth_lr]*(weight_row_ur * weight_col_ur * weight_depth_lr))+\
                                     (w_5l[:, col_ur, depth_ur]*(weight_row_ur * weight_col_ur * weight_depth_ur)))
     
+w_rec_x_t0 = ((w_t0[:, col_lr, depth_lr]*(weight_row_lr * weight_col_lr * weight_depth_lr))+\
+            (w_t0[:, col_lr, depth_ur]*(weight_row_lr * weight_col_lr * weight_depth_ur))+\
+                (w_t0[:, col_ur, depth_lr]*(weight_row_lr * weight_col_ur * weight_depth_lr))+\
+                    (w_t0[:, col_ur, depth_ur]*(weight_row_lr * weight_col_ur * weight_depth_ur))+\
+                        (w_t0[:, col_lr, depth_lr]*(weight_row_ur * weight_col_lr * weight_depth_lr))+\
+                            (w_t0[:, col_lr, depth_ur]*(weight_row_ur * weight_col_lr * weight_depth_ur))+\
+                                (w_t0[:, col_ur, depth_lr]*(weight_row_ur * weight_col_ur * weight_depth_lr))+\
+                                    (w_t0[:, col_ur, depth_ur]*(weight_row_ur * weight_col_ur * weight_depth_ur)))    
+    
 w_rec_y_end = ((w_new[row_lr, :, depth_lr]*(weight_row_lr * weight_col_lr * weight_depth_lr))+\
         (w_new[row_lr, :, depth_ur]*(weight_row_lr * weight_col_lr * weight_depth_ur))+\
             (w_new[row_lr, :, depth_lr]*(weight_row_lr * weight_col_ur * weight_depth_lr))+\
@@ -615,11 +624,18 @@ if tcalc == "decay":
     plt.title("Figure 13: Energy density over the x axis at t=5*lambda_time")
     plt.plot(x,w_rec_x_5l)
     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
-    plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
+    plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')
     
-    #Figure 14: Total Energy density over the space x.
+    #Figure 14: Energy density at t=sourceoff_step over the space x.
     plt.figure(14)
-    plt.title("Figure 14: Total Energy density over the x axis")
+    plt.title("Figure 14: Energy density over the x axis at t=0")
+    plt.plot(x,w_rec_x_t0)
+    plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
+    plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')
+    
+    #Figure 15: Total Energy density over the space x.
+    plt.figure(15)
+    plt.title("Figure 15: Total Energy density over the x axis")
     plt.plot(x,w_rec_sum)
     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 

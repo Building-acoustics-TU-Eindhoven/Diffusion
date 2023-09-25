@@ -13,6 +13,7 @@ Welcome to DiffusionEquationCode's documentation!
    Documentation1D.md
    Documentation2D.md
    Documentation3D.md
+   DocumentationFVM.md
 
 Indices and tables
 ==================

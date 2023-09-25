@@ -52,14 +52,14 @@ length_mesh = 2 ###???We do not need it!
 dt = np.sqrt(length_mesh*(10**-8)/2) #time discretizatione
 
 # Source position
-x_source = 0.5  #position of the source in the x direction [m]
-y_source = 0.5  #position of the source in the y direction [m]
-z_source = 1.0  #position of the source in the z direction [m]
+x_source = 1.36  #position of the source in the x direction [m]
+y_source = 3.76  #position of the source in the y direction [m]
+z_source = 1.62  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 2.0 #position of the receiver in the x direction [m]
-y_rec = 0.5 #position of the receiver in the y direction [m]
-z_rec = 1.0 #position of the receiver in the z direction [m]
+x_rec = 4.26 #position of the receiver in the x direction [m]
+y_rec = 1.76 #position of the receiver in the y direction [m]
+z_rec = 1.62 #position of the receiver in the z direction [m]
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
@@ -172,13 +172,13 @@ for i in volumeEl_dict.keys():
     coord_centre_cell = np.zeros(3)
     centre_cell[i] = []
     #print(i)
-    vc0 = vnodeCoord_dict[volumeEl_dict[i][0]] #Coordinates of the node number zero of the volume element i
+    vc0 = gmsh.model.mesh.getNode(volumeEl_dict[i][0])[0] #Coordinates of the node number zero of the volume element i
     #print(nc0)
-    vc1 = vnodeCoord_dict[volumeEl_dict[i][1]] #Coordinates of the node number one of the volume element i
+    vc1 = gmsh.model.mesh.getNode(volumeEl_dict[i][1])[0] #Coordinates of the node number one of the volume element i
     #print(nc1)
-    vc2 = vnodeCoord_dict[volumeEl_dict[i][2]] #Coordinates of the node number two of the volume element i
+    vc2 = gmsh.model.mesh.getNode(volumeEl_dict[i][2])[0] #Coordinates of the node number two of the volume element i
     #print(nc2)
-    vc3 = vnodeCoord_dict[volumeEl_dict[i][3]] #Coordinates of the node number three of the volume element i
+    vc3 = gmsh.model.mesh.getNode(volumeEl_dict[i][3])[0] #Coordinates of the node number three of the volume element i
     #print(nc3)
     for j in range(3):
         coord_centre_cell[j] = (vc0[j]+vc1[j]+vc2[j]+vc3[j])/4
@@ -194,11 +194,12 @@ for i in boundaryEl_dict.keys():
     coord_centre_area = np.zeros(3)
     centre_area[i] = []
     #print(i)
-    bc0 = bnodeCoord_dict[boundaryEl_dict[i][0]] #Coordinates of the node number zero of the volume element i
+    bc0 = gmsh.model.mesh.getNode(boundaryEl_dict[i][0])[0]
+    #bnodeCoord_dict[boundaryEl_dict[i][0]] #Coordinates of the node number zero of the volume element i
     #print(nc0)
-    bc1 = bnodeCoord_dict[boundaryEl_dict[i][1]] #Coordinates of the node number one of the volume element i
+    bc1 = gmsh.model.mesh.getNode(boundaryEl_dict[i][1])[0] #Coordinates of the node number one of the volume element i
     #print(nc1)
-    bc2 = bnodeCoord_dict[boundaryEl_dict[i][2]] #Coordinates of the node number two of the volume element i
+    bc2 = gmsh.model.mesh.getNode(boundaryEl_dict[i][2])[0] #Coordinates of the node number two of the volume element i
     #print(nc2)
     for j in range(3):
         coord_centre_area[j] = (bc0[j]+bc1[j]+bc2[j])/3 #coordinates of the centre of each volume element
@@ -272,25 +273,40 @@ dist_dict = {}
 
 #namGroup = gmsh.model.getPhysicalName(dimGroup, tagGroup)
 
+###############################################################################
+#Absorption term
+###############################################################################
+#Absorption term for boundary conditions 
+def abs_term(th,alpha):
+    if th == 1:
+        Absx = (c0*alpha)/4 #Sabine
+    elif th == 2:
+        Absx = (c0*(-log(1-alpha)))/4 #Eyring
+    elif th == 3:
+        Absx = (c0*alpha)/(2*(2-alpha)) #Modified by Xiang
+    return Absx
 
-#Get Physical tags, groups to put boundary conditions
 
-vGroups = gmsh.model.getPhysicalGroups()
+Abs_terms = []
+vGroups = gmsh.model.getPhysicalGroups(-1)
 vGroupsNames = []
 for iGroup in vGroups:
     dimGroup = iGroup[0]  #entity tag: 1 lines, 2 surfaces, 3 volumes (1D, 2D or 3D)
     tagGroup = iGroup[1]  #physical tag group 
-    namGroup = gmsh.model.getPhysicalName(dimGroup, tagGroup)
+    namGroup = gmsh.model.getPhysicalName(dimGroup, tagGroup)         
     alist = [dimGroup,tagGroup,namGroup]
+    print(alist)
     vGroupsNames.append(alist)
+    vEntities = gmsh.model.getEntitiesForPhysicalGroup(dimGroup, tagGroup)
+    print(vEntities)
 
-surfEl = {}
-for el in vGroupsNames:
-    if el[0] == 2:
-        surfaces, bounNodeTagstype = gmsh.model.mesh.getElementsByType(el[0],el[1])
-        abscoeff = input(f"Enter absorption coefficient input for {el[2]}:")
-        surfaces = np.append(surfaces,abscoeff)
-        surfEl[el[2]] = surfaces
+#surfEl = {}
+#for el in vGroupsNames:
+#    if el[0] == 2:
+#        surfaces, bounNodeTagstype = gmsh.model.mesh.getElementsByType(el[0],el[1])
+#        abscoeff = input(f"Enter absorption coefficient input for {el[2]}:")
+#        surfaces = np.append(surfaces,abscoeff)
+#        surfEl[el[2]] = surfaces
 
         #vGroupsNames[el].append(abscoeff)
 
@@ -345,133 +361,10 @@ for key in centre_cell:
     cell_center = np.append(cell_center,centre_cell[key])
 cell_center = cell_center.reshape((-1,3))
 
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
+cell_volume = np.array(())
+for key in vcell_dict:
+    cell_volume = np.append(cell_volume,vcell_dict[key])
 
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
-
-
-#Boundary face areas
-face_areas = []
-total_boundArea = 0
-#for i in range(velement):
-#    nodes_on_boundary = 0
-#    print(i)
-    # Count the number of nodes from the current tetrahedron that are on the boundary
-#    node_bound = []
-#    for node in velemNodes[i][:]:
-        #print(velemNodes[i][:])
-#        if node in bounNode:
-#            nodes_on_boundary += 1
-#            node_bound.append(node)
-   # If exactly 3 nodes from this tetrahedron are on the boundary, calculate the area
-#    if nodes_on_boundary == 3:
-        # Calculate the face area using the appropriate formula
-#        bc0 = nodecoords[int(node_bound[0]-1)]
-#        bc1 = nodecoords[int(node_bound[1]-1)]
-#        bc2 = nodecoords[int(node_bound[2]-1)]
-#        face_area = np.linalg.norm(np.cross(bc2-bc0,bc1-bc0))/2  # Calculate the area based on the coordinates of the nodes
-#        face_areas.append(face_area)
-#        total_boundArea += face_area
-#    else:
-#        face_areas.append(0)  # No boundary face, so area is zero
-
-
-
-##############This might be right
-#face_areas = np.zeros(len(velemNodes))
-#for idx, element in enumerate(velemNodes):
-#    print(idx)
-#    nodes = element[:3]  # Take the first 3 nodes for a face
-        
-        # Check if the nodes are in any order in bounNode
-#    is_boundary = False
-#    for surface in bounNode:
-#        surface_set = set(surface)
-#        nodes_set = set(nodes)
-#        if nodes_set.issubset(surface_set):
-#            is_boundary = True
-#            break
-        
-#    if is_boundary:
-#        bc0 = nodecoords[int(nodes[0]-1)]
-#        bc1 = nodecoords[int(nodes[1]-1)]
-#        bc2 = nodecoords[int(nodes[2]-1)]
-#        face_area = np.linalg.norm(np.cross(bc2-bc0,bc1-bc0))/2 # Calculate area for the triangle
-#        face_areas[idx] = face_area
-
-import itertools
-face_areas = np.zeros(len(velemNodes))
-for idx, element in enumerate(velemNodes):
-    print(idx)
-    node_combinations = [list(nodes) for nodes in itertools.combinations(element, 3)]
-    #nodes = element[:3]  # Take the first 3 nodes for a face
-        
-        # Check if the nodes are in any order in bounNode
-    is_boundary = False
-    for nodes in node_combinations:
-        for surface in bounNode:
-            surface_set = set(surface)
-            nodes_set = set(nodes)
-            if nodes_set.issubset(surface_set):
-                is_boundary = True
-                break
-        
-    if is_boundary:
-        bc0 = nodecoords[int(nodes[0]-1)]
-        bc1 = nodecoords[int(nodes[1]-1)]
-        bc2 = nodecoords[int(nodes[2]-1)]
-        face_area = np.linalg.norm(np.cross(bc2-bc0,bc1-bc0))/2 # Calculate area for the triangle
-        face_areas[idx] = face_area
-        total_boundArea += face_area
-
-
-
-
-
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
-
-
-#Absorption term for boundary conditions 
-def abs_term(th,alpha):
-    if th == 1:
-        Absx = (c0*alpha)/4 #Sabine
-    elif th == 2:
-        Absx = (c0*(-log(1-alpha)))/4 #Eyring
-    elif th == 3:
-        Absx = (c0*alpha)/(2*(2-alpha)) #Modified by Xiang
-    return Absx
-
-Abs_1 = abs_term(th,alpha_1) #absorption term for S1
-Abs_2 = abs_term(th,alpha_2) #absorption term for S2
-Abs_3 = abs_term(th,alpha_3) #absorption term for S3
-Abs_4 = abs_term(th,alpha_4) #absorption term for S4
-Abs_5 = abs_term(th,alpha_5) #absorption term for S5
-Abs_6 = abs_term(th,alpha_6) #absorption term for S6
-
-Abs_terms = []
-vGroups = gmsh.model.getPhysicalGroups(-1)
-vGroupsNames = []
-for iGroup in vGroups:
-    dimGroup = iGroup[0]  #entity tag: 1 lines, 2 surfaces, 3 volumes (1D, 2D or 3D)
-    tagGroup = iGroup[1]  #physical tag group 
-    namGroup = gmsh.model.getPhysicalName(dimGroup, tagGroup)         
-    alist = [dimGroup,tagGroup,namGroup]
-    print(alist)
-    vGroupsNames.append(alist)
-    vEntities = gmsh.model.getEntitiesForPhysicalGroup(dimGroup, tagGroup)
-    print(vEntities)
 
 # Initialize a list to store surface tags and their absorption coefficients
 surface_absorption = []
@@ -500,7 +393,70 @@ for group in vGroupsNames:
 
 
 
+#######################################################################################################
+#######################################################################################################
+#FACE AREA
+#######################################################################################################
+#######################################################################################################
+total_boundArea = 0
+boundaryV = []  # Initialize a list to store boundaryV values for each tetrahedron
+import itertools
+face_areas = np.zeros(len(velemNodes))
+for idx, element in enumerate(velemNodes):
+    #if idx == 3323:
+        tetrahedron_boundaryV = 0
+        total_tetrahedron_boundaryV = 0
+        print(idx)
+        node_combinations = [list(nodes) for nodes in itertools.combinations(element, 3)]
+        #nodes = element[:3]  # Take the first 3 nodes for a face
+            # Check if the nodes are in any order in bounNode
+        is_boundary = False
+        for nodes in node_combinations:
+            for surface_idx, surface in enumerate(bounNode):
+                surface_set = sorted(set(surface))
+                surface_set_idx = surface_idx
+                nodes_set = sorted(set(nodes))
+                surface_list = list(surface)
+                if nodes_set == surface_set:
+                    print(surface_set)
+                    print(surface_list)
+                    is_boundary = True
+                    if is_boundary:
+                        # Convert the vertices to NumPy arrays for vector operations
+                        bc0 = gmsh.model.mesh.getNode(nodes[0])[0]
+                        bc1 = gmsh.model.mesh.getNode(nodes[1])[0]
+                        bc2 = gmsh.model.mesh.getNode(nodes[2])[0]
+                        
+                        # Calculate the area using half of the cross product's magnitude
+                        face_area = 0.5 * np.linalg.norm(np.cross(bc1 - bc0, bc2 - bc0))
+                        #print(face_area)
+                        
+                        face_areas[idx] = face_area
+                        total_boundArea += face_area
+                        
+                        if face_area > 0:
+                            #Calculate the index of the current face within the tetrahedron
+                            #face_index = np.where(bounNode == surface_t)
+                            
+                            #face_index = np.where((bounNode == surface))[0][0]
+                            
+                            # Use the index to access the corresponding absorption area
+                            face_absorption_product = face_area * triangle_face_absorption[surface_set_idx]
+                            print(face_absorption_product)
+                            
+                            tetrahedron_boundaryV += face_absorption_product
+                            
+                            total_tetrahedron_boundaryV += tetrahedron_boundaryV
+                            
+        # Append the total boundaryV for the tetrahedron to the list
+        boundaryV.append(total_tetrahedron_boundaryV)
+        print(total_tetrahedron_boundaryV)
 
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
 
 
 
@@ -545,12 +501,28 @@ Fmat = lil_matrix(interior)
 fel = np.sum(interior, axis=1)
 
 
+##############################################################################
+##############################################################################
+##############################################################################
+##############################################################################
 
+#distance between source and receiver
+dist_sr = math.sqrt((abs(x_rec - x_source))**2 + (abs(y_rec - y_source))**2 + (abs(z_rec - z_source))**2) #distance between source and receiver
 
+coord_source = [x_source,y_source,z_source] #coordinates of the receiver position in an list
+coord_rec = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
 
+#Position of receiver is the centre of a cell so the minimum distance with the centre of a cell has been calculated to understand which cell is the closest
+dist_rec_cc = np.sum((cell_center - coord_rec)**2, axis=1)
+rec_idx = np.argmin(dist_rec_cc)
 
+#Position of source is the one of the nodes, the closest to the actual source coordinates
+dist_source_cc = np.sum((nodecoords[nodeTags-1] - coord_source)**2, axis=1)
+source_idx = np.argmin(dist_source_cc)
 
-
+#Position of source is the centre of a cell , the closest to the actual source coordinates
+dist_source_cc = np.sum((cell_center - coord_source)**2, axis=1)
+source_idx = np.argmin(dist_source_cc)
 
 #######################################################################################################
 #######################################################################################################
@@ -607,13 +579,13 @@ gmsh.finalize()
 
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
-Vs = 4 #Volume of the cell #volume of the source = to volume of cells ###?????
+Vs = cell_volume[source_idx] #Volume of the cell #volume of the source = to volume of cells ###?????
 
 sourceon_time =  0.50 #time that the source is ON before interrupting [s]
 recording_time = 2.00 #total time recorded for the calculation [s]
 
-V = sum(vcell_dict.values())
-S = 100 # surface area of the room ###???
+V = sum(cell_volume)
+S = total_boundArea # surface area of the room ###???
 
 #%%
 ###############################################################################
@@ -640,10 +612,10 @@ Dx = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms x directi
 Dy = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms y direction
 Dz = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms z direction
 
-Sjk =  10#area face between two adjacent tetrahedron shapes ###?????
-hjk = 10 #distance between the central nodes of two adjacent tetrahedron shapes ###?????
+#Sjk =  10#area face between two adjacent tetrahedron shapes ###?????
+#hjk = 10 #distance between the central nodes of two adjacent tetrahedron shapes ###?????
 
-beta_zero = np.divide((dt*(Dx*Sjk/hjk - hjk*Abs_terms)),vcell_dict.values()) ###????? my interpretation of the beta_zero
+beta_zero = np.divide((dt*(np.multiply(Dx,fel) + boundaryV)),cell_volume) ###????? my interpretation of the beta_zero
 
 #Finding index in meshgrid of the source position
 coord_source = [x_source,y_source,z_source] #coordinates of the receiver position in an list
@@ -673,8 +645,8 @@ for steps in range(0, recording_steps):
     #Computing w_new (w at n+1 time step)
     w_new = np.divide((np.multiply(w_old,(1-beta_zero))),(1+beta_zero)) - \
         np.divide((2*dt*c0*m_atm*w),(1+beta_zero)) + \
-            np.divide((np.divide((2*dt*Dx*(Sjk/hjk)*w),vcell_dict.values())),(1+beta_zero)) + \
-                np.divide((2*dt*s),(1+beta_zero)) #The absorption term is part of beta_zero
+            np.divide(np.divide((2*dt*Dx*(Fmat)*w),cell_volume),(1+beta_zero)) #+ \
+               # np.divide((2*dt*s),(1+beta_zero)) #The absorption term is part of beta_zero
                  ###?????
                  
     #Update w before next step

@@ -111,38 +111,9 @@ for item in neighbourVolume:
     
 neighbourVolume = neighbourVolume.reshape((-1,4))
 
-
-
-
 ###############################################################################
-#Face areas
+#Absorption term
 ###############################################################################
-       
-import itertools
-face_areas = np.zeros(len(velemNodes))
-for idx, element in enumerate(velemNodes):
-    print(idx)
-    node_combinations = [list(nodes) for nodes in itertools.combinations(element, 3)]
-    #nodes = element[:3]  # Take the first 3 nodes for a face
-        
-        # Check if the nodes are in any order in bounNode
-    is_boundary = False
-    for nodes in node_combinations:
-        for surface in bounNode:
-            surface_set = set(surface)
-            nodes_set = set(nodes)
-            if nodes_set.issubset(surface_set):
-                is_boundary = True
-                break
-        
-    if is_boundary:
-        bc0 = nodecoords[int(nodes[0]-1)]
-        bc1 = nodecoords[int(nodes[1]-1)]
-        bc2 = nodecoords[int(nodes[2]-1)]
-        face_area = np.linalg.norm(np.cross(bc2-bc0,bc1-bc0))/2 # Calculate area for the triangle
-        face_areas[idx] = face_area
-        total_boundArea += face_area
-        
 #Absorption term for boundary conditions 
 def abs_term(th,alpha):
     if th == 1:
@@ -192,9 +163,90 @@ for group in vGroupsNames:
         triangle_face_absorption.extend([Abs_term] * len(triangle_faces))
 
 ###############################################################################
+#Face areas
+###############################################################################
+       
+total_boundArea = 0
+boundaryV = []  # Initialize a list to store boundaryV values for each tetrahedron
+import itertools
+face_areas = np.zeros(len(velemNodes))
+for idx, element in enumerate(velemNodes):
+    tetrahedron_boundaryV = 0
+    total_tetrahedron_boundaryV = 0
+    print(idx)
+    node_combinations = [list(nodes) for nodes in itertools.combinations(element, 3)]
+    #nodes = element[:3]  # Take the first 3 nodes for a face
+        # Check if the nodes are in any order in bounNode
+    is_boundary = False
+    for nodes in node_combinations:
+        for surface in bounNode:
+            surface_set = set(surface)
+            nodes_set = set(nodes)
+            if nodes_set.issubset(surface_set):
+                is_boundary = True
+                if is_boundary:
+                    # Convert the vertices to NumPy arrays for vector operations
+                    bc0 = gmsh.model.mesh.getNode(nodes[0])[0]
+                    bc1 = gmsh.model.mesh.getNode(nodes[1])[0]
+                    bc2 = gmsh.model.mesh.getNode(nodes[2])[0]
+                    
+                    # Calculate the area using half of the cross product's magnitude
+                    face_area = 0.5 * np.linalg.norm(np.cross(bc1 - bc0, bc2 - bc0))
+                    
+                    face_areas[idx] = face_area
+                    total_boundArea += face_area
+                    
+                    if face_area > 0:
+                        #Calculate the index of the current face within the tetrahedron
+                        face_index = np.where((bounNode == nodes))[0][0]
+                        
+                        # Use the index to access the corresponding absorption area
+                        face_absorption_product = face_area * triangle_face_absorption[face_index]
+                        
+                        tetrahedron_boundaryV += face_absorption_product
+                        
+                    total_tetrahedron_boundaryV += tetrahedron_boundaryV
+                        
+    # Append the total boundaryV for the tetrahedron to the list
+    boundaryV.append(total_tetrahedron_boundaryV)
+
+
+######PREVIOUS########################################################
+total_boundArea = 0
+
+import itertools
+face_areas = np.zeros(len(velemNodes))
+for idx, element in enumerate(velemNodes):
+    print(idx)
+    node_combinations = [list(nodes) for nodes in itertools.combinations(element, 3)]
+    #nodes = element[:3]  # Take the first 3 nodes for a face
+        # Check if the nodes are in any order in bounNode
+    is_boundary = False
+    for nodes in node_combinations:
+        for surface in bounNode:
+            surface_set = set(surface)
+            nodes_set = set(nodes)
+            if nodes_set.issubset(surface_set):
+                is_boundary = True
+                if is_boundary:
+                    # Convert the vertices to NumPy arrays for vector operations
+                    bc0 = gmsh.model.mesh.getNode(nodes[0])[0]
+                    bc1 = gmsh.model.mesh.getNode(nodes[1])[0]
+                    bc2 = gmsh.model.mesh.getNode(nodes[2])[0]
+                    
+                    # Calculate the area using half of the cross product's magnitude
+                    face_area = 0.5 * np.linalg.norm(np.cross(bc1 - bc0, bc2 - bc0))
+
+                    face_areas[idx] = face_area
+                    total_boundArea += face_area
+
+
+
+
+###############################################################################
 ###############################################################################
 
-#faceNodes = gmsh.model.mesh.getElementFaceNodes(2, 3)
+faceNodes = gmsh.model.mesh.getElementFaceNodes(2, 3)
 #faceTags, faceOrientations = gmsh.model.mesh.getFaces(3, faceNodes)
 #elementTags, elementNodeTags = gmsh.model.mesh.getElementsByType(2)
 #faces2Elements = {}
@@ -209,11 +261,88 @@ for group in vGroupsNames:
 #    facebyvolume = gmsh.model.mesh.getFaces(3,neighbourVolume[i])
     
     
+#boundaryAreaTotal = 0
+#boundaryV = []
+#Computing list of faces per tetrahedron
+#faces = []
+#facenodes2 = facenodes.reshape((-1,3)) #gmsh.model.mesh.getElementFaceNodes(4, 3) #4 is the element type (tetrahedron) and three are the nodes per each face
+
+#faces_per_tet = [] #dictionary with keys as the nodes of each face and values the volume elements of which this face is neighbour
+
+#for i in range(0, len(facenodes2)): # per ecah element basically, goes trhough the nodes of each face 3by3
+#    print(i)
+#    f = list(sorted(facenodes2[i])) #nodes of each face put in a tuple from node i to node i plus 3
+#    #faces.append(f)
+#    #t = voluEl[i // 12] #volume element number at which the faces are associated?
+#    faces_per_tet.append(f)
+#    #if not f in faces_per_tet: #if the face f (with its node) is alrady in the dictionary, just append the volume element neighbour to
+    #    faces_per_tet[i] = [f]
+    #else:
+    #    faces_per_tet[i].append(f)
+
+#faces_per_tet = np.reshape(faces_per_tet, (len(voluEl),4))
+
+#total_faces = []
+#list_facesxt = []
+#for i in range(0,len(faces_per_tet),4):
+#    list_facesxt.append(list(faces_per_tet[i:i+4]))
+
     
+#Computing boundary area*abs_term
+#boundaryAreaTotal = 0
+#boundaryV = np.zeros(velement)
+            
+# Create a set of faces that are on the boundary for faster lookup
+
+#for i in range(len(list_facesxt)):
+    #print(i)
+    #if i == 159:
+    #    break
+    #    is_boundary = False  # Flag to check if any face of this tetrahedron is on the boundary
+#    for j in range(len(belemNodes)):
+#        if (list_facesxt[i][0:4] == belemNodes[j]).any():
+#            print(j)
+#            print(belemNodes[j])
+#            print(list_facesxt[i])
+            #break
+                #j = int(j)
+                #face_in_consideration = gmsh.model.mesh.getFaces(3, j)
+#            a_surf = face_areas[i] * triangle_face_absorption[j]
+#    boundaryV[i] = a_surf
+
+
+
+
+#face_per_tet = {}
+#for i in range(len(neighbourVolume)):
+#    print(i)
+#new = []
+#for key,value in fxt.items():
+#flipped = {}
+ 
+#for key, value in fxt.items():
+#    if value[0] not in flipped:
+#        flipped[value[0]] = [list(key)]
+#    else:
+#        flipped[value[0]].append(list(key))
+
     
+
+
+#face_per_tet = {}
+#for i in range(len(neighbourVolume)):
+#    print(i)
+#for key,value in fxt.items():
+#    print(key)
+#    a_list_key = list(key)
+#    if len(fxt[key]) <2:
+#        tet = fxt[key][0]
+#        if tet not in face_per_tet:
+#            face_per_tet[tet] = a_list_key
+#        else:
+#            face_per_tet[tet].append(a_list_key)
     
-    
-    
+"""
 
 boundaryAreaTotal = 0
 boundaryV = []
@@ -234,3 +363,5 @@ for i in range(len(neighbourVolume)):
             break  # No need to check other faces if one is on the boundary
     if not is_boundary:
         boundaryV.append(0)
+        
+"""

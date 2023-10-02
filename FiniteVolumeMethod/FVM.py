@@ -14,8 +14,6 @@ import numpy as np
 from scipy.integrate import simps
 from scipy import linalg
 import sys
-#uncomment this if you need drawnow
-from drawnow import drawnow
 from math import ceil
 from math import log
 from math import sqrt
@@ -33,7 +31,6 @@ from scipy import stats
 from scipy.interpolate import griddata
 from matplotlib.animation import FuncAnimation
 from scipy.sparse import lil_matrix
-
 import gmsh
 import sys
  
@@ -48,8 +45,8 @@ st = time.time() #start time of calculation
 c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
-length_mesh = 2 ###???We do not need it!
-dt = np.sqrt(length_mesh*(10**-8)/2) #time discretizatione
+length_mesh = 1 ###???We do not need it! maybe later????
+dt = 0.001 #time discretizatione
 
 # Source position
 x_source = 1.36  #position of the source in the x direction [m]
@@ -76,7 +73,7 @@ alpha_6 = 1/6 #Absorption coefficient for Surface6 - Wall Right
 #INITIALISE GMSH
 ###############################################################################
     
-file_name = "rect.msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "scenario2.msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 
@@ -98,17 +95,17 @@ elemTypes,elemTags,elemNodeTags = gmsh.model.mesh.getElements(dim,tag)
 for e_type in elemTypes:
     if e_type == 1: #if the e_type = 1, then get all the elements (lines) with that e_type
         tag = -1 
-        edgeEl, edgeNodeTagstype = gmsh.model.mesh.getElementsByType(e_type,tag)
+        edgeEl, edgeNodeTagstype = gmsh.model.mesh.getElementsByType(e_type,tag) #get the edge element tags and the nodes; edgeEl are lines
         #edgeEl = numbered edge elements (lines)
     elif e_type == 2: #if the e_type = 2, then get all the elements (surfaces) with that e_type
         tag = -1 
-        bounEl, bounNodeTagstype = gmsh.model.mesh.getElementsByType(e_type,tag)
+        bounEl, bounNodeTagstype = gmsh.model.mesh.getElementsByType(e_type,tag) #get the boundary/surface element tags and the nodes; bounEl are surfaces
         bounNode = bounNodeTagstype.reshape((-1,3))
         #boundEl = numbered boundary elements (surfaces)
         #bounNode = nodes of the surfaces
     elif e_type == 4:
         tag = -1#if the e_type = 4, then get all the elements (tetrahedron) with that e_type
-        voluEl, voluNodeTagstype = gmsh.model.mesh.getElementsByType(e_type,tag)
+        voluEl, voluNodeTagstype = gmsh.model.mesh.getElementsByType(e_type,tag) #get the volume element tags and the nodes; voluEl are tetrahedrons
         voluNode = voluNodeTagstype.reshape((-1,4))
         #voluEl = numbered volume elements (tetrahedron)
         #voluNode = nodes of the tetrahedon
@@ -133,37 +130,15 @@ for elem in range(len(voluEl)):
 
 
 #Volume Element dictionary + nodes of each volume elements (4 nodes per element)
-volumeEl_dict = {} #Dictionary of volumelements + its nodes
+volumeEl_dict = {} #Initialization Dictionary of volumelements + its nodes
 for i in range(len(voluEl)):
     #print(i)
-    volumeEl_dict[voluEl[i]] = velemNodes[i]
-  
-#Each element has 4 nodes, each node has three coordinates; here we store the coordinates per each node    
-vnodeCoord_dict = {}
-for i in range(len(elemNodeTags[2])):
-    if not elemNodeTags[2][i] in vnodeCoord_dict.keys(): 
-        vnodeCoord_dict[elemNodeTags[2][i]] = nodecoords[int(elemNodeTags[2][i])-1]
-    #print(nodes)
+    volumeEl_dict[voluEl[i]] = velemNodes[i] #Dictionary of volumelements + its nodes
     
 #Boundary Element dictionary + node per each surface elements (3 nodes per element)
-boundaryEl_dict = {} #Dictionary of boundary elements + its nodes
+boundaryEl_dict = {} #Initialization Dictionary of boundary elements + its nodes
 for i in range(len(bounEl)):
-    boundaryEl_dict[bounEl[i]] = belemNodes[i]    
-
-bnodeCoord_dict = {}
-for i in range(len(elemNodeTags[1])):
-    if not elemNodeTags[1][i] in bnodeCoord_dict.keys(): 
-        bnodeCoord_dict[elemNodeTags[1][i]] = nodecoords[int(elemNodeTags[1][i])-1]
-    #print(nodes)
-
-#volumeEl_dict = {} #Dictionary of volumelements + its nodes
-#for i in range(velement):
-#    volumeEl_dict[i] = velemNodes[i]
-    
-#boundaryEl_dict = {} #Dictionary of boundary elements + its nodes
-#for i in range(belement):
-#    boundaryEl_dict[i] = belemNodes[i]
-
+    boundaryEl_dict[bounEl[i]] = belemNodes[i] #Dictionary of boundary elements + its nodes
 
 #Calculation of volume cells and centre of volume    
 vcell_dict = {} #volume of each element tetrahedron initialization
@@ -180,11 +155,20 @@ for i in volumeEl_dict.keys():
     #print(nc2)
     vc3 = gmsh.model.mesh.getNode(volumeEl_dict[i][3])[0] #Coordinates of the node number three of the volume element i
     #print(nc3)
-    for j in range(3):
-        coord_centre_cell[j] = (vc0[j]+vc1[j]+vc2[j]+vc3[j])/4
+    for j in range(3): #three coordinates per each node
+        coord_centre_cell[j] = (vc0[j]+vc1[j]+vc2[j]+vc3[j])/4 #coordinates of the centre of each volume element
         centre_cell[i].append(coord_centre_cell[j])
-        #centre_cell[i,j] = (vc0[j]+vc1[j]+vc2[j]+vc3[j])/4; #coordinates of the centre of each volume element
     vcell_dict[i] = abs(np.dot(np.cross(vc1-vc3,vc2-vc3),vc0-vc3))/6 #volume of each volume element
+
+#The dictionary centre cell is modified into an array of floats (list)
+cell_center = np.array(()) #initialization of an array of centre cell coordinates from the centre_cell dictionary
+for key in centre_cell:
+    cell_center = np.append(cell_center,centre_cell[key])
+cell_center = cell_center.reshape((-1,3))
+
+cell_volume = np.array(()) #initialization of an array of cell volumes from the vcell_dict dictionary
+for key in vcell_dict:
+    cell_volume = np.append(cell_volume,vcell_dict[key])
 
 
 #Calculation of boundary elements area and centre   
@@ -207,71 +191,48 @@ for i in boundaryEl_dict.keys():
     barea_dict[i] = abs(sum(np.cross(bc2-bc1,bc1-bc0)))/2 #volume of each volume element
 
 
-#distance between volume elements
-#for j in range(velement):
-#    for k in range(velement):
-#        if j != k:
-#            dist_jk = math.sqrt((abs(centre_cell[i][0] - centre_cell[j][0]))**2 + (abs(centre_cell[i][1] - centre_cell[j][1]))**2 + (abs(centre_cell[i][2] - centre_cell[j][2]))**2) #distance between volume elements
-
-##################
-#This is for each volume element with its own numbering
-##################
 #Neighbours calculation; What are the neighbours faces of each volume? 3 per each minimum?
-facenodes = gmsh.model.mesh.getElementFaceNodes(4, 3) #4 is the element type (tetrahedron) and three are the nodes per each face
+facenodes = gmsh.model.mesh.getElementFaceNodes(4, 3) #4 is the element type (tetrahedron) and three are the nodes per each face #get all the face tags of all the faces of the tetrahedrons
 
 #Computing face x tetrahedon incidence
-faces = []
+faces = [] #initialization of list of tuples of the faces nodes
 fxt = {} #dictionary with keys as the nodes of each face and values the volume elements of which this face is neighbour
-for i in range(0, len(facenodes), 3): # per ecah element basically, goes trhough the nodes of each face 3by3
+for i in range(0, len(facenodes), 3): # per each element basically, goes trhough the nodes of each face 3by3
     #print(i)
     f = tuple(sorted(facenodes[i:i + 3])) #nodes of each face put in a tuple from node i to node i plus 3
     faces.append(f)
-    t = voluEl[i // 12] #volume element number at which the faces are associated?
-    if not f in fxt: #if the face f (with its node) is alrady in the dictionary, just append the volume element neighbour to
-        fxt[f] = [t]
+    tet = voluEl[i // 12] #volume element number at which the faces are associated?
+    if not f in fxt: #if the face f (with its node) is already in the dictionary, just append the volume element neighbour to
+        fxt[f] = [tet]
     else:
-        fxt[f].append(t)
+        fxt[f].append(tet)
 
 #Computing neighbors by face
-txt = {}
+txt = {} #dictionary with keys as the tetrahedron tag and values as the tet that are neighbours (the tet at the boundary are not counted)
 for i in range(0, len(faces)):
     #print(i)
-    f = faces[i]
-    t = voluEl[i // 4]
-    if not t in txt:
-        txt[t] = []
+    f = faces[i] #f is a tuple of the nodes of the face into consideration
+    tet = voluEl[i // 4] #tetrahedron at which the face is neighbour
+    if not tet in txt: #if the tet is not in the dictionary, add it, otherwise append the new tt
+        txt[tet] = []
     for tt in fxt[f]:
-        if tt != t:
-            txt[t].append(int(tt-(voluEl[0]-1))) #volumes neighbours to each volume
-for values in txt.values():
-    if len(values)==2:
+        if tt != tet:
+            txt[tet].append(int(tt-(voluEl[0]-1))) #volumes neighbours to each volume
+for values in txt.values(): 
+    if len(values)==2: #if there are only two tetrahedrons neighbours it means that the other two are boundary tetrahedrons, therefore add a zero for each tetrahedron missing
         values.append(0)
         values.append(0)
-    if len(values) == 3:
+    if len(values) == 3: #if there are only three tetrahedrons neighbours it means that the other one is a boundary tetrahedron, therefore add a zero
         values.append(0)
 
-#print("--- done: neighbors by face =", txt)
+neighbourVolume = np.array(()) #initialization of an array with the neighbours tetrahedron per each tetrahedron in order from 0 to the number of tetrahedrons
+for key in txt:
+    neighbourVolume = np.append(neighbourVolume,txt[key])
+for item in neighbourVolume:
+        item = int(item)   
+    
+neighbourVolume = neighbourVolume.reshape((-1,4)) #reshape the array so that we have the 4 tetrahedrons neighbours of the tetrahedron in consideration
 
-dist_dict = {}
-#distance between neighbour volume elements
-#for j in txt.keys():
-    #print(j)
-#    centre_cell_j = centre_cell[j]
-#    distances = []
-#    for k in txt[j]:
-        #print(k)
-#        centre_cell_k = centre_cell[k]
-#        if j != k:
-#            dist_jk = math.sqrt((abs(centre_cell[j][0] - centre_cell[k][0]))**2 + (abs(centre_cell[j][1] - centre_cell[k][1]))**2 + (abs(centre_cell[j][2] - centre_cell[k][2]))**2) #distance between volume elements
-#        distances.append(dist_jk)
-#    dist_dict[j] = distances
-
-#    for k in range(velement):
-#        if j != k:
-#            dist_jk = math.sqrt((abs(centre_cell[i][0] - centre_cell[j][0]))**2 + (abs(centre_cell[i][1] - centre_cell[j][1]))**2 + (abs(centre_cell[i][2] - centre_cell[j][2]))**2) #distance between volume elements
-
-
-#namGroup = gmsh.model.getPhysicalName(dimGroup, tagGroup)
 
 ###############################################################################
 #Absorption term
@@ -286,170 +247,88 @@ def abs_term(th,alpha):
         Absx = (c0*alpha)/(2*(2-alpha)) #Modified by Xiang
     return Absx
 
-
-Abs_terms = []
-vGroups = gmsh.model.getPhysicalGroups(-1)
-vGroupsNames = []
+vGroups = gmsh.model.getPhysicalGroups(-1) #these are the entity tag and physical groups in the msh file. 
+vGroupsNames = [] #these are the entity tag and physical groups in the msh file + their names
 for iGroup in vGroups:
     dimGroup = iGroup[0]  #entity tag: 1 lines, 2 surfaces, 3 volumes (1D, 2D or 3D)
-    tagGroup = iGroup[1]  #physical tag group 
-    namGroup = gmsh.model.getPhysicalName(dimGroup, tagGroup)         
-    alist = [dimGroup,tagGroup,namGroup]
-    print(alist)
+    tagGroup = iGroup[1]  #physical tag group (depending on material properties defined in SketchUp)
+    namGroup = gmsh.model.getPhysicalName(dimGroup, tagGroup) #names of the physical groups defined in SketchUp   
+    alist = [dimGroup,tagGroup,namGroup] #creates a list of the entity tag, physical tag group and name
+    #print(alist)
     vGroupsNames.append(alist)
-    vEntities = gmsh.model.getEntitiesForPhysicalGroup(dimGroup, tagGroup)
-    print(vEntities)
 
-#surfEl = {}
-#for el in vGroupsNames:
-#    if el[0] == 2:
-#        surfaces, bounNodeTagstype = gmsh.model.mesh.getElementsByType(el[0],el[1])
-#        abscoeff = input(f"Enter absorption coefficient input for {el[2]}:")
-#        surfaces = np.append(surfaces,abscoeff)
-#        surfEl[el[2]] = surfaces
-
-        #vGroupsNames[el].append(abscoeff)
-
-#Area faces
-
-#farea_dict = {}
-
-#for tetrahedron, neighbors in txt.items():
-#    tetrahedron_faces = fxt.keys()
-#    fareas = []
-
-#    for neighbor in neighbors:
-#        shared_faces = [face for face, tetrahedron_list in fxt.items() if tetrahedron in tetrahedron_list and neighbor in tetrahedron_list]
-
-#        for shared_face in shared_faces:
-#            fc0 = vnodeCoord_dict[shared_face[0]]
-#            fc1 = vnodeCoord_dict[shared_face[1]]
-#            fc2 = vnodeCoord_dict[shared_face[2]]
-#            farea = abs(np.dot(np.cross(fc2 - fc0, fc1 - fc0), fc2 - fc0)) / 2.0
-#            fareas.append(farea)
-#
-#    farea_dict[tetrahedron] = fareas
-
-
-#for tetraj in range(velement):
-#    print(tetraj)
-#    for tetrak in range(velement):
-#        print(tetrak)
 
 #######################################################################################################
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
-
-cell_center = np.array(())
-for key in centre_cell:
-    cell_center = np.append(cell_center,centre_cell[key])
-cell_center = cell_center.reshape((-1,3))
-
-
-neighbourVolume = np.array(())
-for key in txt:
-    neighbourVolume = np.append(neighbourVolume,txt[key])
-for item in neighbourVolume:
-        item = int(item)   
-    
-neighbourVolume = neighbourVolume.reshape((-1,4))
-
-
-faces = np.array(())
-for key in centre_cell:
-    cell_center = np.append(cell_center,centre_cell[key])
-cell_center = cell_center.reshape((-1,3))
-
-cell_volume = np.array(())
-for key in vcell_dict:
-    cell_volume = np.append(cell_volume,vcell_dict[key])
-
 
 # Initialize a list to store surface tags and their absorption coefficients
-surface_absorption = []
-triangle_face_absorption = []
+surface_absorption = [] #initialization absorption term (alpha*surfaceofwall) for each wall of the room
+triangle_face_absorption = [] #initialization absorption term for each triangle face at the boundary and per each wall
 
 for group in vGroupsNames:
     if group[0] != 2:
         continue
-
-    # Get the physical group tag
-    physical_tag = group[1]
-
-    # Retrieve all the entities in this physical group
-    entities = gmsh.model.getEntitiesForPhysicalGroup(2, physical_tag)
-
-    abscoeff = float(input(f"Enter absorption coefficient input for {group[2]}:"))
-    Abs_term = abs_term(th, abscoeff)
-
+    physical_tag = group[1] #Get the physical group tag
+    entities = gmsh.model.getEntitiesForPhysicalGroup(2, physical_tag) #Retrieve all the entities in this physical group (the entities are the number of walls in the physical group)
+    abscoeff = float(input(f"Enter absorption coefficient input for {group[2]}:")) #input the absorption coefficient
+    Abs_term = abs_term(th, abscoeff) #calculates the absorption term based on the type of boundary condition th
     for entity in entities:
-        surface_absorption.append((entity, Abs_term))
-        # Get all the triangle faces for the current surface
-        triangle_faces, _ = gmsh.model.mesh.getElementsByType(2, entity)
-        
-        # Append the Abs_term value for each triangle face
-        triangle_face_absorption.extend([Abs_term] * len(triangle_faces))
+        surface_absorption.append((entity, Abs_term)) #absorption term (alpha*surfaceofwall) for each wall of the room
+        surface_absorption = sorted(surface_absorption, key=lambda x: x[0])
+
+for entity, Abs_term in surface_absorption:
+    triangle_faces, _ = gmsh.model.mesh.getElementsByType(2, entity) #Get all the triangle faces for the current surface
+    triangle_face_absorption.extend([Abs_term] * len(triangle_faces)) #Append the Abs_term value for each triangle face
 
 
-
 #######################################################################################################
 #######################################################################################################
-#FACE AREA
+#FACE AREA & BOUNDARYV
 #######################################################################################################
 #######################################################################################################
-total_boundArea = 0
-boundaryV = []  # Initialize a list to store boundaryV values for each tetrahedron
+total_boundArea = 0 #initialization of total surface area of the room
+boundaryV = []  #Initialize a list to store boundaryV values for each tetrahedron
 import itertools
-face_areas = np.zeros(len(velemNodes))
-for idx, element in enumerate(velemNodes):
-    #if idx == 3323:
-        tetrahedron_boundaryV = 0
-        total_tetrahedron_boundaryV = 0
-        print(idx)
-        node_combinations = [list(nodes) for nodes in itertools.combinations(element, 3)]
-        #nodes = element[:3]  # Take the first 3 nodes for a face
-            # Check if the nodes are in any order in bounNode
-        is_boundary = False
-        for nodes in node_combinations:
-            for surface_idx, surface in enumerate(bounNode):
-                surface_set = sorted(set(surface))
+face_areas = np.zeros(len(velemNodes)) #Per each tetrahedron, if there is a face that is on the boundary, include the area, otehrwise zero
+for idx, element in enumerate(velemNodes): #for index and element in the number of tetrahedrons
+    #if idx == 491:
+        tetrahedron_boundaryV = 0 #initialization tetrahedron face on boundary*its absorption term
+        total_tetrahedron_boundaryV = 0 #initialization total tetrahedron face on boundary*its absorption term if there are more than one face in the tetrahedron that is on the boundary
+        #print(idx)
+        node_combinations = [list(nodes) for nodes in itertools.combinations(element, 3)] #all possible combinations of the nodes of the tetrahedrons (it checks also for the order of the nodes in the same combination)
+        # Check if the nodes are in any order in bounNode
+        is_boundary = False #variable to say that at the beginning the face in not on a boundary
+        for nodes in node_combinations: #for each node in each combination
+            for surface_idx, surface in enumerate(bounNode): #for index and surface in the number of nodes
+                surface_set = sorted(set(surface)) #creates a set of the surface nodes
                 surface_set_idx = surface_idx
-                nodes_set = sorted(set(nodes))
+                nodes_set = sorted(set(nodes)) #create a set of the node combination of the tetrahedron into consideration
                 surface_list = list(surface)
-                if nodes_set == surface_set:
-                    print(surface_set)
-                    print(surface_list)
+                if nodes_set == surface_set: #if these are equal, it means that the tetrahedron into consideration has a surface in the boundary and therefore is_boundary gets the value of True.
+                    #print(surface_set)
+                    #print(surface_list)
                     is_boundary = True
-                    if is_boundary:
-                        # Convert the vertices to NumPy arrays for vector operations
-                        bc0 = gmsh.model.mesh.getNode(nodes[0])[0]
-                        bc1 = gmsh.model.mesh.getNode(nodes[1])[0]
-                        bc2 = gmsh.model.mesh.getNode(nodes[2])[0]
+                    if is_boundary: #if the surface is at the boundary, then take the coordinates of each vertix
+                        #Convert the vertices to NumPy arrays for vector operations
+                        bc0 = gmsh.model.mesh.getNode(nodes[0])[0] #coordinates of vertix 0
+                        bc1 = gmsh.model.mesh.getNode(nodes[1])[0] #coordinates of vertix 1
+                        bc2 = gmsh.model.mesh.getNode(nodes[2])[0] #coordinates of vertix 2
                         
-                        # Calculate the area using half of the cross product's magnitude
-                        face_area = 0.5 * np.linalg.norm(np.cross(bc1 - bc0, bc2 - bc0))
+                        face_area = 0.5 * np.linalg.norm(np.cross(bc1 - bc0, bc2 - bc0)) #Compute the area using half of the cross product's magnitude
                         #print(face_area)
                         
-                        face_areas[idx] = face_area
-                        total_boundArea += face_area
+                        face_areas[idx] = face_area #area of the surface that is on boundary per each tetrahedron
+                        total_boundArea += face_area #add to the total boundary area
                         
                         if face_area > 0:
-                            #Calculate the index of the current face within the tetrahedron
-                            #face_index = np.where(bounNode == surface_t)
-                            
-                            #face_index = np.where((bounNode == surface))[0][0]
-                            
                             # Use the index to access the corresponding absorption area
-                            face_absorption_product = face_area * triangle_face_absorption[surface_set_idx]
-                            print(face_absorption_product)
+                            face_absorption_product = face_area * triangle_face_absorption[surface_set_idx] #calculate the product between the area*the correspondent absorption term
+                            #print(face_absorption_product)
                             
-                            tetrahedron_boundaryV += face_absorption_product
+                            tetrahedron_boundaryV += face_absorption_product #add the calculation to the tetrahedron correspondent
                             
-                            total_tetrahedron_boundaryV += tetrahedron_boundaryV
+                            total_tetrahedron_boundaryV = tetrahedron_boundaryV #if there are multiple surfaces on the boundary per each tetrahedron, then add also the second and the third one
                             
-        # Append the total boundaryV for the tetrahedron to the list
-        boundaryV.append(total_tetrahedron_boundaryV)
+        boundaryV.append(total_tetrahedron_boundaryV) #Append the total boundaryV for the tetrahedron to the list
         print(total_tetrahedron_boundaryV)
 
 #######################################################################################################
@@ -458,47 +337,40 @@ for idx, element in enumerate(velemNodes):
 #######################################################################################################
 #######################################################################################################
 
+interior = np.zeros((velement, velement)) #initialization matrix of tetrahedron per tetrahedron
 
-
-
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
-
-
-
-interior = np.zeros((velement, velement))
-
-for i in range(velement):
+for i in range(velement): #for each tetrahedron, take its centre
     print(i)
     cell_center_i = cell_center[i]
-    for j in range(velement):
+    for j in range(velement): #for each tetrahedron, take its centre
         cell_center_j = cell_center[j]
         print(j)
-        if i != j:
+        if i != j: #if the tetrahedrons are not the same one, then check if there are shared nodes in between the two tetrahedron i and j
             shared_nodes = []
             count = 0
             for node in velemNodes[i]: #for each node in tetrahedron i
                 print(node)
                 if node in velemNodes[j]: #if each node of the tetrahedron i is in nodelist of tetrahedron j
                     count += 1
-                    shared_nodes.append(node)
-            if count == 3:
-                sc0 = nodecoords[int(shared_nodes[0]-1)]
-                sc1 = nodecoords[int(shared_nodes[1]-1)]
-                sc2 = nodecoords[int(shared_nodes[2]-1)]
-                shared_area = np.linalg.norm(np.cross(sc2-sc0,sc1-sc0))/2
+                    shared_nodes.append(node) #append the node that it is in common
+            if count == 3: #after have done this for all the nodes, if the cound is 3 then calculate the shared area between the tetrahedrons
+                sc0 = gmsh.model.mesh.getNode(shared_nodes[0])[0] #coordinates of node 0
+                sc1 = gmsh.model.mesh.getNode(shared_nodes[1])[0] #coordinates of node 1
+                sc2 = gmsh.model.mesh.getNode(shared_nodes[2])[0] #coordinates of node 2
+                shared_area = np.linalg.norm(np.cross(sc2-sc0,sc1-sc0))/2 #compute shared area
                 shared_distance = sqrt((abs(cell_center_i[0] - cell_center_j[0]))**2 + (abs(cell_center_i[1] - cell_center_j[1]))**2 + (abs(cell_center_i[2] - cell_center_j[2]))**2) #distance between volume elements
-                interior[i, j] = shared_area/shared_distance
+                interior[i, j] = shared_area/shared_distance #division between shared area and shared distance
             else:
                 shared_area = 0
                 interior[i, j] = shared_area
 
-Fmat = lil_matrix(interior)
-#fb = boundaryV
-fel = np.sum(interior, axis=1)
+#Fmat = lil_matrix(interior) #this is like sparse in matlab
+
+from scipy.sparse import csr_matrix
+
+Fmat = csr_matrix(interior)
+
+interior_sum = np.sum(interior, axis=1) #sum of interior per columns (so per i element)
 
 
 ##############################################################################
@@ -513,79 +385,39 @@ coord_source = [x_source,y_source,z_source] #coordinates of the receiver positio
 coord_rec = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
 
 #Position of receiver is the centre of a cell so the minimum distance with the centre of a cell has been calculated to understand which cell is the closest
-dist_rec_cc = np.sum((cell_center - coord_rec)**2, axis=1)
-rec_idx = np.argmin(dist_rec_cc)
+dist_rec_cc_list = []
+for i in range(len(cell_center)):
+    dist_rec_cc = math.sqrt(np.sum((cell_center[i] - coord_rec)**2))
+    dist_rec_cc_list.append(dist_rec_cc)
+rec_idx = np.argmin(dist_rec_cc_list)
 
 #Position of source is the one of the nodes, the closest to the actual source coordinates
-dist_source_cc = np.sum((nodecoords[nodeTags-1] - coord_source)**2, axis=1)
-source_idx = np.argmin(dist_source_cc)
+dist_source_cc_list = []
+for i in range(len(nodeTags)):
+    dist_source_cc = math.sqrt(np.sum((gmsh.model.mesh.getNode(int(nodeTags[i]))[0] - coord_source)**2))
+    dist_source_cc_list.append(dist_source_cc)
+    
+#dist_source_cc = np.sum((nodecoords[nodeTags-1] - coord_source)**2, axis=1)
+source_idx = np.argmin(dist_source_cc_list)
 
 #Position of source is the centre of a cell , the closest to the actual source coordinates
-dist_source_cc = np.sum((cell_center - coord_source)**2, axis=1)
-source_idx = np.argmin(dist_source_cc)
-
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
-#OLD
-
-#farea_dict = {}
-#for i in txt.keys():
-#    print(i)
-#    fareas = []
-#    for value in txt[i]:
-#        print(value)
-#        thelist = [i,value]
-#        for j in fxt.values():
-#            if j == thelist:
-#                face = #this needs to be the key correspondent to the value j
-#                fc0 = vnodeCoord_dict[face[0]] #Coordinates of the node number zero of the volume element i
-#                #print(nc0)
-#                fc1 = vnodeCoord_dict[face[1]] #Coordinates of the node number one of the volume element i
-#                #print(nc1)
-#                fc2 = vnodeCoord_dict[face[2]] #Coordinates of the node number two of the volume element i
-#                #print(nc2)
-#                farea = abs(sum(np.cross(fc2-fc1,fc1-fc0)))/2 #volume of each volume element
-#        fareas.append(farea)
-#    farea_dict[i] = fareas        
-            
-            
-            
-            
-#        for key in fxt.keys():
-#            print(key)
-#            if fxt[key] == thelist:
-#                face = key
-#                fc0 = vnodeCoord_dict[face[0]] #Coordinates of the node number zero of the volume element i
-#                #print(nc0)
-#                fc1 = vnodeCoord_dict[face[1]] #Coordinates of the node number one of the volume element i
-#                #print(nc1)
-#                fc2 = vnodeCoord_dict[face[2]] #Coordinates of the node number two of the volume element i
-#                #print(nc2)
-#                farea = abs(sum(np.cross(fc2-fc1,fc1-fc0)))/2 #volume of each volume element
-#            flist.append(farea)
-#    farea_dict[i] = flist
-
-       # face = {i for i in fxt if fxt[i]==thelist}
-        
-        
+#dist_source_cc = np.sum((cell_center - coord_source)**2, axis=1)
+#source_idx = np.argmin(dist_source_cc)
 
 gmsh.finalize()
 
-
 #%%
-
 
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
-Vs = cell_volume[source_idx] #Volume of the cell #volume of the source = to volume of cells ###?????
+#Vs = 4.857643119512416
+Vs = cell_volume[source_idx] #volume of the source = to volume of cells where the volume is 
 
 sourceon_time =  0.50 #time that the source is ON before interrupting [s]
-recording_time = 2.00 #total time recorded for the calculation [s]
+recording_time = 8.00 #total time recorded for the calculation [s]
 
 V = sum(cell_volume)
-S = total_boundArea # surface area of the room ###???
+S = total_boundArea #surface area of the room
 
 #%%
 ###############################################################################
@@ -612,28 +444,21 @@ Dx = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms x directi
 Dy = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms y direction
 Dz = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms z direction
 
-#Sjk =  10#area face between two adjacent tetrahedron shapes ###?????
-#hjk = 10 #distance between the central nodes of two adjacent tetrahedron shapes ###?????
-
-beta_zero = np.divide((dt*(np.multiply(Dx,fel) + boundaryV)),cell_volume) ###????? my interpretation of the beta_zero
-
-#Finding index in meshgrid of the source position
-coord_source = [x_source,y_source,z_source] #coordinates of the receiver position in an list
+beta_zero = np.divide((dt*(np.multiply(Dx,interior_sum) + boundaryV)),cell_volume) #my interpretation of the beta_zero
 
 s = np.zeros((velement,velement)) #matrix of zeros for source
-
-#Finding index in meshgrid of the receiver position
-coord_receiver = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
-
 
 #%%
 ###############################################################################
 #MAIN CALCULATION - COMPUTING ENERGY DENSITY
 ############################################################################### 
 
-w_new = np.zeros((velement,velement)) #unknown w at new time level (n+1)
+
+w_new = np.zeros(velement) #unknown w at new time level (n+1)
+w_old = np.zeros(velement) 
 w = w_new #w at n level
-w_old = w #w_old at n-1 level
+#w_old = w #w_old at n-1 level
+w_old[source_idx] = w1 #w_old at source position -> impulse source
 
 w_rec = np.arange(0,recording_time,dt) #energy density at the receiver
 
@@ -643,9 +468,13 @@ for steps in range(0, recording_steps):
     time_steps = steps*dt #total time for the calculation
     
     #Computing w_new (w at n+1 time step)
+    #w_new = np.divide((np.multiply(w_old, (1 - beta_zero))) - \
+     #       (2 * dt * c0 * m_atm * w) + \
+      #      (np.divide(2 * dt * Dx * interior @ w , cell_volume)),(1 + beta_zero)) 
+                
     w_new = np.divide((np.multiply(w_old,(1-beta_zero))),(1+beta_zero)) - \
         np.divide((2*dt*c0*m_atm*w),(1+beta_zero)) + \
-            np.divide(np.divide((2*dt*Dx*(Fmat)*w),cell_volume),(1+beta_zero)) #+ \
+            np.divide(np.divide((2*dt*Dx*(interior@w)),cell_volume),(1+beta_zero)) #+ \
                # np.divide((2*dt*s),(1+beta_zero)) #The absorption term is part of beta_zero
                  ###?????
                  
@@ -654,7 +483,8 @@ for steps in range(0, recording_steps):
     w = w_new #The w at n+1 step becomes the w at n step
     print(time_steps)
     #w_rec is the energy density at the specific receiver
-#    w_rec[steps] = w_new[row_lr, col_lr, depth_lr]
+    #w_rec[steps] = w_new[gmsh.model.mesh.getNode(rec_idx[0])[0], gmsh.model.mesh.getNode(rec_idx[1])[0], gmsh.model.mesh.getNode(rec_idx[2])[0]]
+    w_rec[steps] = w_new[rec_idx]
 
 
 

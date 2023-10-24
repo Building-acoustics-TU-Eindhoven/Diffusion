@@ -61,7 +61,7 @@ z_rec = 1.62 #position of the receiver in the z direction [m]
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
-alpha_1 = 1/6 #Absorption coefficient for Surface1 - Floor
+alpha_1 = [1/6,1/6,1/6,1/6,1/6,1/6 ] #Absorption coefficient 1
 alpha_2 = 1/6 #Absorption coefficient for Surface2 - Ceiling
 alpha_3 = 1/6 #Absorption coefficient for Surface3 - Wall Front
 alpha_4 = 1/6 #Absorption coefficient for Surface4 - Wall Back
@@ -262,6 +262,29 @@ for iGroup in vGroups:
     #print(alist)
     vGroupsNames.append(alist)
 
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+
+# abs_coeff_dict = {}
+# for iGroup in vGroupsNames:
+#     if iGroup[0] != 2:
+#         continue
+#     name_group = iGroup[2]
+#     name_split = name_group.split("$")
+#     name_abs_coeff = name_split[0]
+#     abs_coeff = name_split[1].split(",")
+#     abs_coeff = [float(i) for i in abs_coeff]
+#     if not name_abs_coeff in abs_coeff_dict:
+#         abs_coeff_dict[name_abs_coeff] = abs_coeff
+
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
 
 #######################################################################################################
 
@@ -272,9 +295,15 @@ triangle_face_absorption = [] #initialization absorption term for each triangle 
 for group in vGroupsNames:
     if group[0] != 2:
         continue
+    name_group = group[2]
+    name_split = name_group.split("$")
+    name_abs_coeff = name_split[0]
+    abscoeff = name_split[1].split(",")
+    abscoeff = [float(i) for i in abscoeff][-1]
+    
     physical_tag = group[1] #Get the physical group tag
     entities = gmsh.model.getEntitiesForPhysicalGroup(2, physical_tag) #Retrieve all the entities in this physical group (the entities are the number of walls in the physical group)
-    abscoeff = float(input(f"Enter absorption coefficient input for {group[2]}:")) #input the absorption coefficient
+    #abscoeff = float(input(f"Enter absorption coefficient input for {group[2]}:")) #input the absorption coefficient
     Abs_term = abs_term(th, abscoeff) #calculates the absorption term based on the type of boundary condition th
     for entity in entities:
         surface_absorption.append((entity, Abs_term)) #absorption term (alpha*surfaceofwall) for each wall of the room

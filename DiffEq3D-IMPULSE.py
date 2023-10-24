@@ -52,7 +52,7 @@ y_source = 0.5  #position of the source in the y direction [m]
 z_source = 1.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 2.5 #position of the receiver in the x direction [m]
+x_rec = 2.0 #position of the receiver in the x direction [m]
 y_rec = 0.5 #position of the receiver in the y direction [m]
 z_rec = 1.0 #position of the receiver in the z direction [m]
 
@@ -62,7 +62,7 @@ dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
 #Time discretization
-dt = 1/32000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
+dt = 1/2000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
@@ -81,8 +81,8 @@ tcalc = "decay"
 
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
-sourceon_time =  1.00 #time that the source is ON before interrupting [s]
-recording_time = 2.00 #total time recorded for the calculation [s]
+sourceon_time =  0.5 #time that the source is ON before interrupting [s]
+recording_time = 0.3 #total time recorded for the calculation [s]
 
 #%%
 ###############################################################################
@@ -168,8 +168,9 @@ if beta_zero_condition >1:
 Vs=dx*dy*dz  #Volume of the source
 w1=Ws/Vs #w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
 sourceon_steps = ceil(sourceon_time/dt) #time steps at which the source is calculated/considered in the calculation
-s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position
-source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
+#s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position
+#source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
+source1 = np.append(w1, np.zeros(recording_steps-1))
 
 ###############################################################################
 #SOURCE INTERPOLATION
@@ -309,16 +310,18 @@ dist_y = np.sqrt((((xx[row_lr, col_lr, depth_lr]*(weight_row_lr * weight_col_lr 
 
 w_new = np.zeros((Nx,Ny,Nz)) #unknown w at new time level (n+1)
 w = w_new #w at n level
-w_old = w #w_old at n-1 level
+w_old = np.zeros((Nx,Ny,Nz)) #w_old at n-1 level
 
-w_old[row_lower, col_lower, depth_lower] += w1 * (weight_row_lower * weight_col_lower * weight_depth_lower)
-w_old[row_lower, col_lower, depth_upper] += w1 * (weight_row_lower * weight_col_lower * weight_depth_upper)
-w_old[row_lower, col_upper, depth_lower] += w1 * (weight_row_lower * weight_col_upper * weight_depth_lower)
-w_old[row_lower, col_upper, depth_upper] += w1 * (weight_row_lower * weight_col_upper * weight_depth_upper)
-w_old[row_upper, col_lower, depth_lower] += w1 * (weight_row_upper * weight_col_lower * weight_depth_lower)
-w_old[row_upper, col_lower, depth_upper] += w1 * (weight_row_upper * weight_col_lower * weight_depth_upper)
-w_old[row_upper, col_upper, depth_lower] += w1 * (weight_row_upper * weight_col_upper * weight_depth_lower)
-w_old[row_upper, col_upper, depth_upper] += w1 * (weight_row_upper * weight_col_upper * weight_depth_upper)
+#w_old[row_lower, col_lower, depth_lower] += w1 * (weight_row_lower * weight_col_lower * weight_depth_lower)
+#w_old[row_lower, col_lower, depth_upper] += w1 * (weight_row_lower * weight_col_lower * weight_depth_upper)
+#w_old[row_lower, col_upper, depth_lower] += w1 * (weight_row_lower * weight_col_upper * weight_depth_lower)
+#w_old[row_lower, col_upper, depth_upper] += w1 * (weight_row_lower * weight_col_upper * weight_depth_upper)
+#w_old[row_upper, col_lower, depth_lower] += w1 * (weight_row_upper * weight_col_lower * weight_depth_lower)
+#w_old[row_upper, col_lower, depth_upper] += w1 * (weight_row_upper * weight_col_lower * weight_depth_upper)
+#w_old[row_upper, col_upper, depth_lower] += w1 * (weight_row_upper * weight_col_upper * weight_depth_lower)
+#w_old[row_upper, col_upper, depth_upper] += w1 * (weight_row_upper * weight_col_upper * weight_depth_upper)
+
+#w=w_old 
 
 w_rec = np.arange(0,recording_time,dt) #energy density at the receiver
 w_rec_all = np.zeros((1,len(x))) 
@@ -364,6 +367,7 @@ for steps in range(0, recording_steps):
     #Computing w_new (w at n+1 time step)
     w_new = np.divide((np.multiply(w_old,(1-beta_zero))),(1+beta_zero)) - \
         np.divide((2*dt*c0*m_atm*w),(1+beta_zero)) + \
+            np.divide((2*dt*s),(1+beta_zero)) + \
                 np.divide((np.multiply(beta_zero_x,(w_iplus1+w_iminus1))),(1+beta_zero)) + \
                     np.divide((np.multiply(beta_zero_y,(w_jplus1+w_jminus1))),(1+beta_zero)) + \
                         np.divide((np.multiply(beta_zero_z,(w_kplus1+w_kminus1))),(1+beta_zero))
@@ -407,7 +411,7 @@ for steps in range(0, recording_steps):
         #print("Steps for source:",steps)
         w_t0 = w_new
 
-    if steps == 5*lambda_time_step + sourceon_steps:
+    if steps == 5*lambda_time_step + 1:
         w_5l = w_new
         
     #4D Visualization????
@@ -454,16 +458,8 @@ for steps in range(0, recording_steps):
         s[row_upper, col_lower, depth_upper] = source1[steps] * weight_row_upper * weight_col_lower * weight_depth_upper
         s[row_upper, col_upper, depth_lower] = source1[steps] * weight_row_upper * weight_col_upper * weight_depth_lower
         s[row_upper, col_upper, depth_upper] = source1[steps] * weight_row_upper * weight_col_upper * weight_depth_upper
-        
+
     if tcalc == "stationarysource":
-        s[row_lower, col_lower, depth_lower] = source1[0] * weight_row_lower * weight_col_lower * weight_depth_lower
-        s[row_lower, col_lower, depth_upper] = source1[0] * weight_row_lower * weight_col_lower * weight_depth_upper
-        s[row_lower, col_upper, depth_lower] = source1[0] * weight_row_lower * weight_col_upper * weight_depth_lower
-        s[row_lower, col_upper, depth_upper] = source1[0] * weight_row_lower * weight_col_upper * weight_depth_upper
-        s[row_upper, col_lower, depth_lower] = source1[0] * weight_row_upper * weight_col_lower * weight_depth_lower
-        s[row_upper, col_lower, depth_upper] = source1[0] * weight_row_upper * weight_col_lower * weight_depth_upper
-        s[row_upper, col_upper, depth_lower] = source1[0] * weight_row_upper * weight_col_upper * weight_depth_lower
-        s[row_upper, col_upper, depth_upper] = source1[0] * weight_row_upper * weight_col_upper * weight_depth_upper
         
         w_old[row_lower, col_lower, depth_lower] += w1 * (weight_row_lower * weight_col_lower * weight_depth_lower)
         w_old[row_lower, col_lower, depth_upper] += w1 * (weight_row_lower * weight_col_lower * weight_depth_upper)
@@ -536,26 +532,28 @@ spl_r_norm = 10*np.log10((((abs(w_rec))*rho*(c0**2))/(pRef**2)) / np.max(((abs(w
 spl_r_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_sr) + ((abs(w_rec))*c0)/(pRef**2))) #spl total (including direct field) at the receiver position????? but it will need to be calculated for a stationary source 100dB
 
 #Find the energy decay part of the overal calculation
-idx_w_rec = np.where(t == sourceon_time)[0][0] #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
-w_rec_off = w_rec[idx_w_rec:] #cutting the energy density array at the receiver from the idx_w_rec to the end
+#idx_w_rec = np.where(w_rec == -inf)[0][0] #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
+#w_rec_off = w_rec[idx_w_rec:] #cutting the energy density array at the receiver from the idx_w_rec to the end
 
 #Impulse response from the energy density
-w_rec_off_deriv = w_rec_off #initialising an array of derivative equal to the w_rec_off -> this will be the impulse response after modifying it
-w_rec_off_deriv = np.delete(w_rec_off_deriv, 0) #delete the first element of the array -> this means shifting the array one step before and therefore do a derivation
-w_rec_off_deriv = np.append(w_rec_off_deriv,0) #add a zero in the last element of the array -> for derivation and to have the same length as previously
-impulse = (((w_rec_off) - w_rec_off_deriv)/(dt))#/(rho*c0**2) #This is the difference between the the energy density and the impulse response 
+#w_rec_off_deriv = w_rec_off #initialising an array of derivative equal to the w_rec_off -> this will be the impulse response after modifying it
+#w_rec_off_deriv = np.delete(w_rec_off_deriv, 0) #delete the first element of the array -> this means shifting the array one step before and therefore do a derivation
+#w_rec_off_deriv = np.append(w_rec_off_deriv,0) #add a zero in the last element of the array -> for derivation and to have the same length as previously
+#impulse = (((w_rec_off) - w_rec_off_deriv)/(dt))#/(rho*c0**2) #This is the difference between the the energy density and the impulse response 
 #IMPORTANT NOTE: The "impulse" variable should be divided by dt in theory according to Schroeder 1965 but this is not done because otherwise it does not match the results of the radiosity method.
 
+
+
 #Schroeder integration
-#energy_r_rev = (w_rec_off)[::-1] #reverting the array
+energy_r_rev = (w_rec)[::-1] #reverting the array
 #The energy density is related to the pressure with the following relation: w = p^2
-#energy_r_rev_cum = np.cumsum(energy_r_rev) #cumulative summation of all the item in the array
-schroeder = w_rec_off #energy_r_rev_cum[::-1] #reverting the array again -> creating the schroder decay
+energy_r_rev_cum = np.cumsum(energy_r_rev) #cumulative summation of all the item in the array
+schroeder = (energy_r_rev_cum[::-1])*dt#reverting the array again -> creating the schroder decay
 sch_db = 10.0 * np.log10(schroeder / max(schroeder)) #level of the array: schroeder decay
 
 if tcalc == "decay":
-    t60 = t60_decay(t, sch_db, idx_w_rec) #called function for calculation of t60 [s]
-    edt = edt_decay(t, sch_db, idx_w_rec) #called function for calculation of edt [s]
+    t60 = t60_decay(t, sch_db, 0) #called function for calculation of t60 [s]
+    edt = edt_decay(t, sch_db, 0) #called function for calculation of edt [s]
     c80 = clarity(t60, V, Eq_A, S, c0, dist_sr) #called function for calculation of c80 [dB]
     d50 = definition(t60, V, Eq_A, S, c0, dist_sr) #called function for calculation of d50 [%]
     ts = centretime(t60, Eq_A, S) #called function for calculation of ts [ms]
@@ -603,13 +601,13 @@ if tcalc == "decay":
     
     #Figure 8: Schroeder decay
     plt.figure(8)
-    plt.plot(t[idx_w_rec:],sch_db)
+    plt.plot(t,sch_db)
     plt.title("Figure 8: Schroeder decay (Energy Decay Curve)")
     plt.xlabel("t [s]")
     plt.ylabel("Energy decay [dB]")
     plt.xlim()
     plt.ylim()
-    plt.xticks(np.arange(t[idx_w_rec], recording_time +0.1, 0.1))
+    #plt.xticks(np.arange(t, recording_time +0.1, 0.1))
     
     #Figure 9: 2D image of the energy density in the room
     w_new_2d = w_new[:,:,depth_ur] #The 3D w_new array is slised at the the desired z level
@@ -746,7 +744,7 @@ if tcalc == "stationarysource":
 #SAVING
 ###############################################################################
 np.save('w_rec',w_rec)
-np.save('w_rec_off',w_rec_off)
+#np.save('w_rec_off',w_rec_off)
 np.save('w_rec_x',w_rec_x_end)
 np.save('w_rec_y',w_rec_y_end)
 np.save('D0',Dx)

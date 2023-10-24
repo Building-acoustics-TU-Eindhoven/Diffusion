@@ -62,7 +62,7 @@ dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
 #Time discretization
-dt = 1/32000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
+dt = 1/2000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
@@ -81,8 +81,8 @@ tcalc = "decay"
 
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
-sourceon_time =  1.00 #time that the source is ON before interrupting [s]
-recording_time = 2.00 #total time recorded for the calculation [s]
+sourceon_time =  0.5 #time that the source is ON before interrupting [s]
+recording_time = 0.8 #total time recorded for the calculation [s]
 
 #%%
 ###############################################################################
@@ -409,7 +409,16 @@ for steps in range(0, recording_steps):
         #print("Steps for source:",steps)
         w_t0 = w_new
 
-    if steps == 5*lambda_time_step + sourceon_steps:
+    if steps == round(1*lambda_time_step + sourceon_steps + (dist_sr/c0)):
+        w_1l = w_new
+        
+    if steps == round(2*lambda_time_step + sourceon_steps + (dist_sr/c0)):
+        w_2l = w_new
+        
+    if steps == round(3*lambda_time_step + sourceon_steps + (dist_sr/c0)):
+        w_3l = w_new
+
+    if steps == round(5*lambda_time_step + sourceon_steps + (dist_sr/c0)):
         w_5l = w_new
         
     #4D Visualization????
@@ -480,6 +489,33 @@ w_rec_x_end = ((w_new[:, col_lr, depth_lr]*(weight_row_lr * weight_col_lr * weig
                             (w_new[:, col_ur, depth_lr]*(weight_row_ur * weight_col_ur * weight_depth_lr))+\
                                 (w_new[:, col_ur, depth_ur]*(weight_row_ur * weight_col_ur * weight_depth_ur)))
         
+w_rec_x_1l = ((w_1l[:, col_lr, depth_lr]*(weight_row_lr * weight_col_lr * weight_depth_lr))+\
+            (w_1l[:, col_lr, depth_ur]*(weight_row_lr * weight_col_lr * weight_depth_ur))+\
+                (w_1l[:, col_ur, depth_lr]*(weight_row_lr * weight_col_ur * weight_depth_lr))+\
+                    (w_1l[:, col_ur, depth_ur]*(weight_row_lr * weight_col_ur * weight_depth_ur))+\
+                        (w_1l[:, col_lr, depth_lr]*(weight_row_ur * weight_col_lr * weight_depth_lr))+\
+                            (w_1l[:, col_lr, depth_ur]*(weight_row_ur * weight_col_lr * weight_depth_ur))+\
+                                (w_1l[:, col_ur, depth_lr]*(weight_row_ur * weight_col_ur * weight_depth_lr))+\
+                                    (w_1l[:, col_ur, depth_ur]*(weight_row_ur * weight_col_ur * weight_depth_ur)))    
+    
+w_rec_x_2l = ((w_2l[:, col_lr, depth_lr]*(weight_row_lr * weight_col_lr * weight_depth_lr))+\
+               (w_2l[:, col_lr, depth_ur]*(weight_row_lr * weight_col_lr * weight_depth_ur))+\
+                   (w_2l[:, col_ur, depth_lr]*(weight_row_lr * weight_col_ur * weight_depth_lr))+\
+                       (w_2l[:, col_ur, depth_ur]*(weight_row_lr * weight_col_ur * weight_depth_ur))+\
+                           (w_2l[:, col_lr, depth_lr]*(weight_row_ur * weight_col_lr * weight_depth_lr))+\
+                               (w_2l[:, col_lr, depth_ur]*(weight_row_ur * weight_col_lr * weight_depth_ur))+\
+                                   (w_2l[:, col_ur, depth_lr]*(weight_row_ur * weight_col_ur * weight_depth_lr))+\
+                                       (w_2l[:, col_ur, depth_ur]*(weight_row_ur * weight_col_ur * weight_depth_ur))) 
+
+w_rec_x_3l = ((w_3l[:, col_lr, depth_lr]*(weight_row_lr * weight_col_lr * weight_depth_lr))+\
+               (w_3l[:, col_lr, depth_ur]*(weight_row_lr * weight_col_lr * weight_depth_ur))+\
+                   (w_3l[:, col_ur, depth_lr]*(weight_row_lr * weight_col_ur * weight_depth_lr))+\
+                       (w_3l[:, col_ur, depth_ur]*(weight_row_lr * weight_col_ur * weight_depth_ur))+\
+                           (w_3l[:, col_lr, depth_lr]*(weight_row_ur * weight_col_lr * weight_depth_lr))+\
+                               (w_3l[:, col_lr, depth_ur]*(weight_row_ur * weight_col_lr * weight_depth_ur))+\
+                                   (w_3l[:, col_ur, depth_lr]*(weight_row_ur * weight_col_ur * weight_depth_lr))+\
+                                       (w_3l[:, col_ur, depth_ur]*(weight_row_ur * weight_col_ur * weight_depth_ur)))     
+
 w_rec_x_5l = ((w_5l[:, col_lr, depth_lr]*(weight_row_lr * weight_col_lr * weight_depth_lr))+\
             (w_5l[:, col_lr, depth_ur]*(weight_row_lr * weight_col_lr * weight_depth_ur))+\
                 (w_5l[:, col_ur, depth_lr]*(weight_row_lr * weight_col_ur * weight_depth_lr))+\
@@ -536,7 +572,7 @@ w_rec_off = w_rec[idx_w_rec:] #cutting the energy density array at the receiver 
 w_rec_off_deriv = w_rec_off #initialising an array of derivative equal to the w_rec_off -> this will be the impulse response after modifying it
 w_rec_off_deriv = np.delete(w_rec_off_deriv, 0) #delete the first element of the array -> this means shifting the array one step before and therefore do a derivation
 w_rec_off_deriv = np.append(w_rec_off_deriv,0) #add a zero in the last element of the array -> for derivation and to have the same length as previously
-impulse = (((w_rec_off) - w_rec_off_deriv)/(dt))#/(rho*c0**2) #This is the difference between the the energy density and the impulse response 
+impulse = ((w_rec_off - w_rec_off_deriv))#/(rho*c0**2) #This is the difference between the the energy density and the impulse response 
 #IMPORTANT NOTE: The "impulse" variable should be divided by dt in theory according to Schroeder 1965 but this is not done because otherwise it does not match the results of the radiosity method.
 
 #Schroeder integration
@@ -643,7 +679,7 @@ if tcalc == "decay":
     
     #Figure 13: Energy density at t=5*lambda over the space x.
     plt.figure(13)
-    plt.title("Figure 13: Energy density over the x axis at t=5*lambda_time")
+    plt.title("Figure 13: Energy density over the x axis at t=5*lambda")
     plt.plot(x,w_rec_x_5l)
     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
@@ -654,7 +690,7 @@ if tcalc == "decay":
     plt.plot(x,w_rec_x_t0)
     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
-    
+        
     #Figure 15: SPL at t=sourceoff_step over the space x. reverb sound only
     plt.figure(15)
     plt.title("Figure 15: SPL REVERB over the x axis at t=0")
@@ -667,6 +703,27 @@ if tcalc == "decay":
     plt.title("Figure 16: SPL DIRECT over the x axis at t=0")
     plt.plot(x,spl_stat_x_t0)
     plt.ylabel('$\mathrm{SPL \ [dB]}$')
+    plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
+    
+    #Figure 17: Energy density at t=1lambda over the space x.
+    plt.figure(17)
+    plt.title("Figure 17: Energy density over the x axis at t=1lambda")
+    plt.plot(x,w_rec_x_1l)
+    plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
+    plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
+    
+    #Figure 18: Energy density at t=2lambda over the space x.
+    plt.figure(18)
+    plt.title("Figure 18: Energy density over the x axis at t=2lambda")
+    plt.plot(x,w_rec_x_2l)
+    plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
+    plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
+    
+    #Figure 19: Energy density at t=3lambda over the space x.
+    plt.figure(19)
+    plt.title("Figure 19: Energy density over the x axis at t=3lambda")
+    plt.plot(x,w_rec_x_3l)
+    plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
     
 if tcalc == "stationarysource":
@@ -738,8 +795,8 @@ if tcalc == "stationarysource":
 ###############################################################################
 #SAVING
 ###############################################################################
-np.save('w_rec',w_rec)
-np.save('w_rec_off',w_rec_off)
-np.save('w_rec_x',w_rec_x_end)
-np.save('w_rec_y',w_rec_y_end)
-np.save('D0',Dx)
+#np.save('w_rec',w_rec)
+#np.save('w_rec_off',w_rec_off)
+#np.save('w_rec_x',w_rec_x_end)
+#np.save('w_rec_y',w_rec_y_end)
+#np.save('D0',Dx)

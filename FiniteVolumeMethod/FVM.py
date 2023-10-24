@@ -68,6 +68,11 @@ alpha_4 = 1/6 #Absorption coefficient for Surface4 - Wall Back
 alpha_5 = 1/6 #Absorption coefficient for Surface5 - Wall Left
 alpha_6 = 1/6 #Absorption coefficient for Surface6 - Wall Right
 
+#Type of Calculation
+#Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
+#Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
+tcalc = "decay"
+
 #%%
 ###############################################################################
 #INITIALISE GMSH
@@ -440,6 +445,8 @@ source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be
 
 #Diffusion parameters
 lambda_path = (4*V)/S #mean free path for 3D
+lambda_time= lambda_path/c0 #mean free time for 3D
+lambda_time_step = int(lambda_time/dt)
 Dx = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms x direction
 Dy = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms y direction
 Dz = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms z direction
@@ -481,19 +488,154 @@ for steps in range(0, recording_steps):
     #Update w before next step
     w_old = w #The w at n step becomes the w at n-1 step
     w = w_new #The w at n+1 step becomes the w at n step
-    print(time_steps)
+    
     #w_rec is the energy density at the specific receiver
     #w_rec[steps] = w_new[gmsh.model.mesh.getNode(rec_idx[0])[0], gmsh.model.mesh.getNode(rec_idx[1])[0], gmsh.model.mesh.getNode(rec_idx[2])[0]]
     w_rec[steps] = w_new[rec_idx]
+    
+    if steps == sourceon_steps:
+        #print("Steps for source:",steps)
+        w_t0 = w_new
 
+    if steps == round(1*lambda_time_step + sourceon_steps + (dist_sr/c0)):
+        w_1l = w_new
+        
+    if steps == round(2*lambda_time_step + sourceon_steps + (dist_sr/c0)):
+        w_2l = w_new
+        
+    if steps == round(3*lambda_time_step + sourceon_steps + (dist_sr/c0)):
+        w_3l = w_new
 
+    if steps == round(5*lambda_time_step + sourceon_steps + (dist_sr/c0)):
+        w_5l = w_new
+    
+    if tcalc == "stationarysource":
+        s[source_idx] = source1[0]
+        s[source_idx] = source1[0] 
+        s[source_idx] = source1[0] 
+        s[source_idx] = source1[0] 
+        s[source_idx] = source1[0] 
+        s[source_idx] = source1[0] 
+        s[source_idx] = source1[0] 
+        s[source_idx] = source1[0]
 
+    print(time_steps)
 
+plt.show()
 
+#%%
 
+###############################################################################
+#RESULTS
+###############################################################################
 
+press_r = ((abs(w_rec))*rho*(c0**2)) #pressure at the receiver
+spl_r = 10*np.log10(((abs(w_rec))*rho*(c0**2))/(pRef**2)) #,where=press_r>0, sound pressure level at the receiver
+spl_r_norm = 10*np.log10((((abs(w_rec))*rho*(c0**2))/(pRef**2)) / np.max(((abs(w_rec))*rho*(c0**2))/(pRef**2))) #normalised to maximum to 0dB
+spl_r_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_sr) + ((abs(w_rec))*c0)/(pRef**2))) #spl total (including direct field) at the receiver position????? but it will need to be calculated for a stationary source 100dB
 
+#Find the energy decay part of the overal calculation
+idx_w_rec = np.where(t == sourceon_time)[0][0] #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
+w_rec_off = w_rec[idx_w_rec:] #cutting the energy density array at the receiver from the idx_w_rec to the end
 
+#Schroeder integration
+#energy_r_rev = (w_rec_off)[::-1] #reverting the array
+#The energy density is related to the pressure with the following relation: w = p^2
+#energy_r_rev_cum = np.cumsum(energy_r_rev) #cumulative summation of all the item in the array
+schroeder = w_rec_off #energy_r_rev_cum[::-1] #reverting the array again -> creating the schroder decay
+sch_db = 10.0 * np.log10(schroeder / max(schroeder)) #level of the array: schroeder decay
 
+if tcalc == "decay":
+    t60 = t60_decay(t, sch_db, idx_w_rec) #called function for calculation of t60 [s]
+    edt = edt_decay(t, sch_db, idx_w_rec) #called function for calculation of edt [s]
+    c80 = clarity(t60, V, Eq_A, S, c0, dist_sr) #called function for calculation of c80 [dB]
+    d50 = definition(t60, V, Eq_A, S, c0, dist_sr) #called function for calculation of d50 [%]
+    ts = centretime(t60, Eq_A, S) #called function for calculation of ts [ms]
 
+et = time.time() #end time
+elapsed_time = et - st
+
+#%%
+###############################################################################
+#FIGURES & POST-PROCESSING
+###############################################################################
+
+if tcalc == "decay":
+    #Figure 5: Decay of SPL in the recording_time
+    plt.figure(5)
+    plt.plot(t, spl_r)  # plot sound pressure level with Pref = (2e-5)**5
+    plt.title("Figure 5 :SPL over time at the receiver")
+    plt.xlabel("t [s]")
+    plt.ylabel("SPL [dB]")
+    plt.xlim()
+    plt.ylim()
+    plt.xticks(np.arange(0, recording_time + 0.1, 0.5))
+    plt.yticks(np.arange(0, 120, 20))
+
+    #Figure 6: Decay of SPL in the recording_time normalised to maximum 0dB
+    plt.figure(6)
+    plt.plot(t,spl_r_norm)
+    plt.title("Figure 6: Normalised SPL over time at the receiver")
+    plt.xlabel("t [s]")
+    plt.ylabel("SPL [dB]")
+    plt.xlim()
+    plt.ylim()
+    plt.xticks(np.arange(0, recording_time +0.1, 0.1))
+    plt.yticks(np.arange(0, -60, -10))
+    
+    #Figure 7: Energy density at the receiver over time
+    plt.figure(7)
+    plt.plot(t,w_rec)
+    plt.title("Figure 7: Energy density over time at the receiver")
+    plt.xlabel("t [s]")
+    plt.ylabel("Energy density [kg m^-1 s^-2]")
+    plt.xlim()
+    plt.ylim()
+    plt.xticks(np.arange(0, recording_time +0.1, 0.1))
+    
+    #Figure 8: Schroeder decay
+    plt.figure(8)
+    plt.plot(t[idx_w_rec:],sch_db)
+    plt.title("Figure 8: Schroeder decay (Energy Decay Curve)")
+    plt.xlabel("t [s]")
+    plt.ylabel("Energy decay [dB]")
+    plt.xlim()
+    plt.ylim()
+    plt.xticks(np.arange(t[idx_w_rec], recording_time +0.1, 0.1))
+    
+if tcalc == "stationarysource":
+
+    #Figure 3: Decay of SPL in the recording_time at the receiver
+    plt.figure(3)
+    plt.plot(t,spl_r) #plot sound pressure level with Pref = (2e-5)**5
+    plt.title("Figure 3: SPL over time at the receiver")
+    plt.xlabel("t [s]")
+    plt.ylabel("SPL [dB]")
+    plt.xlim()
+    plt.ylim()
+    plt.xticks(np.arange(0, recording_time +0.1, 0.5))
+    #plt.yticks(np.arange(0, 120, 20))
+
+    #Figure 4: Decay of SPL in the recording_time normalised to maximum 0dB
+    plt.figure(4)
+    plt.title("Figure 4: Normalised SPL over time at the receiver")
+    plt.plot(t,spl_r_norm)
+    plt.xlabel("t [s]")
+    plt.ylabel("SPL [dB]")
+    plt.xlim()
+    plt.ylim()
+    plt.xticks(np.arange(0, recording_time +0.1, 0.1))
+    plt.yticks(np.arange(0, -60, -10))
+
+    #Figure 5: Energy density over time at the receiver
+    plt.figure(5)
+    plt.title("Figure 5: Energy density over time at the receiver")
+    plt.plot(t,w_rec)
+    plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
+    plt.xlabel("t [s]")
+
+#%%
+###############################################################################
+#SAVING
+###############################################################################
 

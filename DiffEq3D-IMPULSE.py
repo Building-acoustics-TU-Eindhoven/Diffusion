@@ -194,18 +194,6 @@ weight_col_lower = 1 - weight_col_upper
 weight_depth_upper = (z_source / dz) - depth_lower
 weight_depth_lower = 1 - weight_depth_upper
 
-s = np.zeros((Nx,Ny,Nz)) #matrix of zeros for source
-
-# Perform linear interpolation
-s[row_lower, col_lower, depth_lower] += source1[0] * weight_row_lower * weight_col_lower * weight_depth_lower
-s[row_lower, col_lower, depth_upper] += source1[0] * weight_row_lower * weight_col_lower * weight_depth_upper
-s[row_lower, col_upper, depth_lower] += source1[0] * weight_row_lower * weight_col_upper * weight_depth_lower
-s[row_lower, col_upper, depth_upper] += source1[0] * weight_row_lower * weight_col_upper * weight_depth_upper
-s[row_upper, col_lower, depth_lower] += source1[0] * weight_row_upper * weight_col_lower * weight_depth_lower
-s[row_upper, col_lower, depth_upper] += source1[0] * weight_row_upper * weight_col_lower * weight_depth_upper
-s[row_upper, col_upper, depth_lower] += source1[0] * weight_row_upper * weight_col_upper * weight_depth_lower
-s[row_upper, col_upper, depth_upper] += source1[0] * weight_row_upper * weight_col_upper * weight_depth_upper
-
 ###############################################################################
 #RECEIVER INTERPOLATION
 ###############################################################################
@@ -309,19 +297,17 @@ dist_y = np.sqrt((((xx[row_lr, col_lr, depth_lr]*(weight_row_lr * weight_col_lr 
 ############################################################################### 
 
 w_new = np.zeros((Nx,Ny,Nz)) #unknown w at new time level (n+1)
-w = w_new #w at n level
 w_old = np.zeros((Nx,Ny,Nz)) #w_old at n-1 level
+w = w_new #w at n level
 
-#w_old[row_lower, col_lower, depth_lower] += w1 * (weight_row_lower * weight_col_lower * weight_depth_lower)
-#w_old[row_lower, col_lower, depth_upper] += w1 * (weight_row_lower * weight_col_lower * weight_depth_upper)
-#w_old[row_lower, col_upper, depth_lower] += w1 * (weight_row_lower * weight_col_upper * weight_depth_lower)
-#w_old[row_lower, col_upper, depth_upper] += w1 * (weight_row_lower * weight_col_upper * weight_depth_upper)
-#w_old[row_upper, col_lower, depth_lower] += w1 * (weight_row_upper * weight_col_lower * weight_depth_lower)
-#w_old[row_upper, col_lower, depth_upper] += w1 * (weight_row_upper * weight_col_lower * weight_depth_upper)
-#w_old[row_upper, col_upper, depth_lower] += w1 * (weight_row_upper * weight_col_upper * weight_depth_lower)
-#w_old[row_upper, col_upper, depth_upper] += w1 * (weight_row_upper * weight_col_upper * weight_depth_upper)
-
-#w=w_old 
+w_old[row_lower, col_lower, depth_lower] += w1 * (weight_row_lower * weight_col_lower * weight_depth_lower)
+w_old[row_lower, col_lower, depth_upper] += w1 * (weight_row_lower * weight_col_lower * weight_depth_upper)
+w_old[row_lower, col_upper, depth_lower] += w1 * (weight_row_lower * weight_col_upper * weight_depth_lower)
+w_old[row_lower, col_upper, depth_upper] += w1 * (weight_row_lower * weight_col_upper * weight_depth_upper)
+w_old[row_upper, col_lower, depth_lower] += w1 * (weight_row_upper * weight_col_lower * weight_depth_lower)
+w_old[row_upper, col_lower, depth_upper] += w1 * (weight_row_upper * weight_col_lower * weight_depth_upper)
+w_old[row_upper, col_upper, depth_lower] += w1 * (weight_row_upper * weight_col_upper * weight_depth_lower)
+w_old[row_upper, col_upper, depth_upper] += w1 * (weight_row_upper * weight_col_upper * weight_depth_upper) 
 
 w_rec = np.arange(0,recording_time,dt) #energy density at the receiver
 w_rec_all = np.zeros((1,len(x))) 
@@ -367,7 +353,6 @@ for steps in range(0, recording_steps):
     #Computing w_new (w at n+1 time step)
     w_new = np.divide((np.multiply(w_old,(1-beta_zero))),(1+beta_zero)) - \
         np.divide((2*dt*c0*m_atm*w),(1+beta_zero)) + \
-            np.divide((2*dt*s),(1+beta_zero)) + \
                 np.divide((np.multiply(beta_zero_x,(w_iplus1+w_iminus1))),(1+beta_zero)) + \
                     np.divide((np.multiply(beta_zero_y,(w_jplus1+w_jminus1))),(1+beta_zero)) + \
                         np.divide((np.multiply(beta_zero_z,(w_kplus1+w_kminus1))),(1+beta_zero))
@@ -449,16 +434,7 @@ for steps in range(0, recording_steps):
     ##plt.pause(0.01)  # Adjust the pause duration as needed
     
     #Updating the source term
-    if tcalc == "decay":
-        s[row_lower, col_lower, depth_lower] = source1[steps] * weight_row_lower * weight_col_lower * weight_depth_lower
-        s[row_lower, col_lower, depth_upper] = source1[steps] * weight_row_lower * weight_col_lower * weight_depth_upper
-        s[row_lower, col_upper, depth_lower] = source1[steps] * weight_row_lower * weight_col_upper * weight_depth_lower
-        s[row_lower, col_upper, depth_upper] = source1[steps] * weight_row_lower * weight_col_upper * weight_depth_upper
-        s[row_upper, col_lower, depth_lower] = source1[steps] * weight_row_upper * weight_col_lower * weight_depth_lower
-        s[row_upper, col_lower, depth_upper] = source1[steps] * weight_row_upper * weight_col_lower * weight_depth_upper
-        s[row_upper, col_upper, depth_lower] = source1[steps] * weight_row_upper * weight_col_upper * weight_depth_lower
-        s[row_upper, col_upper, depth_upper] = source1[steps] * weight_row_upper * weight_col_upper * weight_depth_upper
-
+    
     if tcalc == "stationarysource":
         
         w_old[row_lower, col_lower, depth_lower] += w1 * (weight_row_lower * weight_col_lower * weight_depth_lower)

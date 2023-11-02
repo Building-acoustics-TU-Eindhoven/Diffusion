@@ -42,19 +42,19 @@ c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
 #Room dimensions
-length = 3.0 #point x finish at the length of the room in the x direction [m] %Length
-width = 3.0 #point y finish at the length of the room in the y direction [m] %Width
-height = 3.0 #point z finish at the length of the room in the x direction [m] %Height
+length = 8.0 #point x finish at the length of the room in the x direction [m] %Length
+width = 8.0 #point y finish at the length of the room in the y direction [m] %Width
+height = 8.0 #point z finish at the length of the room in the x direction [m] %Height
 
 # Source position
-x_source = 0.5  #position of the source in the x direction [m]
-y_source = 0.5  #position of the source in the y direction [m]
-z_source = 1.0  #position of the source in the z direction [m]
+x_source = 4.0  #position of the source in the x direction [m]
+y_source = 4.0  #position of the source in the y direction [m]
+z_source = 4.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 2.0 #position of the receiver in the x direction [m]
-y_rec = 0.5 #position of the receiver in the y direction [m]
-z_rec = 1.0 #position of the receiver in the z direction [m]
+x_rec = 2 #position of the receiver in the x direction [m]
+y_rec = 2 #position of the receiver in the y direction [m]
+z_rec = 2 #position of the receiver in the z direction [m]
 
 #Spatial discretization
 dx = 0.5 #distance between grid points x direction [m] #See Documentation for more insight about dt and dx
@@ -62,17 +62,17 @@ dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
 #Time discretization
-dt = 1/2000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
+dt = 1/8000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
-alpha_1 = 1/6 #Absorption coefficient for Surface1 - Floor
-alpha_2 = 1/6 #Absorption coefficient for Surface2 - Ceiling
-alpha_3 = 1/6 #Absorption coefficient for Surface3 - Wall Front
-alpha_4 = 1/6 #Absorption coefficient for Surface4 - Wall Back
-alpha_5 = 1/6 #Absorption coefficient for Surface5 - Wall Left
-alpha_6 = 1/6 #Absorption coefficient for Surface6 - Wall Right
+alpha_1 = 0.16 #Absorption coefficient for Surface1 - Floor
+alpha_2 = 0.16 #Absorption coefficient for Surface2 - Ceiling
+alpha_3 = 0.16 #Absorption coefficient for Surface3 - Wall Front
+alpha_4 = 0.16 #Absorption coefficient for Surface4 - Wall Back
+alpha_5 = 0.16 #Absorption coefficient for Surface5 - Wall Left
+alpha_6 = 0.16 #Absorption coefficient for Surface6 - Wall Right
 
 #Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
@@ -82,7 +82,7 @@ tcalc = "decay"
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
 sourceon_time =  0.5 #time that the source is ON before interrupting [s]
-recording_time = 0.8 #total time recorded for the calculation [s]
+recording_time = 1.8 #total time recorded for the calculation [s]
 
 #%%
 ###############################################################################
@@ -555,6 +555,7 @@ w_rec_y_end = ((w_new[row_lr, :, depth_lr]*(weight_row_lr * weight_col_lr * weig
 spl_stat_x_t0 = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_x**2))) + ((abs(w_rec_x_t0)*c0)))/(pRef**2)) #with direct sound
 spl_stat_x_5l = 10*np.log10(rho*c0**2*w_rec_x_5l/pRef**2)
 
+spl_stat_x_rev = 10*np.log10(rho*c0*(((abs(w_rec_x_end)*c0)))/(pRef**2))
 
 spl_stat_x = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_x**2))) + ((abs(w_rec_x_end)*c0)))/(pRef**2))
 spl_stat_y = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_y**2))) + ((abs(w_rec_y_end)*c0)))/(pRef**2)) #It should be the spl stationary
@@ -784,9 +785,23 @@ if tcalc == "stationarysource":
     plt.ylabel('$\mathrm{Sound \ Pressure \ Level \ [dB]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')
     
-    #Figure 8: Energy density at t=recording_time over the space x.
+    #Figure 8: Sound pressure level stationary over the space x. only reverberant
     plt.figure(8)
-    plt.title("Figure 8: Energy density over the x axis at t=recording_time")
+    t_dim = len(t)
+    last_time_index = t_dim-1
+    spl_x = spl_stat_x_rev
+    data_x = spl_x
+    plt.title("Figure 8: SPL over the x axis only reverberant")
+    plt.plot(x,data_x)
+    #plt.xticks(np.arange(0, 35, 5))
+    #plt.yticks(np.arange(65, 105, 5))
+    plt.ylabel('$\mathrm{Sound \ Pressure \ Level \ [dB]}$')
+    plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')
+    
+    
+    #Figure 9: Energy density at t=recording_time over the space x.
+    plt.figure(9)
+    plt.title("Figure 9: Energy density over the x axis at t=recording_time")
     plt.plot(x,w_rec_x_end)
     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')

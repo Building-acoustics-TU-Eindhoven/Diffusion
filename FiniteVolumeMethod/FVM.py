@@ -5,7 +5,7 @@ Created on Wed Aug  2 16:12:40 2023
 @author: 20225533
 """
 
-#Code developed by Ilaria Fichera for the analysis of the FV method with Du Fort & Frankel method adapted solving the 3D diffusion equation with one intermittent omnidirectional sound source
+#Code developed by Ilaria Fichera for the analysis of the FVM method adapted solving the 3D diffusion equation with one intermittent omnidirectional sound source
 #Import modules
 import math
 import matplotlib
@@ -46,17 +46,17 @@ c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
 length_mesh = 1 ###???We do not need it! maybe later????
-dt = 0.001 #time discretizatione
+dt = 1/8000 #time discretizatione
 
 # Source position
-x_source = 1.36  #position of the source in the x direction [m]
-y_source = 3.76  #position of the source in the y direction [m]
-z_source = 1.62  #position of the source in the z direction [m]
+x_source = 4.0  #position of the source in the x direction [m]
+y_source = 4.0  #position of the source in the y direction [m]
+z_source = 4.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 4.26 #position of the receiver in the x direction [m]
-y_rec = 1.76 #position of the receiver in the y direction [m]
-z_rec = 1.62 #position of the receiver in the z direction [m]
+x_rec = 2.0 #position of the receiver in the x direction [m]
+y_rec = 2.0 #position of the receiver in the y direction [m]
+z_rec = 2.0 #position of the receiver in the z direction [m]
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
@@ -73,16 +73,17 @@ alpha_6 = 1/6 #Absorption coefficient for Surface6 - Wall Right
 #Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
 tcalc = "decay"
 
+
 #%%
 ###############################################################################
 #INITIALISE GMSH
 ###############################################################################
     
-file_name = "scenario2.msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "8x8x8.msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 
-#gmsh.fltk.run() #run the file to see it in gmsh
+gmsh.fltk.run() #run the file to see it in gmsh
 
 dim = -1 #dimensions of the entities, 0 for points, 1 for curves/edge/lines, 2 for surfaces, 3 for volumes, -1 for all the entities 
 tag = -1 #all the nodes of the room
@@ -262,10 +263,7 @@ for iGroup in vGroups:
     #print(alist)
     vGroupsNames.append(alist)
 
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
+
 #######################################################################################################
 
 # abs_coeff_dict = {}
@@ -279,12 +277,6 @@ for iGroup in vGroups:
 #     abs_coeff = [float(i) for i in abs_coeff]
 #     if not name_abs_coeff in abs_coeff_dict:
 #         abs_coeff_dict[name_abs_coeff] = abs_coeff
-
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
 
 #######################################################################################################
 
@@ -312,6 +304,35 @@ for group in vGroupsNames:
 for entity, Abs_term in surface_absorption:
     triangle_faces, _ = gmsh.model.mesh.getElementsByType(2, entity) #Get all the triangle faces for the current surface
     triangle_face_absorption.extend([Abs_term] * len(triangle_faces)) #Append the Abs_term value for each triangle face
+
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+surface_areas = {}
+for entity, Abs_term in surface_absorption:
+    triangle_faces, _ = gmsh.model.mesh.getElementsByType(2, entity) #Get all the triangle faces for the current surface
+    surf_area_tot = 0
+    for face in triangle_faces:
+        face_nodes= gmsh.model.mesh.getElementFaceNodes(2, 3)
+        #face_nodes = face_nodes.reshape((-1,3))#[face]
+        c0 = gmsh.model.mesh.getNode(face_nodes[0])[0] #coordinates of vertix 0
+        c1 = gmsh.model.mesh.getNode(face_nodes[1])[0] #coordinates of vertix 1
+        c2 = gmsh.model.mesh.getNode(face_nodes[2])[0] #coordinates of vertix 2
+        face_area = 0.5 * np.linalg.norm(np.cross(c1 - c0, c2 - c0)) #Compute the area using half of the cross product's magnitude
+        surf_area_tot += face_area
+    surface_areas[entity] = surf_area_tot
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+
+
+
+
+
 
 
 #######################################################################################################
@@ -472,6 +493,11 @@ sourceon_steps = ceil(sourceon_time/dt) #time steps at which the source is calcu
 s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position
 source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
 
+#Absorption parameters for room
+alpha_average = (alpha_1*S1 + alpha_2*S2 + alpha_3*S3 + alpha_4*S4 + alpha_5*S5 + alpha_6*S6)/S #average absorption
+Eq_A = alpha_1*S1 + alpha_2*S2 + alpha_3*S3 + alpha_4*S4 + alpha_5*S5 + alpha_6*S6 #equivalent absorption area of the room
+
+
 #Diffusion parameters
 lambda_path = (4*V)/S #mean free path for 3D
 lambda_time= lambda_path/c0 #mean free time for 3D
@@ -482,19 +508,20 @@ Dz = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms z directi
 
 beta_zero = np.divide((dt*(np.multiply(Dx,interior_sum) + boundaryV)),cell_volume) #my interpretation of the beta_zero
 
-s = np.zeros((velement,velement)) #matrix of zeros for source
+s = np.zeros((velement)) #matrix of zeros for source
+s[source_idx] = source1[0]
+
 
 #%%
 ###############################################################################
 #MAIN CALCULATION - COMPUTING ENERGY DENSITY
 ############################################################################### 
 
-
 w_new = np.zeros(velement) #unknown w at new time level (n+1)
-w_old = np.zeros(velement) 
+#w_old = np.zeros(velement) 
 w = w_new #w at n level
-#w_old = w #w_old at n-1 level
-w_old[source_idx] = w1 #w_old at source position -> impulse source
+w_old = w #w_old at n-1 level
+#w_old[source_idx] = w1 #w_old at source position -> impulse source
 
 w_rec = np.arange(0,recording_time,dt) #energy density at the receiver
 
@@ -510,8 +537,8 @@ for steps in range(0, recording_steps):
                 
     w_new = np.divide((np.multiply(w_old,(1-beta_zero))),(1+beta_zero)) - \
         np.divide((2*dt*c0*m_atm*w),(1+beta_zero)) + \
-            np.divide(np.divide((2*dt*Dx*(interior@w)),cell_volume),(1+beta_zero)) #+ \
-               # np.divide((2*dt*s),(1+beta_zero)) #The absorption term is part of beta_zero
+            np.divide(np.divide((2*dt*Dx*(interior@w)),cell_volume),(1+beta_zero)) + \
+                np.divide((2*dt*s),(1+beta_zero)) #The absorption term is part of beta_zero
                  ###?????
                  
     #Update w before next step
@@ -538,14 +565,10 @@ for steps in range(0, recording_steps):
     if steps == round(5*lambda_time_step + sourceon_steps + (dist_sr/c0)):
         w_5l = w_new
     
+    if tcalc == "decay":
+        s[source_idx] = source1[steps]
+    
     if tcalc == "stationarysource":
-        s[source_idx] = source1[0]
-        s[source_idx] = source1[0] 
-        s[source_idx] = source1[0] 
-        s[source_idx] = source1[0] 
-        s[source_idx] = source1[0] 
-        s[source_idx] = source1[0] 
-        s[source_idx] = source1[0] 
         s[source_idx] = source1[0]
 
     print(time_steps)

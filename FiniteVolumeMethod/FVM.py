@@ -45,7 +45,6 @@ st = time.time() #start time of calculation
 c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
-length_mesh = 1 ###???We do not need it! maybe later????
 dt = 1/8000 #time discretizatione
 
 # Source position
@@ -61,12 +60,6 @@ z_rec = 2.0 #position of the receiver in the z direction [m]
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
-#alpha_1 = [1/6,1/6,1/6,1/6,1/6,1/6 ] #Absorption coefficient 1
-#alpha_2 = 1/6 #Absorption coefficient for Surface2 - Ceiling
-#alpha_3 = 1/6 #Absorption coefficient for Surface3 - Wall Front
-#alpha_4 = 1/6 #Absorption coefficient for Surface4 - Wall Back
-#alpha_5 = 1/6 #Absorption coefficient for Surface5 - Wall Left
-#alpha_6 = 1/6 #Absorption coefficient for Surface6 - Wall Right
 
 #Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
@@ -263,23 +256,6 @@ for iGroup in vGroups:
     #print(alist)
     vGroupsNames.append(alist)
 
-
-#######################################################################################################
-
-# abs_coeff_dict = {}
-# for iGroup in vGroupsNames:
-#     if iGroup[0] != 2:
-#         continue
-#     name_group = iGroup[2]
-#     name_split = name_group.split("$")
-#     name_abs_coeff = name_split[0]
-#     abs_coeff = name_split[1].split(",")
-#     abs_coeff = [float(i) for i in abs_coeff]
-#     if not name_abs_coeff in abs_coeff_dict:
-#         abs_coeff_dict[name_abs_coeff] = abs_coeff
-
-#######################################################################################################
-
 # Initialize a list to store surface tags and their absorption coefficients
 surface_absorption = [] #initialization absorption term (alpha*surfaceofwall) for each wall of the room
 triangle_face_absorption = [] #initialization absorption term for each triangle face at the boundary and per each wall
@@ -307,10 +283,7 @@ for entity, Abs_term in surface_absorption:
     triangle_faces, _ = gmsh.model.mesh.getElementsByType(2, entity) #Get all the triangle faces for the current surface
     triangle_face_absorption.extend([Abs_term] * len(triangle_faces)) #Append the Abs_term value for each triangle face
 
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
+
 #######################################################################################################
 surface_areas = {}   
 for entity, Abs_term in surface_absorption:   
@@ -326,15 +299,6 @@ for entity, Abs_term in surface_absorption:
         surf_area_tot += face_area
         surface_areas[entity] = surf_area_tot
 #######################################################################################################
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
-
-
-
-
-
 
 
 #######################################################################################################
@@ -527,7 +491,7 @@ w_new = np.zeros(velement) #unknown w at new time level (n+1)
 #w_old = np.zeros(velement) 
 w = w_new #w at n level
 w_old = w #w_old at n-1 level
-#w_old[source_idx] = w1 #w_old at source position -> impulse source
+#w[source_idx] = w1 #w (m time step) at source position -> impulse source
 
 w_rec = np.arange(0,recording_time,dt) #energy density at the receiver
 
@@ -537,15 +501,11 @@ for steps in range(0, recording_steps):
     time_steps = steps*dt #total time for the calculation
     
     #Computing w_new (w at n+1 time step)
-    #w_new = np.divide((np.multiply(w_old, (1 - beta_zero))) - \
-     #       (2 * dt * c0 * m_atm * w) + \
-      #      (np.divide(2 * dt * Dx * interior @ w , cell_volume)),(1 + beta_zero)) 
                 
     w_new = np.divide((np.multiply(w_old,(1-beta_zero))),(1+beta_zero)) - \
         np.divide((2*dt*c0*m_atm*w),(1+beta_zero)) + \
             np.divide(np.divide((2*dt*Dx*(interior@w)),cell_volume),(1+beta_zero)) + \
                 np.divide((2*dt*s),(1+beta_zero)) #The absorption term is part of beta_zero
-                 ###?????
                  
     #Update w before next step
     w_old = w #The w at n step becomes the w at n-1 step

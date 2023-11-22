@@ -108,5 +108,4 @@ Mesh.Algorithm3D = 1; // Delaunay3D, works for boundary layer insertion.
 Mesh.Optimize = 1; // Gmsh smoother, works with boundary layers (netgen version does not).
 Mesh.CharacteristicLengthFromPoints = 1;
 // Recombine Surface "*";
-Mesh.RemeshAlgorithm = 1; // automatic
 

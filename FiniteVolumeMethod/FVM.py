@@ -61,12 +61,12 @@ z_rec = 2.0 #position of the receiver in the z direction [m]
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
-alpha_1 = [1/6,1/6,1/6,1/6,1/6,1/6 ] #Absorption coefficient 1
-alpha_2 = 1/6 #Absorption coefficient for Surface2 - Ceiling
-alpha_3 = 1/6 #Absorption coefficient for Surface3 - Wall Front
-alpha_4 = 1/6 #Absorption coefficient for Surface4 - Wall Back
-alpha_5 = 1/6 #Absorption coefficient for Surface5 - Wall Left
-alpha_6 = 1/6 #Absorption coefficient for Surface6 - Wall Right
+#alpha_1 = [1/6,1/6,1/6,1/6,1/6,1/6 ] #Absorption coefficient 1
+#alpha_2 = 1/6 #Absorption coefficient for Surface2 - Ceiling
+#alpha_3 = 1/6 #Absorption coefficient for Surface3 - Wall Front
+#alpha_4 = 1/6 #Absorption coefficient for Surface4 - Wall Back
+#alpha_5 = 1/6 #Absorption coefficient for Surface5 - Wall Left
+#alpha_6 = 1/6 #Absorption coefficient for Surface6 - Wall Right
 
 #Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
@@ -79,7 +79,7 @@ tcalc = "decay"
 #INITIALISE GMSH
 ###############################################################################
     
-file_name = "8x8x8.msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "10x10x10.msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 
@@ -283,6 +283,7 @@ for iGroup in vGroups:
 # Initialize a list to store surface tags and their absorption coefficients
 surface_absorption = [] #initialization absorption term (alpha*surfaceofwall) for each wall of the room
 triangle_face_absorption = [] #initialization absorption term for each triangle face at the boundary and per each wall
+absorption_coefficient = {}
 
 for group in vGroupsNames:
     if group[0] != 2:
@@ -298,6 +299,7 @@ for group in vGroupsNames:
     #abscoeff = float(input(f"Enter absorption coefficient input for {group[2]}:")) #input the absorption coefficient
     Abs_term = abs_term(th, abscoeff) #calculates the absorption term based on the type of boundary condition th
     for entity in entities:
+        absorption_coefficient[entity] = abscoeff
         surface_absorption.append((entity, Abs_term)) #absorption term (alpha*surfaceofwall) for each wall of the room
         surface_absorption = sorted(surface_absorption, key=lambda x: x[0])
 
@@ -310,19 +312,19 @@ for entity, Abs_term in surface_absorption:
 #######################################################################################################
 #######################################################################################################
 #######################################################################################################
-surface_areas = {}
-for entity, Abs_term in surface_absorption:
-    triangle_faces, _ = gmsh.model.mesh.getElementsByType(2, entity) #Get all the triangle faces for the current surface
+surface_areas = {}   
+for entity, Abs_term in surface_absorption:   
+    face_nodes_per_entity= gmsh.model.mesh.getElementFaceNodes(2, 3, tag=entity)
     surf_area_tot = 0
-    for face in triangle_faces:
-        face_nodes= gmsh.model.mesh.getElementFaceNodes(2, 3)
-        #face_nodes = face_nodes.reshape((-1,3))#[face]
-        c0 = gmsh.model.mesh.getNode(face_nodes[0])[0] #coordinates of vertix 0
-        c1 = gmsh.model.mesh.getNode(face_nodes[1])[0] #coordinates of vertix 1
-        c2 = gmsh.model.mesh.getNode(face_nodes[2])[0] #coordinates of vertix 2
-        face_area = 0.5 * np.linalg.norm(np.cross(c1 - c0, c2 - c0)) #Compute the area using half of the cross product's magnitude
+    for i in range(0, len(face_nodes_per_entity), 3): # per each element basically, goes trhough the nodes of each face 3by3
+        #print(i)
+        f = tuple(sorted(face_nodes_per_entity[i:i + 3])) 
+        fc0 = gmsh.model.mesh.getNode(f[0])[0] #coordinates of vertix 0
+        fc1 = gmsh.model.mesh.getNode(f[1])[0] #coordinates of vertix 1
+        fc2 = gmsh.model.mesh.getNode(f[2])[0] #coordinates of vertix 2
+        face_area = 0.5 * np.linalg.norm(np.cross(fc1 - fc0, fc2 - fc0)) #Compute the area using half of the cross product's magnitude
         surf_area_tot += face_area
-    surface_areas[entity] = surf_area_tot
+        surface_areas[entity] = surf_area_tot
 #######################################################################################################
 #######################################################################################################
 #######################################################################################################
@@ -493,10 +495,14 @@ sourceon_steps = ceil(sourceon_time/dt) #time steps at which the source is calcu
 s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position
 source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
 
+sum_alpha_average = 0
+Eq_A = 0
 #Absorption parameters for room
-alpha_average = (alpha_1*S1 + alpha_2*S2 + alpha_3*S3 + alpha_4*S4 + alpha_5*S5 + alpha_6*S6)/S #average absorption
-Eq_A = alpha_1*S1 + alpha_2*S2 + alpha_3*S3 + alpha_4*S4 + alpha_5*S5 + alpha_6*S6 #equivalent absorption area of the room
-
+for entity in surface_areas:
+    print(entity)
+    sum_alpha_average += absorption_coefficient[entity]*surface_areas[entity]
+    Eq_A += absorption_coefficient[entity]*surface_areas[entity]
+alpha_average = sum_alpha_average/S #average absorption
 
 #Diffusion parameters
 lambda_path = (4*V)/S #mean free path for 3D
@@ -600,6 +606,7 @@ sch_db = 10.0 * np.log10(schroeder / max(schroeder)) #level of the array: schroe
 if tcalc == "decay":
     t60 = t60_decay(t, sch_db, idx_w_rec) #called function for calculation of t60 [s]
     edt = edt_decay(t, sch_db, idx_w_rec) #called function for calculation of edt [s]
+    #Eq_A = 0.16*V/t60 #equivalent absorption area defined from the RT 
     c80 = clarity(t60, V, Eq_A, S, c0, dist_sr) #called function for calculation of c80 [dB]
     d50 = definition(t60, V, Eq_A, S, c0, dist_sr) #called function for calculation of d50 [%]
     ts = centretime(t60, Eq_A, S) #called function for calculation of ts [ms]

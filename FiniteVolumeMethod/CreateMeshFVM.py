@@ -57,10 +57,72 @@ import subprocess
 #Run Gmsh to generate the mesh
 #subprocess.run(command)
 
+
+
+#%%
+###############################################################################
+#INPUT VARIABLES
+###############################################################################
+# Specify the path to your original Geo file
+geo_file_path = '10x10x10.geo'
+max_mesh_size = 1
+name_gmsh_file = '10x10x10.msh'
+length_of_mesh = 0.6
+
+#%%
+#import os
+#import subprocess
+
+# Assuming lengthOfMesh is a variable in Python
+# and filename is the name of the file without extension
+#if lengthOfMesh == 'H':
+#    strimp = f'gmsh -3 -format msh4 {os.getcwd()}/"8x8x8".geo'
+#    subprocess.run(strimp, shell=True)
+#    lengthOfMesh = 2
+#else:
+
+#strimp = f'gmsh -3 -format msh4 -clscale {lengthOfMesh} "{os.getcwd()}/"8x8x8".geo"'
+#subprocess.run(strimp, shell=True)
+#lengthOfMesh = float(lengthOfMesh)
+
+# Assuming msh_file is the path to the generated mesh file
+#msh_file = f'{os.getcwd()}/GeoModels/"8x8x8".msh'
+
+
+#%%
+###############################################################################
+#INITIALISE GMSH
+###############################################################################
+# Read the content of the Geo file
+with open(geo_file_path, 'r') as file:
+    geo_content = file.readlines()
+
+# Specify the line to be removed
+line_to_remove = 'Mesh.RemeshAlgorithm = 1; // automatic\n'
+
+# Remove the specified line from the content
+if line_to_remove in geo_content:
+    geo_content.remove(line_to_remove)
+
+# Write the modified content back to the Geo file
+with open(geo_file_path, 'w') as file:
+    file.writelines(geo_content)
+
 gmsh.initialize()
-gmsh.open('8x8x8.geo')
-gmsh.option.setNumber('Mesh.MeshSizeMin', 1)
-gmsh.option.setNumber('Mesh.MeshSizeMax', 1)
+gmsh.open(geo_file_path)
+
+#gmsh.option.setNumber('Mesh.MeshSizeMin', 1)
+#gmsh.option.setNumber('Mesh.MeshSizeMax', max_mesh_size)
+
+# Set the mesh size factor to control the characteristic length
+gmsh.option.setNumber('Mesh.MeshSizeFactor', length_of_mesh) 
+
 gmsh.model.mesh.generate(3)
-gmsh.write('mesh.msh')
+print(gmsh.logger.get())
+gmsh.write(name_gmsh_file)
 gmsh.finalize()
+
+gmsh.initialize() #Initialize msh file
+mesh = gmsh.open(name_gmsh_file) #open the file
+
+#gmsh.fltk.run() #run the file to see it in gmsh

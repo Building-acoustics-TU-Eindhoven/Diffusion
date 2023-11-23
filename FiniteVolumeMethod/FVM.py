@@ -440,6 +440,13 @@ recording_time = 8.00 #total time recorded for the calculation [s]
 V = sum(cell_volume)
 S = total_boundArea #surface area of the room
 
+# Frequency resolution
+fcLow = 125
+fcHigh = 2000
+nthOctave = 1
+
+nBands = nthOctave * log(fcHigh/fcLow) / log(2) + 1
+
 #%%
 ###############################################################################
 #CALCULATION SECTION
@@ -486,6 +493,14 @@ s[source_idx] = source1[0]
 ###############################################################################
 #MAIN CALCULATION - COMPUTING ENERGY DENSITY
 ############################################################################### 
+
+#w_new_band = []
+#for iBand in range(nBands):
+#    thisBandNo = iBand;
+#    thisFc = centerFrequencies(iBand);
+
+
+
 
 w_new = np.zeros(velement) #unknown w at new time level (n+1)
 #w_old = np.zeros(velement) 
@@ -538,6 +553,8 @@ for steps in range(0, recording_steps):
         s[source_idx] = source1[0]
 
     print(time_steps)
+
+#w_new_band.append(w_new)
 
 plt.show()
 

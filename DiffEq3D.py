@@ -57,7 +57,7 @@ y_rec = 2 #position of the receiver in the y direction [m]
 z_rec = 2 #position of the receiver in the z direction [m]
 
 #Spatial discretization
-dx = 0.5 #distance between grid points x direction [m] #See Documentation for more insight about dt and dx
+dx = 0.2 #distance between grid points x direction [m] #See Documentation for more insight about dt and dx
 dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
@@ -67,12 +67,12 @@ dt = 1/8000 #distance between grid points on the time discretization [s] #See Do
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
-alpha_1 = 0.16 #Absorption coefficient for Surface1 - Floor
-alpha_2 = 0.16 #Absorption coefficient for Surface2 - Ceiling
-alpha_3 = 0.16 #Absorption coefficient for Surface3 - Wall Front
-alpha_4 = 0.16 #Absorption coefficient for Surface4 - Wall Back
-alpha_5 = 0.16 #Absorption coefficient for Surface5 - Wall Left
-alpha_6 = 0.16 #Absorption coefficient for Surface6 - Wall Right
+alpha_1 = 0.5 #Absorption coefficient for Surface1 - Floor
+alpha_2 = 0 #Absorption coefficient for Surface2 - Ceiling
+alpha_3 = 0.5 #Absorption coefficient for Surface3 - Wall Front
+alpha_4 = 0 #Absorption coefficient for Surface4 - Wall Back
+alpha_5 = 0 #Absorption coefficient for Surface5 - Wall Left
+alpha_6 = 0 #Absorption coefficient for Surface6 - Wall Right
 
 #Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 

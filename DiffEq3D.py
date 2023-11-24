@@ -39,40 +39,40 @@ st = time.time() #start time of calculation
 
 #General settings
 c0= 343 #adiabatic speed of sound [m.s^-1]
-m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
+m_atm = 1.202* (10**(-3)) #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
 #Room dimensions
-length = 8.0 #point x finish at the length of the room in the x direction [m] %Length
-width = 8.0 #point y finish at the length of the room in the y direction [m] %Width
-height = 8.0 #point z finish at the length of the room in the x direction [m] %Height
+length = 3.94 #point x finish at the length of the room in the x direction [m] %Length
+width = 5.36 #point y finish at the length of the room in the y direction [m] %Width
+height = 2.71 #point z finish at the length of the room in the x direction [m] %Height
 
 # Source position
-x_source = 4  #position of the source in the x direction [m]
-y_source = 4  #position of the source in the y direction [m]
-z_source = 4  #position of the source in the z direction [m]
+x_source = 1.1  #position of the source in the x direction [m]
+y_source = 1.97  #position of the source in the y direction [m]
+z_source = 1.72  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 2 #position of the receiver in the x direction [m]
-y_rec = 2 #position of the receiver in the y direction [m]
-z_rec = 2 #position of the receiver in the z direction [m]
+x_rec = 3.25 #position of the receiver in the x direction [m]
+y_rec = 1.97 #position of the receiver in the y direction [m]
+z_rec = 0.90 #position of the receiver in the z direction [m]
 
 #Spatial discretization
-dx = 0.2 #distance between grid points x direction [m] #See Documentation for more insight about dt and dx
+dx = 0.10 #distance between grid points x direction [m] #See Documentation for more insight about dt and dx
 dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
 #Time discretization
-dt = 1/8000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
+dt = 10**(-5) #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
 
 #Absorption term and Absorption coefficients
-th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
+th = 1 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
-alpha_1 = 0.5 #Absorption coefficient for Surface1 - Floor
-alpha_2 = 0 #Absorption coefficient for Surface2 - Ceiling
-alpha_3 = 0.5 #Absorption coefficient for Surface3 - Wall Front
-alpha_4 = 0 #Absorption coefficient for Surface4 - Wall Back
-alpha_5 = 0 #Absorption coefficient for Surface5 - Wall Left
-alpha_6 = 0 #Absorption coefficient for Surface6 - Wall Right
+alpha_1 = 0.01 #Absorption coefficient for Surface1 - Floor
+alpha_2 = 0.17 #Absorption coefficient for Surface2 - Ceiling
+alpha_3 = 0.02 #Absorption coefficient for Surface3 - Wall Front
+alpha_4 = 0.02 #Absorption coefficient for Surface4 - Wall Back
+alpha_5 = 0.02 #Absorption coefficient for Surface5 - Wall Left
+alpha_6 = 0.02 #Absorption coefficient for Surface6 - Wall Right
 
 #Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
@@ -82,7 +82,7 @@ tcalc = "decay"
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
 sourceon_time =  0.5 #time that the source is ON before interrupting [s]
-recording_time = 1.8 #total time recorded for the calculation [s]
+recording_time = 3 #total time recorded for the calculation [s]
 
 #%%
 ###############################################################################
@@ -454,7 +454,7 @@ for steps in range(0, recording_steps):
         s[row_lr_s, col_lr_s, dep_lr_s] = source1[steps] * (weight_row_lr_s * weight_col_lr_s * weight_dep_lr_s)
         s[row_lr_s, col_lr_s, dep_up_s] = source1[steps] * (weight_row_lr_s * weight_col_lr_s * weight_dep_up_s)
         s[row_lr_s, col_up_s, dep_lr_s] = source1[steps] * (weight_row_lr_s * weight_col_up_s * weight_dep_lr_s)
-        s[row_lr_s, col_up_s, dep_lr_s] = source1[steps] * (weight_row_lr_s * weight_col_up_s * weight_dep_up_s)
+        s[row_lr_s, col_up_s, dep_up_s] = source1[steps] * (weight_row_lr_s * weight_col_up_s * weight_dep_up_s)
         s[row_up_s, col_lr_s, dep_lr_s] = source1[steps] * (weight_row_up_s * weight_col_lr_s * weight_dep_lr_s)
         s[row_up_s, col_lr_s, dep_up_s] = source1[steps] * (weight_row_up_s * weight_col_lr_s * weight_dep_up_s)
         s[row_up_s, col_up_s, dep_lr_s] = source1[steps] * (weight_row_up_s * weight_col_up_s * weight_dep_lr_s)
@@ -463,7 +463,7 @@ for steps in range(0, recording_steps):
         s[row_lr_s, col_lr_s, dep_lr_s] = source1[0] * (weight_row_lr_s * weight_col_lr_s * weight_dep_lr_s)
         s[row_lr_s, col_lr_s, dep_up_s] = source1[0] * (weight_row_lr_s * weight_col_lr_s * weight_dep_up_s)
         s[row_lr_s, col_up_s, dep_lr_s] = source1[0] * (weight_row_lr_s * weight_col_up_s * weight_dep_lr_s)
-        s[row_lr_s, col_up_s, dep_lr_s] = source1[0] * (weight_row_lr_s * weight_col_up_s * weight_dep_up_s)
+        s[row_lr_s, col_up_s, dep_up_s] = source1[0] * (weight_row_lr_s * weight_col_up_s * weight_dep_up_s)
         s[row_up_s, col_lr_s, dep_lr_s] = source1[0] * (weight_row_up_s * weight_col_lr_s * weight_dep_lr_s)
         s[row_up_s, col_lr_s, dep_up_s] = source1[0] * (weight_row_up_s * weight_col_lr_s * weight_dep_up_s)
         s[row_up_s, col_up_s, dep_lr_s] = source1[0] * (weight_row_up_s * weight_col_up_s * weight_dep_lr_s)

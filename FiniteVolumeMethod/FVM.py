@@ -43,22 +43,22 @@ st = time.time() #start time of calculation
 
 #General settings
 c0= 343 #adiabatic speed of sound [m.s^-1]
-m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
+m_atm = 1.202* (10**(-3)) #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
-dt = 1/8000 #time discretizatione
+dt = 10**(-5) #time discretizatione
 
 # Source position
-x_source = 4.0  #position of the source in the x direction [m]
-y_source = 4.0  #position of the source in the y direction [m]
-z_source = 4.0  #position of the source in the z direction [m]
+x_source = 1.1  #position of the source in the x direction [m]
+y_source = 1.97  #position of the source in the y direction [m]
+z_source = 1.72  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 2.0 #position of the receiver in the x direction [m]
-y_rec = 2.0 #position of the receiver in the y direction [m]
-z_rec = 2.0 #position of the receiver in the z direction [m]
+x_rec = 3.25 #position of the receiver in the x direction [m]
+y_rec = 1.97 #position of the receiver in the y direction [m]
+z_rec = 0.90 #position of the receiver in the z direction [m]
 
 #Absorption term and Absorption coefficients
-th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
+th = 1 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
 
 #Type of Calculation
@@ -69,7 +69,7 @@ tcalc = "decay"
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
 sourceon_time =  0.50 #time that the source is ON before interrupting [s]
-recording_time = 8.00 #total time recorded for the calculation [s]
+recording_time = 3.00 #total time recorded for the calculation [s]
 
 # Frequency resolution
 fcLow = 125
@@ -82,7 +82,7 @@ nBands = nthOctave * log(fcHigh/fcLow) / log(2) + 1
 #INITIALISE GMSH
 ###############################################################################
     
-file_name = "8x8x8(D).msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "3.94x5.36x2.72.msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 
@@ -448,9 +448,6 @@ gmsh.finalize()
 ###############################################################################
 
 Vs = cell_volume[source_idx] #volume of the source = to volume of cells where the volume is 
-
-sourceon_time =  0.50 #time that the source is ON before interrupting [s]
-recording_time = 1.8 #total time recorded for the calculation [s]
 
 V = sum(cell_volume)
 S = total_boundArea #surface area of the room

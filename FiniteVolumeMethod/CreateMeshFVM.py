@@ -67,7 +67,7 @@ import subprocess
 geo_file_path = '8x8x8.geo'
 max_mesh_size = 1
 name_gmsh_file = '8x8x8.msh'
-length_of_mesh = 1
+length_of_mesh = 2
 
 #%%
 #import os

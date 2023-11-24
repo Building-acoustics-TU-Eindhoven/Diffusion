@@ -47,9 +47,9 @@ width = 8.0 #point y finish at the length of the room in the y direction [m] %Wi
 height = 8.0 #point z finish at the length of the room in the x direction [m] %Height
 
 # Source position
-x_source = 4.0  #position of the source in the x direction [m]
-y_source = 4.0  #position of the source in the y direction [m]
-z_source = 4.0  #position of the source in the z direction [m]
+x_source = 4  #position of the source in the x direction [m]
+y_source = 4  #position of the source in the y direction [m]
+z_source = 4  #position of the source in the z direction [m]
 
 # Receiver position
 x_rec = 2 #position of the receiver in the x direction [m]

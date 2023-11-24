@@ -423,12 +423,17 @@ for i in range(len(cell_center)):
 rec_idx = np.argmin(dist_rec_cc_list)
 
 #Position of source is the one of the nodes, the closest to the actual source coordinates
+#dist_source_cc_list = []
+#for i in range(len(nodeTags)):
+#    dist_source_cc = math.sqrt(np.sum((gmsh.model.mesh.getNode(int(nodeTags[i]))[0] - coord_source)**2))
+#    dist_source_cc_list.append(dist_source_cc)
+#source_idx = np.argmin(dist_source_cc_list)
+
+#Position of source is the centre of a cell so the minimum distance with the centre of a cell has been calculated to understand which cell is the closest
 dist_source_cc_list = []
-for i in range(len(nodeTags)):
-    dist_source_cc = math.sqrt(np.sum((gmsh.model.mesh.getNode(int(nodeTags[i]))[0] - coord_source)**2))
+for i in range(len(cell_center)):
+    dist_source_cc = math.sqrt(np.sum((cell_center[i] - coord_source)**2))
     dist_source_cc_list.append(dist_source_cc)
-    
-#dist_source_cc = np.sum((nodecoords[nodeTags-1] - coord_source)**2, axis=1)
 source_idx = np.argmin(dist_source_cc_list)
 
 #Position of source is the centre of a cell , the closest to the actual source coordinates
@@ -445,7 +450,7 @@ gmsh.finalize()
 Vs = cell_volume[source_idx] #volume of the source = to volume of cells where the volume is 
 
 sourceon_time =  0.50 #time that the source is ON before interrupting [s]
-recording_time = 8.00 #total time recorded for the calculation [s]
+recording_time = 1.8 #total time recorded for the calculation [s]
 
 V = sum(cell_volume)
 S = total_boundArea #surface area of the room

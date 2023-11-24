@@ -146,12 +146,12 @@ alpha_average = (alpha_1*S1 + alpha_2*S2 + alpha_3*S3 + alpha_4*S4 + alpha_5*S5 
 Eq_A = alpha_1*S1 + alpha_2*S2 + alpha_3*S3 + alpha_4*S4 + alpha_5*S5 + alpha_6*S6 #equivalent absorption area of the room
 
 #Diffusion parameters
-lambda_path = (4*V)/S #mean free path for 3D
-lambda_time= lambda_path/c0 #mean free time for 3D
-lambda_time_step = int(lambda_time/dt)
-Dx = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms x direction
-Dy = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms y direction
-Dz = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms z direction
+mean_free_path = (4*V)/S #mean free path for 3D
+mean_free_time= mean_free_path/c0 #mean free time for 3D
+mean_free_time_step = int(mean_free_time/dt)
+Dx = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms x direction
+Dy = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms y direction
+Dz = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms z direction
 
 #Mesh numbers
 beta_zero_x = (2*Dx*dt)/(dx**2) #mesh number in x direction
@@ -399,19 +399,19 @@ for steps in range(0, recording_steps):
         #print("Steps for source:",steps)
         w_t0 = w_new
 
-    if steps == round(1*lambda_time_step + sourceon_steps + (dist_sr/c0)):
+    if steps == round(1*mean_free_time_step + sourceon_steps + (dist_sr/c0)):
         index_1l = steps
         w_1l = w_new
         
-    if steps == round(2*lambda_time_step + sourceon_steps + (dist_sr/c0)):
+    if steps == round(2*mean_free_time_step + sourceon_steps + (dist_sr/c0)):
         index_2l = steps
         w_2l = w_new
         
-    if steps == round(3*lambda_time_step + sourceon_steps + (dist_sr/c0)):
+    if steps == round(3*mean_free_time_step + sourceon_steps + (dist_sr/c0)):
         index_3l = steps
         w_3l = w_new
 
-    if steps == round(5*lambda_time_step + sourceon_steps + (dist_sr/c0)):
+    if steps == round(5*mean_free_time_step + sourceon_steps + (dist_sr/c0)):
         index_5l = steps
         w_5l = w_new
         
@@ -636,7 +636,7 @@ if tcalc == "decay":
     
     #Figure 8: Schroeder decay
     plt.figure(8)
-    plt.plot(t,sch_db)
+    plt.plot(t[idx_w_rec:],sch_db)
     plt.title("Figure 8: Schroeder decay (Energy Decay Curve)")
     plt.xlabel("t [s]")
     plt.ylabel("Energy decay [dB]")
@@ -695,58 +695,58 @@ if tcalc == "decay":
     plt.ylabel('$\mathrm{SPL \ [dB]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
        
-    #Figure 15: Energy density at t=1*lambda over the space x.
+    #Figure 15: Energy density at t=1*mean_free over the space x.
     plt.figure(15)
-    plt.title("Figure 15: Energy density over the x axis at t=1*lambda_time")
+    plt.title("Figure 15: Energy density over the x axis at t=1*mean_free_time")
     plt.plot(x,w_rec_x_1l)
     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
     
-    #Figure 16: SPL at  t=1*lambda over the space x. reverb sound only
+    #Figure 16: SPL at  t=1*mean_free over the space x. reverb sound only
     plt.figure(16)
-    plt.title("Figure 16: SPL REVERB over the x axis at t=1*lambda")
+    plt.title("Figure 16: SPL REVERB over the x axis at t=1*mean_free")
     plt.plot(x,spl_rec_x_1l)
     plt.ylabel('$\mathrm{SPL \ [dB]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')    
     
-    #Figure 17: Energy density at t=2*lambda over the space x.
+    #Figure 17: Energy density at t=2*mean_free over the space x.
     plt.figure(17)
-    plt.title("Figure 17: Energy density over the x axis at t=2*lambda_time")
+    plt.title("Figure 17: Energy density over the x axis at t=2*mean_free_time")
     plt.plot(x,w_rec_x_2l)
     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
     
-    #Figure 18: SPL at  t=2*lambda over the space x. reverb sound only
+    #Figure 18: SPL at  t=2*mean_free over the space x. reverb sound only
     plt.figure(18)
-    plt.title("Figure 18: SPL REVERB over the x axis at t=2*lambda")
+    plt.title("Figure 18: SPL REVERB over the x axis at t=2*mean_free")
     plt.plot(x,spl_rec_x_2l)
     plt.ylabel('$\mathrm{SPL \ [dB]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')      
     
-    #Figure 19: Energy density at t=3*lambda over the space x.
+    #Figure 19: Energy density at t=3*mean_free over the space x.
     plt.figure(19)
-    plt.title("Figure 19: Energy density over the x axis at t=3*lambda_time")
+    plt.title("Figure 19: Energy density over the x axis at t=3*mean_free_time")
     plt.plot(x,w_rec_x_3l)
     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
     
-    #Figure 20: SPL at  t=3*lambda over the space x. reverb sound only
+    #Figure 20: SPL at  t=3*mean_free over the space x. reverb sound only
     plt.figure(20)
-    plt.title("Figure 20: SPL REVERB over the x axis at t=3*lambda")
+    plt.title("Figure 20: SPL REVERB over the x axis at t=3*mean_free")
     plt.plot(x,spl_rec_x_3l)
     plt.ylabel('$\mathrm{SPL \ [dB]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
     
-    #Figure 21: Energy density at t=5*lambda over the space x.
+    #Figure 21: Energy density at t=5*mean_free over the space x.
     plt.figure(21)
-    plt.title("Figure 21: Energy density over the x axis at t=5*lambda_time")
+    plt.title("Figure 21: Energy density over the x axis at t=5*mean_free_time")
     plt.plot(x,w_rec_x_5l)
     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
     
-    #Figure 22: SPL at  t=5*lambda over the space x. reverb sound only
+    #Figure 22: SPL at  t=5*mean_free over the space x. reverb sound only
     plt.figure(22)
-    plt.title("Figure 22: SPL REVERB over the x axis at t=5*lambda")
+    plt.title("Figure 22: SPL REVERB over the x axis at t=5*mean_free")
     plt.plot(x,spl_rec_x_5l)
     plt.ylabel('$\mathrm{SPL \ [dB]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
@@ -837,3 +837,12 @@ np.save('spl_rec_x_5l',spl_rec_x_5l)
 np.save('w_rec_x',w_rec_x_end)
 np.save('w_rec_y',w_rec_y_end)
 np.save('D0',Dx)
+
+# Collect all variables in the workspace using locals()
+FDM_8x8x8_S444_R222_AM0_alpha016_dx05 = {name: value for name, value in locals().items()}
+
+import pickle
+import dill
+# Save the dictionary to a file using pickle
+with open('FDM_8x8x8_S444_R222_AM0_alpha016_dx05.pkl', 'wb') as f:
+    dill.dump(FDM_8x8x8_S444_R222_AM0_alpha016_dx05, f)

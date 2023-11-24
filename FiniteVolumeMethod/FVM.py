@@ -66,13 +66,23 @@ th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):"))
 #Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
 tcalc = "decay"
 
+#Set initial condition - Source Info (interrupted method)
+Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
+sourceon_time =  0.50 #time that the source is ON before interrupting [s]
+recording_time = 8.00 #total time recorded for the calculation [s]
 
+# Frequency resolution
+fcLow = 125
+fcHigh = 2000
+nthOctave = 1
+
+nBands = nthOctave * log(fcHigh/fcLow) / log(2) + 1
 #%%
 ###############################################################################
 #INITIALISE GMSH
 ###############################################################################
     
-file_name = "10x10x10.msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "8x8x8.msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 
@@ -428,10 +438,10 @@ source_idx = np.argmin(dist_source_cc_list)
 gmsh.finalize()
 
 #%%
+###############################################################################
+#CALCULATION SECTION
+###############################################################################
 
-#Set initial condition - Source Info (interrupted method)
-Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
-#Vs = 4.857643119512416
 Vs = cell_volume[source_idx] #volume of the source = to volume of cells where the volume is 
 
 sourceon_time =  0.50 #time that the source is ON before interrupting [s]
@@ -476,12 +486,12 @@ for entity in surface_areas:
 alpha_average = sum_alpha_average/S #average absorption
 
 #Diffusion parameters
-lambda_path = (4*V)/S #mean free path for 3D
-lambda_time= lambda_path/c0 #mean free time for 3D
-lambda_time_step = int(lambda_time/dt)
-Dx = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms x direction
-Dy = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms y direction
-Dz = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms z direction
+mean_free_path = (4*V)/S #mean free path for 3D
+mean_free_time= mean_free_path/c0 #mean free time for 3D
+mean_free_time_step = int(mean_free_time/dt)
+Dx = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms x direction
+Dy = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms y direction
+Dz = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms z direction
 
 beta_zero = np.divide((dt*(np.multiply(Dx,interior_sum) + boundaryV)),cell_volume) #my interpretation of the beta_zero
 
@@ -534,16 +544,16 @@ for steps in range(0, recording_steps):
         #print("Steps for source:",steps)
         w_t0 = w_new
 
-    if steps == round(1*lambda_time_step + sourceon_steps + (dist_sr/c0)):
+    if steps == round(1*mean_free_time_step + sourceon_steps + (dist_sr/c0)):
         w_1l = w_new
         
-    if steps == round(2*lambda_time_step + sourceon_steps + (dist_sr/c0)):
+    if steps == round(2*mean_free_time_step + sourceon_steps + (dist_sr/c0)):
         w_2l = w_new
         
-    if steps == round(3*lambda_time_step + sourceon_steps + (dist_sr/c0)):
+    if steps == round(3*mean_free_time_step + sourceon_steps + (dist_sr/c0)):
         w_3l = w_new
 
-    if steps == round(5*lambda_time_step + sourceon_steps + (dist_sr/c0)):
+    if steps == round(5*mean_free_time_step + sourceon_steps + (dist_sr/c0)):
         w_5l = w_new
     
     if tcalc == "decay":

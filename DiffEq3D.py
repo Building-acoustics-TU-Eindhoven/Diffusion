@@ -39,50 +39,50 @@ st = time.time() #start time of calculation
 
 #General settings
 c0= 343 #adiabatic speed of sound [m.s^-1]
-m_atm = 1.202* (10**(-3)) #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
+m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
 #Room dimensions
-length = 3.94 #point x finish at the length of the room in the x direction [m] %Length
-width = 5.36 #point y finish at the length of the room in the y direction [m] %Width
-height = 2.71 #point z finish at the length of the room in the x direction [m] %Height
+length = 30 #point x finish at the length of the room in the x direction [m] %Length
+width = 8 #point y finish at the length of the room in the y direction [m] %Width
+height = 3 #point z finish at the length of the room in the x direction [m] %Height
 
 # Source position
-x_source = 1.1  #position of the source in the x direction [m]
-y_source = 1.97  #position of the source in the y direction [m]
-z_source = 1.72  #position of the source in the z direction [m]
+x_source = 2.0  #position of the source in the x direction [m]
+y_source = 4.0  #position of the source in the y direction [m]
+z_source = 2.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 3.25 #position of the receiver in the x direction [m]
-y_rec = 1.97 #position of the receiver in the y direction [m]
-z_rec = 0.90 #position of the receiver in the z direction [m]
+x_rec = 3.0 #position of the receiver in the x direction [m]
+y_rec = 4.0 #position of the receiver in the y direction [m]
+z_rec = 1.5 #position of the receiver in the z direction [m]
 
 #Spatial discretization
-dx = 0.10 #distance between grid points x direction [m] #See Documentation for more insight about dt and dx
+dx = 0.50 #distance between grid points x direction [m] #See Documentation for more insight about dt and dx
 dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
 #Time discretization
-dt = 10**(-5) #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
+dt = 1/16000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
 
 #Absorption term and Absorption coefficients
-th = 1 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
+th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
-alpha_1 = 0.01 #Absorption coefficient for Surface1 - Floor
-alpha_2 = 0.17 #Absorption coefficient for Surface2 - Ceiling
-alpha_3 = 0.02 #Absorption coefficient for Surface3 - Wall Front
-alpha_4 = 0.02 #Absorption coefficient for Surface4 - Wall Back
-alpha_5 = 0.02 #Absorption coefficient for Surface5 - Wall Left
-alpha_6 = 0.02 #Absorption coefficient for Surface6 - Wall Right
+alpha_1 = 0.2 #Absorption coefficient for Surface1 - Floor
+alpha_2 = 0.2 #Absorption coefficient for Surface2 - Ceiling
+alpha_3 = 0.2 #Absorption coefficient for Surface3 - Wall Front
+alpha_4 = 0.8 #Absorption coefficient for Surface4 - Wall Back
+alpha_5 = 0.2 #Absorption coefficient for Surface5 - Wall Left
+alpha_6 = 0.2 #Absorption coefficient for Surface6 - Wall Right
 
 #Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
 #Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
-tcalc = "decay"
+tcalc = "stationarysource"
 
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
-sourceon_time =  0.5 #time that the source is ON before interrupting [s]
-recording_time = 3 #total time recorded for the calculation [s]
+sourceon_time =  2 #time that the source is ON before interrupting [s]
+recording_time = 4 #total time recorded for the calculation [s]
 
 #%%
 ###############################################################################
@@ -232,58 +232,58 @@ weight_dep_lr_r = 1 - weight_dep_up_r #weight z lower
 dist_sr = math.sqrt((abs(x_rec - x_source))**2 + (abs(y_rec - y_source))**2 + (abs(z_rec - z_source))**2) #distance between source and receiver
 
 #distance between source and each mesh point in the x direction 
-dist_x = np.sqrt((((xx[:, col_lr_s, dep_lr_s]*(weight_row_lr_s * weight_col_lr_s * weight_dep_lr_s))+\
-    (xx[:, col_lr_s, dep_up_s]*(weight_row_lr_s * weight_col_lr_s * weight_dep_up_s))+\
-        (xx[:, col_up_s, dep_lr_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_lr_s))+\
-            (xx[:, col_up_s, dep_up_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_up_s))+\
-                (xx[:, col_lr_s, dep_lr_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_lr_s))+\
-                    (xx[:, col_lr_s, dep_up_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_up_s))+\
-                        (xx[:, col_up_s, dep_lr_s]*(weight_row_up_s * weight_col_up_s * weight_dep_lr_s))+\
-                            (xx[:, col_up_s, dep_up_s]*(weight_row_up_s * weight_col_up_s * weight_dep_up_s))) - x_source)**2 +\
-                 (((yy[row_lr_s, col_lr_s, dep_lr_s]*(weight_row_lr_s * weight_col_lr_s* weight_dep_lr_s))+\
-                     (yy[row_lr_s, col_lr_s, dep_up_s]*(weight_row_lr_s * weight_col_lr_s * weight_dep_up_s))+\
-                         (yy[row_lr_s, col_up_s, dep_lr_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_lr_s))+\
-                             (yy[row_lr_s, col_up_s, dep_up_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_up_s))+\
-                                 (yy[row_up_s, col_lr_s, dep_lr_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_lr_s))+\
-                                     (yy[row_up_s, col_lr_s, dep_up_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_up_s))+\
-                                         (yy[row_up_s, col_up_s, dep_lr_s]*(weight_row_up_s * weight_col_up_s * weight_dep_lr_s))+\
-                                             (yy[row_up_s, col_up_s, dep_up_s]*(weight_row_up_s * weight_col_up_s * weight_dep_up_s))) - y_source)**2 +\
-                     (((zz[row_lr_s, col_lr_s, dep_lr_s]*(weight_row_lr_s * weight_col_lr_s * weight_dep_lr_s))+\
-                         (zz[row_lr_s, col_lr_s, dep_up_s]*(weight_row_lr_s * weight_col_lr_s * weight_dep_up_s))+\
-                             (zz[row_lr_s, col_up_s, dep_lr_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_lr_s))+\
-                                 (zz[row_lr_s, col_up_s, dep_up_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_up_s))+\
-                                     (zz[row_up_s, col_lr_s, dep_lr_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_lr_s))+\
-                                         (zz[row_up_s, col_lr_s, dep_up_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_up_s))+\
-                                             (zz[row_up_s, col_up_s, dep_lr_s]*(weight_row_up_s * weight_col_up_s * weight_dep_lr_s))+\
-                                                 (zz[row_up_s, col_up_s, dep_up_s]*(weight_row_up_s * weight_col_up_s * weight_dep_up_s))) - z_source)**2)
+dist_x = np.sqrt((((xx[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
+    (xx[:, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
+        (xx[:, col_up_r, dep_lr_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_lr_r))+\
+            (xx[:, col_up_r, dep_up_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_up_r))+\
+                (xx[:, col_lr_r, dep_lr_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_lr_r))+\
+                    (xx[:, col_lr_r, dep_up_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_up_r))+\
+                        (xx[:, col_up_r, dep_lr_r]*(weight_row_up_r * weight_col_up_r * weight_dep_lr_r))+\
+                            (xx[:, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r))) - x_source)**2 +\
+                 (((yy[row_lr_r, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r* weight_dep_lr_r))+\
+                     (yy[row_lr_r, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
+                         (yy[row_lr_r, col_up_r, dep_lr_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_lr_r))+\
+                             (yy[row_lr_r, col_up_r, dep_up_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_up_r))+\
+                                 (yy[row_up_r, col_lr_r, dep_lr_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_lr_r))+\
+                                     (yy[row_up_r, col_lr_r, dep_up_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_up_r))+\
+                                         (yy[row_up_r, col_up_r, dep_lr_r]*(weight_row_up_r * weight_col_up_r * weight_dep_lr_r))+\
+                                             (yy[row_up_r, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r))) - y_source)**2 +\
+                     (((zz[row_lr_r, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
+                         (zz[row_lr_r, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
+                             (zz[row_lr_r, col_up_r, dep_lr_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_lr_r))+\
+                                 (zz[row_lr_r, col_up_r, dep_up_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_up_r))+\
+                                     (zz[row_up_r, col_lr_r, dep_lr_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_lr_r))+\
+                                         (zz[row_up_r, col_lr_r, dep_up_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_up_r))+\
+                                             (zz[row_up_r, col_up_r, dep_lr_r]*(weight_row_up_r * weight_col_up_r * weight_dep_lr_r))+\
+                                                 (zz[row_up_r, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r))) - z_source)**2)
 
 
+#distance between source and each mesh point in the y direction  
+dist_y = np.sqrt((((xx[row_lr_r, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
+    (xx[row_lr_r, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
+        (xx[row_lr_r, col_up_r, dep_lr_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_lr_r))+\
+            (xx[row_lr_r, col_up_r, dep_up_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_up_r))+\
+                (xx[row_up_r, col_lr_r, dep_lr_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_lr_r))+\
+                    (xx[row_up_r, col_lr_r, dep_up_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_up_r))+\
+                        (xx[row_up_r, col_up_r, dep_lr_r]*(weight_row_up_r * weight_col_up_r * weight_dep_lr_r))+\
+                            (xx[row_up_r, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r))) - x_source)**2 +\
+                 (((yy[row_lr_r, :, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r* weight_dep_lr_r))+\
+                     (yy[row_lr_r, :, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
+                         (yy[row_lr_r, :, dep_lr_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_lr_r))+\
+                             (yy[row_lr_r, :, dep_up_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_up_r))+\
+                                 (yy[row_up_r, :, dep_lr_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_lr_r))+\
+                                     (yy[row_up_r, :, dep_up_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_up_r))+\
+                                         (yy[row_up_r, :, dep_lr_r]*(weight_row_up_r * weight_col_up_r * weight_dep_lr_r))+\
+                                             (yy[row_up_r, :, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r))) - y_source)**2 +\
+                     (((zz[row_lr_r, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
+                         (zz[row_lr_r, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
+                             (zz[row_lr_r, col_up_r, dep_lr_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_lr_r))+\
+                                 (zz[row_lr_r, col_up_r, dep_up_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_up_r))+\
+                                     (zz[row_up_r, col_lr_r, dep_lr_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_lr_r))+\
+                                         (zz[row_up_r, col_lr_r, dep_up_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_up_r))+\
+                                             (zz[row_up_r, col_up_r, dep_lr_r]*(weight_row_up_r * weight_col_up_r * weight_dep_lr_r))+\
+                                                 (zz[row_up_r, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r))) - z_source)**2)
 
-#distance between source and each mesh point in the y direction 
-dist_y = np.sqrt((((xx[row_lr_s, col_lr_s, dep_lr_s]*(weight_row_lr_s * weight_col_lr_s * weight_dep_lr_s))+\
-    (xx[row_lr_s, col_lr_s, dep_up_s]*(weight_row_lr_s * weight_col_lr_s * weight_dep_up_s))+\
-        (xx[row_lr_s, col_up_s, dep_lr_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_lr_s))+\
-            (xx[row_lr_s, col_up_s, dep_up_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_up_s))+\
-                (xx[row_up_s, col_lr_s, dep_lr_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_lr_s))+\
-                    (xx[row_up_s, col_lr_s, dep_up_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_up_s))+\
-                        (xx[row_up_s, col_up_s, dep_lr_s]*(weight_row_up_s * weight_col_up_s * weight_dep_lr_s))+\
-                            (xx[row_up_s, col_up_s, dep_up_s]*(weight_row_up_s * weight_col_up_s * weight_dep_up_s))) - x_source)**2 +\
-                 (((yy[row_lr_s, :, dep_lr_s]*(weight_row_lr_s * weight_col_lr_s* weight_dep_lr_s))+\
-                     (yy[row_lr_s, :, dep_up_s]*(weight_row_lr_s * weight_col_lr_s * weight_dep_up_s))+\
-                         (yy[row_lr_s, :, dep_lr_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_lr_s))+\
-                             (yy[row_lr_s, :, dep_up_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_up_s))+\
-                                 (yy[row_up_s, :, dep_lr_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_lr_s))+\
-                                     (yy[row_up_s, :, dep_up_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_up_s))+\
-                                         (yy[row_up_s, :, dep_lr_s]*(weight_row_up_s * weight_col_up_s * weight_dep_lr_s))+\
-                                             (yy[row_up_s, :, dep_up_s]*(weight_row_up_s * weight_col_up_s * weight_dep_up_s))) - y_source)**2 +\
-                     (((zz[row_lr_s, col_lr_s, dep_lr_s]*(weight_row_lr_s * weight_col_lr_s * weight_dep_lr_s))+\
-                         (zz[row_lr_s, col_lr_s, dep_up_s]*(weight_row_lr_s * weight_col_lr_s * weight_dep_up_s))+\
-                             (zz[row_lr_s, col_up_s, dep_lr_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_lr_s))+\
-                                 (zz[row_lr_s, col_up_s, dep_up_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_up_s))+\
-                                     (zz[row_up_s, col_lr_s, dep_lr_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_lr_s))+\
-                                         (zz[row_up_s, col_lr_s, dep_up_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_up_s))+\
-                                             (zz[row_up_s, col_up_s, dep_lr_s]*(weight_row_up_s * weight_col_up_s * weight_dep_lr_s))+\
-                                                 (zz[row_up_s, col_up_s, dep_up_s]*(weight_row_up_s * weight_col_up_s * weight_dep_up_s))) - z_source)**2)
 
 #Function to draw figure
 ##def draw_fig():

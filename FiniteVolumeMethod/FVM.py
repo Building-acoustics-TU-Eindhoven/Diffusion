@@ -43,46 +43,50 @@ st = time.time() #start time of calculation
 
 #General settings
 c0= 343 #adiabatic speed of sound [m.s^-1]
-m_atm = 1.202* (10**(-3)) #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
+m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
-dt = 10**(-5) #time discretizatione
+dt = 1/16000 #time discretizatione
 
 # Source position
-x_source = 1.1  #position of the source in the x direction [m]
-y_source = 1.97  #position of the source in the y direction [m]
-z_source = 1.72  #position of the source in the z direction [m]
+x_source = 2.0  #position of the source in the x direction [m]
+y_source = 4.0  #position of the source in the y direction [m]
+z_source = 2.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 3.25 #position of the receiver in the x direction [m]
-y_rec = 1.97 #position of the receiver in the y direction [m]
-z_rec = 0.90 #position of the receiver in the z direction [m]
+x_rec = 3.0 #position of the receiver in the x direction [m]
+y_rec = 4.0 #position of the receiver in the y direction [m]
+z_rec = 1.5 #position of the receiver in the z direction [m]
 
 #Absorption term and Absorption coefficients
-th = 1 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
+th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
 
 #Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
 #Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
-tcalc = "decay"
+tcalc = "stationarysource"
 
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
-sourceon_time =  0.50 #time that the source is ON before interrupting [s]
-recording_time = 3.00 #total time recorded for the calculation [s]
+sourceon_time =  2 #time that the source is ON before interrupting [s]
+recording_time = 4 #total time recorded for the calculation [s]
 
 # Frequency resolution
-fcLow = 125
-fcHigh = 2000
-nthOctave = 1
+fc_low = 125
+fc_high = 2000
+nth_octave = 1
 
-nBands = nthOctave * log(fcHigh/fcLow) / log(2) + 1
+x_frequencies  = nth_octave * log(fc_high/fc_low) / log(2)
+nBands = nth_octave * log(fc_high/fc_low) / log(2) + 1
+center_freq = fc_low * np.power(2,((np.arange(0,x_frequencies+1) / nth_octave)))
+
+
 #%%
 ###############################################################################
 #INITIALISE GMSH
 ###############################################################################
     
-file_name = "3.94x5.36x2.72.msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "30x8x3.msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 
@@ -271,6 +275,7 @@ surface_absorption = [] #initialization absorption term (alpha*surfaceofwall) fo
 triangle_face_absorption = [] #initialization absorption term for each triangle face at the boundary and per each wall
 absorption_coefficient = {}
 
+
 for group in vGroupsNames:
     if group[0] != 2:
         continue
@@ -278,11 +283,11 @@ for group in vGroupsNames:
     name_split = name_group.split("$")
     name_abs_coeff = name_split[0]
     abscoeff = name_split[1].split(",")
-    abscoeff = [float(i) for i in abscoeff][-1]
+    abscoeff = [float(i) for i in abscoeff][-1] #for one frequency   
     
     physical_tag = group[1] #Get the physical group tag
     entities = gmsh.model.getEntitiesForPhysicalGroup(2, physical_tag) #Retrieve all the entities in this physical group (the entities are the number of walls in the physical group)
-    #abscoeff = float(input(f"Enter absorption coefficient input for {group[2]}:")) #input the absorption coefficient
+
     Abs_term = abs_term(th, abscoeff) #calculates the absorption term based on the type of boundary condition th
     for entity in entities:
         absorption_coefficient[entity] = abscoeff
@@ -436,28 +441,52 @@ for i in range(len(cell_center)):
     dist_source_cc_list.append(dist_source_cc)
 source_idx = np.argmin(dist_source_cc_list)
 
-#Position of source is the centre of a cell , the closest to the actual source coordinates
-#dist_source_cc = np.sum((cell_center - coord_source)**2, axis=1)
-#source_idx = np.argmin(dist_source_cc)
+###############Calculation of length of room#######################
+# Extract x-coordinates of all nodes
+x_coordinates = nodecoords[:, 0]
+
+# Find the minimum and maximum x-coordinates to determine the length of the room
+min_x = np.min(x_coordinates)
+max_x = np.max(x_coordinates)
+
+# Calculate the length of the room
+room_length = max_x - min_x
+
+dx = 0.5
+x_axis = np.arange(0,room_length+dx,dx); #lispace on x_axis with distance dx
+
+#####################Calculation of receivers in a line####################
+line_rec_x_idx_list = []
+dist_x = np.array([])
+for x_chang in x_axis:
+    line_rec = [x_chang, y_rec, z_rec]
+    #Position of line_receiver is the centre of a cell
+    dist_line_rec_x =  math.sqrt((abs(line_rec[0] - x_source))**2 + (abs(line_rec[1] - y_source))**2 + (abs(line_rec[2] - z_source))**2) #distance between source and line_receiver
+    dist_x = np.append(dist_x, dist_line_rec_x)  # Append to the NumPy array
+    dist_line_rec_cc_list = []
+    for i in range(len(cell_center)):
+        dist_line_rec_cc = math.sqrt(np.sum((cell_center[i] - line_rec)**2))
+        dist_line_rec_cc_list.append(dist_line_rec_cc)
+    line_rec_idx = np.argmin(dist_line_rec_cc_list)
+    line_rec_x_idx_list.append(line_rec_idx)   
+
+
+
+
+
+#def interpolate_receiver_position(interior, cell_centers, receiver_position):
+#    distances = np.sqrt(np.sum((cell_centers - receiver_position)**2, axis=1))
+#    weights = interior[rec_idx, :] / distances  # Use the row corresponding to the receiver index
+#    interpolated_position = np.dot(weights, cell_centers) / np.sum(weights)
+#    return interpolated_position
+
+#interpolated_receiver_position = interpolate_receiver_position(interior, cell_center, coord_rec)
+
+#dist_sr_interpolated = np.linalg.norm(interpolated_receiver_position - coord_source)
+
+
 
 gmsh.finalize()
-
-#%%
-###############################################################################
-#CALCULATION SECTION
-###############################################################################
-
-Vs = cell_volume[source_idx] #volume of the source = to volume of cells where the volume is 
-
-V = sum(cell_volume)
-S = total_boundArea #surface area of the room
-
-# Frequency resolution
-fcLow = 125
-fcHigh = 2000
-nthOctave = 1
-
-nBands = nthOctave * log(fcHigh/fcLow) / log(2) + 1
 
 #%%
 ###############################################################################
@@ -467,6 +496,12 @@ nBands = nthOctave * log(fcHigh/fcLow) / log(2) + 1
 #Fixed inputs
 pRef = 2 * (10**-5) #Reference pressure in Pa
 rho = 1.21 #air density [kg.m^-3] at 20°C
+
+Vs = cell_volume[source_idx] #volume of the source = to volume of cells where the volume is 
+
+V = sum(cell_volume)
+S = total_boundArea #surface area of the room
+
 
 #Time resolution
 t = np.arange(0, recording_time, dt) #mesh point in time
@@ -511,6 +546,8 @@ s[source_idx] = source1[0]
 #    thisBandNo = iBand;
 #    thisFc = centerFrequencies(iBand);
 
+
+#w_rec_x_end = np.zeros(1, len(x_axis))
 
 
 
@@ -575,6 +612,14 @@ plt.show()
 ###############################################################################
 #RESULTS
 ###############################################################################
+w_rec_x_end = np.array([])
+for xr in line_rec_x_idx_list:
+    w_rec_x = w_new[xr]
+    w_rec_x_end = np.append(w_rec_x_end, w_rec_x)
+
+spl_stat_x = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_x**2))) + ((abs(w_rec_x_end)*c0)))/(pRef**2))
+#spl_stat_y = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_y**2))) + ((abs(w_rec_y)*c0)))/(pRef**2)) #It should be the spl stationary
+
 
 press_r = ((abs(w_rec))*rho*(c0**2)) #pressure at the receiver
 spl_r = 10*np.log10(((abs(w_rec))*rho*(c0**2))/(pRef**2)) #,where=press_r>0, sound pressure level at the receiver
@@ -681,6 +726,40 @@ if tcalc == "stationarysource":
     plt.plot(t,w_rec)
     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
     plt.xlabel("t [s]")
+    
+    #Figure 6: Sound pressure level stationary over the space y.
+    #plt.figure(6)
+    #t_dim = len(t)
+    #last_time_index = t_dim-1
+    #spl_y = spl_stat[rows_r,:,dept_r]
+    #spl_y = spl_stat_y
+    #data_y = spl_y
+    #plt.title("Figure 6: SPL over the y axis")
+    #plt.plot(y,data_y)
+    #plt.xticks(np.arange(0, 20, 5))
+    #plt.yticks(np.arange(75, 105, 5))
+    #plt.ylabel('$\mathrm{Sound \ Pressure\ Level \ [dB]}$')
+    #plt.xlabel('$\mathrm{Distance \ along \ y \ axis \ [m]}$')
+    
+    #Figure 7: Sound pressure level stationary over the space x.
+    plt.figure(7)
+    t_dim = len(t)
+    last_time_index = t_dim-1
+    spl_x = spl_stat_x
+    data_x = spl_x
+    plt.title("Figure 7: SPL over the x axis")
+    plt.plot(x_axis,data_x)
+    #plt.xticks(np.arange(0, 35, 5))
+    #plt.yticks(np.arange(65, 105, 5))
+    plt.ylabel('$\mathrm{Sound \ Pressure \ Level \ [dB]}$')
+    plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')
+    
+    #Figure 8: Energy density at t=recording_time over the space x.
+    plt.figure(8)
+    plt.title("Figure 8: Energy density over the x axis at t=recording_time")
+    plt.plot(x_axis,w_rec_x_end)
+    plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
+    plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')
 
 #%%
 ###############################################################################

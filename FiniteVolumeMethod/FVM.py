@@ -43,22 +43,22 @@ st = time.time() #start time of calculation
 
 #General settings
 c0= 343 #adiabatic speed of sound [m.s^-1]
-m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
+m_atm = 0.01 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
 dt = 1/16000 #time discretizatione
 
 # Source position
 x_source = 2.0  #position of the source in the x direction [m]
-y_source = 4.0  #position of the source in the y direction [m]
-z_source = 2.0  #position of the source in the z direction [m]
+y_source = 15.0  #position of the source in the y direction [m]
+z_source = 1.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 3.0 #position of the receiver in the x direction [m]
-y_rec = 4.0 #position of the receiver in the y direction [m]
-z_rec = 1.5 #position of the receiver in the z direction [m]
+x_rec = 10.0 #position of the receiver in the x direction [m]
+y_rec = 15.0 #position of the receiver in the y direction [m]
+z_rec = 1.0 #position of the receiver in the z direction [m]
 
 #Absorption term and Absorption coefficients
-th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
+th = 2 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
 
 #Type of Calculation
@@ -86,7 +86,7 @@ center_freq = fc_low * np.power(2,((np.arange(0,x_frequencies+1) / nth_octave)))
 #INITIALISE GMSH
 ###############################################################################
     
-file_name = "30x8x3.msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "30x30x3.msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 

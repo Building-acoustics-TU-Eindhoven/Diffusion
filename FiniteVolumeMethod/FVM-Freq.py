@@ -506,8 +506,10 @@ for iBand in range(nBands):
     freq = center_freq[iBand]
     beta_zero = np.array([])
     for tria in range(len(boundaryV)):
+        print(tria)
         beta_zero = np.divide((dt*(np.multiply(Dx,interior_sum) + boundaryV[tria][iBand])),cell_volume) #my interpretation of the beta_zero
-    beta_zero_freq.append(beta_zero)
+        print(beta_zero)
+        beta_zero_freq.append(beta_zero)
 
     
     

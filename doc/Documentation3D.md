@@ -36,7 +36,6 @@ The inputs are:
 - Absorption conditions term (option 1 Sabine, 2 Eyring, 3 Modified);
 - Absorption coefficient $\\alpha_i$ of each surface $$ for one frequency only;
 - Source point power $W_s$ in Watts;
-- Volume of the source $V_s$ in $m^3$;
 - Source time in s (time of the source being on before interrupting).
 
 ## Theory of Diffusion Equation model

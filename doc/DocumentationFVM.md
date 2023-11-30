@@ -31,6 +31,7 @@ Libraries for python:
 The inputs are:
 - SketchUp model
 - G mesh creation
+- Length of mesh
 - Air absorption $m_\{atm\}$ in 1/m;
 - Position of the source $x_\{source\},y_\{source\},z_\{source\}$ in m in the x,y,z directions;
 - Position of the receiver $x_\{rec\},y_\{rec\},z_\{rec\}$ in m in the x,y,z directions;
@@ -39,7 +40,6 @@ The inputs are:
 - Absorption conditions term (option 1 Sabine, 2 Eyring, 3 Modified);
 - Absorption coefficient $\\alpha_i$ of each surface $$ for one frequency only;
 - Source point power $W_s$ in Watts;
-- Volume of the source $V_s$ in $m^3$;
 - Source time in s (time of the source being on before interrupting).
 
 ## Theory of Diffusion Equation model
@@ -144,5 +144,5 @@ The software is organised in four sections:
     Results of SPL and other are included in this section together with graphs for the analysis.
 
 ## References
-- R. Pagán Muñoz, "Numerical modeling for urban sound propagation: developments in wave-based and energy based methods," Technische Universiteit Eindhoven, 2019.
+- R. P. Muñoz, "Numerical modeling for urban sound propagation: developments in wave-based and energy based methods," PhD Thesis, Technische Universiteit Eindhoven, 2019.
 - Vorländer M. Auralization: fundamentals of acoustics, modelling, simulation,algorithms and acoustic virtual reality. Springer 2008

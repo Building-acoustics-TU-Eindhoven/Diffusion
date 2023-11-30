@@ -14,10 +14,12 @@ Version 1.0
 3. Open the Main files through the preferred IDE and test the software
 
 ### Repository structure
-The numerical solver of the Diffusion Equation is based on the finite differences method by Du Fort&Frankel (Navarro et al., 2012).
-It can be used for cuboid shapes. The code is developed for a 1D, 2D and 3D spaces, respectively reflected in the following Python files DiffEq1D.py, DiffEq2D.py, DiffEq3D.py.
+The solution of the Diffusion Equation is currently investigated with two different numerical methods: the Finite Different Method (FDM) by Du Fort&Frankel (Navarro et al., 2012) and the Finite VOlume Method (FVM) (Munoz, 2019). 
+The FDM can be used for cuboid shapes while the FVM can be used for any shape/geometry.
+The FDM script is developed for a 1D, 2D and 3D spaces, respectively reflected in the following Python files DiffEq1D.py, DiffEq2D.py, DiffEq3D.py.
+The FVM script is developed for 3D spaces in the Python file FVM.py. 
 
-DiffEq3D.py is the main software and it works with the following associated functions:
+For both the numerical methods, the main software works with the following associated functions:
 + FunctionRT.py calculates the reverberation time of the room in question
 + FunctionEDT.py calculates the early decay time of the room in question
 + FunctionClarity.py calculates the clarity $C_{80}$ of the room in question based on Barron's revised theory formula.
@@ -31,7 +33,7 @@ Documentation documents can be found below:
 - [Documentation 3D](https://ilariafichera.github.io/Diffusion/Documentation3D.html)
 - [Documentation FVM](https://ilariafichera.github.io/Diffusion/DocumentationFVM.html)
 
-## Sample Calculation
+## Sample Calculation FDM
 
 Test the software with the following inputs (Navarro et al., 2012):
 - Spatial discretization:             dx = 0.5 m
@@ -56,7 +58,8 @@ Test if the software provides the following results (Navarro et al., 2012):
 Software is being developed by Ilaria Fichera at Eindhoven University of Technology.
 
 ## References
-+ J. M. Navarro, J. Escolano and J. J. Lopez, Implementation and evaluation of a diffusion equation model based on finite difference schemes for sound field prediction in rooms,Appl. Acoust.73(2012) 659–665.
++ J. M. Navarro, J. Escolano and J. J. Lopez, Implementation and evaluation of a diffusion equation model based on finite difference schemes for sound field prediction in rooms, Appl. Acoust.73 (2012) 659–665.
++ R. P. Muñoz, "Numerical modeling for urban sound propagation: developments in wave-based and energy based methods," PhD Thesis, Technische Universiteit Eindhoven, 2019.
 
 ## Funding
 The project is funded by <u>[NWO](https://www.nwo.nl/projecten/19430), in the Netherlands.

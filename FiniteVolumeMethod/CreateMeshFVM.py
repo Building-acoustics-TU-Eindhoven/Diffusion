@@ -64,9 +64,9 @@ import subprocess
 #INPUT VARIABLES
 ###############################################################################
 # Specify the path to your original Geo file
-geo_file_path = '32x4x4.geo'
+geo_file_path = '6x6x6(c).geo'
 max_mesh_size = 1
-name_gmsh_file = '32x4x4.msh'
+name_gmsh_file = '6x6x6(c).msh'
 length_of_mesh = 1
 
 #%%

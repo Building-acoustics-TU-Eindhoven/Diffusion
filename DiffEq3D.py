@@ -42,17 +42,17 @@ c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
 #Room dimensions
-length = 32 #point x finish at the length of the room in the x direction [m] %Length
-width = 4 #point y finish at the length of the room in the y direction [m] %Width
-height = 4 #point z finish at the length of the room in the x direction [m] %Height
+length = 6 #point x finish at the length of the room in the x direction [m] %Length
+width = 6 #point y finish at the length of the room in the y direction [m] %Width
+height = 6 #point z finish at the length of the room in the x direction [m] %Height
 
 # Source position
-x_source = 2.0  #position of the source in the x direction [m]
-y_source = 2.0  #position of the source in the y direction [m]
-z_source = 2.0  #position of the source in the z direction [m]
+x_source = 3.0  #position of the source in the x direction [m]
+y_source = 3.0  #position of the source in the y direction [m]
+z_source = 3.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 15.0 #position of the receiver in the x direction [m]
+x_rec = 2.0 #position of the receiver in the x direction [m]
 y_rec = 2.0 #position of the receiver in the y direction [m]
 z_rec = 2.0 #position of the receiver in the z direction [m]
 
@@ -65,14 +65,14 @@ dz = dx #distance between grid points z direction [m]
 dt = 1/16000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
 
 #Absorption term and Absorption coefficients
-th = 1 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
+th = 2 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
-alpha_1 = 0.1 #Absorption coefficient for Surface1 - Floor
-alpha_2 = 0.1 #Absorption coefficient for Surface2 - Ceiling
-alpha_3 = 0.1 #Absorption coefficient for Surface3 - Wall Front
-alpha_4 = 0.1 #Absorption coefficient for Surface4 - Wall Back
-alpha_5 = 0.1 #Absorption coefficient for Surface5 - Wall Left
-alpha_6 = 0.1 #Absorption coefficient for Surface6 - Wall Right
+alpha_1 = 0.9 #Absorption coefficient for Surface1 - Floor
+alpha_2 = 0.9 #Absorption coefficient for Surface2 - Ceiling
+alpha_3 = 0.9 #Absorption coefficient for Surface3 - Wall Front
+alpha_4 = 0.9 #Absorption coefficient for Surface4 - Wall Back
+alpha_5 = 0.9 #Absorption coefficient for Surface5 - Wall Left
+alpha_6 = 0.9 #Absorption coefficient for Surface6 - Wall Right
 
 #Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 

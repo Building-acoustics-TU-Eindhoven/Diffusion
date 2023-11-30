@@ -504,24 +504,22 @@ s[source_idx] = source1[0]
 beta_zero_freq = []
 for iBand in range(nBands):
     freq = center_freq[iBand]
-    beta_zero = np.array([])
+    beta_zero_band = np.array([])
     for tria in range(len(boundaryV)):
         print(tria)
-        beta_zero = np.divide((dt*(np.multiply(Dx,interior_sum) + boundaryV[tria][iBand])),cell_volume) #my interpretation of the beta_zero
-        print(beta_zero)
-        beta_zero_freq.append(beta_zero)
+        beta_zero_element = np.divide((dt*(np.multiply(Dx,interior_sum) + boundaryV[tria][iBand])),cell_volume) #my interpretation of the beta_zero
+        #print(beta_zero)
+        #beta_zero_band = np.append(beta_zero_band, beta_zero_element)
+    beta_zero_freq.append(beta_zero_element)
 
     
     
-    #%%
-    ###############################################################################
-    #MAIN CALCULATION - COMPUTING ENERGY DENSITY
-    ############################################################################### 
+#%%
+###############################################################################
+#MAIN CALCULATION - COMPUTING ENERGY DENSITY
+############################################################################### 
     
-    #w_new_band = []
-    #for iBand in range(nBands):
-    #    thisBandNo = iBand;
-    #    thisFc = centerFrequencies(iBand);
+w_new_band = []
     
 for iBand in range(nBands):
     freq = center_freq[iBand]    
@@ -541,10 +539,10 @@ for iBand in range(nBands):
         
         #Computing w_new (w at n+1 time step)
                     
-        w_new = np.divide((np.multiply(w_old,(1-beta_zero))),(1+beta_zero)) - \
-            np.divide((2*dt*c0*m_atm*w),(1+beta_zero)) + \
-                np.divide(np.divide((2*dt*Dx*(interior@w)),cell_volume),(1+beta_zero)) + \
-                    np.divide((2*dt*s),(1+beta_zero)) #The absorption term is part of beta_zero
+        w_new = np.divide((np.multiply(w_old,(1-beta_zero_freq[iBand]))),(1+beta_zero_freq[iBand])) - \
+            np.divide((2*dt*c0*m_atm*w),(1+beta_zero_freq[iBand])) + \
+                np.divide(np.divide((2*dt*Dx*(interior@w)),cell_volume),(1+beta_zero_freq[iBand])) + \
+                    np.divide((2*dt*s),(1+beta_zero_freq[iBand])) #The absorption term is part of beta_zero
                      
         #Update w before next step
         w_old = w #The w at n step becomes the w at n-1 step
@@ -578,7 +576,7 @@ for iBand in range(nBands):
     
         print(time_steps)
 
-#w_new_band.append(w_new)
+    w_new_band.append(w_new)
 
 plt.show()
 

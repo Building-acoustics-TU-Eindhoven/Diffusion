@@ -48,13 +48,13 @@ m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro p
 dt = 1/16000 #time discretizatione
 
 # Source position
-x_source = 2.0  #position of the source in the x direction [m]
-y_source = 15.0  #position of the source in the y direction [m]
-z_source = 1.0  #position of the source in the z direction [m]
+x_source = 3.0  #position of the source in the x direction [m]
+y_source = 2.0  #position of the source in the y direction [m]
+z_source = 3.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 10.0 #position of the receiver in the x direction [m]
-y_rec = 15.0 #position of the receiver in the y direction [m]
+x_rec = 0.5 #position of the receiver in the x direction [m]
+y_rec = 0.5 #position of the receiver in the y direction [m]
 z_rec = 1.0 #position of the receiver in the z direction [m]
 
 #Absorption term and Absorption coefficients
@@ -64,12 +64,12 @@ th = 2 #int(input("Enter type Absortion conditions (option 1,2,3):"))
 #Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
 #Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
-tcalc = "decay"
+tcalc = "stationarysource"
 
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
-sourceon_time =  0.5 #time that the source is ON before interrupting [s]
-recording_time = 2.0 #total time recorded for the calculation [s]
+sourceon_time =  2.0 #time that the source is ON before interrupting [s]
+recording_time = 4.0 #total time recorded for the calculation [s]
 
 # Frequency resolution
 fc_low = 125
@@ -86,7 +86,7 @@ center_freq = fc_low * np.power(2,((np.arange(0,x_frequencies+1) / nth_octave)))
 #INITIALISE GMSH
 ###############################################################################
     
-file_name = "30x30x3(b).msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "40x4x4.msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 
@@ -452,10 +452,24 @@ max_x = np.max(x_coordinates)
 # Calculate the length of the room
 room_length = max_x - min_x
 
-dx = 0.5
-x_axis = np.arange(0,room_length+dx,dx); #lispace on x_axis with distance dx
 
-#####################Calculation of receivers in a line####################
+###############Calculation of width of room#######################
+# Extract y-coordinates of all nodes
+y_coordinates = nodecoords[:, 1]
+
+# Find the minimum and maximum x-coordinates to determine the length of the room
+min_y = np.min(y_coordinates)
+max_y = np.max(y_coordinates)
+
+# Calculate the length of the room
+room_width = max_y - min_y
+
+#Arange linespace lines
+dx = 0.5
+x_axis = np.arange(0,room_length+dx,dx) #lispace on x_axis with distance dx
+y_axis = np.arange(0,room_width+dx,dx)
+
+#####################Calculation of receivers in a x line####################
 line_rec_x_idx_list = []
 dist_x = np.array([])
 for x_chang in x_axis:
@@ -463,15 +477,28 @@ for x_chang in x_axis:
     #Position of line_receiver is the centre of a cell
     dist_line_rec_x =  math.sqrt((abs(line_rec[0] - x_source))**2 + (abs(line_rec[1] - y_source))**2 + (abs(line_rec[2] - z_source))**2) #distance between source and line_receiver
     dist_x = np.append(dist_x, dist_line_rec_x)  # Append to the NumPy array
-    dist_line_rec_cc_list = []
+    dist_line_rec_x_cc_list = []
     for i in range(len(cell_center)):
-        dist_line_rec_cc = math.sqrt(np.sum((cell_center[i] - line_rec)**2))
-        dist_line_rec_cc_list.append(dist_line_rec_cc)
-    line_rec_idx = np.argmin(dist_line_rec_cc_list)
-    line_rec_x_idx_list.append(line_rec_idx)   
+        dist_line_rec_x_cc = math.sqrt(np.sum((cell_center[i] - line_rec)**2))
+        dist_line_rec_x_cc_list.append(dist_line_rec_x_cc)
+    line_rec_x_idx = np.argmin(dist_line_rec_x_cc_list)
+    line_rec_x_idx_list.append(line_rec_x_idx)   
 
 
-
+#####################Calculation of receivers in a x line####################
+line_rec_y_idx_list = []
+dist_y = np.array([])
+for y_chang in y_axis:
+    line_rec = [x_rec, y_chang, z_rec]
+    #Position of line_receiver is the centre of a cell
+    dist_line_rec_y =  math.sqrt((abs(line_rec[0] - x_source))**2 + (abs(line_rec[1] - y_source))**2 + (abs(line_rec[2] - z_source))**2) #distance between source and line_receiver
+    dist_y = np.append(dist_y, dist_line_rec_y)  # Append to the NumPy array
+    dist_line_rec_y_cc_list = []
+    for i in range(len(cell_center)):
+        dist_line_rec_y_cc = math.sqrt(np.sum((cell_center[i] - line_rec)**2))
+        dist_line_rec_y_cc_list.append(dist_line_rec_y_cc)
+    line_rec_y_idx = np.argmin(dist_line_rec_y_cc_list)
+    line_rec_y_idx_list.append(line_rec_y_idx)  
 
 
 #def interpolate_receiver_position(interior, cell_centers, receiver_position):
@@ -616,9 +643,14 @@ w_rec_x_end = np.array([])
 for xr in line_rec_x_idx_list:
     w_rec_x = w_new[xr]
     w_rec_x_end = np.append(w_rec_x_end, w_rec_x)
+    
+w_rec_y_end = np.array([])
+for yr in line_rec_y_idx_list:
+    w_rec_y = w_new[yr]
+    w_rec_y_end = np.append(w_rec_y_end, w_rec_y)
 
 spl_stat_x = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_x**2))) + ((abs(w_rec_x_end)*c0)))/(pRef**2))
-#spl_stat_y = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_y**2))) + ((abs(w_rec_y)*c0)))/(pRef**2)) #It should be the spl stationary
+spl_stat_y = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_y**2))) + ((abs(w_rec_y_end)*c0)))/(pRef**2)) #It should be the spl stationary
 
 
 press_r = ((abs(w_rec))*rho*(c0**2)) #pressure at the receiver
@@ -728,18 +760,17 @@ if tcalc == "stationarysource":
     plt.xlabel("t [s]")
     
     #Figure 6: Sound pressure level stationary over the space y.
-    #plt.figure(6)
-    #t_dim = len(t)
-    #last_time_index = t_dim-1
-    #spl_y = spl_stat[rows_r,:,dept_r]
-    #spl_y = spl_stat_y
-    #data_y = spl_y
-    #plt.title("Figure 6: SPL over the y axis")
-    #plt.plot(y,data_y)
-    #plt.xticks(np.arange(0, 20, 5))
-    #plt.yticks(np.arange(75, 105, 5))
-    #plt.ylabel('$\mathrm{Sound \ Pressure\ Level \ [dB]}$')
-    #plt.xlabel('$\mathrm{Distance \ along \ y \ axis \ [m]}$')
+    plt.figure(6)
+    t_dim = len(t)
+    last_time_index = t_dim-1
+    spl_y = spl_stat_y
+    data_y = spl_y
+    plt.title("Figure 6: SPL over the y axis")
+    plt.plot(y_axis,data_y)
+    plt.xticks(np.arange(0, 20, 5))
+    plt.yticks(np.arange(75, 105, 5))
+    plt.ylabel('$\mathrm{Sound \ Pressure\ Level \ [dB]}$')
+    plt.xlabel('$\mathrm{Distance \ along \ y \ axis \ [m]}$')
     
     #Figure 7: Sound pressure level stationary over the space x.
     plt.figure(7)
@@ -750,7 +781,7 @@ if tcalc == "stationarysource":
     plt.title("Figure 7: SPL over the x axis")
     plt.plot(x_axis,data_x)
     #plt.xticks(np.arange(0, 35, 5))
-    #plt.yticks(np.arange(65, 105, 5))
+    plt.yticks(np.arange(90, 97, 1))
     plt.ylabel('$\mathrm{Sound \ Pressure \ Level \ [dB]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')
     

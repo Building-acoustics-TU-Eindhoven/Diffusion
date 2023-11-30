@@ -42,18 +42,18 @@ c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
 #Room dimensions
-length = 30 #point x finish at the length of the room in the x direction [m] %Length
-width = 30 #point y finish at the length of the room in the y direction [m] %Width
-height = 3 #point z finish at the length of the room in the x direction [m] %Height
+length = 40 #point x finish at the length of the room in the x direction [m] %Length
+width = 4 #point y finish at the length of the room in the y direction [m] %Width
+height = 4 #point z finish at the length of the room in the x direction [m] %Height
 
 # Source position
-x_source = 2.0  #position of the source in the x direction [m]
-y_source = 15.0  #position of the source in the y direction [m]
-z_source = 1.0  #position of the source in the z direction [m]
+x_source = 3.0  #position of the source in the x direction [m]
+y_source = 2.0  #position of the source in the y direction [m]
+z_source = 3.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 10.0 #position of the receiver in the x direction [m]
-y_rec = 15.0 #position of the receiver in the y direction [m]
+x_rec = 0.5 #position of the receiver in the x direction [m]
+y_rec = 0.5 #position of the receiver in the y direction [m]
 z_rec = 1.0 #position of the receiver in the z direction [m]
 
 #Spatial discretization
@@ -67,22 +67,22 @@ dt = 1/16000 #distance between grid points on the time discretization [s] #See D
 #Absorption term and Absorption coefficients
 th = 2 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
-alpha_1 = 0.3 #Absorption coefficient for Surface1 - Floor
-alpha_2 = 0.3 #Absorption coefficient for Surface2 - Ceiling
-alpha_3 = 0.3 #Absorption coefficient for Surface3 - Wall Front
-alpha_4 = 0.3 #Absorption coefficient for Surface4 - Wall Back
-alpha_5 = 0.3 #Absorption coefficient for Surface5 - Wall Left
-alpha_6 = 0.3 #Absorption coefficient for Surface6 - Wall Right
+alpha_1 = 0.9 #Absorption coefficient for Surface1 - Floor
+alpha_2 = 0.9 #Absorption coefficient for Surface2 - Ceiling
+alpha_3 = 0.9 #Absorption coefficient for Surface3 - Wall Front
+alpha_4 = 0.4 #Absorption coefficient for Surface4 - Wall Back
+alpha_5 = 0.9 #Absorption coefficient for Surface5 - Wall Left
+alpha_6 = 0.9 #Absorption coefficient for Surface6 - Wall Right
 
 #Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
 #Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
-tcalc = "decay"
+tcalc = "stationarysource"
 
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
-sourceon_time =  0.5 #time that the source is ON before interrupting [s]
-recording_time = 2.0 #total time recorded for the calculation [s]
+sourceon_time =  2.0 #time that the source is ON before interrupting [s]
+recording_time = 4.0 #total time recorded for the calculation [s]
 
 #%%
 ###############################################################################
@@ -805,7 +805,7 @@ if tcalc == "stationarysource":
     plt.title("Figure 7: SPL over the x axis")
     plt.plot(x,data_x)
     #plt.xticks(np.arange(0, 35, 5))
-    #plt.yticks(np.arange(65, 105, 5))
+    #plt.yticks(np.arange(90, 97, 1))
     plt.ylabel('$\mathrm{Sound \ Pressure \ Level \ [dB]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')
     

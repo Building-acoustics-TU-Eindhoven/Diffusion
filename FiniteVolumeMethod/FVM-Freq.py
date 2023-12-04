@@ -520,6 +520,7 @@ for iBand in range(nBands):
 ############################################################################### 
     
 w_new_band = []
+w_rec_band = []
     
 for iBand in range(nBands):
     freq = center_freq[iBand]    
@@ -577,6 +578,7 @@ for iBand in range(nBands):
         print(time_steps)
 
     w_new_band.append(w_new)
+    w_rec_band.append(w_rec)
 
 plt.show()
 

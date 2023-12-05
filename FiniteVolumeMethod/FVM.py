@@ -43,33 +43,33 @@ st = time.time() #start time of calculation
 
 #General settings
 c0= 343 #adiabatic speed of sound [m.s^-1]
-m_atm = 0.01 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
+m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
 dt = 1/16000 #time discretizatione
 
 # Source position
-x_source = 2.0  #position of the source in the x direction [m]
-y_source = 1.0  #position of the source in the y direction [m]
-z_source = 1.0  #position of the source in the z direction [m]
+x_source = 4.0  #position of the source in the x direction [m]
+y_source = 4.0  #position of the source in the y direction [m]
+z_source = 4.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 10.0 #position of the receiver in the x direction [m]
-y_rec = 1.0 #position of the receiver in the y direction [m]
-z_rec = 1.0 #position of the receiver in the z direction [m]
+x_rec = 2.0 #position of the receiver in the x direction [m]
+y_rec = 2.0 #position of the receiver in the y direction [m]
+z_rec = 2.0 #position of the receiver in the z direction [m]
 
 #Absorption term and Absorption coefficients
-th = 2 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
+th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
 
 #Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
 #Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
-tcalc = "stationarysource"
+tcalc = "decay"
 
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
-sourceon_time =  2.0 #time that the source is ON before interrupting [s]
-recording_time = 4.0 #total time recorded for the calculation [s]
+sourceon_time =  0.5 #time that the source is ON before interrupting [s]
+recording_time = 1.8 #total time recorded for the calculation [s]
 
 # Frequency resolution
 fc_low = 125
@@ -86,7 +86,7 @@ center_freq = fc_low * np.power(2,((np.arange(0,x_frequencies+1) / nth_octave)))
 #INITIALISE GMSH
 ###############################################################################
     
-file_name = "30x2x2.msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "8x8x8.msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 
@@ -382,7 +382,7 @@ from itertools import combinations
 
 def boundaryV_function():
     total_boundArea = 0 #initialization of total surface area of the room
-    boundaryV = []  #Initialize a list to store boundaryV values for each tetrahedron
+    boundaryV = np.array([])  #Initialize a list to store boundaryV values for each tetrahedron
     #import itertools
     face_areas = np.zeros(len(velemNodes)) #Per each tetrahedron, if there is a face that is on the boundary, include the area, otehrwise zero
     for idx, element in enumerate(velemNodes): #for index and element in the number of tetrahedrons
@@ -424,7 +424,7 @@ def boundaryV_function():
                                 
                                 total_tetrahedron_boundaryV = tetrahedron_boundaryV #if there are multiple surfaces on the boundary per each tetrahedron, then add also the second and the third one
                                 
-            boundaryV.append(total_tetrahedron_boundaryV) #Append the total boundaryV for the tetrahedron to the list
+            boundaryV = np. append(boundaryV,total_tetrahedron_boundaryV) #Append the total boundaryV for the tetrahedron to the list
             print(total_tetrahedron_boundaryV)
     return boundaryV, total_boundArea
 
@@ -623,28 +623,21 @@ interior, interior_sum = interior_function()
 #distance between source and receiver
 dist_sr = math.sqrt((abs(x_rec - x_source))**2 + (abs(y_rec - y_source))**2 + (abs(z_rec - z_source))**2) #distance between source and receiver
 
-coord_source = [x_source,y_source,z_source] #coordinates of the receiver position in an list
-coord_rec = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
+coord_source = np.array([x_source,y_source,z_source]) #coordinates of the receiver position in an list
+coord_rec = np.array([x_rec,y_rec,z_rec]) #coordinates of the receiver position in an list
 
 #Position of receiver is the centre of a cell so the minimum distance with the centre of a cell has been calculated to understand which cell is the closest
-dist_rec_cc_list = []
+dist_rec_cc_list = np.array([])
 for i in range(len(cell_center)):
     dist_rec_cc = math.sqrt(np.sum((cell_center[i] - coord_rec)**2))
-    dist_rec_cc_list.append(dist_rec_cc)
+    dist_rec_cc_list = np.append(dist_rec_cc_list,dist_rec_cc)
 rec_idx = np.argmin(dist_rec_cc_list)
 
-#Position of source is the one of the nodes, the closest to the actual source coordinates
-#dist_source_cc_list = []
-#for i in range(len(nodeTags)):
-#    dist_source_cc = math.sqrt(np.sum((gmsh.model.mesh.getNode(int(nodeTags[i]))[0] - coord_source)**2))
-#    dist_source_cc_list.append(dist_source_cc)
-#source_idx = np.argmin(dist_source_cc_list)
-
 #Position of source is the centre of a cell so the minimum distance with the centre of a cell has been calculated to understand which cell is the closest
-dist_source_cc_list = []
+dist_source_cc_list = np.array([])
 for i in range(len(cell_center)):
     dist_source_cc = math.sqrt(np.sum((cell_center[i] - coord_source)**2))
-    dist_source_cc_list.append(dist_source_cc)
+    dist_source_cc_list = np.append(dist_source_cc_list,dist_source_cc)
 source_idx = np.argmin(dist_source_cc_list)
 
 ###############Calculation of length of room#######################
@@ -676,35 +669,35 @@ x_axis = np.arange(0,room_length+dx,dx) #lispace on x_axis with distance dx
 y_axis = np.arange(0,room_width+dx,dx)
 
 #####################Calculation of receivers in a x line####################
-line_rec_x_idx_list = []
+line_rec_x_idx_list = np.array([])
 dist_x = np.array([])
 for x_chang in x_axis:
     line_rec = [x_chang, y_rec, z_rec]
     #Position of line_receiver is the centre of a cell
     dist_line_rec_x =  math.sqrt((abs(line_rec[0] - x_source))**2 + (abs(line_rec[1] - y_source))**2 + (abs(line_rec[2] - z_source))**2) #distance between source and line_receiver
     dist_x = np.append(dist_x, dist_line_rec_x)  # Append to the NumPy array
-    dist_line_rec_x_cc_list = []
+    dist_line_rec_x_cc_list = np.array([])
     for i in range(len(cell_center)):
         dist_line_rec_x_cc = math.sqrt(np.sum((cell_center[i] - line_rec)**2))
-        dist_line_rec_x_cc_list.append(dist_line_rec_x_cc)
+        dist_line_rec_x_cc_list = np.append(dist_line_rec_x_cc_list,dist_line_rec_x_cc)
     line_rec_x_idx = np.argmin(dist_line_rec_x_cc_list)
-    line_rec_x_idx_list.append(line_rec_x_idx)   
+    line_rec_x_idx_list = np.append(line_rec_x_idx_list,line_rec_x_idx)   
 
 
 #####################Calculation of receivers in a x line####################
-line_rec_y_idx_list = []
+line_rec_y_idx_list = np.array([])
 dist_y = np.array([])
 for y_chang in y_axis:
     line_rec = [x_rec, y_chang, z_rec]
     #Position of line_receiver is the centre of a cell
     dist_line_rec_y =  math.sqrt((abs(line_rec[0] - x_source))**2 + (abs(line_rec[1] - y_source))**2 + (abs(line_rec[2] - z_source))**2) #distance between source and line_receiver
     dist_y = np.append(dist_y, dist_line_rec_y)  # Append to the NumPy array
-    dist_line_rec_y_cc_list = []
+    dist_line_rec_y_cc_list = np.array([])
     for i in range(len(cell_center)):
         dist_line_rec_y_cc = math.sqrt(np.sum((cell_center[i] - line_rec)**2))
-        dist_line_rec_y_cc_list.append(dist_line_rec_y_cc)
+        dist_line_rec_y_cc_list = np.append(dist_line_rec_y_cc_list,dist_line_rec_y_cc)
     line_rec_y_idx = np.argmin(dist_line_rec_y_cc_list)
-    line_rec_y_idx_list.append(line_rec_y_idx)  
+    line_rec_y_idx_list = np.append(line_rec_y_idx_list,line_rec_y_idx)  
 
 
 #def interpolate_receiver_position(interior, cell_centers, receiver_position):

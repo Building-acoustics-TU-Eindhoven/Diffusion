@@ -45,20 +45,20 @@ st = time.time() #start time of calculation
 c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
-dt = 1/16000 #time discretizatione
+dt = 0.001 #time discretizatione
 
 # Source position
-x_source = 3.0  #position of the source in the x direction [m]
-y_source = 3.0  #position of the source in the y direction [m]
-z_source = 3.0  #position of the source in the z direction [m]
+x_source = 1.36  #position of the source in the x direction [m]
+y_source = 3.76  #position of the source in the y direction [m]
+z_source = 1.62  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 2.0 #position of the receiver in the x direction [m]
-y_rec = 2.0 #position of the receiver in the y direction [m]
-z_rec = 2.0 #position of the receiver in the z direction [m]
+x_rec = 4.26 #position of the receiver in the x direction [m]
+y_rec = 1.76 #position of the receiver in the y direction [m]
+z_rec = 1.62 #position of the receiver in the z direction [m]
 
 #Absorption term and Absorption coefficients
-th = 2 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
+th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
 
 #Type of Calculation
@@ -69,7 +69,7 @@ tcalc = "decay"
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
 sourceon_time =  0.5 #time that the source is ON before interrupting [s]
-recording_time = 2.0 #total time recorded for the calculation [s]
+recording_time = 3.0 #total time recorded for the calculation [s]
 
 # Frequency resolution
 fc_low = 125
@@ -86,7 +86,7 @@ center_freq = fc_low * np.power(2,((np.arange(0,x_frequencies+1) / nth_octave)))
 #INITIALISE GMSH
 ###############################################################################
     
-file_name = "8x8x8.msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "scenario2.msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 
@@ -283,7 +283,7 @@ for group in vGroupsNames:
     name_split = name_group.split("$")
     name_abs_coeff = name_split[0]
     abscoeff = name_split[1].split(",")
-    abscoeff = [float(i) for i in abscoeff][-1] #for one frequency   
+    abscoeff = [float(i) for i in abscoeff][0] #for one frequency   
     
     physical_tag = group[1] #Get the physical group tag
     entities = gmsh.model.getEntitiesForPhysicalGroup(2, physical_tag) #Retrieve all the entities in this physical group (the entities are the number of walls in the physical group)

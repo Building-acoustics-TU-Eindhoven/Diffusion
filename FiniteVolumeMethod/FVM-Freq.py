@@ -45,17 +45,17 @@ st = time.time() #start time of calculation
 c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
-dt = 1/8000 #time discretizatione
+dt = 0.001 #time discretizatione
 
 # Source position
-x_source = 4  #position of the source in the x direction [m]
-y_source = 4  #position of the source in the y direction [m]
-z_source = 4  #position of the source in the z direction [m]
+x_source = 1.36  #position of the source in the x direction [m]
+y_source = 3.76  #position of the source in the y direction [m]
+z_source = 1.62  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 2 #position of the receiver in the x direction [m]
-y_rec = 2 #position of the receiver in the y direction [m]
-z_rec = 2 #position of the receiver in the z direction [m]
+x_rec = 4.26 #position of the receiver in the x direction [m]
+y_rec = 1.76 #position of the receiver in the y direction [m]
+z_rec = 1.62 #position of the receiver in the z direction [m]
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
@@ -69,7 +69,7 @@ tcalc = "decay"
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
 sourceon_time =  0.50 #time that the source is ON before interrupting [s]
-recording_time = 1.80 #total time recorded for the calculation [s]
+recording_time = 3.0 #total time recorded for the calculation [s]
 
 # Frequency resolution
 fc_low = 125
@@ -487,32 +487,20 @@ Dx = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms x dire
 Dy = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms y direction
 Dz = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms z direction
 
-#term1 = np.multiply(Dx,interior_sum)
-
-# Adding term1 to each array in the list
-#result = [term1 + arr.reshape(5, 1) for arr in boundaryV]
-
-# Convert the result to a NumPy array if needed
-#result = np.array(result)
-
-#beta_zero = np.divide((dt*result),cell_volume) #my interpretation of the beta_zero
-
 
 s = np.zeros((velement)) #matrix of zeros for source
 s[source_idx] = source1[0]
 
-beta_zero_freq = []
-for iBand in range(nBands):
-    freq = center_freq[iBand]
-    beta_zero_band = np.array([])
-    for tria in range(len(boundaryV)):
-        print(tria)
-        beta_zero_element = np.divide((dt*(np.multiply(Dx,interior_sum) + boundaryV[tria][iBand])),cell_volume) #my interpretation of the beta_zero
-        #print(beta_zero)
-        #beta_zero_band = np.append(beta_zero_band, beta_zero_element)
-    beta_zero_freq.append(beta_zero_element)
 
-    
+boundaryV = np.array(boundaryV)
+boundaryV = boundaryV.T
+beta_zero_freq = []
+for iBand in range(len(boundaryV)):
+    print(iBand)
+    #freq = center_freq[iBand]
+    print(boundaryV[iBand])
+    beta_zero_element = np.divide(dt*((Dx *interior_sum) + boundaryV[iBand]),cell_volume) #my interpretation of the beta_zero
+    beta_zero_freq.append(beta_zero_element)
     
 #%%
 ###############################################################################
@@ -588,30 +576,39 @@ plt.show()
 #RESULTS
 ###############################################################################
 
-press_r = ((abs(w_rec))*rho*(c0**2)) #pressure at the receiver
-spl_r = 10*np.log10(((abs(w_rec))*rho*(c0**2))/(pRef**2)) #,where=press_r>0, sound pressure level at the receiver
-spl_r_norm = 10*np.log10((((abs(w_rec))*rho*(c0**2))/(pRef**2)) / np.max(((abs(w_rec))*rho*(c0**2))/(pRef**2))) #normalised to maximum to 0dB
-spl_r_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_sr) + ((abs(w_rec))*c0)/(pRef**2))) #spl total (including direct field) at the receiver position????? but it will need to be calculated for a stationary source 100dB
+spl_r_band = []
+t60_band = []
+sch_db_band = []
 
-#Find the energy decay part of the overal calculation
-idx_w_rec = np.where(t == sourceon_time)[0][0] #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
-w_rec_off = w_rec[idx_w_rec:] #cutting the energy density array at the receiver from the idx_w_rec to the end
-
-#Schroeder integration
-#energy_r_rev = (w_rec_off)[::-1] #reverting the array
-#The energy density is related to the pressure with the following relation: w = p^2
-#energy_r_rev_cum = np.cumsum(energy_r_rev) #cumulative summation of all the item in the array
-schroeder = w_rec_off #energy_r_rev_cum[::-1] #reverting the array again -> creating the schroder decay
-sch_db = 10.0 * np.log10(schroeder / max(schroeder)) #level of the array: schroeder decay
-
-if tcalc == "decay":
-    t60 = t60_decay(t, sch_db, idx_w_rec) #called function for calculation of t60 [s]
-    edt = edt_decay(t, sch_db, idx_w_rec) #called function for calculation of edt [s]
-    #Eq_A = 0.16*V/t60 #equivalent absorption area defined from the RT 
-    c80 = clarity(t60, V, Eq_A, S, c0, dist_sr) #called function for calculation of c80 [dB]
-    d50 = definition(t60, V, Eq_A, S, c0, dist_sr) #called function for calculation of d50 [%]
-    ts = centretime(t60, Eq_A, S) #called function for calculation of ts [ms]
-
+for iBand in range(nBands):
+    press_r = ((abs(w_rec_band[iBand]))*rho*(c0**2)) #pressure at the receiver
+    spl_r = 10*np.log10(((abs(w_rec_band[iBand]))*rho*(c0**2))/(pRef**2)) #,where=press_r>0, sound pressure level at the receiver
+    spl_r_norm = 10*np.log10((((abs(w_rec_band[iBand]))*rho*(c0**2))/(pRef**2)) / np.max(((abs(w_rec_band[iBand]))*rho*(c0**2))/(pRef**2))) #normalised to maximum to 0dB
+    spl_r_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_sr) + ((abs(w_rec_band[iBand]))*c0)/(pRef**2))) #spl total (including direct field) at the receiver position????? but it will need to be calculated for a stationary source 100dB
+    
+    #Find the energy decay part of the overal calculation
+    idx_w_rec = np.where(t == sourceon_time)[0][0] #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
+    w_rec_off = w_rec_band[iBand][idx_w_rec:] #cutting the energy density array at the receiver from the idx_w_rec to the end
+    
+    #Schroeder integration
+    #energy_r_rev = (w_rec_off)[::-1] #reverting the array
+    #The energy density is related to the pressure with the following relation: w = p^2
+    #energy_r_rev_cum = np.cumsum(energy_r_rev) #cumulative summation of all the item in the array
+    schroeder = w_rec_off #energy_r_rev_cum[::-1] #reverting the array again -> creating the schroder decay
+    sch_db = 10.0 * np.log10(schroeder / max(schroeder)) #level of the array: schroeder decay
+    
+    if tcalc == "decay":
+        t60 = t60_decay(t, sch_db, idx_w_rec) #called function for calculation of t60 [s]
+        edt = edt_decay(t, sch_db, idx_w_rec) #called function for calculation of edt [s]
+        #Eq_A = 0.16*V/t60 #equivalent absorption area defined from the RT 
+        c80 = clarity(t60, V, Eq_A[iBand], S, c0, dist_sr) #called function for calculation of c80 [dB]
+        d50 = definition(t60, V, Eq_A[iBand], S, c0, dist_sr) #called function for calculation of d50 [%]
+        ts = centretime(t60, Eq_A[iBand], S) #called function for calculation of ts [ms]
+    
+    spl_r_band.append(spl_r)
+    t60_band.append(t60)
+    sch_db_band.append(sch_db)
+    
 et = time.time() #end time
 elapsed_time = et - st
 
@@ -621,47 +618,37 @@ elapsed_time = et - st
 ###############################################################################
 
 if tcalc == "decay":
-    #Figure 5: Decay of SPL in the recording_time
-    plt.figure(5)
-    plt.plot(t, spl_r)  # plot sound pressure level with Pref = (2e-5)**5
-    plt.title("Figure 5 :SPL over time at the receiver")
-    plt.xlabel("t [s]")
-    plt.ylabel("SPL [dB]")
-    plt.xlim()
-    plt.ylim()
-    plt.xticks(np.arange(0, recording_time + 0.1, 0.5))
-    plt.yticks(np.arange(0, 120, 20))
-
-    #Figure 6: Decay of SPL in the recording_time normalised to maximum 0dB
-    plt.figure(6)
-    plt.plot(t,spl_r_norm)
-    plt.title("Figure 6: Normalised SPL over time at the receiver")
-    plt.xlabel("t [s]")
-    plt.ylabel("SPL [dB]")
-    plt.xlim()
-    plt.ylim()
-    plt.xticks(np.arange(0, recording_time +0.1, 0.1))
-    plt.yticks(np.arange(0, -60, -10))
-    
-    #Figure 7: Energy density at the receiver over time
-    plt.figure(7)
-    plt.plot(t,w_rec)
-    plt.title("Figure 7: Energy density over time at the receiver")
-    plt.xlabel("t [s]")
-    plt.ylabel("Energy density [kg m^-1 s^-2]")
-    plt.xlim()
-    plt.ylim()
-    plt.xticks(np.arange(0, recording_time +0.1, 0.1))
-    
-    #Figure 8: Schroeder decay
-    plt.figure(8)
-    plt.plot(t[idx_w_rec:],sch_db)
-    plt.title("Figure 8: Schroeder decay (Energy Decay Curve)")
-    plt.xlabel("t [s]")
-    plt.ylabel("Energy decay [dB]")
-    plt.xlim()
-    plt.ylim()
-    plt.xticks(np.arange(t[idx_w_rec], recording_time +0.1, 0.1))
+    for iBand in range(nBands):
+        #Figure 5: Decay of SPL in the recording_time
+        plt.figure(5)
+        plt.plot(t, spl_r_band[iBand])  # plot sound pressure level with Pref = (2e-5)**5
+        plt.title("Figure 5 :SPL over time at the receiver")
+        plt.xlabel("t [s]")
+        plt.ylabel("SPL [dB]")
+        plt.xlim()
+        plt.ylim()
+        plt.xticks(np.arange(0, recording_time + 0.1, 0.5))
+        plt.yticks(np.arange(0, 120, 20))
+        
+        #Figure 7: Energy density at the receiver over time
+        plt.figure(7)
+        plt.plot(t,w_rec_band[iBand])
+        plt.title("Figure 7: Energy density over time at the receiver")
+        plt.xlabel("t [s]")
+        plt.ylabel("Energy density [kg m^-1 s^-2]")
+        plt.xlim()
+        plt.ylim()
+        plt.xticks(np.arange(0, recording_time +0.1, 0.1))
+        
+        #Figure 8: Schroeder decay
+        plt.figure(8)
+        plt.plot(t[idx_w_rec:],sch_db_band[iBand])
+        plt.title("Figure 8: Schroeder decay (Energy Decay Curve)")
+        plt.xlabel("t [s]")
+        plt.ylabel("Energy decay [dB]")
+        plt.xlim()
+        plt.ylim()
+        plt.xticks(np.arange(t[idx_w_rec], recording_time +0.1, 0.1))
     
 if tcalc == "stationarysource":
 

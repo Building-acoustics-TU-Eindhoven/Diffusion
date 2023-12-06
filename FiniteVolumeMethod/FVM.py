@@ -427,6 +427,10 @@ for i in range(len(cell_center)):
     dist_rec_cc_list.append(dist_rec_cc)
 rec_idx = np.argmin(dist_rec_cc_list)
 
+
+
+
+
 #Position of source is the one of the nodes, the closest to the actual source coordinates
 #dist_source_cc_list = []
 #for i in range(len(nodeTags)):
@@ -440,6 +444,7 @@ for i in range(len(cell_center)):
     dist_source_cc = math.sqrt(np.sum((cell_center[i] - coord_source)**2))
     dist_source_cc_list.append(dist_source_cc)
 source_idx = np.argmin(dist_source_cc_list)
+
 
 ###############Calculation of length of room#######################
 # Extract x-coordinates of all nodes
@@ -559,8 +564,35 @@ Dz = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms z dire
 
 beta_zero = np.divide((dt*(np.multiply(Dx,interior_sum) + boundaryV)),cell_volume) #my interpretation of the beta_zero
 
+
+###############################################################################
+#SOURCE INTERPOLATION
+###############################################################################
+A = nodecoords[voluNode[source_idx]][0] #vertix 1 of the tetrahedron cointaining the source
+B = nodecoords[voluNode[source_idx]][1] #vertix 2 of the tetrahedron cointaining the source
+C = nodecoords[voluNode[source_idx]][2] #vertix 3 of the tetrahedron cointaining the source
+D = nodecoords[voluNode[source_idx]][3] #vertix 4 of the tetrahedron cointaining the source
+
+V1V2 = B - A
+V1V3 = C - A
+
+dot_V1V2_V1V2 = np.dot(V1V2, V1V2)
+dot_V1V3_V1V3 = np.dot(V1V3, V1V3)
+
+#Baricentric interpolation
+u = np.dot(V1V2, coord_source - A) / dot_V1V2_V1V2 #weight of three vertices of the tetrahedron (baricentric coordinates)
+v = np.dot(V1V3, coord_source - A) / dot_V1V3_V1V3
+w = 1 - u - v
+
+# Calculate linear parameters
+t1 = np.dot(B - coord_source, B - C) / np.dot(A - B, B - C)
+t2 = np.dot(B - coord_source, A - B) / np.dot(C - B, A - B)
+t3 = 1 - t1 - t2
+
+interpolated_source = u * 0.01 + v * 0.01 + w * 0.01
+
 s = np.zeros((velement)) #matrix of zeros for source
-s[source_idx] = source1[0]
+s[source_idx] = source1[0] *u +  source1[0] *v +source1[0] *w
 
 
 #%%

@@ -414,12 +414,139 @@ interior_sum = np.sum(interior, axis=1) #sum of interior per columns (so per i e
 ##############################################################################
 ##############################################################################
 
+gmsh.finalize()
+
+#%%
+###############################################################################
+#CALCULATION SECTION
+###############################################################################
+
+#Fixed inputs
+pRef = 2 * (10**-5) #Reference pressure in Pa
+rho = 1.21 #air density [kg.m^-3] at 20°C
+
+V = sum(cell_volume)
+S = total_boundArea #surface area of the room
+
+#Time resolution
+t = np.arange(0, recording_time, dt) #mesh point in time
+recording_steps = ceil(recording_time/dt) #number of time steps to consider in the calculation
+
+sum_alpha_average = 0
+Eq_A = 0
+#Absorption parameters for room
+for entity in surface_areas:
+    print(entity)
+    sum_alpha_average += absorption_coefficient[entity]*surface_areas[entity]
+    Eq_A += absorption_coefficient[entity]*surface_areas[entity]
+alpha_average = sum_alpha_average/S #average absorption
+
+#Diffusion parameters
+mean_free_path = (4*V)/S #mean free path for 3D
+mean_free_time= mean_free_path/c0 #mean free time for 3D
+mean_free_time_step = int(mean_free_time/dt)
+Dx = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms x direction
+Dy = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms y direction
+Dz = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms z direction
+
+beta_zero = np.divide((dt*(np.multiply(Dx,interior_sum) + boundaryV)),cell_volume) #my interpretation of the beta_zero
+
+#%%
+###############################################################################
+#SOURCE & RECEIVER
+###############################################################################
+
 #distance between source and receiver
 dist_sr = math.sqrt((abs(x_rec - x_source))**2 + (abs(y_rec - y_source))**2 + (abs(z_rec - z_source))**2) #distance between source and receiver
 
 coord_source = [x_source,y_source,z_source] #coordinates of the receiver position in an list
 coord_rec = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
 
+###############################################################################
+#SOURCE INTERPOLATION
+###############################################################################
+#Position of source is the centre of a cell so the minimum distance with the centre of a cell has been calculated to understand which cell is the closest
+dist_source_cc_list = []
+for i in range(len(cell_center)):
+    dist_source_cc = math.sqrt(np.sum((cell_center[i] - coord_source)**2))
+    dist_source_cc_list.append(dist_source_cc)
+source_idx = np.argmin(dist_source_cc_list)
+
+import math
+
+#cl_tet_s stands for cl=closest, tet=tetrahedron, s=to the source
+cl_tet_s = {} #initialise dictionary fro closest tetrahedrons to the source
+for i in range(len(dist_source_cc_list)):
+    if dist_source_cc_list[i] < 0.5: #the number of closest tetrahedron to the source depends on the mesh and I would say that 0.5 should be equal to the length of mesh
+        cl_tet_s[i] = dist_source_cc_list[i]
+
+total_weights_s = {} #initialise weights for each tetrahedron around the actual source position
+sum_weights_s = 0
+Vs = 0
+for i, dist in cl_tet_s.items(): #for each key and value in the dictionary (so for each closest tetrahedron to the source)
+    weights = np.divide(1.0 , dist)  #calculate the inverse distance weights, so closer to the point means higher weight
+    #print(weights)
+    sum_weights_s += weights
+    #weights /= np.sum(weights)  # Normalize weights to sum to 1
+    total_weights_s[i] = weights #put the wweigths (values) to the correspondent closest tetrahedron (keys)
+    Vs += cell_volume[i]
+
+#total_weights_s_values = total_weights_s.values()
+for i,weight in total_weights_s.items():
+    total_weights_s[i] = weight/sum_weights_s if sum_weights_s != 0 else 0
+
+cl_tet_s_keys = cl_tet_s.keys() #take only the keys of the cl_tet_s dictionary (so basically the indexes of the tetrahedrons)
+
+
+#Vs = cell_volume[source_idx] #volume of the source = to volume of cells where the volume is 
+
+#Initial condition - Source Info (interrupted method)
+w1=Ws/Vs #w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
+sourceon_steps = ceil(sourceon_time/dt) #time steps at which the source is calculated/considered in the calculation
+s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position
+source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
+
+
+
+
+s = np.zeros((velement)) #matrix of zeros for source
+for tet in cl_tet_s_keys:
+    s[tet] += source1[0] *total_weights_s[tet]
+
+#Previous approach (did not understand)
+#A = nodecoords[voluNode[source_idx]][0] #vertix 1 of the tetrahedron cointaining the source
+#B = nodecoords[voluNode[source_idx]][1] #vertix 2 of the tetrahedron cointaining the source
+#C = nodecoords[voluNode[source_idx]][2] #vertix 3 of the tetrahedron cointaining the source
+#D = nodecoords[voluNode[source_idx]][3] #vertix 4 of the tetrahedron cointaining the source
+
+# V1V2 = B - A
+# V1V3 = C - A
+
+# dot_V1V2_V1V2 = np.dot(V1V2, V1V2)
+# dot_V1V3_V1V3 = np.dot(V1V3, V1V3)
+
+# #Baricentric interpolation
+# u = np.dot(V1V2, coord_source - A) / dot_V1V2_V1V2 #weight of three vertices of the tetrahedron (baricentric coordinates)
+# v = np.dot(V1V3, coord_source - A) / dot_V1V3_V1V3
+# w = 1 - u - v
+
+# # Calculate linear parameters
+# t1 = np.dot(B - coord_source, B - C) / np.dot(A - B, B - C)
+# t2 = np.dot(B - coord_source, A - B) / np.dot(C - B, A - B)
+# t3 = 1 - t1 - t2
+
+# interpolated_source = u * 0.01 + v * 0.01 + w * 0.01
+
+# s = np.zeros((velement)) #matrix of zeros for source
+# s[source_idx] = source1[0] *u +  source1[0] *v +source1[0] *w
+
+#ORIGINAL
+#s = np.zeros((velement)) #matrix of zeros for source
+#s[source_idx] = source1[0]
+
+###############################################################################
+#RECEIVER INTERPOLATION
+###############################################################################
 #Position of receiver is the centre of a cell so the minimum distance with the centre of a cell has been calculated to understand which cell is the closest
 dist_rec_cc_list = []
 for i in range(len(cell_center)):
@@ -431,19 +558,9 @@ rec_idx = np.argmin(dist_rec_cc_list)
 
 
 
-#Position of source is the one of the nodes, the closest to the actual source coordinates
-#dist_source_cc_list = []
-#for i in range(len(nodeTags)):
-#    dist_source_cc = math.sqrt(np.sum((gmsh.model.mesh.getNode(int(nodeTags[i]))[0] - coord_source)**2))
-#    dist_source_cc_list.append(dist_source_cc)
-#source_idx = np.argmin(dist_source_cc_list)
 
-#Position of source is the centre of a cell so the minimum distance with the centre of a cell has been calculated to understand which cell is the closest
-dist_source_cc_list = []
-for i in range(len(cell_center)):
-    dist_source_cc = math.sqrt(np.sum((cell_center[i] - coord_source)**2))
-    dist_source_cc_list.append(dist_source_cc)
-source_idx = np.argmin(dist_source_cc_list)
+
+
 
 
 ###############Calculation of length of room#######################
@@ -517,98 +634,10 @@ for y_chang in y_axis:
 #dist_sr_interpolated = np.linalg.norm(interpolated_receiver_position - coord_source)
 
 
-
-gmsh.finalize()
-
-#%%
-###############################################################################
-#CALCULATION SECTION
-###############################################################################
-
-#Fixed inputs
-pRef = 2 * (10**-5) #Reference pressure in Pa
-rho = 1.21 #air density [kg.m^-3] at 20°C
-
-Vs = cell_volume[source_idx] #volume of the source = to volume of cells where the volume is 
-
-V = sum(cell_volume)
-S = total_boundArea #surface area of the room
-
-
-#Time resolution
-t = np.arange(0, recording_time, dt) #mesh point in time
-recording_steps = ceil(recording_time/dt) #number of time steps to consider in the calculation
-
-#Initial condition - Source Info (interrupted method)
-w1=Ws/Vs #w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
-sourceon_steps = ceil(sourceon_time/dt) #time steps at which the source is calculated/considered in the calculation
-s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position
-source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
-
-sum_alpha_average = 0
-Eq_A = 0
-#Absorption parameters for room
-for entity in surface_areas:
-    print(entity)
-    sum_alpha_average += absorption_coefficient[entity]*surface_areas[entity]
-    Eq_A += absorption_coefficient[entity]*surface_areas[entity]
-alpha_average = sum_alpha_average/S #average absorption
-
-#Diffusion parameters
-mean_free_path = (4*V)/S #mean free path for 3D
-mean_free_time= mean_free_path/c0 #mean free time for 3D
-mean_free_time_step = int(mean_free_time/dt)
-Dx = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms x direction
-Dy = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms y direction
-Dz = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms z direction
-
-beta_zero = np.divide((dt*(np.multiply(Dx,interior_sum) + boundaryV)),cell_volume) #my interpretation of the beta_zero
-
-
-###############################################################################
-#SOURCE INTERPOLATION
-###############################################################################
-A = nodecoords[voluNode[source_idx]][0] #vertix 1 of the tetrahedron cointaining the source
-B = nodecoords[voluNode[source_idx]][1] #vertix 2 of the tetrahedron cointaining the source
-C = nodecoords[voluNode[source_idx]][2] #vertix 3 of the tetrahedron cointaining the source
-D = nodecoords[voluNode[source_idx]][3] #vertix 4 of the tetrahedron cointaining the source
-
-V1V2 = B - A
-V1V3 = C - A
-
-dot_V1V2_V1V2 = np.dot(V1V2, V1V2)
-dot_V1V3_V1V3 = np.dot(V1V3, V1V3)
-
-#Baricentric interpolation
-u = np.dot(V1V2, coord_source - A) / dot_V1V2_V1V2 #weight of three vertices of the tetrahedron (baricentric coordinates)
-v = np.dot(V1V3, coord_source - A) / dot_V1V3_V1V3
-w = 1 - u - v
-
-# Calculate linear parameters
-t1 = np.dot(B - coord_source, B - C) / np.dot(A - B, B - C)
-t2 = np.dot(B - coord_source, A - B) / np.dot(C - B, A - B)
-t3 = 1 - t1 - t2
-
-interpolated_source = u * 0.01 + v * 0.01 + w * 0.01
-
-s = np.zeros((velement)) #matrix of zeros for source
-s[source_idx] = source1[0] *u +  source1[0] *v +source1[0] *w
-
-
 #%%
 ###############################################################################
 #MAIN CALCULATION - COMPUTING ENERGY DENSITY
 ############################################################################### 
-
-#w_new_band = []
-#for iBand in range(nBands):
-#    thisBandNo = iBand;
-#    thisFc = centerFrequencies(iBand);
-
-
-#w_rec_x_end = np.zeros(1, len(x_axis))
-
-
 
 w_new = np.zeros(velement) #unknown w at new time level (n+1)
 #w_old = np.zeros(velement) 
@@ -655,7 +684,9 @@ for steps in range(0, recording_steps):
         w_5l = w_new
     
     if tcalc == "decay":
-        s[source_idx] = source1[steps]
+        for tet in cl_tet_s_keys:
+            s[tet] = source1[steps] *total_weights_s[tet]
+        #s[source_idx] = source1[steps]
     
     if tcalc == "stationarysource":
         s[source_idx] = source1[0]

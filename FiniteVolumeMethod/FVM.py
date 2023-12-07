@@ -840,12 +840,12 @@ plt.show()
 ###############################################################################
 w_rec_x_end = np.array([])
 for xr in line_rec_x_idx_list:
-    w_rec_x = w_new[xr]
+    w_rec_x = w_new[int(xr)]
     w_rec_x_end = np.append(w_rec_x_end, w_rec_x)
     
 w_rec_y_end = np.array([])
 for yr in line_rec_y_idx_list:
-    w_rec_y = w_new[yr]
+    w_rec_y = w_new[int(yr)]
     w_rec_y_end = np.append(w_rec_y_end, w_rec_y)
 
 spl_stat_x = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_x**2))) + ((abs(w_rec_x_end)*c0)))/(pRef**2))

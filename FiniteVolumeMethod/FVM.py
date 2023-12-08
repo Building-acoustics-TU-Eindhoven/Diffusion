@@ -45,17 +45,17 @@ st = time.time() #start time of calculation
 c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
-dt = 0.001 #time discretizatione
+dt = 1/8000 #time discretizatione
 
 # Source position
-x_source = 1.36  #position of the source in the x direction [m]
-y_source = 3.76  #position of the source in the y direction [m]
-z_source = 1.62  #position of the source in the z direction [m]
+x_source = 4  #position of the source in the x direction [m]
+y_source = 4  #position of the source in the y direction [m]
+z_source = 4  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 4.26 #position of the receiver in the x direction [m]
-y_rec = 1.76 #position of the receiver in the y direction [m]
-z_rec = 1.62 #position of the receiver in the z direction [m]
+x_rec = 2 #position of the receiver in the x direction [m]
+y_rec = 2 #position of the receiver in the y direction [m]
+z_rec = 2 #position of the receiver in the z direction [m]
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
@@ -69,7 +69,9 @@ tcalc = "decay"
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
 sourceon_time =  0.5 #time that the source is ON before interrupting [s]
-recording_time = 3.0 #total time recorded for the calculation [s]
+recording_time = 1.8 #total time recorded for the calculation [s]
+
+length_of_mesh = 2
 
 # Frequency resolution
 fc_low = 125
@@ -86,7 +88,7 @@ center_freq = fc_low * np.power(2,((np.arange(0,x_frequencies+1) / nth_octave)))
 #INITIALISE GMSH
 ###############################################################################
     
-file_name = "scenario2.msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "8x8x8(A).msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 
@@ -477,7 +479,7 @@ import math
 #cl_tet_s stands for cl=closest, tet=tetrahedron, s=to the source
 cl_tet_s = {} #initialise dictionary fro closest tetrahedrons to the source
 for i in range(len(dist_source_cc_list)):
-    if dist_source_cc_list[i] < 0.5: #the number of closest tetrahedron to the source depends on the mesh and I would say that 0.5 should be equal to the length of mesh
+    if dist_source_cc_list[i] < length_of_mesh: #the number of closest tetrahedron to the source depends on the mesh and I would say that 0.5 should be equal to the length of mesh
         cl_tet_s[i] = dist_source_cc_list[i]
 
 total_weights_s = {} #initialise weights for each tetrahedron around the actual source position
@@ -489,7 +491,7 @@ for i, dist in cl_tet_s.items(): #for each key and value in the dictionary (so f
     sum_weights_s += weights
     #weights /= np.sum(weights)  # Normalize weights to sum to 1
     total_weights_s[i] = weights #put the wweigths (values) to the correspondent closest tetrahedron (keys)
-    Vs += cell_volume[i]
+#    Vs += cell_volume[i] #volume of the source calculated summing the volumes of all the tetrahedrons involved
 
 #total_weights_s_values = total_weights_s.values()
 for i,weight in total_weights_s.items():
@@ -498,16 +500,18 @@ for i,weight in total_weights_s.items():
 cl_tet_s_keys = cl_tet_s.keys() #take only the keys of the cl_tet_s dictionary (so basically the indexes of the tetrahedrons)
 
 
-#Vs = cell_volume[source_idx] #volume of the source = to volume of cells where the volume is 
+#Calculate volume of the source with the 4 cell centres as the vertices of the tetrahedron
+#for tet in cl_tet_s_keys:
+#    vertix1 = cell_center[tet]
+
+
+Vs = cell_volume[source_idx] #volume of the source = to volume of cells where the volume is 
 
 #Initial condition - Source Info (interrupted method)
 w1=Ws/Vs #w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
 sourceon_steps = ceil(sourceon_time/dt) #time steps at which the source is calculated/considered in the calculation
 s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position
 source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
-
-
-
 
 s = np.zeros((velement)) #matrix of zeros for source
 for tet in cl_tet_s_keys:

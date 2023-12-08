@@ -45,16 +45,16 @@ st = time.time() #start time of calculation
 c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
-dt = 0.001 #time discretizatione
+dt = 1/16000 #time discretizatione
 
 # Source position
-x_source = 1.36  #position of the source in the x direction [m]
-y_source = 3.76  #position of the source in the y direction [m]
-z_source = 1.62  #position of the source in the z direction [m]
+x_source = 2.5  #position of the source in the x direction [m]
+y_source = 2.5  #position of the source in the y direction [m]
+z_source = 2.5  #position of the source in the z direction [m]
 # Receiver position
-x_rec = 4.26 #position of the receiver in the x direction [m]
-y_rec = 1.76 #position of the receiver in the y direction [m]
-z_rec = 1.62 #position of the receiver in the z direction [m]
+x_rec = 1 #position of the receiver in the x direction [m]
+y_rec = 1 #position of the receiver in the y direction [m]
+z_rec = 1 #position of the receiver in the z direction [m]
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
@@ -68,7 +68,7 @@ tcalc = "decay"
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
 sourceon_time =  0.5 #time that the source is ON before interrupting [s]
-recording_time = 3.0 #total time recorded for the calculation [s]
+recording_time = 1.8 #total time recorded for the calculation [s]
 
 length_of_mesh = 0.5
 
@@ -87,7 +87,7 @@ center_freq = fc_low * np.power(2,((np.arange(0,x_frequencies+1) / nth_octave)))
 #INITIALISE GMSH
 ###############################################################################
     
-file_name = "scenario2.msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "5x5x5.msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 
@@ -513,8 +513,8 @@ s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 
 source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
 
 s = np.zeros((velement)) #matrix of zeros for source
-for tet in cl_tet_s_keys:
-    s[tet] += source1[0] *total_weights_s[tet]
+for tet_s in cl_tet_s_keys:
+    s[tet_s] += source1[0] *total_weights_s[tet_s]
 
 #Previous approach (did not understand)
 #A = nodecoords[voluNode[source_idx]][0] #vertix 1 of the tetrahedron cointaining the source
@@ -670,8 +670,7 @@ w = w_new #w at n level
 w_old = w #w_old at n-1 level
 #w[source_idx] = w1 #w (m time step) at source position -> impulse source
 
-w_rec = np.arange(0,recording_time,dt) #energy density at the receiver
-
+w_rec = np.zeros(recording_steps)# np.arange(0,recording_time,dt) #energy density at the receiver
 #Computing w;
 for steps in range(0, recording_steps):
     #Compute w at inner mesh points
@@ -688,10 +687,15 @@ for steps in range(0, recording_steps):
     w_old = w #The w at n step becomes the w at n-1 step
     w = w_new #The w at n+1 step becomes the w at n step
     
+    #w_new_total = 0
     #w_rec is the energy density at the specific receiver
     #w_rec[steps] = w_new[gmsh.model.mesh.getNode(rec_idx[0])[0], gmsh.model.mesh.getNode(rec_idx[1])[0], gmsh.model.mesh.getNode(rec_idx[2])[0]]
-    for tet in cl_tet_r_keys:
-        w_rec[steps] = w_new[tet] *total_weights_r[tet]   
+    #w_rec[steps] = w_new[rec_idx]
+    for tet_r in cl_tet_r_keys:
+        w_rec[steps] += w_new[tet_r] *total_weights_r[tet_r]   
+    #w_rec[steps] += w_new[tet_r]
+    
+    #w_rec[steps] = w_new_total
     
     if steps == sourceon_steps:
         #print("Steps for source:",steps)
@@ -710,8 +714,8 @@ for steps in range(0, recording_steps):
         w_5l = w_new
     
     if tcalc == "decay":
-        for tet in cl_tet_s_keys:
-            s[tet] = source1[steps] *total_weights_s[tet]
+        for tet_s in cl_tet_s_keys:
+            s[tet_s] = source1[steps] *total_weights_s[tet_s]
         #s[source_idx] = source1[steps]
     
     if tcalc == "stationarysource":

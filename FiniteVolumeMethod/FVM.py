@@ -45,17 +45,16 @@ st = time.time() #start time of calculation
 c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
-dt = 1/8000 #time discretizatione
+dt = 0.001 #time discretizatione
 
 # Source position
-x_source = 4  #position of the source in the x direction [m]
-y_source = 4  #position of the source in the y direction [m]
-z_source = 4  #position of the source in the z direction [m]
-
+x_source = 1.36  #position of the source in the x direction [m]
+y_source = 3.76  #position of the source in the y direction [m]
+z_source = 1.62  #position of the source in the z direction [m]
 # Receiver position
-x_rec = 2 #position of the receiver in the x direction [m]
-y_rec = 2 #position of the receiver in the y direction [m]
-z_rec = 2 #position of the receiver in the z direction [m]
+x_rec = 4.26 #position of the receiver in the x direction [m]
+y_rec = 1.76 #position of the receiver in the y direction [m]
+z_rec = 1.62 #position of the receiver in the z direction [m]
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
@@ -69,9 +68,9 @@ tcalc = "decay"
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
 sourceon_time =  0.5 #time that the source is ON before interrupting [s]
-recording_time = 1.8 #total time recorded for the calculation [s]
+recording_time = 3.0 #total time recorded for the calculation [s]
 
-length_of_mesh = 2
+length_of_mesh = 0.5
 
 # Frequency resolution
 fc_low = 125
@@ -88,7 +87,7 @@ center_freq = fc_low * np.power(2,((np.arange(0,x_frequencies+1) / nth_octave)))
 #INITIALISE GMSH
 ###############################################################################
     
-file_name = "8x8x8(A).msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "scenario2.msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 
@@ -559,43 +558,64 @@ for i in range(len(cell_center)):
 rec_idx = np.argmin(dist_rec_cc_list)
 
 
+#cl_tet_s stands for cl=closest, tet=tetrahedron, s=to the source
+cl_tet_r = {} #initialise dictionary fro closest tetrahedrons to the source
+for i in range(len(dist_rec_cc_list)):
+    if dist_rec_cc_list[i] < length_of_mesh: #the number of closest tetrahedron to the source depends on the mesh and I would say that 0.5 should be equal to the length of mesh
+        cl_tet_r[i] = dist_rec_cc_list[i]
 
+total_weights_r = {} #initialise weights for each tetrahedron around the actual source position
+sum_weights_r = 0
+for i, dist in cl_tet_r.items(): #for each key and value in the dictionary (so for each closest tetrahedron to the source)
+    weights = np.divide(1.0 , dist)  #calculate the inverse distance weights, so closer to the point means higher weight
+    #print(weights)
+    sum_weights_r += weights
+    #weights /= np.sum(weights)  # Normalize weights to sum to 1
+    total_weights_r[i] = weights #put the wweigths (values) to the correspondent closest tetrahedron (keys)
 
+#total_weights_s_values = total_weights_s.values()
+for i,weight in total_weights_r.items():
+    total_weights_r[i] = weight/sum_weights_r if sum_weights_r != 0 else 0
 
+cl_tet_r_keys = cl_tet_r.keys() #take only the keys of the cl_tet_s dictionary (so basically the indexes of the tetrahedrons)
 
-
-
-
-
-###############Calculation of length of room#######################
-# Extract x-coordinates of all nodes
+###############################################################################
+#CALCULATION OF LENGHT OF ROOM
+###############################################################################
+#Extract x-coordinates of all nodes
 x_coordinates = nodecoords[:, 0]
 
-# Find the minimum and maximum x-coordinates to determine the length of the room
+#Find the minimum and maximum x-coordinates to determine the length of the room
 min_x = np.min(x_coordinates)
 max_x = np.max(x_coordinates)
 
-# Calculate the length of the room
+#Calculate the length of the room
 room_length = max_x - min_x
 
-
-###############Calculation of width of room#######################
-# Extract y-coordinates of all nodes
+###############################################################################
+#CALCULATION OF WIDTH OF ROOM
+###############################################################################
+#Extract y-coordinates of all nodes
 y_coordinates = nodecoords[:, 1]
 
-# Find the minimum and maximum x-coordinates to determine the length of the room
+#Find the minimum and maximum x-coordinates to determine the width of the room
 min_y = np.min(y_coordinates)
 max_y = np.max(y_coordinates)
 
-# Calculate the length of the room
+#Calculate the length of the room
 room_width = max_y - min_y
 
+###############################################################################
+#LINESPACE LINES OVER THE X AND Y SPACE 
+###############################################################################
 #Arange linespace lines
 dx = 0.5
 x_axis = np.arange(0,room_length+dx,dx) #lispace on x_axis with distance dx
 y_axis = np.arange(0,room_width+dx,dx)
 
-#####################Calculation of receivers in a x line####################
+###############################################################################
+#CALCULATION OF RECEIVERS IN A X LINE
+###############################################################################
 line_rec_x_idx_list = []
 dist_x = np.array([])
 for x_chang in x_axis:
@@ -610,8 +630,9 @@ for x_chang in x_axis:
     line_rec_x_idx = np.argmin(dist_line_rec_x_cc_list)
     line_rec_x_idx_list.append(line_rec_x_idx)   
 
-
-#####################Calculation of receivers in a x line####################
+###############################################################################
+#CALCULATION OF RECEIVERS IN A Y LINE
+###############################################################################
 line_rec_y_idx_list = []
 dist_y = np.array([])
 for y_chang in y_axis:
@@ -669,7 +690,8 @@ for steps in range(0, recording_steps):
     
     #w_rec is the energy density at the specific receiver
     #w_rec[steps] = w_new[gmsh.model.mesh.getNode(rec_idx[0])[0], gmsh.model.mesh.getNode(rec_idx[1])[0], gmsh.model.mesh.getNode(rec_idx[2])[0]]
-    w_rec[steps] = w_new[rec_idx]
+    for tet in cl_tet_r_keys:
+        w_rec[steps] = w_new[tet] *total_weights_r[tet]   
     
     if steps == sourceon_steps:
         #print("Steps for source:",steps)

@@ -45,16 +45,17 @@ st = time.time() #start time of calculation
 c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
-dt = 1/16000 #time discretizatione
+dt = 0.002 #time discretizatione
 
 # Source position
-x_source = 2.5  #position of the source in the x direction [m]
-y_source = 2.5  #position of the source in the y direction [m]
-z_source = 2.5  #position of the source in the z direction [m]
+x_source = 2.0  #position of the source in the x direction [m]
+y_source = 2.0  #position of the source in the y direction [m]
+z_source = 2.0  #position of the source in the z direction [m]
+
 # Receiver position
-x_rec = 1 #position of the receiver in the x direction [m]
-y_rec = 1 #position of the receiver in the y direction [m]
-z_rec = 1 #position of the receiver in the z direction [m]
+x_rec = 10.0 #position of the receiver in the x direction [m]
+y_rec = 2.0 #position of the receiver in the y direction [m]
+z_rec = 2.0 #position of the receiver in the z direction [m]
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
@@ -63,14 +64,14 @@ th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):"))
 #Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
 #Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
-tcalc = "decay"
+tcalc = "stationarysource"
 
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
 sourceon_time =  0.5 #time that the source is ON before interrupting [s]
-recording_time = 1.8 #total time recorded for the calculation [s]
+recording_time = 2.0 #total time recorded for the calculation [s]
 
-length_of_mesh = 0.5
+length_of_mesh = 1
 
 # Frequency resolution
 fc_low = 125
@@ -87,7 +88,7 @@ center_freq = fc_low * np.power(2,((np.arange(0,x_frequencies+1) / nth_octave)))
 #INITIALISE GMSH
 ###############################################################################
     
-file_name = "5x5x5.msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "40x4x4.msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 
@@ -500,11 +501,27 @@ cl_tet_s_keys = cl_tet_s.keys() #take only the keys of the cl_tet_s dictionary (
 
 
 #Calculate volume of the source with the 4 cell centres as the vertices of the tetrahedron
-#for tet in cl_tet_s_keys:
-#    vertix1 = cell_center[tet]
+vertices_source = np.array([]).reshape(0, 3)  # Initialize as an empty 2D array with 3 columns
+for tet in cl_tet_s_keys:
+    vertices = cell_center[tet]
+    vertices_source = np.vstack((vertices_source, vertices))
 
+#VOLUME CALCULATED WITHIN CENTRE CELL SELECTED
+from scipy.spatial import ConvexHull
 
-Vs = cell_volume[source_idx] #volume of the source = to volume of cells where the volume is 
+def calculate_volume(vertices_source):
+    # Create a ConvexHull object
+    hull = ConvexHull(vertices_source)
+
+    # Calculate the volume of the convex hull
+    volume = hull.volume
+
+    return volume
+
+Vs = calculate_volume(vertices_source)
+
+#VOLUME ORIGINAL
+#Vs = cell_volume[source_idx] #volume of the source = to volume of cells where the volume is 
 
 #Initial condition - Source Info (interrupted method)
 w1=Ws/Vs #w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
@@ -512,40 +529,14 @@ sourceon_steps = ceil(sourceon_time/dt) #time steps at which the source is calcu
 s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position
 source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
 
+#ORIGINAL
+# s = np.zeros((velement)) #matrix of zeros for source
+# s[source_idx] = source1[0]
+
+#INTERPOLATION
 s = np.zeros((velement)) #matrix of zeros for source
 for tet_s in cl_tet_s_keys:
     s[tet_s] += source1[0] *total_weights_s[tet_s]
-
-#Previous approach (did not understand)
-#A = nodecoords[voluNode[source_idx]][0] #vertix 1 of the tetrahedron cointaining the source
-#B = nodecoords[voluNode[source_idx]][1] #vertix 2 of the tetrahedron cointaining the source
-#C = nodecoords[voluNode[source_idx]][2] #vertix 3 of the tetrahedron cointaining the source
-#D = nodecoords[voluNode[source_idx]][3] #vertix 4 of the tetrahedron cointaining the source
-
-# V1V2 = B - A
-# V1V3 = C - A
-
-# dot_V1V2_V1V2 = np.dot(V1V2, V1V2)
-# dot_V1V3_V1V3 = np.dot(V1V3, V1V3)
-
-# #Baricentric interpolation
-# u = np.dot(V1V2, coord_source - A) / dot_V1V2_V1V2 #weight of three vertices of the tetrahedron (baricentric coordinates)
-# v = np.dot(V1V3, coord_source - A) / dot_V1V3_V1V3
-# w = 1 - u - v
-
-# # Calculate linear parameters
-# t1 = np.dot(B - coord_source, B - C) / np.dot(A - B, B - C)
-# t2 = np.dot(B - coord_source, A - B) / np.dot(C - B, A - B)
-# t3 = 1 - t1 - t2
-
-# interpolated_source = u * 0.01 + v * 0.01 + w * 0.01
-
-# s = np.zeros((velement)) #matrix of zeros for source
-# s[source_idx] = source1[0] *u +  source1[0] *v +source1[0] *w
-
-#ORIGINAL
-#s = np.zeros((velement)) #matrix of zeros for source
-#s[source_idx] = source1[0]
 
 ###############################################################################
 #RECEIVER INTERPOLATION
@@ -558,7 +549,7 @@ for i in range(len(cell_center)):
 rec_idx = np.argmin(dist_rec_cc_list)
 
 
-#cl_tet_s stands for cl=closest, tet=tetrahedron, s=to the source
+#cl_tet_r stands for cl=closest, tet=tetrahedron, r=to the receiver
 cl_tet_r = {} #initialise dictionary fro closest tetrahedrons to the source
 for i in range(len(dist_rec_cc_list)):
     if dist_rec_cc_list[i] < length_of_mesh: #the number of closest tetrahedron to the source depends on the mesh and I would say that 0.5 should be equal to the length of mesh
@@ -693,9 +684,6 @@ for steps in range(0, recording_steps):
     #w_rec[steps] = w_new[rec_idx]
     for tet_r in cl_tet_r_keys:
         w_rec[steps] += w_new[tet_r] *total_weights_r[tet_r]   
-    #w_rec[steps] += w_new[tet_r]
-    
-    #w_rec[steps] = w_new_total
     
     if steps == sourceon_steps:
         #print("Steps for source:",steps)
@@ -714,8 +702,8 @@ for steps in range(0, recording_steps):
         w_5l = w_new
     
     if tcalc == "decay":
-        for tet_s in cl_tet_s_keys:
-            s[tet_s] = source1[steps] *total_weights_s[tet_s]
+         for tet_s in cl_tet_s_keys:
+             s[tet_s] = source1[steps] *total_weights_s[tet_s]
         #s[source_idx] = source1[steps]
     
     if tcalc == "stationarysource":

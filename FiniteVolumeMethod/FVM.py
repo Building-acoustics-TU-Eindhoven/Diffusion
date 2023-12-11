@@ -491,7 +491,7 @@ for i, dist in cl_tet_s.items(): #for each key and value in the dictionary (so f
     sum_weights_s += weights
     #weights /= np.sum(weights)  # Normalize weights to sum to 1
     total_weights_s[i] = weights #put the wweigths (values) to the correspondent closest tetrahedron (keys)
-#    Vs += cell_volume[i] #volume of the source calculated summing the volumes of all the tetrahedrons involved
+    Vs += cell_volume[i] #volume of the source calculated summing the volumes of all the tetrahedrons involved
 
 #total_weights_s_values = total_weights_s.values()
 for i,weight in total_weights_s.items():
@@ -518,7 +518,7 @@ def calculate_volume(vertices_source):
 
     return volume
 
-Vs = calculate_volume(vertices_source)
+#Vs = calculate_volume(vertices_source)
 
 #VOLUME ORIGINAL
 #Vs = cell_volume[source_idx] #volume of the source = to volume of cells where the volume is 

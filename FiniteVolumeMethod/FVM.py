@@ -48,14 +48,14 @@ m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro p
 dt = 1/16000 #time discretizatione
 
 # Source position
-x_source = 20.0  #position of the source in the x direction [m]
-y_source = 1.11  #position of the source in the y direction [m]
-z_source = 1.68  #position of the source in the z direction [m]
+x_source = 2.0  #position of the source in the x direction [m]
+y_source = 1.0  #position of the source in the y direction [m]
+z_source = 1.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 30.0 #position of the receiver in the x direction [m]
-y_rec = 1.11 #position of the receiver in the y direction [m]
-z_rec = 1.68 #position of the receiver in the z direction [m]
+x_rec = 14.0 #position of the receiver in the x direction [m]
+y_rec = 1.0 #position of the receiver in the y direction [m]
+z_rec = 1.0 #position of the receiver in the z direction [m]
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
@@ -64,7 +64,7 @@ th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):"))
 #Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
 #Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
-tcalc = "stationarysource"
+tcalc = "decay"
 
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
@@ -88,7 +88,7 @@ center_freq = fc_low * np.power(2,((np.arange(0,x_frequencies+1) / nth_octave)))
 #INITIALISE GMSH
 ###############################################################################
     
-file_name = "47.3x2.23x3.36.msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "30x2x2.msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 

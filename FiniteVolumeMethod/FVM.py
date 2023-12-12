@@ -45,15 +45,15 @@ st = time.time() #start time of calculation
 c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
-dt = 0.002 #time discretizatione
+dt = 1/8000 #time discretizatione
 
 # Source position
-x_source = 2.0  #position of the source in the x direction [m]
-y_source = 2.0  #position of the source in the y direction [m]
-z_source = 2.0  #position of the source in the z direction [m]
+x_source = 4.0  #position of the source in the x direction [m]
+y_source = 4.0  #position of the source in the y direction [m]
+z_source = 4.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 10.0 #position of the receiver in the x direction [m]
+x_rec = 2.0 #position of the receiver in the x direction [m]
 y_rec = 2.0 #position of the receiver in the y direction [m]
 z_rec = 2.0 #position of the receiver in the z direction [m]
 
@@ -64,14 +64,14 @@ th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):"))
 #Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
 #Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
-tcalc = "stationarysource"
+tcalc = "decay"
 
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
 sourceon_time =  0.5 #time that the source is ON before interrupting [s]
-recording_time = 2.0 #total time recorded for the calculation [s]
+recording_time = 1.8 #total time recorded for the calculation [s]
 
-length_of_mesh = 1
+#length_of_mesh = 1
 
 # Frequency resolution
 fc_low = 125
@@ -88,7 +88,7 @@ center_freq = fc_low * np.power(2,((np.arange(0,x_frequencies+1) / nth_octave)))
 #INITIALISE GMSH
 ###############################################################################
     
-file_name = "40x4x4.msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "8x8x8(A).msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 
@@ -477,7 +477,7 @@ coord_rec = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
 # source_idx = np.argmin(dist_source_cc_list)
 
 #SOURCE INTERPOLATION CALCULATED WITHIN N CENTRE CELL SELECTED WITHIN THE LENGTH OF MESH
-# #Position of source is the centre of a cell so the minimum distance with the centre of a cell has been calculated to understand which cell is the closest
+#Position of source is the centre of a cell so the minimum distance with the centre of a cell has been calculated to understand which cell is the closest
 # dist_source_cc_list = []
 # for i in range(len(cell_center)):
 #     dist_source_cc = math.sqrt(np.sum((cell_center[i] - coord_source)**2))
@@ -555,26 +555,30 @@ cl_tet_s_keys = cl_tet_s.keys() #take only the keys of the cl_tet_s dictionary (
 # CD = vertices_source[1] - vertices_source[3]
 # EF = vertices_source[2] - vertices_source[3]
 
-# # Calculate volume using scalar triple product
+# Calculate volume using scalar triple product
 # Vs = np.abs(np.dot(AB, np.cross(CD, EF))) / 6.0
 
 
-# #VOLUME CALCULATED WITHIN N CENTRE CELL SELECTED 
-# # from scipy.spatial import ConvexHull
+#VOLUME CALCULATED WITHIN N CENTRE CELL SELECTED
+# vertices_source = np.array([]).reshape(0, 3)  # Initialize as an empty 2D array with 3 columns
+# for tet in cl_tet_s_keys:
+#     vertices = cell_center[tet]
+#     vertices_source = np.vstack((vertices_source, vertices)) 
+# from scipy.spatial import ConvexHull
 
-# # def calculate_volume(vertices_source):
-# #     # Create a ConvexHull object
-# #     hull = ConvexHull(vertices_source)
+# def calculate_volume(vertices_source):
+#     # Create a ConvexHull object
+#     hull = ConvexHull(vertices_source)
 
-# #     # Calculate the volume of the convex hull
-# #     volume = hull.volume
+#     # Calculate the volume of the convex hull
+#     volume = hull.volume
 
-# #     return volume
-# # Vs = calculate_volume(vertices_source)
+#     return volume
+# Vs = calculate_volume(vertices_source)
 
 #VOLUME ORIGINAL
 Vs = cell_volume[source_idx] #volume of the source = to volume of cells where the volume is 
-#Vs = 1
+# Vs = 1
 
 ################SOURCE INTERPOLATION WITH VERTICES OF TETRAHEDRON IN WHICH SOURCE IS IN
 #Position of source is the centre of a cell so the minimum distance with the centre of a cell has been calculated to understand which cell is the closest

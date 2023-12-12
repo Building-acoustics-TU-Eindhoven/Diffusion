@@ -45,15 +45,15 @@ st = time.time() #start time of calculation
 c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
-dt = 1/8000 #time discretizatione
+dt = 0.002 #time discretizatione
 
 # Source position
-x_source = 4.0  #position of the source in the x direction [m]
-y_source = 4.0  #position of the source in the y direction [m]
-z_source = 4.0  #position of the source in the z direction [m]
+x_source = 2.0  #position of the source in the x direction [m]
+y_source = 2.0  #position of the source in the y direction [m]
+z_source = 2.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 2.0 #position of the receiver in the x direction [m]
+x_rec = 10.0 #position of the receiver in the x direction [m]
 y_rec = 2.0 #position of the receiver in the y direction [m]
 z_rec = 2.0 #position of the receiver in the z direction [m]
 
@@ -64,12 +64,12 @@ th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):"))
 #Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
 #Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
-tcalc = "decay"
+tcalc = "stationarysource"
 
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
 sourceon_time =  0.5 #time that the source is ON before interrupting [s]
-recording_time = 1.8 #total time recorded for the calculation [s]
+recording_time = 2.0 #total time recorded for the calculation [s]
 
 length_of_mesh = 1
 
@@ -88,7 +88,7 @@ center_freq = fc_low * np.power(2,((np.arange(0,x_frequencies+1) / nth_octave)))
 #INITIALISE GMSH
 ###############################################################################
     
-file_name = "8x8x8(A).msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "40x4x4.msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 
@@ -470,11 +470,11 @@ coord_rec = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
 
 #ORIGINAL
 #Position of source is the centre of a cell so the minimum distance with the centre of a cell has been calculated to understand which cell is the closest
-dist_source_cc_list = []
-for i in range(len(cell_center)):
-    dist_source_cc = math.sqrt(np.sum((cell_center[i] - coord_source)**2))
-    dist_source_cc_list.append(dist_source_cc)
-source_idx = np.argmin(dist_source_cc_list)
+# dist_source_cc_list = []
+# for i in range(len(cell_center)):
+#     dist_source_cc = math.sqrt(np.sum((cell_center[i] - coord_source)**2))
+#     dist_source_cc_list.append(dist_source_cc)
+# source_idx = np.argmin(dist_source_cc_list)
 
 #SOURCE INTERPOLATION CALCULATED WITHIN N CENTRE CELL SELECTED WITHIN THE LENGTH OF MESH
 # #Position of source is the centre of a cell so the minimum distance with the centre of a cell has been calculated to understand which cell is the closest
@@ -544,7 +544,7 @@ for i,weight in total_weights_s.items():
 cl_tet_s_keys = cl_tet_s.keys() #take only the keys of the cl_tet_s dictionary (so basically the indexes of the tetrahedrons)
 
 # #VOLUME CALCULATED WITHIN 4 CENTRE CELL SELECTED (TETRAHEDRON)
-# #Calculate volume of the source with the 4 cell centres as the vertices of the tetrahedron
+#Calculate volume of the source with the 4 cell centres as the vertices of the tetrahedron
 # vertices_source = np.array([]).reshape(0, 3)  # Initialize as an empty 2D array with 3 columns
 # for tet in cl_tet_s_keys:
 #     vertices = cell_center[tet]
@@ -556,7 +556,7 @@ cl_tet_s_keys = cl_tet_s.keys() #take only the keys of the cl_tet_s dictionary (
 # EF = vertices_source[2] - vertices_source[3]
 
 # # Calculate volume using scalar triple product
-# #Vs = np.abs(np.dot(AB, np.cross(CD, EF))) / 6.0
+# Vs = np.abs(np.dot(AB, np.cross(CD, EF))) / 6.0
 
 
 # #VOLUME CALCULATED WITHIN N CENTRE CELL SELECTED 
@@ -637,11 +637,11 @@ for tet_s in cl_tet_s_keys:
 #RECEIVER INTERPOLATION
 ###############################################################################
 #ORIGINAL
-dist_rec_cc_list = []
-for i in range(len(cell_center)):
-    dist_rec_cc = math.sqrt(np.sum((cell_center[i] - coord_rec)**2))
-    dist_rec_cc_list.append(dist_rec_cc)
-rec_idx = np.argmin(dist_rec_cc_list)
+# dist_rec_cc_list = []
+# for i in range(len(cell_center)):
+#     dist_rec_cc = math.sqrt(np.sum((cell_center[i] - coord_rec)**2))
+#     dist_rec_cc_list.append(dist_rec_cc)
+# rec_idx = np.argmin(dist_rec_cc_list)
 
 #INTERPOLATION WITH CLOSEST CENTRES WITHIN THE LENGTH OF MESH
 #Position of receiver is the centre of a cell so the minimum distance with the centre of a cell has been calculated to understand which cell is the closest
@@ -675,41 +675,41 @@ rec_idx = np.argmin(dist_rec_cc_list)
 
 #RECEIVER INTERPOLATION CALCULATED WITHIN 4 CENTRE CELL SELECTED (TETRAHEDRON)
 #Position of receiver is the centre of a cell so the minimum distance with the centre of a cell has been calculated to understand which cell is the closest
-# dist_rec_cc_list = [] #initialise the list for all the distances between each cell centre and the source
-# for i in range(len(cell_center)): #for each tetra
-#     dist_rec_cc = math.sqrt(np.sum((cell_center[i] - coord_rec)**2)) #calculate the distance between its centre cell and the source coordinate
-#     dist_rec_cc_list.append(dist_rec_cc) #append the distance in a list
-# rec_idx = np.argmin(dist_rec_cc_list) #take the minimum distance index; this is where the source will be positioned
+dist_rec_cc_list = [] #initialise the list for all the distances between each cell centre and the source
+for i in range(len(cell_center)): #for each tetra
+    dist_rec_cc = math.sqrt(np.sum((cell_center[i] - coord_rec)**2)) #calculate the distance between its centre cell and the source coordinate
+    dist_rec_cc_list.append(dist_rec_cc) #append the distance in a list
+rec_idx = np.argmin(dist_rec_cc_list) #take the minimum distance index; this is where the source will be positioned
 
-# dist_rec_cc_list_sorted = sorted(dist_rec_cc_list) #sorted from the minimum to the maximum distance
-# selected_rec_cc_list = dist_rec_cc_list_sorted[:4] #take only the first four element of the sorted list (take the first 4 cell centres closest to the source)
+dist_rec_cc_list_sorted = sorted(dist_rec_cc_list) #sorted from the minimum to the maximum distance
+selected_rec_cc_list = dist_rec_cc_list_sorted[:4] #take only the first four element of the sorted list (take the first 4 cell centres closest to the source)
 
-# dist_rec_cc_list_sorted_indices = np.argsort(dist_rec_cc_list)[:4] #takes the indeces of the minimum distances
-# selected_rec_cc_list_indices = dist_rec_cc_list_sorted_indices[:4] #does exactly the same as the previous line
+dist_rec_cc_list_sorted_indices = np.argsort(dist_rec_cc_list)[:4] #takes the indeces of the minimum distances
+selected_rec_cc_list_indices = dist_rec_cc_list_sorted_indices[:4] #does exactly the same as the previous line
 
-# import math
-# #cl_tet_s stands for cl=closest, tet=tetrahedron, s=to the source
-# cl_tet_r = {} #initialise dictionary for closest tetrahedrons to the source
-# for i in range(len(dist_rec_cc_list_sorted_indices)): #for each of the 4 tetra closest to the source
-#     idx = selected_rec_cc_list[i] #take its index
-#     cl_tet_r[dist_rec_cc_list_sorted_indices[i]] = idx #put it in a dictionary
+import math
+#cl_tet_s stands for cl=closest, tet=tetrahedron, s=to the source
+cl_tet_r = {} #initialise dictionary for closest tetrahedrons to the source
+for i in range(len(dist_rec_cc_list_sorted_indices)): #for each of the 4 tetra closest to the source
+    idx = selected_rec_cc_list[i] #take its index
+    cl_tet_r[dist_rec_cc_list_sorted_indices[i]] = idx #put it in a dictionary
 
-# total_weights_r = {} #initialise weights for each tetrahedron around the actual source position
-# sum_weights_r = 0
-# #Vs = 0
-# for i, dist in cl_tet_r.items(): #for each key and value in the dictionary (so for each closest tetrahedron to the source)
-#     weights = np.divide(1.0 , dist)  #calculate the inverse distance weights, so closer to the point means higher weight
-#     #print(weights)
-#     sum_weights_r += weights
-#     #weights /= np.sum(weights)  # Normalize weights to sum to 1
-#     total_weights_r[i] = weights #put the wweigths (values) to the correspondent closest tetrahedron (keys)
-#     #Vs += cell_volume[i] #volume of the source calculated summing the volumes of all the tetrahedrons involved
+total_weights_r = {} #initialise weights for each tetrahedron around the actual source position
+sum_weights_r = 0
+#Vs = 0
+for i, dist in cl_tet_r.items(): #for each key and value in the dictionary (so for each closest tetrahedron to the source)
+    weights = np.divide(1.0 , dist)  #calculate the inverse distance weights, so closer to the point means higher weight
+    #print(weights)
+    sum_weights_r += weights
+    #weights /= np.sum(weights)  # Normalize weights to sum to 1
+    total_weights_r[i] = weights #put the wweigths (values) to the correspondent closest tetrahedron (keys)
+    #Vs += cell_volume[i] #volume of the source calculated summing the volumes of all the tetrahedrons involved
 
-# #total_weights_s_values = total_weights_s.values()
-# for i,weight in total_weights_r.items():
-#     total_weights_r[i] = weight/sum_weights_r if sum_weights_r != 0 else 0
+#total_weights_s_values = total_weights_s.values()
+for i,weight in total_weights_r.items():
+    total_weights_r[i] = weight/sum_weights_r if sum_weights_r != 0 else 0
 
-# cl_tet_r_keys = cl_tet_r.keys() #take only the keys of the cl_tet_s dictionary (so basically the indexes of the tetrahedrons)
+cl_tet_r_keys = cl_tet_r.keys() #take only the keys of the cl_tet_s dictionary (so basically the indexes of the tetrahedrons)
 
 ###############################################################################
 #CALCULATION OF LENGHT OF ROOM
@@ -822,11 +822,11 @@ for steps in range(0, recording_steps):
     #w_new_total = 0
     #w_rec is the energy density at the specific receiver
     #ORIGINAL
-    w_rec[steps] = w_new[rec_idx]
+    #w_rec[steps] = w_new[rec_idx]
     
     #INTERPOLATION WITH N CELL CENTRES OR 4 CELL CENTRES
-    # for tet_r in cl_tet_r_keys:
-    #     w_rec[steps] += w_new[tet_r] *total_weights_r[tet_r]   
+    for tet_r in cl_tet_r_keys:
+        w_rec[steps] += w_new[tet_r] *total_weights_r[tet_r]   
     
     if steps == sourceon_steps:
         #print("Steps for source:",steps)
@@ -856,8 +856,13 @@ for steps in range(0, recording_steps):
         
     
     if tcalc == "stationarysource":
-        s[source_idx] = source1[0]
-
+        #ORIGINAL
+        #s[source_idx] = source1[0]
+        
+        #INTERPOLATION SOURCE
+        for tet_s in cl_tet_s_keys:
+             s[tet_s] = source1[0] *total_weights_s[tet_s]
+        
     print(time_steps)
 
 #w_new_band.append(w_new)

@@ -507,24 +507,24 @@ source_idx = np.argmin(dist_source_cc_list)
 
 #SOURCE INTERPOLATION CALCULATED WITHIN 4 CENTRE CELL SELECTED (TETRAHEDRON)
 #Position of source is the centre of a cell so the minimum distance with the centre of a cell has been calculated to understand which cell is the closest
-dist_source_cc_list = []
-for i in range(len(cell_center)):
-    dist_source_cc = math.sqrt(np.sum((cell_center[i] - coord_source)**2))
-    dist_source_cc_list.append(dist_source_cc)
-source_idx = np.argmin(dist_source_cc_list)
+dist_source_cc_list = [] #initialise the list for all the distances between each cell centre and the source
+for i in range(len(cell_center)): #for each tetra
+    dist_source_cc = math.sqrt(np.sum((cell_center[i] - coord_source)**2)) #calculate the distance between its centre cell and the source coordinate
+    dist_source_cc_list.append(dist_source_cc) #append the distance in a list
+source_idx = np.argmin(dist_source_cc_list) #take the minimum distance index; this is where the source will be positioned
 
-dist_source_cc_list_sorted = sorted(dist_source_cc_list)
-selected_source_cc_list = dist_source_cc_list_sorted[:4]
+dist_source_cc_list_sorted = sorted(dist_source_cc_list) #sorted from the minimum to the maximum distance
+selected_source_cc_list = dist_source_cc_list_sorted[:4] #take only the first four element of the sorted list (take the first 4 cell centres closest to the source)
 
-dist_source_cc_list_sorted_indices = np.argsort(dist_source_cc_list)[:4]
-selected_source_cc_list_indices = dist_source_cc_list_sorted_indices[:4]
+dist_source_cc_list_sorted_indices = np.argsort(dist_source_cc_list)[:4] #takes the indeces of the minimum distances
+selected_source_cc_list_indices = dist_source_cc_list_sorted_indices[:4] #does exactly the same as the previous line
 
 import math
 #cl_tet_s stands for cl=closest, tet=tetrahedron, s=to the source
-cl_tet_s = {} #initialise dictionary fro closest tetrahedrons to the source
-for i in range(len(selected_source_cc_list_indices)):
-    idx = selected_source_cc_list_indices[i]
-    cl_tet_s[i] = idx
+cl_tet_s = {} #initialise dictionary for closest tetrahedrons to the source
+for i in range(len(dist_source_cc_list_sorted_indices)): #for each of the 4 tetra closest to the source
+    idx = selected_source_cc_list[i] #take its index
+    cl_tet_s[dist_source_cc_list_sorted_indices[i]] = idx #put it in a dictionary
 
 total_weights_s = {} #initialise weights for each tetrahedron around the actual source position
 sum_weights_s = 0
@@ -543,13 +543,13 @@ for i,weight in total_weights_s.items():
 
 cl_tet_s_keys = cl_tet_s.keys() #take only the keys of the cl_tet_s dictionary (so basically the indexes of the tetrahedrons)
 
-#Calculate volume of the source with the 4 cell centres as the vertices of the tetrahedron
-vertices_source = np.array([]).reshape(0, 3)  # Initialize as an empty 2D array with 3 columns
-for tet in cl_tet_s_keys:
-    vertices = cell_center[tet]
-    vertices_source = np.vstack((vertices_source, vertices))
-
 # #VOLUME CALCULATED WITHIN 4 CENTRE CELL SELECTED (TETRAHEDRON)
+# #Calculate volume of the source with the 4 cell centres as the vertices of the tetrahedron
+# vertices_source = np.array([]).reshape(0, 3)  # Initialize as an empty 2D array with 3 columns
+# for tet in cl_tet_s_keys:
+#     vertices = cell_center[tet]
+#     vertices_source = np.vstack((vertices_source, vertices))
+
 # # Calculate edge vectors
 # AB = vertices_source[0] - vertices_source[3]
 # CD = vertices_source[1] - vertices_source[3]
@@ -666,6 +666,44 @@ rec_idx = np.argmin(dist_rec_cc_list)
 #     sum_weights_r += weights
 #     #weights /= np.sum(weights)  # Normalize weights to sum to 1
 #     total_weights_r[i] = weights #put the wweigths (values) to the correspondent closest tetrahedron (keys)
+
+# #total_weights_s_values = total_weights_s.values()
+# for i,weight in total_weights_r.items():
+#     total_weights_r[i] = weight/sum_weights_r if sum_weights_r != 0 else 0
+
+# cl_tet_r_keys = cl_tet_r.keys() #take only the keys of the cl_tet_s dictionary (so basically the indexes of the tetrahedrons)
+
+#RECEIVER INTERPOLATION CALCULATED WITHIN 4 CENTRE CELL SELECTED (TETRAHEDRON)
+#Position of receiver is the centre of a cell so the minimum distance with the centre of a cell has been calculated to understand which cell is the closest
+# dist_rec_cc_list = [] #initialise the list for all the distances between each cell centre and the source
+# for i in range(len(cell_center)): #for each tetra
+#     dist_rec_cc = math.sqrt(np.sum((cell_center[i] - coord_rec)**2)) #calculate the distance between its centre cell and the source coordinate
+#     dist_rec_cc_list.append(dist_rec_cc) #append the distance in a list
+# rec_idx = np.argmin(dist_rec_cc_list) #take the minimum distance index; this is where the source will be positioned
+
+# dist_rec_cc_list_sorted = sorted(dist_rec_cc_list) #sorted from the minimum to the maximum distance
+# selected_rec_cc_list = dist_rec_cc_list_sorted[:4] #take only the first four element of the sorted list (take the first 4 cell centres closest to the source)
+
+# dist_rec_cc_list_sorted_indices = np.argsort(dist_rec_cc_list)[:4] #takes the indeces of the minimum distances
+# selected_rec_cc_list_indices = dist_rec_cc_list_sorted_indices[:4] #does exactly the same as the previous line
+
+# import math
+# #cl_tet_s stands for cl=closest, tet=tetrahedron, s=to the source
+# cl_tet_r = {} #initialise dictionary for closest tetrahedrons to the source
+# for i in range(len(dist_rec_cc_list_sorted_indices)): #for each of the 4 tetra closest to the source
+#     idx = selected_rec_cc_list[i] #take its index
+#     cl_tet_r[dist_rec_cc_list_sorted_indices[i]] = idx #put it in a dictionary
+
+# total_weights_r = {} #initialise weights for each tetrahedron around the actual source position
+# sum_weights_r = 0
+# #Vs = 0
+# for i, dist in cl_tet_r.items(): #for each key and value in the dictionary (so for each closest tetrahedron to the source)
+#     weights = np.divide(1.0 , dist)  #calculate the inverse distance weights, so closer to the point means higher weight
+#     #print(weights)
+#     sum_weights_r += weights
+#     #weights /= np.sum(weights)  # Normalize weights to sum to 1
+#     total_weights_r[i] = weights #put the wweigths (values) to the correspondent closest tetrahedron (keys)
+#     #Vs += cell_volume[i] #volume of the source calculated summing the volumes of all the tetrahedrons involved
 
 # #total_weights_s_values = total_weights_s.values()
 # for i,weight in total_weights_r.items():

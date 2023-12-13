@@ -42,27 +42,27 @@ c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
 #Room dimensions
-length = 30.0 #point x finish at the length of the room in the x direction [m] %Length
-width = 2.0 #point y finish at the length of the room in the y direction [m] %Width
-height = 2.0 #point z finish at the length of the room in the x direction [m] %Height
+length = 40.0 #point x finish at the length of the room in the x direction [m] %Length
+width = 4.0 #point y finish at the length of the room in the y direction [m] %Width
+height = 4.0 #point z finish at the length of the room in the x direction [m] %Height
 
 # Source position
 x_source = 2.0  #position of the source in the x direction [m]
-y_source = 1.0  #position of the source in the y direction [m]
-z_source = 1.0  #position of the source in the z direction [m]
+y_source = 2.0  #position of the source in the y direction [m]
+z_source = 2.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 14.0 #position of the receiver in the x direction [m]
-y_rec = 1.0 #position of the receiver in the y direction [m]
-z_rec = 1.0 #position of the receiver in the z direction [m]
+x_rec = 10.0 #position of the receiver in the x direction [m]
+y_rec = 2.0 #position of the receiver in the y direction [m]
+z_rec = 2.0 #position of the receiver in the z direction [m]
 
 #Spatial discretization
-dx = 0.20 #distance between grid points x direction [m] #See Documentation for more insight about dt and dx
+dx = 0.50 #distance between grid points x direction [m] #See Documentation for more insight about dt and dx
 dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
 #Time discretization
-dt = 1/16000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
+dt = 0.002 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
@@ -77,7 +77,7 @@ alpha_6 = 0.1 #Absorption coefficient for Surface6 - Wall Right
 #Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
 #Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
-tcalc = "decay"
+tcalc = "stationarysource"
 
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB

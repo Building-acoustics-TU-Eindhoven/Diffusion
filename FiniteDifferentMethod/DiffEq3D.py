@@ -70,7 +70,7 @@ th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):"))
 alpha_1 = 0.5 #Absorption coefficient for Surface1 - Floor
 alpha_2 = 0.5 #Absorption coefficient for Surface2 - Ceiling
 alpha_3 = 0.5 #Absorption coefficient for Surface3 - Wall Front
-alpha_4 = 1 #Absorption coefficient for Surface4 - Wall Back
+alpha_4 = 1.0 #Absorption coefficient for Surface4 - Wall Back
 alpha_5 = 0.5 #Absorption coefficient for Surface5 - Wall Left
 alpha_6 = 0.5 #Absorption coefficient for Surface6 - Wall Right
 

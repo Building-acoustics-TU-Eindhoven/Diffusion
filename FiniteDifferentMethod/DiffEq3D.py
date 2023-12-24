@@ -13,7 +13,7 @@ from scipy.integrate import simps
 from scipy import linalg
 import sys
 #uncomment this if you need drawnow
-from drawnow import drawnow
+#from drawnow import drawnow
 from math import ceil
 from math import log
 from FunctionRT import *
@@ -42,18 +42,18 @@ c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
 #Room dimensions
-length = 5.0 #point x finish at the length of the room in the x direction [m] %Length
-width = 5.0 #point y finish at the length of the room in the y direction [m] %Width
-height = 5.0 #point z finish at the length of the room in the x direction [m] %Height
+length = 21.0 #point x finish at the length of the room in the x direction [m] %Length
+width = 3.0 #point y finish at the length of the room in the y direction [m] %Width
+height = 3.0 #point z finish at the length of the room in the x direction [m] %Height
 
 # Source position
-x_source = 2.5  #position of the source in the x direction [m]
-y_source = 2.5  #position of the source in the y direction [m]
-z_source = 2.5  #position of the source in the z direction [m]
+x_source = 0.5  #position of the source in the x direction [m]
+y_source = 0.5  #position of the source in the y direction [m]
+z_source = 1.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 1.0 #position of the receiver in the x direction [m]
-y_rec = 1.0 #position of the receiver in the y direction [m]
+x_rec = 20.0 #position of the receiver in the x direction [m]
+y_rec = 0.5 #position of the receiver in the y direction [m]
 z_rec = 1.0 #position of the receiver in the z direction [m]
 
 #Spatial discretization
@@ -62,17 +62,17 @@ dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
 #Time discretization
-dt = 1/16000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
+dt = 1/2000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
-alpha_1 = 0.5 #Absorption coefficient for Surface1 - Floor
-alpha_2 = 0.5 #Absorption coefficient for Surface2 - Ceiling
-alpha_3 = 0.5 #Absorption coefficient for Surface3 - Wall Front
-alpha_4 = 1.0 #Absorption coefficient for Surface4 - Wall Back
-alpha_5 = 0.5 #Absorption coefficient for Surface5 - Wall Left
-alpha_6 = 0.5 #Absorption coefficient for Surface6 - Wall Right
+alpha_1 = 1/6 #Absorption coefficient for Surface1 - Floor
+alpha_2 = 1/6 #Absorption coefficient for Surface2 - Ceiling
+alpha_3 = 1/6 #Absorption coefficient for Surface3 - Wall Front
+alpha_4 = 1/6 #Absorption coefficient for Surface4 - Wall Back
+alpha_5 = 1/6 #Absorption coefficient for Surface5 - Wall Left
+alpha_6 = 1/6 #Absorption coefficient for Surface6 - Wall Right
 
 #Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
@@ -82,7 +82,7 @@ tcalc = "decay"
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
 sourceon_time =  0.5 #time that the source is ON before interrupting [s]
-recording_time = 1.8 #total time recorded for the calculation [s]
+recording_time = 1.0 #total time recorded for the calculation [s]
 
 #%%
 ###############################################################################
@@ -152,6 +152,12 @@ mean_free_time_step = int(mean_free_time/dt)
 Dx = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms x direction
 Dy = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms y direction
 Dz = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms z direction
+
+
+#Longest dimension in the room
+longest_dimension = math.sqrt(length**2+width**2)
+longest_dimension_time = longest_dimension/c0
+longest_dimension_step = int(longest_dimension_time/dt)
 
 #Mesh numbers
 beta_zero_x = (2*Dx*dt)/(dx**2) #mesh number in x direction
@@ -414,7 +420,14 @@ for steps in range(0, recording_steps):
     if steps == round(5*mean_free_time_step + sourceon_steps + (dist_sr/c0)):
         index_5l = steps
         w_5l = w_new
+    
+    if steps == round(2*longest_dimension_step): #+ sourceon_steps + (dist_sr/c0)):
+        index_2ld = steps
+        w_2ld = w_new
         
+    if steps == round(4*longest_dimension_step): #+ sourceon_steps + (dist_sr/c0)):
+        index_4ld = steps
+        w_4ld = w_new
     #4D Visualization????
     #Flatten the coordinates and w_new values for scatter plot
     ##coords = np.column_stack([xx.ravel(), yy.ravel(), zz.ravel()])
@@ -528,6 +541,29 @@ w_rec_x_5l = ((w_5l[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * 
                             (w_5l[:, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r)))    
 
 spl_rec_x_5l = 10*np.log10(rho*c0**2*w_rec_x_5l/pRef**2)
+
+w_rec_x_2ld = ((w_2ld[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
+    (w_2ld[:, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
+        (w_2ld[:, col_up_r, dep_lr_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_lr_r))+\
+            (w_2ld[:, col_up_r, dep_up_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_up_r))+\
+                (w_2ld[:, col_lr_r, dep_lr_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_lr_r))+\
+                    (w_2ld[:, col_lr_r, dep_up_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_up_r))+\
+                        (w_2ld[:, col_up_r, dep_lr_r]*(weight_row_up_r * weight_col_up_r * weight_dep_lr_r))+\
+                            (w_2ld[:, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r)))    
+
+spl_rec_x_2ld = 10*np.log10(rho*c0**2*w_rec_x_2ld/pRef**2)
+
+w_rec_x_4ld = ((w_4ld[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
+    (w_4ld[:, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
+        (w_4ld[:, col_up_r, dep_lr_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_lr_r))+\
+            (w_4ld[:, col_up_r, dep_up_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_up_r))+\
+                (w_4ld[:, col_lr_r, dep_lr_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_lr_r))+\
+                    (w_4ld[:, col_lr_r, dep_up_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_up_r))+\
+                        (w_4ld[:, col_up_r, dep_lr_r]*(weight_row_up_r * weight_col_up_r * weight_dep_lr_r))+\
+                            (w_4ld[:, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r)))    
+
+spl_rec_x_4ld = 10*np.log10(rho*c0**2*w_rec_x_4ld/pRef**2)
+
     
 w_rec_x_t0 = ((w_t0[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
     (w_t0[:, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
@@ -748,6 +784,34 @@ if tcalc == "decay":
     plt.figure(22)
     plt.title("Figure 22: SPL REVERB over the x axis at t=5*mean_free")
     plt.plot(x,spl_rec_x_5l)
+    plt.ylabel('$\mathrm{SPL \ [dB]}$')
+    plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
+    
+    #Figure 23: Energy density at t=2*ld over the space x.
+    plt.figure(23)
+    plt.title("Figure 23: Energy density over the x axis at t=2*longest_dimension_time")
+    plt.plot(x,w_rec_x_2ld)
+    plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
+    plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
+    
+    #Figure 24: SPL at  t=2*ld over the space x. reverb sound only
+    plt.figure(24)
+    plt.title("Figure 24: SPL REVERB over the x axis at t=2*longest_dimension_time")
+    plt.plot(x,spl_rec_x_2ld)
+    plt.ylabel('$\mathrm{SPL \ [dB]}$')
+    plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
+    
+    #Figure 25: Energy density at t=4*ld over the space x.
+    plt.figure(25)
+    plt.title("Figure 25: Energy density over the x axis at t=4*longest_dimension_time")
+    plt.plot(x,w_rec_x_4ld)
+    plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
+    plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
+    
+    #Figure 26: SPL at  t=4*ld over the space x. reverb sound only
+    plt.figure(26)
+    plt.title("Figure 26: SPL REVERB over the x axis at t=4*longest_dimension_time")
+    plt.plot(x,spl_rec_x_4ld)
     plt.ylabel('$\mathrm{SPL \ [dB]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
     

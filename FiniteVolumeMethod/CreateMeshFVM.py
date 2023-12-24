@@ -28,9 +28,9 @@ Created on Mon Oct 30 08:56:01 2023
 #geom.write_mesh("output.msh")
 
 import gmsh
-import pygmsh as pg
-import py2gmsh as p2g
-from py2gmsh import (Mesh, Entity, Field)
+#import pygmsh as pg
+#import py2gmsh as p2g
+#from py2gmsh import (Mesh, Entity, Field)
 
 import subprocess
 
@@ -64,9 +64,9 @@ import subprocess
 #INPUT VARIABLES
 ###############################################################################
 # Specify the path to your original Geo file
-geo_file_path = '5x5x5.geo'
+geo_file_path = '8x8x8.geo'
 max_mesh_size = 1
-name_gmsh_file = '5x5x5.msh'
+name_gmsh_file = '8x8x8.msh'
 length_of_mesh = 1
 
 #%%

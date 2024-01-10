@@ -30,7 +30,7 @@ The inputs are:
 - Length, width, height of the room (lxmax, lumax, lzmax in m);
 - Position of the source $x_\{source\},y_\{source\},z_\{source\}$ in m in the x,y,z directions;
 - Position of the receiver $x_\{rec\},y_\{rec\},z_\{rec\}$ in m in the x,y,z directions;
-- Distance between grid points dx, dy and dz in m;
+- Distance between grid points dx, dy and dz in m; (use a dx multiple of the dimensions of the rooms, e.g. 0.5m or 0.2m for a 3x3x3 room and not 0.4m)
 - Time discretization dt in s;
 - Recording time of the calculation in s;
 - Absorption conditions term (option 1 Sabine, 2 Eyring, 3 Modified);

@@ -24,7 +24,7 @@ To properly run the cose, the following libraries are needed:
 The inputs are:
 - Length of the line x direction lxmax in m and line in y direction in m;
 - Air absorption m_atm in 1/m;
-- Distance between grid points dx and dy in m;
+- Distance between grid points dx and dy in m; (use a dx multiple of the dimensions of the rooms, e.g. 0.5m or 0.2m for a 3x3x3 room and not 0.4m)
 - Distance between grid points on the time discretization dt in s;
 - Recording time of the calculation in s;
 - Source time (time of the source beeing on before interrupting);

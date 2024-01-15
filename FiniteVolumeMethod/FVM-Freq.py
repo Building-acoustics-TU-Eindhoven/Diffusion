@@ -32,7 +32,6 @@ from scipy.interpolate import griddata
 from matplotlib.animation import FuncAnimation
 from scipy.sparse import lil_matrix
 import gmsh
-import sys
  
 st = time.time() #start time of calculation
 
@@ -79,7 +78,6 @@ nth_octave = 1
 x_frequencies  = nth_octave * log(fc_high/fc_low) / log(2)
 nBands = int(nth_octave * log(fc_high/fc_low) / log(2) + 1)
 center_freq = fc_low * np.power(2,((np.arange(0,x_frequencies+1) / nth_octave)))
-
 
 #%%
 ###############################################################################
@@ -280,7 +278,7 @@ for iGroup in vGroups:
 #######################################################################################################
 #######################################################################################################
 
-interior = np.zeros((velement, velement)) #initialization matrix of tetrahedron per tetrahedron
+interior_tet = np.zeros((velement, velement)) #initialization matrix of tetrahedron per tetrahedron
 
 for i in range(velement): #for each tetrahedron, take its centre
     print(i)
@@ -302,18 +300,18 @@ for i in range(velement): #for each tetrahedron, take its centre
                 sc2 = gmsh.model.mesh.getNode(shared_nodes[2])[0] #coordinates of node 2
                 shared_area = np.linalg.norm(np.cross(sc2-sc0,sc1-sc0))/2 #compute shared area
                 shared_distance = sqrt((abs(cell_center_i[0] - cell_center_j[0]))**2 + (abs(cell_center_i[1] - cell_center_j[1]))**2 + (abs(cell_center_i[2] - cell_center_j[2]))**2) #distance between volume elements
-                interior[i, j] = shared_area/shared_distance #division between shared area and shared distance
+                interior_tet[i, j] = shared_area/shared_distance #division between shared area and shared distance
             else:
                 shared_area = 0
-                interior[i, j] = shared_area
+                interior_tet[i, j] = shared_area
 
-#Fmat = lil_matrix(interior) #this is like sparse in matlab
+#Fmat = lil_matrix(interior_tet) #this is like sparse in matlab
 
 from scipy.sparse import csr_matrix
 
-Fmat = csr_matrix(interior)
+Fmat = csr_matrix(interior_tet)
 
-interior_sum = np.sum(interior, axis=1) #sum of interior per columns (so per i element)
+interior_tet_sum = np.sum(interior_tet, axis=1) #sum of interior_tet per columns (so per i element)
 
 
 ##############################################################################
@@ -368,17 +366,17 @@ for entity, Abs_term in surface_absorption:
 
 #######################################################################################################
 #######################################################################################################
-#FACE AREA & BOUNDARYV
+#FACE AREA & boundary_areas
 #######################################################################################################
 #######################################################################################################
 total_boundArea = 0 #initialization of total surface area of the room
-boundaryV = []  #Initialize a list to store boundaryV values for each tetrahedron
+boundary_areas = []  #Initialize a list to store boundary_areas values for each tetrahedron
 import itertools
 face_areas = np.zeros(len(velemNodes)) #Per each tetrahedron, if there is a face that is on the boundary, include the area, otehrwise zero
 for idx, element in enumerate(velemNodes): #for index and element in the number of tetrahedrons
     #if idx == 491:
-        tetrahedron_boundaryV = 0 #initialization tetrahedron face on boundary*its absorption term
-        total_tetrahedron_boundaryV = np.zeros(5) #initialization total tetrahedron face on boundary*its absorption term if there are more than one face in the tetrahedron that is on the boundary
+        tetrahedron_boundary_areas = 0 #initialization tetrahedron face on boundary*its absorption term
+        total_tetrahedron_boundary_areas = np.zeros(5) #initialization total tetrahedron face on boundary*its absorption term if there are more than one face in the tetrahedron that is on the boundary
         #print(idx)
         node_combinations = [list(nodes) for nodes in itertools.combinations(element, 3)] #all possible combinations of the nodes of the tetrahedrons (it checks also for the order of the nodes in the same combination)
         # Check if the nodes are in any order in bounNode
@@ -410,12 +408,12 @@ for idx, element in enumerate(velemNodes): #for index and element in the number 
                             face_absorption_product = face_area * triangle_face_absorption[surface_set_idx] #calculate the product between the area*the correspondent absorption term
                             #print(face_absorption_product)
                             
-                            tetrahedron_boundaryV += face_absorption_product #add the calculation to the tetrahedron correspondent
+                            tetrahedron_boundary_areas += face_absorption_product #add the calculation to the tetrahedron correspondent
                             
-                            total_tetrahedron_boundaryV = tetrahedron_boundaryV #if there are multiple surfaces on the boundary per each tetrahedron, then add also the second and the third one
+                            total_tetrahedron_boundary_areas = tetrahedron_boundary_areas #if there are multiple surfaces on the boundary per each tetrahedron, then add also the second and the third one
                             
-        boundaryV.append(np.array(total_tetrahedron_boundaryV)) #Append the total boundaryV for the tetrahedron to the list
-        print(total_tetrahedron_boundaryV) 
+        boundary_areas.append(np.array(total_tetrahedron_boundary_areas)) #Append the total boundary_areas for the tetrahedron to the list
+        print(total_tetrahedron_boundary_areas) 
         
 #distance between source and receiver
 dist_sr = math.sqrt((abs(x_rec - x_source))**2 + (abs(y_rec - y_source))**2 + (abs(z_rec - z_source))**2) #distance between source and receiver
@@ -492,14 +490,14 @@ s = np.zeros((velement)) #matrix of zeros for source
 s[source_idx] = source1[0]
 
 
-boundaryV = np.array(boundaryV)
-boundaryV = boundaryV.T
+boundary_areas = np.array(boundary_areas)
+boundary_areas = boundary_areas.T
 beta_zero_freq = []
-for iBand in range(len(boundaryV)):
+for iBand in range(len(boundary_areas)):
     print(iBand)
     #freq = center_freq[iBand]
-    print(boundaryV[iBand])
-    beta_zero_element = np.divide(dt*((Dx *interior_sum) + boundaryV[iBand]),cell_volume) #my interpretation of the beta_zero
+    print(boundary_areas[iBand])
+    beta_zero_element = np.divide(dt*((Dx *interior_tet_sum) + boundary_areas[iBand]),cell_volume) #my interpretation of the beta_zero
     beta_zero_freq.append(beta_zero_element)
     
 #%%
@@ -530,7 +528,7 @@ for iBand in range(nBands):
                     
         w_new = np.divide((np.multiply(w_old,(1-beta_zero_freq[iBand]))),(1+beta_zero_freq[iBand])) - \
             np.divide((2*dt*c0*m_atm*w),(1+beta_zero_freq[iBand])) + \
-                np.divide(np.divide((2*dt*Dx*(interior@w)),cell_volume),(1+beta_zero_freq[iBand])) + \
+                np.divide(np.divide((2*dt*Dx*(interior_tet@w)),cell_volume),(1+beta_zero_freq[iBand])) + \
                     np.divide((2*dt*s),(1+beta_zero_freq[iBand])) #The absorption term is part of beta_zero
                      
         #Update w before next step

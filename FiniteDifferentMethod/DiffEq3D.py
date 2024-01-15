@@ -67,6 +67,7 @@ dt = 1/100000 #distance between grid points on the time discretization [s] #See 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
+
 alpha_1 = 1/6 #Absorption coefficient for Surface1 - Floor
 alpha_2 = 1/6 #Absorption coefficient for Surface2 - Ceiling
 alpha_3 = 1/6 #Absorption coefficient for Surface3 - Wall Front

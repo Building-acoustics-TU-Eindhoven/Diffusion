@@ -42,7 +42,7 @@ c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
 #Room dimensions
-length = 21.0 #point x finish at the length of the room in the x direction [m] %Length
+length = 3.0 #point x finish at the length of the room in the x direction [m] %Length
 width = 3.0 #point y finish at the length of the room in the y direction [m] %Width
 height = 3.0 #point z finish at the length of the room in the x direction [m] %Height
 
@@ -52,17 +52,17 @@ y_source = 0.5  #position of the source in the y direction [m]
 z_source = 1.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 20.0 #position of the receiver in the x direction [m]
+x_rec = 2.0 #position of the receiver in the x direction [m]
 y_rec = 0.5 #position of the receiver in the y direction [m]
 z_rec = 1.0 #position of the receiver in the z direction [m]
 
 #Spatial discretization
-dx = 0.50 #distance between grid points x direction [m] #See Documentation for more insight about dt and dx
+dx = 0.10 #distance between grid points x direction [m] #See Documentation for more insight about dt and dx
 dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
 #Time discretization
-dt = 1/2000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
+dt = 1/100000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
@@ -82,7 +82,7 @@ tcalc = "decay"
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
 sourceon_time =  0.5 #time that the source is ON before interrupting [s]
-recording_time = 1.0 #total time recorded for the calculation [s]
+recording_time = 2.0 #total time recorded for the calculation [s]
 
 #%%
 ###############################################################################
@@ -608,6 +608,7 @@ spl_r_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_s
 #Find the energy decay part of the overal calculation
 idx_w_rec = np.where(t == sourceon_time)[0][0] #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
 w_rec_off = w_rec[idx_w_rec:] #cutting the energy density array at the receiver from the idx_w_rec to the end
+spl_r_off = 10*np.log10(((abs(w_rec_off))*rho*(c0**2))/(pRef**2))
 
 #Impulse response from the energy density
 w_rec_off_deriv = w_rec_off #initialising an array of derivative equal to the w_rec_off -> this will be the impulse response after modifying it

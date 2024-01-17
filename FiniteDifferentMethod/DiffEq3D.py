@@ -42,27 +42,27 @@ c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
 #Room dimensions
-length = 3.0 #point x finish at the length of the room in the x direction [m] %Length
-width = 3.0 #point y finish at the length of the room in the y direction [m] %Width
-height = 3.0 #point z finish at the length of the room in the x direction [m] %Height
+length = 8.0 #point x finish at the length of the room in the x direction [m] %Length
+width = 8.0 #point y finish at the length of the room in the y direction [m] %Width
+height = 8.0 #point z finish at the length of the room in the x direction [m] %Height
 
 # Source position
-x_source = 0.5  #position of the source in the x direction [m]
-y_source = 0.5  #position of the source in the y direction [m]
-z_source = 1.0  #position of the source in the z direction [m]
+x_source = 4  #position of the source in the x direction [m]
+y_source = 4  #position of the source in the y direction [m]
+z_source = 4  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 2.0 #position of the receiver in the x direction [m]
-y_rec = 0.5 #position of the receiver in the y direction [m]
-z_rec = 1.0 #position of the receiver in the z direction [m]
+x_rec = 2 #position of the receiver in the x direction [m]
+y_rec = 2 #position of the receiver in the y direction [m]
+z_rec = 2 #position of the receiver in the z direction [m]
 
 #Spatial discretization
-dx = 0.10 #distance between grid points x direction [m] #See Documentation for more insight about dt and dx
+dx = 0.08 #distance between grid points x direction [m] #See Documentation for more insight about dt and dx
 dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
 #Time discretization
-dt = 1/100000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
+dt = 1/64000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
@@ -83,7 +83,7 @@ tcalc = "decay"
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
 sourceon_time =  0.5 #time that the source is ON before interrupting [s]
-recording_time = 2.0 #total time recorded for the calculation [s]
+recording_time = 1.5 #total time recorded for the calculation [s]
 
 #%%
 ###############################################################################

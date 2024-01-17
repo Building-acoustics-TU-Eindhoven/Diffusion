@@ -13,6 +13,26 @@ The software provides the energy density and sound pressure level over 3D space 
 4. Download SketchUp from [SketchUp website](https://www.sketchup.com/plans-and-pricing/sketchup-free)
 5. Download g-mesh from [G-mesh website](https://gmsh.info/)
 
+## Manual for running a calulation
+1. Install SketchUp;
+2. Install the Meshkit extension of SketchUp from the extension warehouse;
+3. Set the active mesher to gmsh by clicking on the "edit configuration button";
+4. Select gmsh as the active mesher;
+5. Create the 3D of the room to simulate;
+6. Group all the surfaces bounding the internal air volume by selecting everything, right-clicking and clicking "Make Group";
+7. Select the Group and click the "Set selected as an smesh region and define properties" button;
+8. In the "Region Options: gmsh" menu, leave everything as it is. Change only the name of the region by writing ,for example, "RoomVolume" and click "ok";
+9. Open the group by double clicking;
+10. Select one or multiple surfaces you want to assign a boundary property;
+11. Click "Add tetgen boundary to selected";
+12. Under "Refine", change the refinement to 1;
+13. Under "Name": change the name to "materialname$abscoeff1,abscoeff2,..., abscoeffn" e.g."carpet$0.1515,0.3641,0.64,0.8264,0.8821" so a description of the surface followed by a $, followed by absorption coefficients per each frequency (maximum 5 frequencies) separated by commas for that surface;
+14. After finishing defining all the boundaries, select the group and click the "export to generate mesh" button;
+15. Select Format = "gmsh" en Units = "m" and click "ok";
+16. Leave the options as they are apart from "pointSizes" which should change to True, click "ok" and save the .geo file;
+17. Open the "CreateMeshFVM" python file and define the mesh length to use (lengthofmesh). The length of the mesh is in meters, meaning that putting 1 means that it will divide the space into tetrahedrons more or less of the size of 1 m length;
+18. Run "FVM" python file, including the msh file as file name.
+
 ## Libraries
 To properly run the software, the following libraries are needed:
 - Python version 3.10.9 or above
@@ -29,9 +49,9 @@ Libraries for python:
 
 ## Inputs
 The inputs are:
-- SketchUp model
-- G mesh creation
-- Length of mesh
+- SketchUp model;
+- Gmsh creation;
+- Length of mesh;
 - Air absorption $m_\{atm\}$ in 1/m;
 - Position of the source $x_\{source\},y_\{source\},z_\{source\}$ in m in the x,y,z directions;
 - Position of the receiver $x_\{rec\},y_\{rec\},z_\{rec\}$ in m in the x,y,z directions;
@@ -139,9 +159,9 @@ The software is organised in four sections:
     The inputs regarding the room dimensions, source and receiver positions along with other are to be inserted for the specific room in question.
 - Initialization and creation of mesh
 - Calculation loop:
-    The for loop would loop over the time to calculate the energy density at each position in the mesh grid and at each time step.
+    The for loop would loop over the frequencies and the time to calculate the energy density at each tetrahedron and at each time step.
 - Results and Post-processing
-    Results of SPL and other are included in this section together with graphs for the analysis.
+    Results are included in this section together with graphs for the analysis.
 
 ## References
 - R. P. Muñoz, "Numerical modeling for urban sound propagation: developments in wave-based and energy based methods," PhD Thesis, Technische Universiteit Eindhoven, 2019.

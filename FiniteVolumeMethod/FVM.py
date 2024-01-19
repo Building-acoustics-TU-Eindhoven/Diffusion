@@ -97,6 +97,7 @@ tag = -1 #all the nodes of the room
 nodeTags, coords, parametricCoord = gmsh.model.mesh.getNodes(dim,tag) #gets the tags for each node and the coordinates of each node
 nodecoords = coords.reshape((-1,3)) #coordinates reshaped in a matrix 3xnumber of nodes
 
+node_indices = {tag: index for (index, tag) in enumerate(nodeTags)}
 
 #Element Types
 elemTypes,elemTags,elemNodeTags = gmsh.model.mesh.getElements(dim,tag)
@@ -305,13 +306,10 @@ for i in range(velement): #for each tetrahedron, take its centre
                 shared_area = 0
                 interior_tet[i, j] = shared_area
 
-#Fmat = lil_matrix(interior_tet) #this is like sparse in matlab
-
-from scipy.sparse import csr_matrix
-
-Fmat = csr_matrix(interior_tet)
-
 interior_tet_sum = np.sum(interior_tet, axis=1) #sum of interior_tet per columns (so per i element)
+
+#et = time.time() #end time
+#elapsed_time = et - st
 
 
 ##############################################################################

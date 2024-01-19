@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'Diffusion Equation Code'
+project = 'Diffusion Equation for Acoustics'
 copyright = '2023, Ilaria Fichera'
 author = 'Ilaria Fichera'
 

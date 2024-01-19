@@ -28,9 +28,7 @@ For both the numerical methods, the main software works with the following assoc
 
 ## Documentation
 Documentation documents can be found below:
-- [Documentation 1D](https://building-acoustics-tu-eindhoven.github.io/Diffusion/Documentation1D.html)
-- [Documentation 2D](https://building-acoustics-tu-eindhoven.github.io/Diffusion/Documentation2D.html)
-- [Documentation 3D](https://building-acoustics-tu-eindhoven.github.io/Diffusion/Documentation3D.html)
+- [Documentation FDM](https://building-acoustics-tu-eindhoven.github.io/Diffusion/DocumentationFDM.html)
 - [Documentation FVM](https://building-acoustics-tu-eindhoven.github.io/Diffusion/DocumentationFVM.html)
 
 ## Sample Calculation FDM

@@ -3,12 +3,35 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to DiffusionEquationCode's documentation!
+Welcome to Diffusion Equation's documentation
 =================================================
+
+The software is an open source new generation of room acoustics software for research, education and industry in acoustics.
+
+The software is based on the Acoustics Diffusion Equation Method for modeling of sound behaviour in complex geometrical spaces.
+The Diffusion Equation Method is used to understand the acoustics properties of the room and to obtain sptatial distribution of acoustics energy over time in specific rooms.
+The software is developed with two numerical methods: the Finite Different Method and the Finite Volume Method.
+Each method is distributed with its own Python code. The main application of the method is room and building acoustics, but in the future it could also lead to more applications.
+
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Software Presentation:
+
+   Overview.md
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Software Use:
+
+   Documentation1D.md
+   Documentation2D.md
+   DocumentationFDM.md
+   DocumentationFVM.md
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Software Theory:
 
    Documentation1D.md
    Documentation2D.md

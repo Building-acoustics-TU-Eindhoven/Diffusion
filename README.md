@@ -15,7 +15,7 @@ Version 1.0
 
 ### Repository structure
 The solution of the Diffusion Equation is currently investigated with two different numerical methods: the Finite Different Method (FDM) by Du Fort&Frankel (Navarro et al., 2012) and the Finite VOlume Method (FVM) (Munoz, 2019). 
-The FDM can be used for cuboid shapes while the FVM can be used for any shape/geometry.
+The FDM can be used for parallelepiped shapes while the FVM can be used for any shape/geometry.
 The FDM script is developed for a 1D, 2D and 3D spaces, respectively reflected in the following Python files DiffEq1D.py, DiffEq2D.py, DiffEq3D.py.
 The FVM script is developed for 3D spaces in the Python file FVM.py. 
 
@@ -27,30 +27,8 @@ For both the numerical methods, the main software works with the following assoc
 + FunctionCentreTime.py calculates the centre time $T_s$ of the room in question based on Barron's revised theory formula.
 
 ## Documentation
-Documentation documents can be found below:
-- [Documentation FDM](https://building-acoustics-tu-eindhoven.github.io/Diffusion/DocumentationFDM.html)
-- [Documentation FVM](https://building-acoustics-tu-eindhoven.github.io/Diffusion/DocumentationFVM.html)
-
-## Sample Calculation FDM
-
-Test the software with the following inputs (Navarro et al., 2012):
-- Spatial discretization:             dx = 0.5 m
-- Time discretization:                dt = 1/8000 s
-- Recording total time:               T = 2.0 s
-- Room dimension:                     8.0 m x 8.0 m x 8.0 m 
-- Absorption Coefficient surface i:   1/6 ≈ 0.17
-- Air absorption:                     0.0 1/m
-- Absorption term:                    $A_{M}$
-- Source On time:                     S = 1.0 s 
-- Source position coordinates:        4.0, 4.0, 4.0 
-- Receiver position coordinates:      2.0, 2.0, 2.0
-
-Test if the software provides the following results (Navarro et al., 2012):
-- Reverberation time (RT):            1.18 s
-- Early Decay Time (RDT):             1.18 s
-- Clarity ($C_{80}$):                 2.08 dB
-- Definition ($D_{50}$):              45.63 %
-- Centre Time ($T_s$):                85.33 ms
+Documentation documents of the software can be found in the link below for both FDM and FVM.
+[Documentation](https://building-acoustics-tu-eindhoven.github.io/Diffusion/index.html)
 
 ## Authors
 Software is being developed by Ilaria Fichera at Eindhoven University of Technology.

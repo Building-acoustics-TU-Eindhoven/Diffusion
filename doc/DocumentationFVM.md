@@ -59,7 +59,6 @@ The inputs are:
 - Absorption coefficient $\\alpha_i$ of each surface $$ for one frequency only;
 - Source point power $W_s$ in Watts;
 - Source time in s (time of the source being on before interrupting).
->>>>>>> 24040e8 (Added part of documentation)
 
 ## Theory of Diffusion Equation model
 

@@ -28,7 +28,6 @@ Each method is distributed with its own Python code. The main application of the
    Finite Different Method Use.md
    Finite Volume Method Use.md
 
-
 .. toctree::
    :maxdepth: 2
    :caption: Software Theory:

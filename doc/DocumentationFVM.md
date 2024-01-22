@@ -1,4 +1,4 @@
-# Diffusion Equation Code Finite Volume Method Documentation
+# Diffusion Equation Finite Volume Method (FVM) Documentation
 
 The software is based on the Finite Volume method (FVM) solving the diffusion equation (Munoz, 2019).
 

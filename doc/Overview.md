@@ -1,3 +1,5 @@
+# Overview
+
 The Diffusion Equation software is developed as a tool for research, education and commercial use.
 
 The script is organised in sections for easy understanding of the code structure and for easy access to all information, function, parameters and properties.

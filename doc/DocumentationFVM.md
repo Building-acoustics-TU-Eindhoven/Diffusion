@@ -2,64 +2,6 @@
 
 The software is based on the Finite Volume method (FVM) solving the diffusion equation (Munoz, 2019).
 
-## Objectives
-The software provides the energy density and sound pressure level over 3D space and time and the energy parameters such as Reverberation time (RT), Early Decay Time (EDT), Clarity, Definition and Centre time.
-
-## Requirements
-1. Download and install Anaconda or download and install any Python software IDE you prefer
-2. Clone/Fork this repository to a folder of your preference
-3. Open the Main files through the preferred IDE and test the software
-4. Download and install SketchUp from [SketchUp website](https://www.sketchup.com/plans-and-pricing/sketchup-free)
-5. Download and install g-mesh from [G-mesh website](https://gmsh.info/)
-
-## Manual for running a calulation
-1. Install the Meshkit extension of SketchUp from the extension warehouse;
-2. Set the active mesher to gmsh by clicking on the "edit configuration button";
-3. Select gmsh as the active mesher;
-4. Create the 3D of the room to simulate;
-5. Group all the surfaces bounding the internal air volume by selecting everything, right-clicking and clicking "Make Group";
-6. Select the Group and click the "Set selected as an smesh region and define properties" button;
-7. In the "Region Options: gmsh" menu, leave everything as it is. Change only the name of the region by writing ,for example, "RoomVolume" and click "ok";
-8. Open the group by double clicking;
-9. Select one or multiple surfaces you want to assign a boundary property;
-10. Click "Add tetgen boundary to selected";
-11. Under "Refine", change the refinement to 1;
-12. Under "Name": change the name to "materialname$abscoeff1,abscoeff2,..., abscoeffn" e.g."carpet$0.1515,0.3641,0.64,0.8264,0.8821" so a description of the surface followed by a $, followed by absorption coefficients per each frequency (maximum 5 frequencies) separated by commas for that surface;
-13. After finishing defining all the boundaries, select the group and click the "export to generate mesh" button;
-14. Select Format = "gmsh" en Units = "m" and click "ok";
-15. Leave the options as they are apart from "pointSizes" which should change to True, click "ok" and save the .geo file;
-16. Open the "CreateMeshFVM" python file and define the mesh length to use (lengthofmesh). The length of the mesh is in meters, meaning that putting 1 means that it will divide the space into tetrahedrons more or less of the size of 1 m length;
-17. Run "FVM" python file, including the msh file as file name.
-
-## Libraries
-To properly run the software, the following libraries are needed:
-- Python version 3.10.9 or above
-
-Libraries for python:
-- math
-- matplotlib
-- numpy
-- scipy
-- sys
-- drawnow
-- time
-- gmsh
-
-## Inputs
-The inputs are:
-- SketchUp model;
-- Gmsh creation;
-- Length of mesh;
-- Air absorption $m_\{atm\}$ in 1/m;
-- Position of the source $x_\{source\},y_\{source\},z_\{source\}$ in m in the x,y,z directions;
-- Position of the receiver $x_\{rec\},y_\{rec\},z_\{rec\}$ in m in the x,y,z directions;
-- Time discretization dt in s;
-- Recording time of the calculation in s;
-- Absorption conditions term (option 1 Sabine, 2 Eyring, 3 Modified);
-- Absorption coefficient $\\alpha_i$ of each surface $$ for one frequency only;
-- Source point power $W_s$ in Watts;
-- Source time in s (time of the source being on before interrupting).
-
 ## Theory of Diffusion Equation model
 
 The model for the sound energy density w(r,t) at position r and at time t on a domain V is based on the following partial differential equation:

@@ -406,27 +406,27 @@ for steps in range(0, recording_steps):
         #print("Steps for source:",steps)
         w_t0 = w_new
 
-    if steps == round(1*mean_free_time_step + sourceon_steps + (dist_sr/c0)):
+    if steps == round(1*mean_free_time_step + sourceon_steps):
         index_1l = steps
         w_1l = w_new
         
-    if steps == round(2*mean_free_time_step + sourceon_steps + (dist_sr/c0)):
+    if steps == round(2*mean_free_time_step + sourceon_steps):
         index_2l = steps
         w_2l = w_new
         
-    if steps == round(3*mean_free_time_step + sourceon_steps + (dist_sr/c0)):
+    if steps == round(3*mean_free_time_step + sourceon_steps):
         index_3l = steps
         w_3l = w_new
 
-    if steps == round(5*mean_free_time_step + sourceon_steps + (dist_sr/c0)):
+    if steps == round(5*mean_free_time_step + sourceon_steps):
         index_5l = steps
         w_5l = w_new
     
-    if steps == round(2*longest_dimension_step): #+ sourceon_steps + (dist_sr/c0)):
+    if steps == round(2*longest_dimension_step + sourceon_steps):
         index_2ld = steps
         w_2ld = w_new
         
-    if steps == round(4*longest_dimension_step): #+ sourceon_steps + (dist_sr/c0)):
+    if steps == round(4*longest_dimension_step + sourceon_steps):
         index_4ld = steps
         w_4ld = w_new
     #4D Visualization????
@@ -616,6 +616,8 @@ w_rec_off_deriv = w_rec_off #initialising an array of derivative equal to the w_
 w_rec_off_deriv = np.delete(w_rec_off_deriv, 0) #delete the first element of the array -> this means shifting the array one step before and therefore do a derivation
 w_rec_off_deriv = np.append(w_rec_off_deriv,0) #add a zero in the last element of the array -> for derivation and to have the same length as previously
 impulse = ((w_rec_off - w_rec_off_deriv))/dt#/(rho*c0**2) #This is the difference between the the energy density and the impulse response 
+
+spl_r_off_diff = 10*np.log10(((abs(impulse))*rho*(c0**2))/(pRef**2)) #spl att he recevier when the source is off and differentiated
 
 #Schroeder integration
 #energy_r_rev = (w_rec_off)[::-1] #reverting the array
@@ -886,29 +888,8 @@ if tcalc == "stationarysource":
 ###############################################################################
 #SAVING
 ###############################################################################
-np.save('w_rec',w_rec)
 np.save('w_rec_off',w_rec_off)
-np.save('w_rec_x_t0',w_rec_x_t0)
-np.save('w_rec_x_1l',w_rec_x_1l)
-np.save('w_rec_x_2l',w_rec_x_2l)
-np.save('w_rec_x_3l',w_rec_x_3l)
-np.save('w_rec_x_5l',w_rec_x_5l)
-
-np.save('spl_rec_x_t0',spl_rec_x_t0)
-np.save('spl_rec_x_1l',spl_rec_x_1l)
-np.save('spl_rec_x_2l',spl_rec_x_2l)
-np.save('spl_rec_x_3l',spl_rec_x_3l)
-np.save('spl_rec_x_5l',spl_rec_x_5l)
-
-np.save('w_rec_x',w_rec_x_end)
-np.save('w_rec_y',w_rec_y_end)
-np.save('D0',Dx)
-
-# Collect all variables in the workspace using locals()
-FDM_8x8x8_S444_R222_AM0_alpha016_dx05 = {name: value for name, value in locals().items()}
-
-import pickle
-import dill
-# Save the dictionary to a file using pickle
-with open('FDM_8x8x8_S444_R222_AM0_alpha016_dx05.pkl', 'wb') as f:
-    dill.dump(FDM_8x8x8_S444_R222_AM0_alpha016_dx05, f)
+np.save('spl_r_off',spl_r_off)
+np.save('spl_r_off_diff',spl_r_off_diff)
+np.save('x_axis',x)
+np.save('t_off',t[idx_w_rec:])

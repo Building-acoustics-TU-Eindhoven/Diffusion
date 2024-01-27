@@ -44,21 +44,28 @@ st = time.time() #start time of calculation
 c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
-dt = 0.001 #time discretizatione
+dt = 1/20000 #time discretizatione
 
 # Source position
-x_source = 1.36  #position of the source in the x direction [m]
-y_source = 3.76  #position of the source in the y direction [m]
-z_source = 1.62  #position of the source in the z direction [m]
+x_source = 0.5  #position of the source in the x direction [m]
+y_source = 0.5  #position of the source in the y direction [m]
+z_source = 1.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 4.26 #position of the receiver in the x direction [m]
-y_rec = 1.76 #position of the receiver in the y direction [m]
-z_rec = 1.62 #position of the receiver in the z direction [m]
+x_rec = 2.0 #position of the receiver in the x direction [m]
+y_rec = 0.5 #position of the receiver in the y direction [m]
+z_rec = 1.0 #position of the receiver in the z direction [m]
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
+
+#alpha_1 = [1/6,1/6,1/6,1/6,1/6] #Absorption coefficient for Surface1 - Floor
+#alpha_2 = [1/6,1/6,1/6,1/6,1/6] #Absorption coefficient for Surface2 - Ceiling
+#alpha_3 = [1/6,1/6,1/6,1/6,1/6] #Absorption coefficient for Surface3 - Wall Front
+#alpha_4 = [1/6,1/6,1/6,1/6,1/6] #Absorption coefficient for Surface4 - Wall Back
+#alpha_5 = [1/6,1/6,1/6,1/6,1/6] #Absorption coefficient for Surface5 - Wall Left
+#alpha_6 = [1/6,1/6,1/6,1/6,1/6] #Absorption coefficient for Surface6 - Wall Right
 
 #Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
@@ -84,7 +91,7 @@ center_freq = fc_low * np.power(2,((np.arange(0,x_frequencies+1) / num_octave)))
 #INITIALISE GMSH
 ###############################################################################
     
-file_name = "scenario2.msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "3x3x3.msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 
@@ -324,7 +331,8 @@ for group in vGroupsNames:
     name_group = group[2]
     name_split = name_group.split("$")
     name_abs_coeff = name_split[0]
-    abscoeff = name_split[1].split(",")
+    abscoeff = input(f"Enter absorption coefficient for frequency {fc_low} to {fc_high} for {name_abs_coeff}:") 
+    abscoeff = abscoeff.split(",")
     #abscoeff = [float(i) for i in abscoeff][-1] #for one frequency
     abscoeff_list = [float(i) for i in abscoeff] #for multiple frequencies
     

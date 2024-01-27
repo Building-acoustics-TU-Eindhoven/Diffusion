@@ -296,9 +296,9 @@ for i in range(velement): #for each tetrahedron, take its centre
                     count += 1
                     shared_nodes.append(node) #append the node that it is in common
             if count == 3: #after have done this for all the nodes, if the cound is 3 then calculate the shared area between the tetrahedrons
-                sc0 = gmsh.model.mesh.getNode(shared_nodes[0])[0] #coordinates of node 0
-                sc1 = gmsh.model.mesh.getNode(shared_nodes[1])[0] #coordinates of node 1
-                sc2 = gmsh.model.mesh.getNode(shared_nodes[2])[0] #coordinates of node 2
+                sc0 = nodecoords[node_indices[shared_nodes[0]],:] #coordinates of node 0
+                sc1 = nodecoords[node_indices[shared_nodes[1]],:] #coordinates of node 1
+                sc2 = nodecoords[node_indices[shared_nodes[2]],:] #coordinates of node 2
                 shared_area = np.linalg.norm(np.cross(sc2-sc0,sc1-sc0))/2 #compute shared area
                 shared_distance = sqrt((abs(cell_center_i[0] - cell_center_j[0]))**2 + (abs(cell_center_i[1] - cell_center_j[1]))**2 + (abs(cell_center_i[2] - cell_center_j[2]))**2) #distance between volume elements
                 interior_tet[i, j] = shared_area/shared_distance #division between shared area and shared distance
@@ -307,10 +307,6 @@ for i in range(velement): #for each tetrahedron, take its centre
                 interior_tet[i, j] = shared_area
 
 interior_tet_sum = np.sum(interior_tet, axis=1) #sum of interior_tet per columns (so per i element)
-
-#et = time.time() #end time
-#elapsed_time = et - st
-
 
 ##############################################################################
 ##############################################################################

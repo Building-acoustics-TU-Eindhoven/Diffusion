@@ -67,8 +67,8 @@ tcalc = "decay"
 
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
-sourceon_time =  0.5 #time that the source is ON before interrupting [s]
-recording_time = 3 #total time recorded for the calculation [s]
+sourceon_time =  1.5 #time that the source is ON before interrupting [s]
+recording_time = 4.2 #total time recorded for the calculation [s]
 
 # Frequency resolution
 fc_low = 125

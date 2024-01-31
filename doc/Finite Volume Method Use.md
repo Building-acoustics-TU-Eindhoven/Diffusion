@@ -1,12 +1,12 @@
 # Finite Volume Method Use
 
 ## Requirements
-1. Download and install Anaconda or download and install any Python software IDE you prefer
-2. Clone/Fork this repository to a folder of your preference
-3. Open the Main files through the preferred IDE and test the software
-4. Download and install SketchUp from [SketchUp website](https://www.sketchup.com/plans-and-pricing/sketchup-free)
-5. Download and install g-mesh from [G-mesh website](https://gmsh.info/)
-6. Install the Meshkit extension of SketchUp from the extension warehouse
+1. Download and install Anaconda or download and install any preferred Python software IDE;
+2. Clone/Fork this repository to a folder of your preference;
+3. Open the Main files through the preferred IDE and test the software;
+4. Download and install SketchUp from [SketchUp website](https://www.sketchup.com/plans-and-pricing/sketchup-free);
+5. Download and install g-mesh from [G-mesh website](https://gmsh.info/);
+6. Install the Meshkit extension of SketchUp from the extension warehouse.
 
 ## Libraries
 To properly run the software, the following libraries are needed:
@@ -25,13 +25,13 @@ Libraries for python:
 ## Python running files
 Currently, in the repository there are a lot of python files. This is because the software is still in development. 
 Currently the updated files for users to run the software are:
-- CreateMeshFVM.py: to create the volumetric mesh useing Gmsh software;
+- CreateMeshFVM.py: to create the volumetric mesh using Gmsh software;
 - FVM.py: to run the room (as .msh file) and calculate the acoustics parameters in the room.
 
 ## Algorithm
 The software is organised in three sections:
 - Input variables:
-    The inputs regarding the room dimensions, frequencies to consider, source and receiver positions along with other are to be inserted for the specific room in question.
+    The inputs regarding the room dimensions, frequencies to consider, source and receiver positions along with others are to be inserted for the specific room in question.
 - Initialization and creation of mesh
 - Calculation loop:
     The "for loop" would loop over the frequencies and the time to calculate the energy density at each tetrahedron and at each time step.
@@ -64,7 +64,7 @@ The gmsh.exe file needs also to be positioned in the same folder.
 #### Mesh creation
 The volumetric mesh is to be created. The file "CreateMeshFVM.py" allows to create the volumetric mesh using Gmsh software. The only parameters that need to be set in this file is the length_of_mesh. 
 
-The mesh length value is vital to discretize correctly the space and achieve precise and converged results. Through varous trials, it has been established that a mesh length of 1 m is generally adequate. However, for computations involving complex geometries or small rooms, a smaller length of mesh (0.5 m or lower) is recommended.
+The mesh length value is vital to discretize correctly the space and achieve precise and converged results. Through various trials, it has been established that a mesh length of 1 m is generally adequate. However, for computations involving complex geometries or small rooms, a smaller length of mesh (0.5 m or lower) is recommended.
 The choice is contingent upon user preferences for details in parameters values, room dimensions but mostly for the preliminary Reverberation time value calculated with Sabine’s formula.
 
 The method is suitable for any type of geometry.
@@ -81,8 +81,8 @@ The model allows for the insertion of only one source position per calculation.
 The sound source is defined as an omnidirectional source. The users can input the sound power of the source $W_s$ in Watts and its position in the room in the following variables $x_\{source\},y_\{source\},z_\{source\}$ in m in the x,y,z directions.
 
 The source can be defined as an interrupted noise source or an impulse source. 
-- If an interrupted noise source is chosen, then the time within which the source stays on before getting switch off need to be defined. The variable is $sourceon_\{time\}$. The time is defined in seconds and it will need to be long enough for the room to be filled with sound before switching it off. 
-In this case, there is the option to to toggle the sound source on and off or keep it stationary. This can be done by changing the variable "tcalc" from "decay" to "stationarysource".
+- If an interrupted noise source is chosen, then the time within which the source stays on before getting switch off needs to be defined. The variable is $sourceon_\{time\}$. The time is defined in seconds and it will need to be long enough for the room to be filled with sound before switching it off. The source on time needs to be inputted as the 1/3 of the theoretical calculated Sabine reverberation time of the room.
+In this case, there is the option to toggle the sound source on and off or keep it stationary. This can be done by changing the variable "tcalc" from "decay" to "stationarysource".
 - If an impulse source is chosen, the source will be automatically defined.
 
 ### Receiver
@@ -93,7 +93,13 @@ The model allows for the insertion of only one acoustics receiver position per c
 The Finite Volume method works with a spatial volumetric discretization. This is defined in the mesh length variable of the "CreateMeshFVM.py" file. Appropriate mesh length needs to be chosen depending on the use as described above. 
 
 #### Time discretization dt
-The time discretization will need to be chosen.
+The time discretization will need to be chosen appropriately.
+According the Navarro 2012, to get good converged results, the time discretization dt will need to be defined depending on the length of mesh chosen. 
+To make sure that the predictions converge to a fixed value with a very low error, the following empirical cretirion will need to apply.
+```{math}
+10^(-8) = (dt)^2 (dv)^(-2)
+```
+where dv is the mesh length chosen.
 The time discretization is defined in seconds. 
 
 ### Total Recording time
@@ -115,8 +121,7 @@ Within the fixed inputs, there are:
 The acoustic calculation is based on the Finite Volume method (FVM) solving the diffusion equation (Munoz, 2019). More information regarding the Finite Volume Method in the paragraph below.
 
 ## Acoustics parameters
-
-The diffusion equation method predicts the time-dependent propagation of the sound energy density w(r, t) in the evaluated frequency band. 
+The diffusion equation method predicts the time-dependent and spatial-dependent propagation of the sound energy density w(r, t) in the evaluated frequency bands.
 
 #### Sound Density Level
 The sound density level can be expressed as function of sound energy density w(r, t) as:
@@ -137,7 +142,6 @@ From the sound pressure level decay curve, the Reverberation time can be estimat
 The Early Decay time is defined by the time that it takes for the sound pressure level to decay of 10 dB and it is calculated in a similar way. This is obtained from the slope between 0 and -10 dB of the maximum starting level. 
 
 #### Clarity, Definition and Centre Time
-
 The Clarity (C80) parameter is the early to late arriving sound energy ratio. Clarity refers to how clear the sound quality is and it is calculated from the impulse response with the following relation:
 C_80=10 log⁡〖(∫_0^80ms〖p^2 (t)〗 dt)/(∫_80ms^∞〖p^2 (t)〗 dt)〗    [dB]
 
@@ -154,4 +158,5 @@ The values for all these parameters are calculated from the Barron’s revisited
 
 ## References
 - R. P. Muñoz, "Numerical modeling for urban sound propagation: developments in wave-based and energy based methods," PhD Thesis, Technische Universiteit Eindhoven, 2019.
+- J. M. Navarro, J. Escolano and J. J. Lopez, Implementation and evaluation of a diffusion equa-tion model based on finite difference schemes for sound field prediction in rooms,Appl. Acoust.73(2012) 659–665.
 - Vorländer M. Auralization: fundamentals of acoustics, modelling, simulation,algorithms and acoustic virtual reality. Springer 2008

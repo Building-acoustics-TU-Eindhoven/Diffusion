@@ -9,12 +9,12 @@ Solving the diffusion equation allows to study the acoustics properties of a roo
 Version 1.0
 
 ## Setup and Usage instructions
-1. Download and install Anaconda or download and install any Python software IDE you prefer
-2. Clone/Fork this repository to a folder of your preference
-3. Open the Main files through the preferred IDE and test the software
+1. Download and install Anaconda or download and install any Python software IDE you prefer;
+2. Clone/Fork this repository to a folder of your preference;
+3. Open the Main files through the preferred IDE and test the software.
 
 ### Repository structure
-The solution of the Diffusion Equation is currently investigated with two different numerical methods: the Finite Different Method (FDM) by Du Fort&Frankel (Navarro et al., 2012) and the Finite VOlume Method (FVM) (Munoz, 2019). 
+The solution of the Diffusion Equation is currently investigated with two different numerical methods: the Finite Different Method (FDM) by Du Fort&Frankel (Navarro et al., 2012) and the Finite Volume Method (FVM) (Munoz, 2019). 
 The FDM can be used for parallelepiped shapes while the FVM can be used for any shape/geometry.
 The FDM script is developed for a 1D, 2D and 3D spaces, respectively reflected in the following Python files DiffEq1D.py, DiffEq2D.py, DiffEq3D.py.
 The FVM script is developed for 3D spaces in the Python file FVM.py. 
@@ -31,7 +31,7 @@ Documentation documents of the software can be found in the link below for both 
 [Documentation](https://building-acoustics-tu-eindhoven.github.io/Diffusion/index.html)
 
 ## Authors
-Software is being developed by Ilaria Fichera at Eindhoven University of Technology.
+Software is being developed by Ilaria Fichera at Eindhoven University of Technology (TU/e).
 
 ## References
 + J. M. Navarro, J. Escolano and J. J. Lopez, Implementation and evaluation of a diffusion equation model based on finite difference schemes for sound field prediction in rooms, Appl. Acoust.73 (2012) 659–665.
@@ -40,5 +40,5 @@ Software is being developed by Ilaria Fichera at Eindhoven University of Technol
 ## Funding
 The project is funded by <u>[NWO](https://www.nwo.nl/projecten/19430), in the Netherlands.
 
-## Licence
-Diffusion Code is licenced under GNU General Public License v2.0. See LICENCE.md for more details.
+## License
+Diffusion Code is licensed under GNU General Public License v2.0. See LICENSE.md for more details.

@@ -67,8 +67,9 @@ tcalc = "decay"
 
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
-sourceon_time =  0.5 #time that the source is ON before interrupting [s]
-recording_time = 3.5 #total time recorded for the calculation [s]
+
+sourceon_time =  1.5 #time that the source is ON before interrupting [s]
+recording_time = 4.2 #total time recorded for the calculation [s]
 
 # Frequency resolution
 fc_low = 125
@@ -321,10 +322,6 @@ for i in range(velement): #for each tetrahedron, take its centre
                 interior_tet[i, j] = shared_area
 
 interior_tet_sum = np.sum(interior_tet, axis=1) #sum of interior_tet per columns (so per i element)
-
-#et = time.time() #end time
-#elapsed_time = et - st
-
 
 ##############################################################################
 ##############################################################################

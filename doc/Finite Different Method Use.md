@@ -18,6 +18,13 @@ Libraries for python:
 - drawnow
 - time
 
+## Python running files
+Currently, in the repository there are a lot of python files. This is because the software is still in development. 
+Currently, the updated files for users to run the software are:
+- DiffEq1D.py: to simulate a line geometry;
+- DiffEq2D.py: to simulate a surface geometry;
+- DiffEq3D.py: to simulate a 3D geometry.
+
 ## Algorithm
 The software is organised in three sections:
 - Input variables:

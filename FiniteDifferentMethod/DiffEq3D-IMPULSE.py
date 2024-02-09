@@ -471,7 +471,7 @@ w_rec_x_end = ((w_new[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r 
                         (w_new[:, col_up_r, dep_lr_r]*(weight_row_up_r * weight_col_up_r * weight_dep_lr_r))+\
                             (w_new[:, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r)))
 
-spl_rec_x_end = 10*np.log10(rho*c0**2*w_rec_x_end/pRef**2)
+spl_rec_x_end = 10*np.log10(rho*c0**2*abs(w_rec_x_end)/pRef**2)
 
 w_rec_x_1l = ((w_1l[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
      (w_1l[:, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
@@ -482,7 +482,7 @@ w_rec_x_1l = ((w_1l[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * 
                          (w_1l[:, col_up_r, dep_lr_r]*(weight_row_up_r * weight_col_up_r * weight_dep_lr_r))+\
                              (w_1l[:, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r)))
 
-spl_rec_x_1l = 10*np.log10(rho*c0**2*w_rec_x_1l/pRef**2)
+spl_rec_x_1l = 10*np.log10(rho*c0**2*abs(w_rec_x_1l)/pRef**2)
     
 w_rec_x_2l = ((w_2l[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
        (w_2l[:, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
@@ -493,7 +493,7 @@ w_rec_x_2l = ((w_2l[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * 
                            (w_2l[:, col_up_r, dep_lr_r]*(weight_row_up_r * weight_col_up_r * weight_dep_lr_r))+\
                                (w_2l[:, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r)))
 
-spl_rec_x_2l = 10*np.log10(rho*c0**2*w_rec_x_2l/pRef**2)
+spl_rec_x_2l = 10*np.log10(rho*c0**2*abs(w_rec_x_2l)/pRef**2)
 
 w_rec_x_3l = ((w_3l[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
        (w_3l[:, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
@@ -504,7 +504,7 @@ w_rec_x_3l = ((w_3l[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * 
                            (w_3l[:, col_up_r, dep_lr_r]*(weight_row_up_r * weight_col_up_r * weight_dep_lr_r))+\
                                (w_3l[:, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r)))
 
-spl_rec_x_3l = 10*np.log10(rho*c0**2*w_rec_x_3l/pRef**2)
+spl_rec_x_3l = 10*np.log10(rho*c0**2*abs(w_rec_x_3l)/pRef**2)
     
 w_rec_x_5l = ((w_5l[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
     (w_5l[:, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
@@ -516,7 +516,7 @@ w_rec_x_5l = ((w_5l[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * 
                             (w_5l[:, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r)))    
     
     
-spl_rec_x_5l = 10*np.log10(rho*c0**2*w_rec_x_5l/pRef**2)
+spl_rec_x_5l = 10*np.log10(rho*c0**2*abs(w_rec_x_5l)/pRef**2)
     
 w_rec_x_t0 = ((w_t0[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
     (w_t0[:, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
@@ -527,7 +527,7 @@ w_rec_x_t0 = ((w_t0[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * 
                         (w_t0[:, col_up_r, dep_lr_r]*(weight_row_up_r * weight_col_up_r * weight_dep_lr_r))+\
                             (w_t0[:, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r)))        
 
-spl_rec_x_t0 = 10*np.log10(rho*c0**2*w_rec_x_t0/pRef**2)
+spl_rec_x_t0 = 10*np.log10(rho*c0**2*abs(w_rec_x_t0)/pRef**2)
     
 w_rec_y_end = ((w_new[row_lr_r, :, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
     (w_new[row_lr_r, :, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
@@ -555,7 +555,7 @@ spl_stat_y = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_y**2))) + ((abs(w_rec_y_
 press_r = ((abs(w_rec))*rho*(c0**2)) #pressure at the receiver
 spl_r = 10*np.log10(((abs(w_rec))*rho*(c0**2))/(pRef**2)) #,where=press_r>0, sound pressure level at the receiver
 spl_r_norm = 10*np.log10((((abs(w_rec))*rho*(c0**2))/(pRef**2)) / np.max(((abs(w_rec))*rho*(c0**2))/(pRef**2))) #normalised to maximum to 0dB
-spl_r_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_sr) + ((abs(w_rec))*c0)/(pRef**2))) #spl total (including direct field) at the receiver position????? but it will need to be calculated for a stationary source 100dB
+spl_r_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_sr) + ((abs(w_rec))*c0))/(pRef**2)) #spl total (including direct field) at the receiver position????? but it will need to be calculated for a stationary source 100dB
 
 #Schroeder integration
 energy_r_rev = (w_rec)[::-1] #reverting the array

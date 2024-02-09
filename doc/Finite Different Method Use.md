@@ -50,7 +50,7 @@ The model allows for the insertion of only one source position per calculation.
 The sound source is defined as an omnidirectional source. The users can input the sound power of the source $W_s$ in Watts and its position in the room in the following variables $x_\{source\},y_\{source\},z_\{source\}$ in m in the x,y,z directions.
 
 The source can be defined as an interrupted noise source or an impulse source. 
-- If an interrupted noise source is chosen, then the time within which the source stays on before getting switch off need to be defined. The variable is $sourceon_\{time\}$. The time is defined in seconds and it will need to be long enough for the room to be filled with sound before switching it off. 
+- If an interrupted noise source is chosen, then the time within which the source stays on before getting switch off need to be defined. The variable is $sourceon_\{time\}$. The time is defined in seconds and it will need to be long enough for the room to be filled with sound before switching it off. The source on time needs to be inputted as the 2/3 of the theoretical calculated Sabine reverberation time of the room.
 In this case, there is the option to to toggle the sound source on and off or keep it stationary. This can be done by changing the variable "tcalc" from "decay" to "stationarysource".
 - If an impulse source is chosen, the source will be automatically defined.
 

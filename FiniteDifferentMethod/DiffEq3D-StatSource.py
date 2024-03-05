@@ -241,7 +241,7 @@ for steps in range(0, recording_steps):
 w_rec_x = w_new[:, cols_r, dept_r]  
 w_rec_y = w_new[rows_r, :, dept_r]
 
-spl_stat_x = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_x**2))) + ((abs(w_rec_x)*c0)))/(pRef**2))
+spl_stat_x = 10*np.log10(rho*c0*((Ws/(4*math.pi*(dist_x**2))) + ((abs(w_rec_x)*c0)))/(pRef**2))
 spl_stat_y = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_y**2))) + ((abs(w_rec_y)*c0)))/(pRef**2)) #It should be the spl stationary
 #spl_stat_norm = 10*np.log10(rho*c0*((P/(4*math.pi*dist**2)) + ((abs(w_new))*c0)/(pRef**2))/ np.max(rho*c0*((P/(4*math.pi*dist**2)) + ((abs(w_new))*c0)/(pRef**2)))) #It should be the spl stationary
 

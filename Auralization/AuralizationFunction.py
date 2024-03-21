@@ -8,12 +8,13 @@ Created on Thu Feb 22 14:33:58 2024
 import numpy as np
 #import matplotlib
 import matplotlib.pyplot as plt
+from FunctionRT import *
 
 #import soundfile as sf
 #data, samplerate = sf.read('Frequency (english).wav')
 #import scipy.io.wavfile as wav
 
-filename = 'C:/Users/20225533/OneDrive/Desktop/Auralization/Frequency (english).wav' #name of the anechoic signal file
+filename = 'C:/Users/20225533/Diffusion/Auralization/Frequency(english).wav' #name of the anechoic signal file
 #fs, signal = wav.read(filename)
 #signal = signal / 32767 # 2**15 - 1
 
@@ -31,9 +32,16 @@ data_signal, fs = sf.read(filename) #this returns "data_signal", which is the
 #status = sd.wait()  #Wait until file is done playing
 
 #Import the energy decay curve
-edc = np.load('C:/Users/20225533/OneDrive/Desktop/Auralization/w_rec_off.npy') #energy decay curve taken from the results of the diffusion equation model
-edc_deriv = np.load('C:/Users/20225533/OneDrive/Desktop/Auralization/w_rec_off_deriv.npy') #energy decay curve differentiated (or also impulse response of the room)
-t_off = np.load('C:/Users/20225533/OneDrive/Desktop/Auralization/t_off.npy') #decay time of the energy decay curve
+edc = np.load('C:/Users/20225533/Diffusion/Auralization/w_rec_off.npy') #energy decay curve taken from the results of the diffusion equation model
+t = np.load('C:/Users/20225533/Diffusion/Auralization/t.npy')
+
+sch_db = 10.0 * np.log10(edc / max(edc)) #level of the array: schroeder decay
+idx_w_rec = 17000
+t60 = t60_decay(t, sch_db, idx_w_rec) #called function for calculation of t60 [s]
+
+
+edc_deriv = np.load('C:/Users/20225533/Diffusion/Auralization/w_rec_off_deriv.npy') #energy decay curve differentiated (or also impulse response of the room)
+t_off = np.load('C:/Users/20225533/Diffusion/Auralization/t_off.npy') #decay time of the energy decay curve
 t_off = t_off - t_off[0] #removing the t_off[0] to make the vector start from zero.
 
 ###############################################################################
@@ -73,30 +81,30 @@ t_off = t_off - t_off[0] #removing the t_off[0] to make the vector start from ze
 ###############################################################################
 
 #Random noise creation
-# random_array = np.random.rand(1, len(edc_deriv))*2 - 1 #random noise vector with numbers between -1 and 1
-# random_array = sum(random_array) #this line of code is used for passing from a row vector to a column vector
+random_array = np.random.rand(1, len(edc_deriv))*2 - 1 #random noise vector with numbers between -1 and 1
+random_array = sum(random_array) #this line of code is used for passing from a row vector to a column vector
 
 #Multiplication with random noise
-# imp_rand = edc_deriv*random_array 
+imp_rand = edc_deriv*random_array 
 
-# #Play the impulse response
-# #sd.play(imp_rand, fs)
+#Play the impulse response
+#sd.play(imp_rand, fs)
 
-# #Convolution of the impulse_rand with the anechoic signal
-# st = np.arange(0,(len(data_signal))/fs,1/fs) #Time vector of the speech signal
-# ht = np.arange(0,(len(imp_rand))/fs,1/fs)  #Time vector of the room impulse response
+#Convolution of the impulse_rand with the anechoic signal
+st = np.arange(0,(len(data_signal))/fs,1/fs) #Time vector of the speech signal
+ht = np.arange(0,(len(imp_rand))/fs,1/fs)  #Time vector of the room impulse response
 
-# #Create impulse response
-# sh_conv = np.convolve(imp_rand,data_signal) #convolution of the impulse response with the anechoic signal
-# sh_conv = sh_conv/max(abs(sh_conv)) #normalized to the maximum value of the convolved signal
+#Create impulse response
+sh_conv = np.convolve(imp_rand,data_signal) #convolution of the impulse response with the anechoic signal
+sh_conv = sh_conv/max(abs(sh_conv)) #normalized to the maximum value of the convolved signal
 
-# t_conv = np.arange(0,(len(sh_conv))/fs,1/fs) #Time vector of the convolved signal
+t_conv = np.arange(0,(len(sh_conv))/fs,1/fs) #Time vector of the convolved signal
 
-# plt.plot(st,data_signal) #plot the anechoic signal
+plt.plot(st,data_signal) #plot the anechoic signal
  
-# plt.plot(ht,imp_rand) #plot the impulse response
+plt.plot(ht,imp_rand) #plot the impulse response
 
-# plt.plot(t_conv,sh_conv) #plot the convolved signal
+plt.plot(t_conv,sh_conv) #plot the convolved signal
 
 #Play the convolved signal
 #sd.play(sh_conv, fs)
@@ -123,35 +131,35 @@ t_off = t_off - t_off[0] #removing the t_off[0] to make the vector start from ze
 ###############################################################################
 #Use a Gaussian instead of a random noise
 
-#Gaussian distribution
-mean = 0
-sigmax_gau = 1 #??
-gaussian_noise = (np.random.normal(mean, sigmax_gau, len(edc_deriv)))*2 - 1
+# #Gaussian distribution
+# mean = 0
+# sigmax_gau = 1 #??
+# gaussian_noise = (np.random.normal(mean, sigmax_gau, len(edc_deriv)))*2 - 1
 
-#Multiplication with random noise
-imp_rand = edc_deriv*gaussian_noise 
+# #Multiplication with random noise
+# imp_rand = edc_deriv*gaussian_noise 
 
-#Play the impulse response
-#sd.play(imp_rand, fs)
+# #Play the impulse response
+# #sd.play(imp_rand, fs)
 
-#Convolution of the impulse_rand with the anechoic signal
-st = np.arange(0,(len(data_signal))/fs,1/fs) #Time vector of the speech signal
-ht = np.arange(0,(len(imp_rand))/fs,1/fs)  #Time vector of the room impulse response
+# #Convolution of the impulse_rand with the anechoic signal
+# st = np.arange(0,(len(data_signal))/fs,1/fs) #Time vector of the speech signal
+# ht = np.arange(0,(len(imp_rand))/fs,1/fs)  #Time vector of the room impulse response
 
-#Create impulse response
-sh_conv = np.convolve(imp_rand,data_signal) #convolution of the impulse response with the anechoic signal
-sh_conv = sh_conv/max(abs(sh_conv)) #normalized to the maximum value of the convolved signal
+# #Create impulse response
+# sh_conv = np.convolve(imp_rand,data_signal) #convolution of the impulse response with the anechoic signal
+# sh_conv = sh_conv/max(abs(sh_conv)) #normalized to the maximum value of the convolved signal
 
-t_conv = np.arange(0,(len(sh_conv))/fs,1/fs) #Time vector of the convolved signal
+# t_conv = np.arange(0,(len(sh_conv))/fs,1/fs) #Time vector of the convolved signal
 
-plt.plot(st,data_signal) #plot the anechoic signal
+# plt.plot(st,data_signal) #plot the anechoic signal
  
-plt.plot(ht,imp_rand) #plot the impulse response
+# plt.plot(ht,imp_rand) #plot the impulse response
 
-plt.plot(t_conv,sh_conv) #plot the convolved signal
+# plt.plot(t_conv,sh_conv) #plot the convolved signal
 
-#Play the convolved signal
-sd.play(sh_conv, fs)
+# #Play the convolved signal
+# sd.play(sh_conv, fs)
 
 # ###############################################################################
 # ###############################################################################
@@ -191,11 +199,11 @@ from scipy import stats
 slope,intercept = stats.linregress(t_off[idxL1:idxL2],sch_db[idxL1:idxL2])[0:2] #calculating the slope and the interception of the line connecting the two points
 db_regress_init = (init - intercept) / slope #dB initial
 db_regress_end = (end - intercept) / slope #dB End
-t60I = factor * (db_regress_end - db_regress_init) #t60 according to linregress approach
+t60I_after = factor * (db_regress_end - db_regress_init) #t60 according to linregress approach
 
 # Poly-based Approach y = Ax + B
 CoefAlpha = np.polyfit(t_off[idxL1:idxL2], sch_db[idxL1:idxL2], 1) ##calculating the slope and the interception of the line connecting the two points
-t60 = (-60/CoefAlpha[0]) #t60 according to polyfit approach
+t60_after = (-60/CoefAlpha[0]) #t60 according to polyfit approach
 
 y_axis = (slope*t_off + intercept) + slope
 

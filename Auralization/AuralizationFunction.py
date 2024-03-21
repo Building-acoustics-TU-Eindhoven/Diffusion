@@ -28,6 +28,9 @@ data_signal, fs = sf.read(filename) #this returns "data_signal", which is the
 #Import the energy decay curve
 edc = np.load('C:/Users/20225533/Diffusion/Auralization/w_rec_off.npy') #energy decay curve taken from the results of the diffusion equation model
 t = np.load('C:/Users/20225533/Diffusion/Auralization/t.npy') #time steps array
+edc_deriv = np.load('C:/Users/20225533/Diffusion/Auralization/w_rec_off_deriv.npy') #energy decay curve differentiated (or also impulse response of the room)
+t_off = np.load('C:/Users/20225533/Diffusion/Auralization/t_off.npy') #decay time of the energy decay curve
+t_off = t_off - t_off[0] #removing the t_off[0] to make the vector start from zero.
 
 sch_db = 10.0 * np.log10(edc / max(edc)) #level of the array: schroeder decay
 idx_w_rec = 17000
@@ -71,7 +74,7 @@ plt.plot(ht,imp_rand) #plot the impulse response
 plt.plot(t_conv,sh_conv) #plot the convolved signal
 
 #Play the convolved signal
-sd.play(sh_conv, fs)
+#sd.play(sh_conv, fs)
 
 ###############################################################################
 ################################### CHECKS ####################################

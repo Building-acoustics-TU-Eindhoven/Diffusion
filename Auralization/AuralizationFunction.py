@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 #data, samplerate = sf.read('Frequency (english).wav')
 #import scipy.io.wavfile as wav
 
-filename = 'C:/Users/20225533/OneDrive/Desktop/Auralization/Frequency (english).wav' #name of the anechoic signal file
+filename = 'C:/Users/20225533/Diffusion/Auralization/Frequency (english).wav' #name of the anechoic signal file
 #fs, signal = wav.read(filename)
 #signal = signal / 32767 # 2**15 - 1
 
@@ -31,9 +31,9 @@ data_signal, fs = sf.read(filename) #this returns "data_signal", which is the
 #status = sd.wait()  #Wait until file is done playing
 
 #Import the energy decay curve
-edc = np.load('C:/Users/20225533/OneDrive/Desktop/Auralization/w_rec_off.npy') #energy decay curve taken from the results of the diffusion equation model
-edc_deriv = np.load('C:/Users/20225533/OneDrive/Desktop/Auralization/w_rec_off_deriv.npy') #energy decay curve differentiated (or also impulse response of the room)
-t_off = np.load('C:/Users/20225533/OneDrive/Desktop/Auralization/t_off.npy') #decay time of the energy decay curve
+edc = np.load('C:/Users/20225533/Diffusion/Auralization/w_rec_off.npy') #energy decay curve taken from the results of the diffusion equation model
+edc_deriv = np.load('C:/Users/20225533/Diffusion/Auralization/w_rec_off_deriv.npy') #energy decay curve differentiated (or also impulse response of the room)
+t_off = np.load('C:/Users/20225533/Diffusion/Auralization/t_off.npy') #decay time of the energy decay curve
 t_off = t_off - t_off[0] #removing the t_off[0] to make the vector start from zero.
 
 ###############################################################################
@@ -151,7 +151,7 @@ plt.plot(ht,imp_rand) #plot the impulse response
 plt.plot(t_conv,sh_conv) #plot the convolved signal
 
 #Play the convolved signal
-sd.play(sh_conv, fs)
+#sd.play(sh_conv, fs)
 
 # ###############################################################################
 # ###############################################################################

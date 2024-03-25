@@ -527,7 +527,6 @@ coord_rec = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
 #     total_weights_s[i] = weight/sum_weights_s if sum_weights_s != 0 else 0
 # cl_tet_s_keys = cl_tet_s.keys() #take only the keys of the cl_tet_s dictionary (so basically the indexes of the tetrahedrons)
 
-
 #SOURCE INTERPOLATION CALCULATED WITHIN 4 CENTRE CELL SELECTED (TETRAHEDRON)
 #Position of source is the centre of a cell so the minimum distance with the centre of a cell has been calculated to understand which cell is the closest
 dist_source_cc_list = [] #initialise the list for all the distances between each cell centre and the source
@@ -566,6 +565,42 @@ for i,weight in total_weights_s.items():
 
 cl_tet_s_keys = cl_tet_s.keys() #take only the keys of the cl_tet_s dictionary (so basically the indexes of the tetrahedrons)
 
+
+###############################################################################
+###############################################################################
+#To make sure that the source is in the correct tetrahedron position
+node_ids = velemNodes.T
+ori=nodecoords[node_ids[0,:]-1,:]
+#ori = nodecoords[node_indices[node_ids[:,0],:]]
+v_tet_s1=nodecoords[node_ids[1,:]-1,:]-ori
+v_tet_s2=nodecoords[node_ids[2,:]-1,:]-ori
+v_tet_s3=nodecoords[node_ids[3,:]-1,:]-ori
+n_tet=len(node_ids.T)
+v1s = v_tet_s1.T.reshape((3,1,n_tet))
+v2s = v_tet_s2.T.reshape((3,1,n_tet))
+v3s = v_tet_s3.T.reshape((3,1,n_tet))
+mat = np.concatenate((v1s,v2s,v3s), axis=1)
+inv_mat = np.linalg.inv(mat.T).T
+#if coord_source.size==3:  # to make rec has a dimension of (N_rec,3)
+#    rec=rec.reshape((1,3))
+coord_source_array = np.array(coord_source)
+if coord_source_array.size==3:  # to make rec has a dimension of (N_rec,3)
+    coord_source_array=coord_source_array.reshape((1,3))
+N_sou=coord_source_array.shape[0]
+orir=np.repeat(ori[:,:,np.newaxis], N_sou, axis=2)
+newp=np.einsum('imk,kmj->kij',inv_mat,coord_source_array.T-orir)
+val=np.all(newp>=0, axis=1) & np.all(newp <=1, axis=1) & (np.sum(newp, axis=1)<=1)
+id_tet, id_p = np.nonzero(val)
+res = -np.ones(N_sou, dtype=id_tet.dtype) # Sentinel value
+res[id_p]=id_tet
+
+
+
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+
 # #VOLUME CALCULATED WITHIN 4 CENTRE CELL SELECTED (TETRAHEDRON)
 #Calculate volume of the source with the 4 cell centres as the vertices of the tetrahedron
 # vertices_source = np.array([]).reshape(0, 3)  # Initialize as an empty 2D array with 3 columns
@@ -600,7 +635,7 @@ cl_tet_s_keys = cl_tet_s.keys() #take only the keys of the cl_tet_s dictionary (
 # Vs = calculate_volume(vertices_source)
 
 #VOLUME ORIGINAL
-Vs = cell_volume[source_idx] #volume of the source = to volume of cells where the volume is 
+Vs = cell_volume[res[0]] #volume of the source = to volume of cell where the source is 
 # Vs = 1
 
 ################SOURCE INTERPOLATION WITH VERTICES OF TETRAHEDRON IN WHICH SOURCE IS IN

@@ -142,7 +142,12 @@ for i in range(velement): #for each tetrahedron, take its centre
                 shared_area_vector[1] = (sc2[2]-sc0[2])*(sc1[0]-sc0[0]) - (sc1[2]-sc0[2])*(sc2[0]-sc0[0])
                 shared_area_vector[2] = (sc2[0]-sc0[0])*(sc1[1]-sc0[1]) - (sc1[0]-sc0[0])*(sc2[1]-sc0[1])
                 shared_area = np.linalg.norm(np.cross(sc2-sc0,sc1-sc0))/2 #compute shared area
-                Area_vector = (shared_area*shared_area_vector)/np.linalg.norm(shared_area_vector)
+                Area_vector = (shared_area*shared_area_vector)/np.linalg.norm(shared_area_vector) 
+                #The "area vector" here is a mathematical construct used to 
+                #represent the signed area of a triangle in three-dimensional space. 
+                #It's not a traditional vector in the sense of a direction and 
+                #magnitude, but rather a mathematical abstraction that encodes 
+                #information about the orientation and magnitude of the area.
                 shared_distance_vector = cell_center[j] - cell_center_i #vector distance between the two cell centre of the tetrahedrons
                 shared_distance_magnitude = np.linalg.norm(cell_center_i - cell_center[j]) #magnitude of distance between the two cell centre of the tetrahedrons
                 fv1_n = sc1 - sc0 #vector1 for normal of the shared face
@@ -150,16 +155,18 @@ for i in range(velement): #for each tetrahedron, take its centre
                 f_normal = np.cross(fv1_n, fv2_n) #normal vector of shared face
                 
                 #Max of the arcocosine #????
-                ang = max(np.arccos(np.dot(face_to_cell, f_normal) / (np.linalg.norm(face_to_cell) * np.linalg.norm(f_normal))),
-                    np.arccos(np.dot(shared_distance_vector, f_normal) / (np.linalg.norm(shared_distance_vector) * np.linalg.norm(f_normal))))
+                #ang = max((np.degrees(np.arccos(np.dot(face_to_cell, f_normal) / (np.linalg.norm(face_to_cell) * np.linalg.norm(f_normal)))),
+                #    np.degrees(np.arccos(np.dot(shared_distance_vector, f_normal) / (np.linalg.norm(shared_distance_vector) * np.linalg.norm(f_normal))))))
                 
                 #ang = min((np.dot(face_to_cell, f_norm) / (np.linalg.norm(face_to_cell) * np.linalg.norm(f_norm))),
                 #    (np.dot(shared_distance_vector, f_norm) / (np.linalg.norm(shared_distance_vector) * np.linalg.norm(f_norm))))
                 
-                
+                #Based on ANSYN
                 # #This is with the area of the face/vector face to cell and/or area of the face/vector distance between two cells
-                # ang = min(abs(np.dot(Area_vector, face_to_cell) / (np.linalg.norm(Area_vector) * np.linalg.norm(face_to_cell))),
-                #     abs(np.dot(Area_vector, shared_distance_vector) / (np.linalg.norm(Area_vector) * np.linalg.norm(shared_distance_vector))))
+                # This is an orthogonality inex for all the elements
+                ang = min(abs(np.dot(Area_vector, face_to_cell) / (np.linalg.norm(Area_vector) * np.linalg.norm(face_to_cell))),
+                   abs(np.dot(Area_vector, shared_distance_vector) / (np.linalg.norm(Area_vector) * np.linalg.norm(shared_distance_vector))))
+                
                 interior_tet[i, j] = shared_area/shared_distance_magnitude #division between shared area and shared distance
                 angle_non_ortho.append(ang)
                 if shared_area == 0:
@@ -172,7 +179,7 @@ for i in range(velement): #for each tetrahedron, take its centre
     angles[i] = min(angle_non_ortho)
     
 #Normalise if it is an angle
-normalised_data = angles - min(angles)/(max(angles) - min(angles)) #????
+#normalised_data = (angles - min(angles))/(max(angles) - min(angles)) #????
 
 
 

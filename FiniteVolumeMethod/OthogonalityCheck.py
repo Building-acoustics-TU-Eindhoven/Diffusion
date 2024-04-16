@@ -81,17 +81,9 @@ for i in volumeEl_dict.keys():
     centre_cell[i] = []
     #print(i)
     vc0 = nodecoords[node_indices[volumeEl_dict[i][0]],:] #coordinates of node 0
-    #vc0 = gmsh.model.mesh.getNode(volumeEl_dict[i][0])[0] #Coordinates of the node number zero of the volume element i
-    #print(nc0)
     vc1 = nodecoords[node_indices[volumeEl_dict[i][1]],:]
     vc2 = nodecoords[node_indices[volumeEl_dict[i][2]],:]
     vc3 = nodecoords[node_indices[volumeEl_dict[i][3]],:]
-    #vc1 = gmsh.model.mesh.getNode(volumeEl_dict[i][1])[0] #Coordinates of the node number one of the volume element i
-    #print(nc1)
-    #vc2 = gmsh.model.mesh.getNode(volumeEl_dict[i][2])[0] #Coordinates of the node number two of the volume element i
-    #print(nc2)
-    #vc3 = gmsh.model.mesh.getNode(volumeEl_dict[i][3])[0] #Coordinates of the node number three of the volume element i
-    #print(nc3)
     for j in range(3): #three coordinates per each node
         coord_centre_cell[j] = (vc0[j]+vc1[j]+vc2[j]+vc3[j])/4 #coordinates of the centre of each volume element
         centre_cell[i].append(coord_centre_cell[j])
@@ -111,24 +103,17 @@ for key in vcell_dict:
 interior_tet = np.zeros((velement, velement)) #initialization matrix of tetrahedron per tetrahedron
 angles_ortho = np.zeros((velement, velement))
 shared_area_vector = np.zeros((3))
-angles = np.zeros((velement))
+indeces_ortho = np.zeros((velement))
 
 for i in range(velement): #for each tetrahedron, take its centre
     print(i)
     cell_center_i = cell_center[i]
-    angle_non_ortho = []
+    indeces_pertet = []
     for j in range(velement): #for each tetrahedron, take its centre
         #cell_center_j = cell_center[j]
         #print(j)
         if i != j: #if the tetrahedrons are not the same one, then check if there are shared nodes in between the two tetrahedron i and j
             shared_nodes = np.intersect1d(velemNodes[i], velemNodes[j])
-            #shared_nodes = []
-            #count = 0
-            #for node in velemNodes[i]: #for each node in tetrahedron i
-            #    print(node)
-            #    if node in velemNodes[j]: #if each node of the tetrahedron i is in nodelist of tetrahedron j
-            #        count += 1
-            #        shared_nodes.append(node) #append the node that it is in common
             if len(shared_nodes) == 3: #after have done this for all the nodes, if the cound is 3 then calculate the shared area between the tetrahedrons
                 sc0 = nodecoords[node_indices[shared_nodes[0]],:]
                 #sc0 = gmsh.model.mesh.getNode(shared_nodes[0])[0] #coordinates of node 0
@@ -154,136 +139,28 @@ for i in range(velement): #for each tetrahedron, take its centre
                 fv2_n = sc2 - sc0 #vector2 for normal of the shared face
                 f_normal = np.cross(fv1_n, fv2_n) #normal vector of shared face
                 
-                #Max of the arcocosine #????
-                #ang = max((np.degrees(np.arccos(np.dot(face_to_cell, f_normal) / (np.linalg.norm(face_to_cell) * np.linalg.norm(f_normal)))),
-                #    np.degrees(np.arccos(np.dot(shared_distance_vector, f_normal) / (np.linalg.norm(shared_distance_vector) * np.linalg.norm(f_normal))))))
-                
-                #ang = min((np.dot(face_to_cell, f_norm) / (np.linalg.norm(face_to_cell) * np.linalg.norm(f_norm))),
-                #    (np.dot(shared_distance_vector, f_norm) / (np.linalg.norm(shared_distance_vector) * np.linalg.norm(f_norm))))
-                
                 #Based on ANSYN
                 # #This is with the area of the face/vector face to cell and/or area of the face/vector distance between two cells
                 # This is an orthogonality inex for all the elements
-                ang = min(abs(np.dot(Area_vector, face_to_cell) / (np.linalg.norm(Area_vector) * np.linalg.norm(face_to_cell))),
+                ortho_index = min(abs(np.dot(Area_vector, face_to_cell) / (np.linalg.norm(Area_vector) * np.linalg.norm(face_to_cell))),
                    abs(np.dot(Area_vector, shared_distance_vector) / (np.linalg.norm(Area_vector) * np.linalg.norm(shared_distance_vector))))
                 
                 interior_tet[i, j] = shared_area/shared_distance_magnitude #division between shared area and shared distance
-                angle_non_ortho.append(ang)
+                indeces_pertet.append(ortho_index)
                 if shared_area == 0:
                     angles_ortho[i,j] = 0 
                 else:
-                    angles_ortho[i,j] = ang
+                    angles_ortho[i,j] = ortho_index
             else:
                 shared_area = 0
                 interior_tet[i, j] = shared_area
-    angles[i] = min(angle_non_ortho)
+    indeces_ortho[i] = min(indeces_pertet)
+
+count = 0
+for i in indeces_ortho:
+    if i >= 0.7:
+        count +=1
     
-#Normalise if it is an angle
-#normalised_data = (angles - min(angles))/(max(angles) - min(angles)) #????
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# def coms_line_dist(volume_coords, face_nodes):
-#     b_c_1 = np.mean([volume_coords[node - 1] for node in face_nodes], axis=0)
-#     b_c_2 = np.mean([volume_coords[node - 1] for node in face_nodes], axis=0)
-#     coms_line = b_c_2 - b_c_1
-#     center_distance = np.linalg.norm(coms_line)
-#     return coms_line, center_distance
-
-# def face_normal_dir(face_coords):
-#     v1 = face_coords[1] - face_coords[0]
-#     v2 = face_coords[2] - face_coords[1]
-#     f_norm = np.cross(v1, v2)
-#     return f_norm
-
-# def check_non_orth(coms_line, f_norm, avNonOrth, non_orthogonal_threshold):
-#     ang = np.arccos(np.dot(coms_line, f_norm) / (np.linalg.norm(coms_line) * np.linalg.norm(f_norm)))
-#     avNonOrth += ang
-#     maxNonOrth = 0
-#     if ang > non_orthogonal_threshold:
-#         maxNonOrth = max(maxNonOrth, ang)
-#     return avNonOrth, maxNonOrth
-
-# def com_of_face(face_coords):
-#     return np.mean(face_coords, axis=0)
-
-# def check_skewness(p_f_com, coms_line, center_distance, avSkew, skewness_threshold):
-#     skewness = np.linalg.norm(np.cross(p_f_com - coms_line[0], p_f_com - coms_line[1])) / center_distance
-#     avSkew += skewness
-#     maxSkew = 0
-#     if skewness > skewness_threshold:
-#         maxSkew = max(maxSkew, skewness)
-#     return avSkew, maxSkew
-
-# def calc_averages(avNonOrth, avSkew, total_faces):
-#     avNonOrth /= total_faces if total_faces > 0 else 1
-#     avSkew /= total_faces if total_faces > 0 else 1
-#     return avNonOrth, avSkew
-
-# def print_stats(avNonOrth, maxNonOrth, avSkew, maxSkew):
-#     print("MeshQualityCheck:")
-#     print("Average non-orthogonality:", avNonOrth)
-#     print("Maximum non-orthogonality:", maxNonOrth)
-#     print("Average skewness:", avSkew)
-#     print("Maximum skewness:", maxSkew)
-
-
-# # Example usage
-# file_name = "3x3x3.msh" #Insert file name, msh file created from sketchUp and then gmsh
-
-# non_orthogonal_threshold=65
-# skewness_threshold=0.5
-
-# gmsh.initialize()
-# gmsh.open(file_name)
-
-# volume_tags, volume_coords, _ = gmsh.model.mesh.getNodes(dim=3)
-
-# avNonOrth = 0
-# maxNonOrth = 0
-# avSkew = 0
-# maxSkew = 0
-# total_faces = 0
-
-# for vol_tag in volume_tags:
-#     volume_faces = gmsh.model.getBoundary([(3, vol_tag)])[0]
-#     for face_tag in volume_faces:
-#         total_faces += 1
-#         face_nodes = gmsh.model.mesh.getElements(dim=2, tag=face_tag)[0][1]
-#         face_coords = np.array([volume_coords[node - 1] for node in face_nodes])
-#         coms_line, center_distance = coms_line_dist(volume_coords, face_nodes)
-
-#         f_norm = face_normal_dir(face_coords)
-#         avNonOrth, maxNonOrth = check_non_orth(coms_line, f_norm, avNonOrth, non_orthogonal_threshold)
-
-#         p_f_com = com_of_face(face_coords)
-#         avSkew, maxSkew = check_skewness(p_f_com, coms_line, center_distance, avSkew, skewness_threshold)
-
-# avNonOrth, avSkew = calc_averages(avNonOrth, avSkew, total_faces)
-# print_stats(avNonOrth, maxNonOrth, avSkew, maxSkew)
-
-# gmsh.finalize()
+perc_good_indeces = count/len(indeces_ortho)
+if perc_good_indeces >= 0.7:
+    print("Good quality mesh")

@@ -163,4 +163,8 @@ for i in indeces_ortho:
     
 perc_good_indeces = count/len(indeces_ortho)
 if perc_good_indeces >= 0.7:
-    print("Good quality mesh")
+    print("Good quality mesh according to percentage")
+    
+mean_indeces = np.mean(indeces_ortho)
+if mean_indeces >= 0.7:
+    print("Good quality mesh according to average value")

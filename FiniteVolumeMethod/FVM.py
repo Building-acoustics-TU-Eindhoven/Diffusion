@@ -838,6 +838,7 @@ for iBand in range(len(boundary_areas)):
 
 w_new_band = []
 w_rec_band = []
+w_rec_band_deriv = []
     
 for iBand in range(nBands):
     freq = center_freq[iBand]    
@@ -914,6 +915,7 @@ for iBand in range(nBands):
 
     w_new_band.append(w_new)
     w_rec_band.append(w_rec)
+    w_rec_band_deriv.append(w_rec)
 
 plt.show()
 
@@ -956,6 +958,12 @@ for iBand in range(nBands):
     idx_w_rec = np.argmin(np.abs(t - sourceon_time)) #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
     #idx_w_rec = np.where(t == sourceon_time)[0][0] #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
     w_rec_off = w_rec_band[iBand][idx_w_rec:] #cutting the energy density array at the receiver from the idx_w_rec to the end
+    
+    #Envelope of impulse response from the energy density
+    w_rec_off_deriv = w_rec_off #initialising an array of derivative equal to the w_rec_off -> this will be the impulse response after modifying it
+    w_rec_off_deriv = np.delete(w_rec_off_deriv, 0) #delete the first element of the array -> this means shifting the array one step before and therefore do a derivation
+    w_rec_off_deriv = np.append(w_rec_off_deriv,0) #add a zero in the last element of the array -> for derivation and to have the same length as previously
+    w_rec_off_deriv = w_rec_band_deriv[iBand][idx_w_rec:]
     
     #Schroeder integration
     #energy_r_rev = (w_rec_off)[::-1] #reverting the array
@@ -1105,4 +1113,5 @@ if tcalc == "stationarysource":
 ###############################################################################
 #SAVING
 ###############################################################################
-
+np.save('w_rec_band',w_rec_band)
+np.save('w_rec_band_deriv',w_rec_band_deriv)

@@ -44,21 +44,28 @@ st = time.time() #start time of calculation
 c0= 343 #adiabatic speed of sound [m.s^-1]
 m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
 
-dt = 0.001 #time discretizatione
+dt = 1/20000 #time discretizatione
 
 # Source position
-x_source = 1.36  #position of the source in the x direction [m]
-y_source = 3.76  #position of the source in the y direction [m]
-z_source = 1.62  #position of the source in the z direction [m]
+x_source = 0.5  #position of the source in the x direction [m]
+y_source = 0.5  #position of the source in the y direction [m]
+z_source = 1.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 4.26 #position of the receiver in the x direction [m]
-y_rec = 1.76 #position of the receiver in the y direction [m]
-z_rec = 1.62 #position of the receiver in the z direction [m]
+x_rec = 2.0 #position of the receiver in the x direction [m]
+y_rec = 0.5 #position of the receiver in the y direction [m]
+z_rec = 1.0 #position of the receiver in the z direction [m]
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
+
+#alpha_1 = [1/6,1/6,1/6,1/6,1/6] #Absorption coefficient for Surface1 - Floor
+#alpha_2 = [1/6,1/6,1/6,1/6,1/6] #Absorption coefficient for Surface2 - Ceiling
+#alpha_3 = [1/6,1/6,1/6,1/6,1/6] #Absorption coefficient for Surface3 - Wall Front
+#alpha_4 = [1/6,1/6,1/6,1/6,1/6] #Absorption coefficient for Surface4 - Wall Back
+#alpha_5 = [1/6,1/6,1/6,1/6,1/6] #Absorption coefficient for Surface5 - Wall Left
+#alpha_6 = [1/6,1/6,1/6,1/6,1/6] #Absorption coefficient for Surface6 - Wall Right
 
 #Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
@@ -67,6 +74,7 @@ tcalc = "decay"
 
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
+
 sourceon_time =  1.5 #time that the source is ON before interrupting [s]
 recording_time = 4.2 #total time recorded for the calculation [s]
 
@@ -84,7 +92,8 @@ center_freq = fc_low * np.power(2,((np.arange(0,x_frequencies+1) / num_octave)))
 #INITIALISE GMSH
 ###############################################################################
     
-file_name = "scenario2.msh" #Insert file name, msh file created from sketchUp and then gmsh
+
+file_name = "3x3x3.msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 
@@ -159,13 +168,17 @@ for i in volumeEl_dict.keys():
     coord_centre_cell = np.zeros(3)
     centre_cell[i] = []
     #print(i)
-    vc0 = gmsh.model.mesh.getNode(volumeEl_dict[i][0])[0] #Coordinates of the node number zero of the volume element i
+    vc0 = nodecoords[node_indices[volumeEl_dict[i][0]],:] #coordinates of node 0
+    #vc0 = gmsh.model.mesh.getNode(volumeEl_dict[i][0])[0] #Coordinates of the node number zero of the volume element i
     #print(nc0)
-    vc1 = gmsh.model.mesh.getNode(volumeEl_dict[i][1])[0] #Coordinates of the node number one of the volume element i
+    vc1 = nodecoords[node_indices[volumeEl_dict[i][1]],:]
+    vc2 = nodecoords[node_indices[volumeEl_dict[i][2]],:]
+    vc3 = nodecoords[node_indices[volumeEl_dict[i][3]],:]
+    #vc1 = gmsh.model.mesh.getNode(volumeEl_dict[i][1])[0] #Coordinates of the node number one of the volume element i
     #print(nc1)
-    vc2 = gmsh.model.mesh.getNode(volumeEl_dict[i][2])[0] #Coordinates of the node number two of the volume element i
+    #vc2 = gmsh.model.mesh.getNode(volumeEl_dict[i][2])[0] #Coordinates of the node number two of the volume element i
     #print(nc2)
-    vc3 = gmsh.model.mesh.getNode(volumeEl_dict[i][3])[0] #Coordinates of the node number three of the volume element i
+    #vc3 = gmsh.model.mesh.getNode(volumeEl_dict[i][3])[0] #Coordinates of the node number three of the volume element i
     #print(nc3)
     for j in range(3): #three coordinates per each node
         coord_centre_cell[j] = (vc0[j]+vc1[j]+vc2[j]+vc3[j])/4 #coordinates of the centre of each volume element
@@ -190,12 +203,16 @@ for i in boundaryEl_dict.keys():
     coord_centre_area = np.zeros(3)
     centre_area[i] = []
     #print(i)
-    bc0 = gmsh.model.mesh.getNode(boundaryEl_dict[i][0])[0]
+    bc0 = nodecoords[node_indices[boundaryEl_dict[i][0]],:]
+    
+    #bc0 = gmsh.model.mesh.getNode(boundaryEl_dict[i][0])[0]
     #bnodeCoord_dict[boundaryEl_dict[i][0]] #Coordinates of the node number zero of the volume element i
     #print(nc0)
-    bc1 = gmsh.model.mesh.getNode(boundaryEl_dict[i][1])[0] #Coordinates of the node number one of the volume element i
+    bc1 = nodecoords[node_indices[boundaryEl_dict[i][1]],:]
+    #gmsh.model.mesh.getNode(boundaryEl_dict[i][1])[0] #Coordinates of the node number one of the volume element i
     #print(nc1)
-    bc2 = gmsh.model.mesh.getNode(boundaryEl_dict[i][2])[0] #Coordinates of the node number two of the volume element i
+    bc2 = nodecoords[node_indices[boundaryEl_dict[i][2]],:]
+    #gmsh.model.mesh.getNode(boundaryEl_dict[i][2])[0] #Coordinates of the node number two of the volume element i
     #print(nc2)
     for j in range(3):
         coord_centre_area[j] = (bc0[j]+bc1[j]+bc2[j])/3 #coordinates of the centre of each volume element
@@ -279,38 +296,40 @@ for iGroup in vGroups:
 #######################################################################################################
 #######################################################################################################
 
+
 interior_tet = np.zeros((velement, velement)) #initialization matrix of tetrahedron per tetrahedron
 
 for i in range(velement): #for each tetrahedron, take its centre
     print(i)
     cell_center_i = cell_center[i]
     for j in range(velement): #for each tetrahedron, take its centre
-        cell_center_j = cell_center[j]
-        print(j)
+        #cell_center_j = cell_center[j]
+        #print(j)
         if i != j: #if the tetrahedrons are not the same one, then check if there are shared nodes in between the two tetrahedron i and j
-            shared_nodes = []
-            count = 0
-            for node in velemNodes[i]: #for each node in tetrahedron i
-                print(node)
-                if node in velemNodes[j]: #if each node of the tetrahedron i is in nodelist of tetrahedron j
-                    count += 1
-                    shared_nodes.append(node) #append the node that it is in common
-            if count == 3: #after have done this for all the nodes, if the cound is 3 then calculate the shared area between the tetrahedrons
-                sc0 = gmsh.model.mesh.getNode(shared_nodes[0])[0] #coordinates of node 0
-                sc1 = gmsh.model.mesh.getNode(shared_nodes[1])[0] #coordinates of node 1
-                sc2 = gmsh.model.mesh.getNode(shared_nodes[2])[0] #coordinates of node 2
+            shared_nodes = np.intersect1d(velemNodes[i], velemNodes[j])
+            #shared_nodes = []
+            #count = 0
+            #for node in velemNodes[i]: #for each node in tetrahedron i
+            #    print(node)
+            #    if node in velemNodes[j]: #if each node of the tetrahedron i is in nodelist of tetrahedron j
+            #        count += 1
+            #        shared_nodes.append(node) #append the node that it is in common
+            if len(shared_nodes) == 3: #after have done this for all the nodes, if the cound is 3 then calculate the shared area between the tetrahedrons
+                sc0 = nodecoords[node_indices[shared_nodes[0]],:]
+                #sc0 = gmsh.model.mesh.getNode(shared_nodes[0])[0] #coordinates of node 0
+                sc1 = nodecoords[node_indices[shared_nodes[1]],:]
+                #sc1 = gmsh.model.mesh.getNode(shared_nodes[1])[0] #coordinates of node 1
+                sc2 = nodecoords[node_indices[shared_nodes[2]],:]
+                #sc2 = gmsh.model.mesh.getNode(shared_nodes[2])[0] #coordinates of node 2
                 shared_area = np.linalg.norm(np.cross(sc2-sc0,sc1-sc0))/2 #compute shared area
-                shared_distance = sqrt((abs(cell_center_i[0] - cell_center_j[0]))**2 + (abs(cell_center_i[1] - cell_center_j[1]))**2 + (abs(cell_center_i[2] - cell_center_j[2]))**2) #distance between volume elements
+                shared_distance = np.linalg.norm(cell_center_i - cell_center[j])
+                    #sqrt((abs(cell_center_i[0] - cell_center_j[0]))**2 + (abs(cell_center_i[1] - cell_center_j[1]))**2 + (abs(cell_center_i[2] - cell_center_j[2]))**2) #distance between volume elements
                 interior_tet[i, j] = shared_area/shared_distance #division between shared area and shared distance
             else:
                 shared_area = 0
                 interior_tet[i, j] = shared_area
 
 interior_tet_sum = np.sum(interior_tet, axis=1) #sum of interior_tet per columns (so per i element)
-
-#et = time.time() #end time
-#elapsed_time = et - st
-
 
 ##############################################################################
 ##############################################################################
@@ -328,7 +347,8 @@ for group in vGroupsNames:
     name_group = group[2]
     name_split = name_group.split("$")
     name_abs_coeff = name_split[0]
-    abscoeff = name_split[1].split(",")
+    abscoeff = input(f"Enter absorption coefficient for frequency {fc_low} to {fc_high} for {name_abs_coeff}:") 
+    abscoeff = abscoeff.split(",")
     #abscoeff = [float(i) for i in abscoeff][-1] #for one frequency
     abscoeff_list = [float(i) for i in abscoeff] #for multiple frequencies
     
@@ -354,9 +374,12 @@ for entity, Abs_term in surface_absorption:
     for i in range(0, len(face_nodes_per_entity), 3): # per each element basically, goes trhough the nodes of each face 3by3
         #print(i)
         f = tuple(sorted(face_nodes_per_entity[i:i + 3])) 
-        fc0 = gmsh.model.mesh.getNode(f[0])[0] #coordinates of vertix 0
-        fc1 = gmsh.model.mesh.getNode(f[1])[0] #coordinates of vertix 1
-        fc2 = gmsh.model.mesh.getNode(f[2])[0] #coordinates of vertix 2
+        fc0 = nodecoords[node_indices[f[0]],:]
+        #fc0 = gmsh.model.mesh.getNode(f[0])[0] #coordinates of vertix 0
+        fc1 = nodecoords[node_indices[f[1]],:]
+        fc2 = nodecoords[node_indices[f[2]],:]
+        #fc1 = gmsh.model.mesh.getNode(f[1])[0] #coordinates of vertix 1
+        #fc2 = gmsh.model.mesh.getNode(f[2])[0] #coordinates of vertix 2
         face_area = 0.5 * np.linalg.norm(np.cross(fc1 - fc0, fc2 - fc0)) #Compute the area using half of the cross product's magnitude
         surf_area_tot += face_area
         surface_areas[entity] = surf_area_tot
@@ -391,9 +414,14 @@ for idx, element in enumerate(velemNodes): #for index and element in the number 
                     is_boundary = True
                     if is_boundary: #if the surface is at the boundary, then take the coordinates of each vertix
                         #Convert the vertices to NumPy arrays for vector operations
-                        bc0 = gmsh.model.mesh.getNode(nodes[0])[0] #coordinates of vertix 0
-                        bc1 = gmsh.model.mesh.getNode(nodes[1])[0] #coordinates of vertix 1
-                        bc2 = gmsh.model.mesh.getNode(nodes[2])[0] #coordinates of vertix 2
+                        bc0 = nodecoords[node_indices[nodes[0]],:]
+                        bc1 = nodecoords[node_indices[nodes[1]],:]
+                        bc2 = nodecoords[node_indices[nodes[2]],:]
+                        
+                        
+                        #bc0 = gmsh.model.mesh.getNode(nodes[0])[0] #coordinates of vertix 0
+                        #bc1 = gmsh.model.mesh.getNode(nodes[1])[0] #coordinates of vertix 1
+                        #bc2 = gmsh.model.mesh.getNode(nodes[2])[0] #coordinates of vertix 2
                         
                         face_area = 0.5 * np.linalg.norm(np.cross(bc1 - bc0, bc2 - bc0)) #Compute the area using half of the cross product's magnitude
                         #print(face_area)
@@ -499,7 +527,6 @@ coord_rec = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
 #     total_weights_s[i] = weight/sum_weights_s if sum_weights_s != 0 else 0
 # cl_tet_s_keys = cl_tet_s.keys() #take only the keys of the cl_tet_s dictionary (so basically the indexes of the tetrahedrons)
 
-
 #SOURCE INTERPOLATION CALCULATED WITHIN 4 CENTRE CELL SELECTED (TETRAHEDRON)
 #Position of source is the centre of a cell so the minimum distance with the centre of a cell has been calculated to understand which cell is the closest
 dist_source_cc_list = [] #initialise the list for all the distances between each cell centre and the source
@@ -538,6 +565,42 @@ for i,weight in total_weights_s.items():
 
 cl_tet_s_keys = cl_tet_s.keys() #take only the keys of the cl_tet_s dictionary (so basically the indexes of the tetrahedrons)
 
+
+###############################################################################
+###############################################################################
+#To make sure that the source is in the correct tetrahedron position
+node_ids = velemNodes.T
+ori=nodecoords[node_ids[0,:]-1,:]
+#ori = nodecoords[node_indices[node_ids[:,0],:]]
+v_tet_s1=nodecoords[node_ids[1,:]-1,:]-ori
+v_tet_s2=nodecoords[node_ids[2,:]-1,:]-ori
+v_tet_s3=nodecoords[node_ids[3,:]-1,:]-ori
+n_tet=len(node_ids.T)
+v1s = v_tet_s1.T.reshape((3,1,n_tet))
+v2s = v_tet_s2.T.reshape((3,1,n_tet))
+v3s = v_tet_s3.T.reshape((3,1,n_tet))
+mat = np.concatenate((v1s,v2s,v3s), axis=1)
+inv_mat = np.linalg.inv(mat.T).T
+#if coord_source.size==3:  # to make rec has a dimension of (N_rec,3)
+#    rec=rec.reshape((1,3))
+coord_source_array = np.array(coord_source)
+if coord_source_array.size==3:  # to make rec has a dimension of (N_rec,3)
+    coord_source_array=coord_source_array.reshape((1,3))
+N_sou=coord_source_array.shape[0]
+orir=np.repeat(ori[:,:,np.newaxis], N_sou, axis=2)
+newp=np.einsum('imk,kmj->kij',inv_mat,coord_source_array.T-orir)
+val=np.all(newp>=0, axis=1) & np.all(newp <=1, axis=1) & (np.sum(newp, axis=1)<=1)
+id_tet, id_p = np.nonzero(val)
+res = -np.ones(N_sou, dtype=id_tet.dtype) # Sentinel value
+res[id_p]=id_tet
+
+
+
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+
 # #VOLUME CALCULATED WITHIN 4 CENTRE CELL SELECTED (TETRAHEDRON)
 #Calculate volume of the source with the 4 cell centres as the vertices of the tetrahedron
 # vertices_source = np.array([]).reshape(0, 3)  # Initialize as an empty 2D array with 3 columns
@@ -572,7 +635,7 @@ cl_tet_s_keys = cl_tet_s.keys() #take only the keys of the cl_tet_s dictionary (
 # Vs = calculate_volume(vertices_source)
 
 #VOLUME ORIGINAL
-Vs = cell_volume[source_idx] #volume of the source = to volume of cells where the volume is 
+Vs = cell_volume[res[0]] #volume of the source = to volume of cell where the source is 
 # Vs = 1
 
 ################SOURCE INTERPOLATION WITH VERTICES OF TETRAHEDRON IN WHICH SOURCE IS IN
@@ -922,10 +985,11 @@ for iBand in range(nBands):
     press_r = ((abs(w_rec_band[iBand]))*rho*(c0**2)) #pressure at the receiver
     spl_r = 10*np.log10(((abs(w_rec_band[iBand]))*rho*(c0**2))/(pRef**2)) #,where=press_r>0, sound pressure level at the receiver
     spl_r_norm = 10*np.log10((((abs(w_rec_band[iBand]))*rho*(c0**2))/(pRef**2)) / np.max(((abs(w_rec_band[iBand]))*rho*(c0**2))/(pRef**2))) #normalised to maximum to 0dB
-    spl_r_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_sr) + ((abs(w_rec_band[iBand]))*c0)/(pRef**2))) #spl total (including direct field) at the receiver position????? but it will need to be calculated for a stationary source 100dB
+    spl_r_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_sr) + ((abs(w_rec_band[iBand]))*c0))/(pRef**2)) #spl total (including direct field) at the receiver position????? but it will need to be calculated for a stationary source 100dB
     
     #Find the energy decay part of the overal calculation
-    idx_w_rec = np.where(t == sourceon_time)[0][0] #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
+    idx_w_rec = np.argmin(np.abs(t - sourceon_time)) #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
+    #idx_w_rec = np.where(t == sourceon_time)[0][0] #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
     w_rec_off = w_rec_band[iBand][idx_w_rec:] #cutting the energy density array at the receiver from the idx_w_rec to the end
     
     #Schroeder integration

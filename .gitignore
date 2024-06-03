@@ -6,3 +6,6 @@ doc/.ipynb_checkpoints/
 .ipynb_checkpoints/
 PytoMat.m
 .opt
+ConvVsMult.mlx
+forMichalis.m
+DiffEq3DAxis.py

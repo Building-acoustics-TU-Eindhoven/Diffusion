@@ -67,7 +67,7 @@ A dv of 0.5 m normally would suffice for a correct calculation, although the cho
 According the Navarro 2012, to get good converged results, the time discretization dt will need to be defined depending on the dv chosen. 
 To make sure that the predictions converge to a fixed value with a very low error, the following empirical cretirion will need to apply.
 ```{math}
-10^(-8) = (dt)^2 (dv)^(-2)
+10^{(-8)} = (dt)^2 (dv)^{(-2)}
 ```
 The time discretization is defined in seconds. 
 

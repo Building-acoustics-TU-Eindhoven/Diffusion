@@ -53,7 +53,7 @@ In order to create a volumetric mesh of the room, the following steps need to be
 8. Select one or multiple surfaces you want to assign a boundary property;
 9. Click "Add tetgen boundary to selected";
 10. Under "Refine", change the refinement to 1;
-11. Under "Name": change the name to "materialname$abscoeff1,abscoeff2,..., abscoeffn" e.g."carpet$0.1515,0.3641,0.64,0.8264,0.8821" so a description of the surface followed by a $, followed by absorption coefficients per each frequency (maximum 5 frequencies) separated by commas for that surface;
+11. Under "Name": change the name to "materialname" e.g."carpet";
 12. After finishing defining all the boundaries, select the group and click the "export to generate mesh" button;
 13. Select Format = "gmsh" en Units = "m" and click "ok";
 14. Leave the options as they are apart from "pointSizes" which should change to True, click "ok" and save the .geo file;
@@ -67,11 +67,7 @@ The volumetric mesh is to be created. The file "CreateMeshFVM.py" allows to crea
 The mesh length value is vital to discretize correctly the space and achieve precise and converged results. Through various trials, it has been established that a mesh length of 1 m is generally adequate. However, for computations involving complex geometries or small rooms, a smaller length of mesh (0.5 m or lower) is recommended.
 The choice is contingent upon user preferences for details in parameters values, room dimensions but mostly for the preliminary Reverberation time value calculated with Sabine’s formula.
 
-The method is suitable for any type of geometry.
-
-### Surface materials
-The surface materials are defined in the SketchUp file as mentioned above. 
-Each surface (includeing doors, windows etc...) would require frequency dependent absorption coefficients. 
+The method is suitable for any type of geometry. 
 
 ### Mesh file
 The mesh file will need to be inputted in the main "FVM.py" file in the variable "file_name". This will give the input for the calculation to run a specific room (as a .msh file).
@@ -86,7 +82,15 @@ In this case, there is the option to toggle the sound source on and off or keep 
 - If an impulse source is chosen, the source will be automatically defined.
 
 ### Receiver
-The model allows for the insertion of only one acoustics receiver position per calculation. These are defined as point omnidirectional receivers. The users will input the position of the receiver in the room in the following vaariables $x_\{rec\},y_\{rec\},z_\{rec\}$ in m in the x,y,z directions.
+The model allows for the insertion of only one acoustics receiver position per calculation. These are defined as point omnidirectional receivers. The users will input the position of the receiver in the room in the following variables $x_\{rec\},y_\{rec\},z_\{rec\}$ in m in the x,y,z directions.
+
+### Frequency range
+The frequency resolution should be included as inputs variables $fc_low$ and $fc_high$. The maximum number of frequencies is 5 in octave bands. Normally, $fc_low$ is set to 125Hz and $fc_high$ is set to 2000Hz.
+
+### Surface materials
+The surface materials names are defined in the SketchUp file as mentioned above. 
+Each surface (includeing doors, windows etc...) would require frequency dependent absorption coefficients. During the calculation (quite soon after pressing "Run"), the python script will prompt you with a question regarding the absorption coefficients of the surface of the room. It is important to include the absorption coefficient per each frequency (maximum 5 frequencies) separated by commas as per this example:
+"`Enter absorption coefficient for frequency {fc_low} to {fc_high} for carpet:`0.15,0.17,0.20,0.25,0.25".
 
 ### Discretization variables
 #### Spatial discretization
@@ -95,17 +99,18 @@ The Finite Volume method works with a spatial volumetric discretization. This is
 #### Time discretization dt
 The time discretization will need to be chosen appropriately.
 According the Navarro 2012, to get good converged results, the time discretization dt will need to be defined depending on the length of mesh chosen. 
-To make sure that the predictions converge to a fixed value with a very low error, the following empirical cretirion will need to apply.
+To make sure that the predictions converge to a fixed value with a very low error, the following empirical criterion will need to apply.
 ```{math}
-10^(-8) = (dt)^2 (dv)^(-2)
+10^{(-8)} = (dt)^2 (dv)^{(-2)}
 ```
 where dv is the mesh length chosen.
 The time discretization is defined in seconds. 
 
 ### Total Recording time
-The total recording time is the amount of time for the calculation to run. It is the sum of the source on time and the time for the decay. 
-The decay time needs to be inputted as the 2/3 of the theoretical calculated Sabine reverberation time of the room.
-The total recording time is defined in seconds.
+The total recording time is the amount of time for the calculation to run. It is the sum of the source on time (time at which the source stays switched on) and the time for the decay (time after the source has been switched off). 
+The decay time needs to be inputted as the 2/3 of the theoretical calculated Sabine reverberation time of the room. 
+The source on time needs to be inputted as the 2/3 of the theoretical calculated Sabine reverberation time of the room.
+The total recording time is the sum of decay time and source on time and it is defined in seconds.
 
 ### Air absorption
 The absorption of the air will need to be inputted. The air absorption is defined as $m_\{atm\}$ and in 1/meters. 

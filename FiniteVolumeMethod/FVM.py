@@ -93,7 +93,7 @@ center_freq = fc_low * np.power(2,((np.arange(0,x_frequencies+1) / num_octave)))
 ###############################################################################
     
 
-file_name = "3x3x3.msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "MeasurementRoom.msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 

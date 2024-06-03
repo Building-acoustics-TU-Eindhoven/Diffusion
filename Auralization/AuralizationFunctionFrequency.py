@@ -35,6 +35,8 @@ data_signal, fs = sf.read(filename) #this returns "data_signal", which is the
 #sd.play(data, fs) #this line allows to listen to the anechoic signal as it is.
 #status = sd.wait()  #Wait until file is done playing
 
+#resampling function!!!
+
 #%%
 ###############################################################################
 #IMPORT ENERGY DECAY CURVES
@@ -63,7 +65,7 @@ square_root = np.sqrt(edc_deriv_band) #this gives the impulse response
 random_array = np.random.rand(1, edc_deriv_band.shape[1])*2 - 1 #random noise vector with numbers between -1 and 1
 random_array = sum(random_array) #this line of code is used for passing from a row vector to a column vector
 
-
+#normalised one!!!!!! variance to be one
 #%%
 ###############################################################################
 #CREATION OF FILTER
@@ -153,8 +155,6 @@ plt.show()
 conv_length = len(np.convolve(h_all[0, :], random_array))
 
 #Convolution of random noise with filter
-
-
 filt_noise_band = np.empty((nBands, conv_length), dtype=float)
 for fi in range(nBands):
     filt_noise=np.convolve(h_all[fi,:],random_array)
@@ -218,7 +218,7 @@ plt.plot(ht,imp_tot) #plot the impulse response
 plt.plot(t_conv,sh_conv) #plot the convolved signal
 
 #Play the convolved signal
-sd.play(sh_conv, fs)
+#sd.play(sh_conv, fs)
 
 
 #%%

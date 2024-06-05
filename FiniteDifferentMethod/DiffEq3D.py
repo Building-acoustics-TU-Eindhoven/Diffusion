@@ -628,11 +628,11 @@ schroeder = w_rec_off #energy_r_rev_cum[::-1] #reverting the array again -> crea
 sch_db = 10.0 * np.log10(schroeder / max(schroeder)) #level of the array: schroeder decay
 
 if tcalc == "decay":
-    t60 = t60_decay(t, sch_db, idx_w_rec) #called function for calculation of t60 [s]
+    t30 = t60_decay(t, sch_db, idx_w_rec, rt='t30') #called function for calculation of t60 [s]
     edt = edt_decay(t, sch_db, idx_w_rec) #called function for calculation of edt [s]
-    c80 = clarity(t60, V, Eq_A, S, c0, dist_sr) #called function for calculation of c80 [dB]
-    d50 = definition(t60, V, Eq_A, S, c0, dist_sr) #called function for calculation of d50 [%]
-    ts = centretime(t60, Eq_A, S) #called function for calculation of ts [ms]
+    c80 = clarity(t30, V, Eq_A, S, c0, dist_sr) #called function for calculation of c80 [dB]
+    d50 = definition(t30, V, Eq_A, S, c0, dist_sr) #called function for calculation of d50 [%]
+    ts = centretime(t30, Eq_A, S) #called function for calculation of ts [ms]
 
 et = time.time() #end time
 elapsed_time = et - st

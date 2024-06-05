@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt #import matplotlib as mpl
 import numpy as np
 from scipy import stats
 
-def t60_decay(t, sch_db, idx_w_rec):
+def t60_decay(t, sch_db, idx_w_rec, rt='t30'):
     """
     Reverberation time from a Schroeder decay (Schroeder 1965)
     :param t: time axis
@@ -16,9 +16,26 @@ def t60_decay(t, sch_db, idx_w_rec):
     :param idx_w_rec: Index at which the t array is equal to the sourceon_time - calculation of RT from when the source stops.
     :returns: Reverberation time T_{60}
     """    
-    init = -5.0 #because I want the T30, I need to start at -5
-    end = -35.0 #because I want the T30, I need to finish at -35
-    factor = 2.0 #factor of 2 since I need the T30
+    if rt == 't30':
+        init = -5.0 #because I want the T30, I need to start at -5
+        end = -35.0 #because I want the T30, I need to finish at -35
+        factor = 2.0 #factor of 2 since I need the T30
+    elif rt == 't20':
+        init = -5.0 
+        end = -25.0 
+        factor = 3.0 
+    elif rt == 't60':
+        init = -5.0 
+        end = -65.0 
+        factor = 1.0 
+    elif rt == 't10':
+        init = -5.0
+        end = -15.0
+        factor = 6.0
+    elif rt == 'edt':
+        init = 0.0
+        end = -10.0
+        factor = 6.0
     
     #rt_decay = sch_db #decay to be used to calculate the RT
     

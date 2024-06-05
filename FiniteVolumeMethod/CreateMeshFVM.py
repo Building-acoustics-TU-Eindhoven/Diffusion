@@ -67,7 +67,7 @@ import subprocess
 geo_file_path = 'MeasurementRoom.geo'
 #max_mesh_size = 1
 name_gmsh_file = 'MeasurementRoom.msh'
-length_of_mesh = 0.8
+length_of_mesh = 0.6
 
 #%%
 #import os

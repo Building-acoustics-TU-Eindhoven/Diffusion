@@ -77,7 +77,7 @@ tcalc = "decay"
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
 
 sourceon_time =  1.5 #time that the source is ON before interrupting [s]
-recording_time = 4.2 #total time recorded for the calculation [s]
+recording_time = 4.1 #total time recorded for the calculation [s]
 
 # Frequency resolution
 fc_low = 125
@@ -949,6 +949,7 @@ for iBand in range(nBands):
         
         idx_w_rec = np.argmin(np.abs(t - sourceon_time)) #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
         w_rec_off = w_rec[idx_w_rec:]
+        t_off = t[idx_w_rec:]
         
         print(time_steps)
 
@@ -1152,4 +1153,4 @@ if tcalc == "stationarysource":
 ###############################################################################
 #SAVING
 ###############################################################################
-np.save(os.path.join('results_diff_imp','spl_r_off_band'),spl_r_off_band)
+#np.save(os.path.join('results_diff_imp','spl_r_off_band'),spl_r_off_band)

@@ -32,6 +32,7 @@ import time as time
 #from matplotlib.animation import FuncAnimation
 #from scipy.sparse import lil_matrix
 import gmsh
+import os
  
 st = time.time() #start time of calculation
 
@@ -873,6 +874,7 @@ for iBand in range(len(boundary_areas)):
 
 w_new_band = []
 w_rec_band = []
+w_rec_off_band = []
     
 for iBand in range(nBands):
     freq = center_freq[iBand]    
@@ -945,10 +947,14 @@ for iBand in range(nBands):
             for tet_s in cl_tet_s_keys:
                  s[tet_s] = source1[0] *total_weights_s[tet_s]
         
+        idx_w_rec = np.argmin(np.abs(t - sourceon_time)) #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
+        w_rec_off = w_rec[idx_w_rec:]
+        
         print(time_steps)
 
     w_new_band.append(w_new)
     w_rec_band.append(w_rec)
+    w_rec_off_band.append(w_rec_off)
 
 plt.show()
 
@@ -963,8 +969,9 @@ w_rec_y_band = []
 spl_stat_x_band = []
 spl_stat_y_band = []
 spl_r_band = []
+spl_r_off_band = []
 spl_r_norm_band = []
-t60_band = []
+t30_band = []
 sch_db_band = []
 
 for iBand in range(nBands):
@@ -984,38 +991,44 @@ for iBand in range(nBands):
 
     press_r = ((abs(w_rec_band[iBand]))*rho*(c0**2)) #pressure at the receiver
     spl_r = 10*np.log10(((abs(w_rec_band[iBand]))*rho*(c0**2))/(pRef**2)) #,where=press_r>0, sound pressure level at the receiver
+    spl_r_off = 10*np.log10(((abs(w_rec_off_band[iBand]))*rho*(c0**2))/(pRef**2))
+    
     spl_r_norm = 10*np.log10((((abs(w_rec_band[iBand]))*rho*(c0**2))/(pRef**2)) / np.max(((abs(w_rec_band[iBand]))*rho*(c0**2))/(pRef**2))) #normalised to maximum to 0dB
     spl_r_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_sr) + ((abs(w_rec_band[iBand]))*c0))/(pRef**2)) #spl total (including direct field) at the receiver position????? but it will need to be calculated for a stationary source 100dB
     
     #Find the energy decay part of the overal calculation
-    idx_w_rec = np.argmin(np.abs(t - sourceon_time)) #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
+    #idx_w_rec = np.argmin(np.abs(t - sourceon_time)) #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
     #idx_w_rec = np.where(t == sourceon_time)[0][0] #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
-    w_rec_off = w_rec_band[iBand][idx_w_rec:] #cutting the energy density array at the receiver from the idx_w_rec to the end
+    #w_rec_off = w_rec_band[iBand][idx_w_rec:] #cutting the energy density array at the receiver from the idx_w_rec to the end
     
     #Schroeder integration
     #energy_r_rev = (w_rec_off)[::-1] #reverting the array
     #The energy density is related to the pressure with the following relation: w = p^2
     #energy_r_rev_cum = np.cumsum(energy_r_rev) #cumulative summation of all the item in the array
-    schroeder = w_rec_off #energy_r_rev_cum[::-1] #reverting the array again -> creating the schroder decay
+    schroeder = w_rec_off_band[iBand] #energy_r_rev_cum[::-1] #reverting the array again -> creating the schroder decay
     sch_db = 10.0 * np.log10(schroeder / max(schroeder)) #level of the array: schroeder decay
     
     if tcalc == "decay":
-        t60 = t60_decay(t, sch_db, idx_w_rec) #called function for calculation of t60 [s]
+        t30 = t60_decay(t, sch_db, idx_w_rec, rt='t30') #called function for calculation of t60 [s]
         edt = edt_decay(t, sch_db, idx_w_rec) #called function for calculation of edt [s]
         #Eq_A = 0.16*V/t60 #equivalent absorption area defined from the RT 
-        c80 = clarity(t60, V, Eq_A[iBand], S, c0, dist_sr) #called function for calculation of c80 [dB]
-        d50 = definition(t60, V, Eq_A[iBand], S, c0, dist_sr) #called function for calculation of d50 [%]
-        ts = centretime(t60, Eq_A[iBand], S) #called function for calculation of ts [ms]
+        c80 = clarity(t30, V, Eq_A[iBand], S, c0, dist_sr) #called function for calculation of c80 [dB]
+        d50 = definition(t30, V, Eq_A[iBand], S, c0, dist_sr) #called function for calculation of d50 [%]
+        ts = centretime(t30, Eq_A[iBand], S) #called function for calculation of ts [ms]
         
-        t60_band.append(t60)
+        t30_band.append(t30)
         
     w_rec_x_band.append(w_rec_x_end)
     w_rec_y_band.append(w_rec_y_end)
     spl_stat_x_band.append(spl_stat_x)
     spl_stat_y_band.append(spl_stat_y)
     spl_r_band.append(spl_r)
+    spl_r_off_band.append(spl_r_off)
     spl_r_norm_band.append(spl_r_norm)
     sch_db_band.append(sch_db)
+
+spl_r_off_band = np.array(spl_r_off_band)
+t30_band = np.array(t30_band)
 
 et = time.time() #end time
 elapsed_time = et - st
@@ -1135,9 +1148,8 @@ if tcalc == "stationarysource":
         plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
         plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')
 
-#?????
 #%%
 ###############################################################################
 #SAVING
 ###############################################################################
-
+np.save(os.path.join('results_diff_imp','spl_r_off_band'),spl_r_off_band)

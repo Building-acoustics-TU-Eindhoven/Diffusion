@@ -35,18 +35,18 @@ data_signal, fs = sf.read(filename) #this returns "data_signal", which is the
 #sd.play(data, fs) #this line allows to listen to the anechoic signal as it is.
 #status = sd.wait()  #Wait until file is done playing
 
-#resampling function!!!
-
 #%%
 ###############################################################################
 #IMPORT ENERGY DECAY CURVES
 ###############################################################################
 #Import the energy decay curve
+original_fs = np.load('C:/Users/20225533/Diffusion/Auralization/fs.npy')
 edc_band = np.load('C:/Users/20225533/Diffusion/Auralization/w_rec_band.npy')
-#edc = np.load('C:/Users/20225533/Diffusion/Auralization/w_rec_off.npy') #energy decay curve taken from the results of the diffusion equation model
-t = np.load('C:/Users/20225533/Diffusion/Auralization/t.npy') #time steps array
+edc_band = signal.resample(edc_band, int(len(edc_band) * fs / original_fs_edc_band))
 
 edc_deriv_band = np.load('C:/Users/20225533/Diffusion/Auralization/w_rec_band_deriv.npy') #energy decay curve differentiated (or also impulse response of the room)
+edc_deriv_band = signal.resample(edc_deriv_band, int(len(edc_deriv_band) * fs / original_fs_edc_deriv_band))
+
 t_off = np.load('C:/Users/20225533/Diffusion/Auralization/t_off.npy') #decay time of the energy decay curve
 t_off = t_off - t_off[0] #removing the t_off[0] to make the vector start from zero.
 
@@ -194,7 +194,14 @@ imp_tot = np.array(imp_tot, dtype=float)
 scipy.io.wavfile.write("imp_resp.wav", fs, imp_tot)
 
 #Play the impulse response
-sd.play(imp_tot, fs)
+#sd.play(imp_tot, fs)
+
+
+#%%
+###############################################################################
+#RESAMPLING FUNCTION FOR THE ANECHOIC FILE
+###############################################################################
+#data_signal_resampled = signal.resample(data_signal, len(imp_tot))
 
 #%%
 ###############################################################################

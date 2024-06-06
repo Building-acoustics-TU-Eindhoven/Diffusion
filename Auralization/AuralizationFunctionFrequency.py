@@ -40,7 +40,7 @@ data_signal, fs = sf.read(filename) #this returns "data_signal", which is the
 #IMPORT ENERGY DECAY CURVES
 ###############################################################################
 #Import the energy decay curve
-original_fs = np.load('C:/Users/20225533/Diffusion/Auralization/fs.npy')
+original_fs = 1/5e-05 #np.load('C:/Users/20225533/Diffusion/Auralization/fs.npy')
 edc_band = np.load('C:/Users/20225533/Diffusion/Auralization/w_rec_band.npy')
 edc_band = signal.resample(edc_band, int(len(edc_band) * fs / original_fs_edc_band))
 

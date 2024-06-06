@@ -875,6 +875,7 @@ for iBand in range(len(boundary_areas)):
 w_new_band = []
 w_rec_band = []
 w_rec_off_band = []
+w_rec_off_deriv_band = []
     
 for iBand in range(nBands):
     freq = center_freq[iBand]    
@@ -951,11 +952,18 @@ for iBand in range(nBands):
         w_rec_off = w_rec[idx_w_rec:]
         t_off = t[idx_w_rec:]
         
+        #Envelope of Impulse response from the energy density
+        w_rec_off_deriv = w_rec_off #initialising an array of derivative equal to the w_rec_off -> this will be the impulse response after modifying it
+        w_rec_off_deriv = np.delete(w_rec_off_deriv, 0) #delete the first element of the array -> this means shifting the array one step before and therefore do a derivation
+        w_rec_off_deriv = np.append(w_rec_off_deriv,0) #add a zero in the last element of the array -> for derivation and to have the same length as previously
+        impulse = ((w_rec_off - w_rec_off_deriv))/dt#/(rho*c0**2) #This is the difference between the the energy density and the impulse response 
+
         print(time_steps)
 
     w_new_band.append(w_new)
     w_rec_band.append(w_rec)
     w_rec_off_band.append(w_rec_off)
+    w_rec_off_deriv_band.append(w_rec_off_deriv)
 
 plt.show()
 
@@ -1153,4 +1161,7 @@ if tcalc == "stationarysource":
 ###############################################################################
 #SAVING
 ###############################################################################
-#np.save(os.path.join('results_diff_imp','spl_r_off_band'),spl_r_off_band)
+np.save(os.path.join('C:/Users/20225533/Diffusion/FiniteVolumeMethod','dt'),dt)
+np.save(os.path.join('C:/Users/20225533/Diffusion/FiniteVolumeMethod','w_rec_off_band'),w_rec_off_band)
+np.save(os.path.join('C:/Users/20225533/Diffusion/FiniteVolumeMethod','w_rec_off_deriv_band'),w_rec_off_deriv_band)
+np.save(os.path.join('C:/Users/20225533/Diffusion/FiniteVolumeMethod','t_off'),t_off)

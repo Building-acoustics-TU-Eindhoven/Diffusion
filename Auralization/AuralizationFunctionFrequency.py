@@ -42,7 +42,8 @@ data_signal, fs = sf.read(filename) #this returns "data_signal", which is the
 #Import the energy decay curve
 dt_sim = np.load('C:/Users/20225533/Diffusion/Auralization/dt.npy')
 original_fs = 1/dt_sim
-edc_band = np.load('C:/Users/20225533/Diffusion/Auralization/w_rec_off_band.npy')
+edc_band = np.load('C:/Users/20225533/Diffusion/Auralization/w_rec_off_band.npy') #energy decay in terms of energy density
+
 #edc_band = signal.resample(edc_band, int(len(edc_band) * fs / original_fs))
 
 edc_deriv_band = np.load('C:/Users/20225533/Diffusion/Auralization/w_rec_off_deriv_band.npy') #energy decay curve differentiated (or also impulse response of the room)

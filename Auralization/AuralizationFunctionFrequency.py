@@ -40,15 +40,22 @@ data_signal, fs = sf.read(filename) #this returns "data_signal", which is the
 #IMPORT ENERGY DECAY CURVES
 ###############################################################################
 #Import the energy decay curve
-original_fs = 1/5e-05 #np.load('C:/Users/20225533/Diffusion/Auralization/fs.npy')
-edc_band = np.load('C:/Users/20225533/Diffusion/Auralization/w_rec_band.npy')
-edc_band = signal.resample(edc_band, int(len(edc_band) * fs / original_fs_edc_band))
+dt_sim = np.load('C:/Users/20225533/Diffusion/Auralization/dt.npy')
+original_fs = 1/dt_sim
+edc_band = np.load('C:/Users/20225533/Diffusion/Auralization/w_rec_off_band.npy')
+#edc_band = signal.resample(edc_band, int(len(edc_band) * fs / original_fs))
 
-edc_deriv_band = np.load('C:/Users/20225533/Diffusion/Auralization/w_rec_band_deriv.npy') #energy decay curve differentiated (or also impulse response of the room)
-edc_deriv_band = signal.resample(edc_deriv_band, int(len(edc_deriv_band) * fs / original_fs_edc_deriv_band))
+edc_deriv_band = np.load('C:/Users/20225533/Diffusion/Auralization/w_rec_off_deriv_band.npy') #energy decay curve differentiated (or also impulse response of the room)
+#edc_deriv_band = signal.resample(edc_deriv_band, int(edc_deriv_band.shape[1] * fs / original_fs)))
+num_samples = int(edc_deriv_band.shape[1] * fs / original_fs)
+edc_deriv_band_resampled = np.zeros((edc_deriv_band.shape[0], num_samples))
+
+for i in range(edc_deriv_band.shape[0]):
+    edc_deriv_band_resampled[i, :] = signal.resample(edc_deriv_band[i, :], num_samples)
 
 t_off = np.load('C:/Users/20225533/Diffusion/Auralization/t_off.npy') #decay time of the energy decay curve
 t_off = t_off - t_off[0] #removing the t_off[0] to make the vector start from zero.
+t_off = np.linspace(0, len(t_off) / fs, len(t_off))
 
 #%%
 ###############################################################################
@@ -62,10 +69,42 @@ square_root = np.sqrt(edc_deriv_band) #this gives the impulse response
 #CREATION OF RANDOM NOISE
 ###############################################################################
 #Random noise creation
-random_array = np.random.rand(1, edc_deriv_band.shape[1])*2 - 1 #random noise vector with numbers between -1 and 1
-random_array = sum(random_array) #this line of code is used for passing from a row vector to a column vector
+#noise = np.random.random(edc_deriv_band.shape[1]) #This is random from 0 to 1 but NOT uniform distribution
+#noise1= np.random.normal(0,1,edc_deriv_band.shape[1]) #This is how Gerd does it -> This is not from -1 to 1 but from -4 to 4
+#random = np.random.rand(1, edc_deriv_band.shape[1]) #random noise vector with unifrom distribution and with numbers between 0 and 1
+#random = sum(random) #this line of code is used for passing from a row vector to a column vector
 
-#normalised one!!!!!! variance to be one
+#FIRST ATTEMPT of noise creation
+# noise = np.random.rand(1, edc_deriv_band.shape[1])*2 - 1 #random noise vector with unifrom distribution and with numbers between -1 and 1
+# noise = sum(random_noise_array) #this line of code is used for passing from a row vector to a column vector
+# mean_value = np.mean(noise)
+# difference_squared = (noise - mean_value)**2
+# variance = np.mean(difference_squared) 
+#In this way the variance is 0.33 and not 1
+
+#SECOND ATTEMPT of noise creation: after speaking with Wouter; the noise needs to be normal distribution and the variance needs to be one
+# noise = np.random.random(edc_deriv_band.shape[1]) #This is random from 0 to 1 but NOT uniform distribution
+# noise = noise*2 -1
+# mean_value = np.mean(noise)
+# difference_squared = (noise - mean_value)**2
+# variance = np.mean(difference_squared)
+#In this way the variance is 0.33 and not 1
+
+#THIRD ATTEMPT of noise creation: after speaking with Wouter; the noise needs to be normalized and the variance needs to be one
+noise = np.random.normal(0,1,edc_deriv_band.shape[1]) #This is how Gerd does it -> This is not from -1 to 1 but from -4 to 4
+mean_value = np.mean(noise)
+difference_squared = (noise - mean_value)**2
+variance = np.mean(difference_squared)
+#Variance here is 0.997 so this could be good -> the variance is 1 but the noise is not between -1 and 1
+
+#FOURTH ATTEMPT of noise creation: after speaking with Wouter; the noise needs to be normalized and the variance needs to be one
+# noise = np.random.rand(1, edc_deriv_band.shape[1]) #random noise vector with unifrom distribution and with numbers between 0 and 1
+# noise = sum(noise) #this line of code is used for passing from a row vector to a column vector
+# mean_value = np.mean(noise)
+# difference_squared = (noise - mean_value)**2
+# variance = np.mean(difference_squared)
+#In this way the variance is 0.08 and not 1
+
 #%%
 ###############################################################################
 #CREATION OF FILTER
@@ -113,7 +152,7 @@ for i in range(nBands):
     plt.subplot(nBands, 1, i + 1)
     plt.plot(freqs, 20 * np.log10(np.abs(h_all[i, :])))
     plt.title(f'Band-pass Filter for Center Frequency {center_freq[i]} Hz')
-    plt.xlabel('Frequency (Hz)')
+    plt.xlabel('Time (s)')
     plt.ylabel('Magnitude (dB)')
     plt.grid(True)
 
@@ -152,15 +191,13 @@ plt.show()
 ###############################################################################
 
 # Determine the length of the convolved result between filter and random noise
-conv_length = len(np.convolve(h_all[0, :], random_array))
+conv_length = len(np.convolve(h_all[0, :], noise))
 
 #Convolution of random noise with filter
 filt_noise_band = np.empty((nBands, conv_length), dtype=float)
 for fi in range(nBands):
-    filt_noise=np.convolve(h_all[fi,:],random_array)
+    filt_noise=np.convolve(h_all[fi,:],noise)
     filt_noise_band[fi, :] = filt_noise
-
-
 
 #%%
 ###############################################################################
@@ -169,7 +206,7 @@ for fi in range(nBands):
 #Multiplication of SQUARE-ROOT of envelope with random noise only (UNFILTERED)
 imp_unfilt_band = []
 for fi in range(nBands):
-    imp_unfilt = square_root[fi,:] * random_array
+    imp_unfilt = square_root[fi,:] * noise
     imp_unfilt_band.append(imp_unfilt)
 
 
@@ -184,24 +221,19 @@ for fi in range(nBands):
     #imp_filt=np.convolve(h_all[fi,:],square_root[fi,:]*random_array)
     imp_filt_band.append(imp_filt)
 
-
+#%%
+###############################################################################
+#ALL FREQUENCY IMPULSE RESPONSE
+###############################################################################
 #Sum of the bands
 imp_tot = [sum(imp_filt_band[i][j] for i in range(len(imp_filt_band))) for j in range(len(imp_filt_band[0]))]
 imp_tot = np.array(imp_tot, dtype=float)
-
 
 #Create a file wav for impulse response
 scipy.io.wavfile.write("imp_resp.wav", fs, imp_tot)
 
 #Play the impulse response
 #sd.play(imp_tot, fs)
-
-
-#%%
-###############################################################################
-#RESAMPLING FUNCTION FOR THE ANECHOIC FILE
-###############################################################################
-#data_signal_resampled = signal.resample(data_signal, len(imp_tot))
 
 #%%
 ###############################################################################
@@ -227,6 +259,18 @@ plt.plot(t_conv,sh_conv) #plot the convolved signal
 #Play the convolved signal
 #sd.play(sh_conv, fs)
 
+#Create a file wav for impulse response
+scipy.io.wavfile.write("auralization.wav", fs, sh_conv)
+
+#%%
+###############################################################################
+#FROM FLOATING POINT FORMAT TO standard integer format such as 16-bit
+###############################################################################
+# Normalize the floating-point data to the range of int16
+sh_conv_normalized = np.int16(sh_conv / np.max(np.abs(sh_conv)) * 32767) #32767 scales the normalized data to the range of 16-bit integers (-32768 to 32767).
+
+# Write the normalized data to a WAV file
+scipy.io.wavfile.write("auralization.wav", fs, sh_conv_normalized)
 
 #%%
 ###############################################################################
@@ -234,7 +278,7 @@ plt.plot(t_conv,sh_conv) #plot the convolved signal
 ###############################################################################
 #Expected energy ratio
 n = 1 #for octave band
-dt = 1/fs #???? is this correct?
+dt = 1/fs 
 Ci_exp = []
 for fi in range(len(center_freq)):
     Ci = center_freq[fi]*((2**(1/n)-1)/(2**(1/2*n)))*2*dt
@@ -243,7 +287,7 @@ for fi in range(len(center_freq)):
 
 #Predicted energy ratio
 n = 1 #for octave band
-dt = 1/fs #???? is this correct?
+dt = 1/fs
 Ci_pred = []
 for fi in range(len(center_freq)):
     Ci = sum(abs(imp_filt_band[fi])**2*dt)/(sum(abs(imp_unfilt_band[fi])**2*dt))

@@ -37,7 +37,8 @@ data_signal, fs = sf.read(filename) #this returns "data_signal", which is the
 
 #%%
 ###############################################################################
-#IMPORT ENERGY DECAY CURVES or PRESSURE CURVES
+#IMPORT DATA FROM DIFFUSION EQUATION CODE: 
+#ENERGY DECAY CURVES/PRESSURE CURVES, dt, frequencies etc...
 ###############################################################################
 #Import the energy decay curve
 dt_sim = np.load('C:/Users/20225533/Diffusion/Auralization/dt.npy')
@@ -88,6 +89,12 @@ press_deriv_band_resampled_clip_n4 = press_deriv_band_resampled[4]
 
 t_off_resampled = np.linspace(0, len(t_off), num_samples)
 plt.plot(t_off_resampled,press_deriv_band_resampled[4])
+
+
+#Import the frequency from the main FVM calculation
+center_freq = np.load('C:/Users/20225533/Diffusion/Auralization/center_freq.npy')
+center_freq = center_freq.astype(np.int32)
+nBands = len(center_freq) #np.load('C:/Users/20225533/Diffusion/Auralization/nBands.npy')
 
 #%%
 ###############################################################################
@@ -144,11 +151,6 @@ plt.plot(t_off_resampled,noise)
 ###############################################################################
 #CREATION OF FILTER
 ###############################################################################
-
-#Import the frequency from the main FVM calculation
-center_freq = np.load('C:/Users/20225533/Diffusion/Auralization/center_freq.npy')
-center_freq = center_freq.astype(np.int32)
-nBands = len(center_freq) #np.load('C:/Users/20225533/Diffusion/Auralization/nBands.npy')
 
 Nyquist_freq = int(fs/2) 
 Nb = 5 #number of biquad sections of the desired system

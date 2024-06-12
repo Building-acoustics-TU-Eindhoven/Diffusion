@@ -69,27 +69,8 @@ edc_deriv_band = np.load('C:/Users/20225533/Diffusion/Auralization/w_rec_off_der
 ######
 #PRESSURE
 ######
-press_deriv_band = np.load('C:/Users/20225533/Diffusion/Auralization/p_rec_off_deriv_band.npy') #energy decay curve in terms of pressure differentiated
-press_deriv_band_n4 = press_deriv_band[4]
-
-
-num_samples = int(press_deriv_band.shape[1] * fs / original_fs)
-press_deriv_band_resampled = np.zeros((press_deriv_band.shape[0], num_samples))
-press_deriv_band_resampled_n4 = press_deriv_band_resampled[4]
-
-
-for i in range(press_deriv_band.shape[0]):
-    press_deriv_band_resampled[i, :] = signal.resample_poly(press_deriv_band[i, :], up=int(fs), down=int(original_fs))
-
-#Clip negative values to zero
-press_deriv_band_resampled = np.clip(press_deriv_band_resampled, a_min=0, a_max=None)
-press_deriv_band_resampled_clip_n4 = press_deriv_band_resampled[4]
-
-#plt.plot(t_off,press_deriv_band[0])
-
-t_off_resampled = np.linspace(0, len(t_off), num_samples)
-plt.plot(t_off_resampled,press_deriv_band_resampled[4])
-
+p_rec_off_deriv_band = np.load('C:/Users/20225533/Diffusion/Auralization/p_rec_off_deriv_band.npy') #energy decay curve in terms of pressure differentiated
+p_rec_off_deriv_band_n4 = p_rec_off_deriv_band[4]
 
 #Import the frequency from the main FVM calculation
 center_freq = np.load('C:/Users/20225533/Diffusion/Auralization/center_freq.npy')
@@ -98,10 +79,31 @@ nBands = len(center_freq) #np.load('C:/Users/20225533/Diffusion/Auralization/nBa
 
 #%%
 ###############################################################################
+#RESAMPLING PRESSURE ENVELOPE
+###############################################################################
+num_samples = int(p_rec_off_deriv_band.shape[1] * fs / original_fs)
+p_rec_off_deriv_band_resampled = np.zeros((p_rec_off_deriv_band.shape[0], num_samples))
+p_rec_off_deriv_band_resampled_n4 = p_rec_off_deriv_band_resampled[4]
+
+
+for i in range(p_rec_off_deriv_band.shape[0]):
+    p_rec_off_deriv_band_resampled[i, :] = signal.resample_poly(p_rec_off_deriv_band[i, :], up=int(fs), down=int(original_fs))
+
+#Clip negative values to zero
+p_rec_off_deriv_band_resampled = np.clip(p_rec_off_deriv_band_resampled, a_min=0, a_max=None)
+p_rec_off_deriv_band_resampled_clip_n4 = p_rec_off_deriv_band_resampled[4]
+
+#plt.plot(t_off,press_deriv_band[0])
+
+t_off_resampled = np.linspace(0, len(t_off), num_samples)
+plt.plot(t_off_resampled,p_rec_off_deriv_band_resampled[4])
+
+#%%
+###############################################################################
 #SQUARE-ROOT of ENVELOPE
 ###############################################################################
 #From the envelope of the impulse response, we need to get the impulse response
-square_root = np.sqrt(press_deriv_band_resampled) #this gives the impulse response at each frequency
+square_root = np.sqrt(p_rec_off_deriv_band_resampled) #this gives the impulse response at each frequency
 plt.plot(t_off_resampled,square_root[4])
 
 #%%
@@ -115,7 +117,7 @@ plt.plot(t_off_resampled,square_root[4])
 #random = sum(random) #this line of code is used for passing from a row vector to a column vector
 
 #FIRST ATTEMPT of noise creation
-noise = np.random.rand(1, press_deriv_band_resampled.shape[1])*2 - 1 #random noise vector with unifrom distribution and with numbers between -1 and 1
+noise = np.random.rand(1, p_rec_off_deriv_band_resampled.shape[1])*2 - 1 #random noise vector with unifrom distribution and with numbers between -1 and 1
 noise = sum(noise) #this line of code is used for passing from a row vector to a column vector
 mean_value = np.mean(noise)
 difference_squared = (noise - mean_value)**2
@@ -249,7 +251,7 @@ for fi in range(nBands):
 plt.plot(t_off_resampled,imp_unfilt_band[4])
 
 #Padding the square-root to the same length as the filtered random noise
-pad_length = filt_noise_band.shape[1]-press_deriv_band_resampled.shape[1]
+pad_length = filt_noise_band.shape[1]-p_rec_off_deriv_band_resampled.shape[1]
 square_root_padded = np.pad(square_root, ((0,0),(0,pad_length)) ,mode='constant' )
 t_off_padded = np.pad(t_off_resampled, ((0,pad_length)) ,mode='constant' )
 

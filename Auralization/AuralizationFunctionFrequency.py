@@ -19,6 +19,7 @@ import soundfile as sf
 import scipy
 from scipy.io import wavfile
 from scipy import signal
+from scipy import fft
 
 #%%
 ###############################################################################
@@ -279,6 +280,9 @@ scipy.io.wavfile.write("imp_resp.wav", fs, imp_tot)
 
 #Play the impulse response
 sd.play(imp_tot, fs)
+
+#Frequency spectrum
+freq_spectrum = 20*np.log10(abs(np.fft.fft(imp_tot)))
 
 #%%
 ###############################################################################

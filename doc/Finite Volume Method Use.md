@@ -44,17 +44,20 @@ The software is organised in three sections:
 The geometry for this method is defined within SketchUp. 
 In order to create a volumetric mesh of the room, the following steps need to be follow in SketchUp:
 1. Create the 3D of the room to simulate in SketchUp, setting the units of the geometry in meters;
-2. In the MeshKit extension banner in SketchUp software, set the active mesher to gmsh by clicking on the "edit configuration button" ![edit configuration button](images/editconfigurationbutton.png);
+2. In the MeshKit extension banner in SketchUp software, set the active mesher to gmsh by clicking on the "edit configuration button"
+<img src="edit configuration button/editconfigurationbutton.png" width="200">
+
+% [edit configuration button](images/editconfigurationbutton.png);
 3. Include the Gmsh Path of the gmsh.exe and select gmsh as the active mesher;
 4. Group the overal geometry (surfaces and edges) bounding the internal air volume by selecting everything, right-clicking and clicking "Make Group";
-5. Select the Group and click the ["Set selected as an smesh region and define properties" button](images/setselectedasansmeshregion.png) in MeshKit;
+5. Select the Group and click the !["Set selected as an smesh region and define properties" button](images/setselectedasansmeshregion.png) in MeshKit;
 6. In the "Region Options: gmsh" menu, keep all the default option but change only the name of the region by writing, for example, "RoomVolume" and click "ok";
 7. Open the group by double clicking on the object;
 8. Select one or multiple surfaces you want to assign a boundary property;
-9. Click ["Add tetgen boundary to selected"](images/addtetgenboundary.png);
+9. Click !["Add tetgen boundary to selected"](images/addtetgenboundary.png);
 10. Under "Refine", change the refinement to 1;
 11. Under "Name": change the name to "materialname" e.g."carpet" and click "ok";
-12. After finishing defining all the boundaries, select the group and click the ["export to generate mesh" button](images/export.png);
+12. After finishing defining all the boundaries, select the group and click the !["export to generate mesh" button](images/export.png);
 13. Select Format = "gmsh" en Units = "m" and click "ok";
 14. Keep the default options apart from "pointSizes" which should change to True, click "ok" and save the .geo file with the name of your choice;
 15. The .geo file needs to be saved in the same folder as the "CreateMeshFVM.py" file and the "FVM.py" file.

@@ -8,12 +8,7 @@ Solving the diffusion equation allows to study the acoustics properties of a roo
 ## Release version
 Version 1.0
 
-## Setup and Usage instructions
-1. Download and install Anaconda or download and install any Python software IDE you prefer;
-2. Clone/Fork this repository to a folder of your preference;
-3. Open the Main files through the preferred IDE and test the software.
-
-### Repository structure
+## Repository structure
 The solution of the Diffusion Equation is currently investigated with two different numerical methods: the Finite Different Method (FDM) by Du Fort&Frankel (Navarro et al., 2012) and the Finite Volume Method (FVM) (Munoz, 2019). 
 The FDM can be used for parallelepiped shapes while the FVM can be used for any shape/geometry.
 The FDM script is developed for a 1D, 2D and 3D spaces, respectively reflected in the following Python files DiffEq1D.py, DiffEq2D.py, DiffEq3D.py.
@@ -25,6 +20,11 @@ For both the numerical methods, the main software works with the following assoc
 + FunctionClarity.py calculates the clarity $C_{80}$ of the room in question based on Barron's revised theory formula.
 + FunctionDefinition.py calculates the definition $D_{50}$ of the room in question based on Barron's revised theory formula.
 + FunctionCentreTime.py calculates the centre time $T_s$ of the room in question based on Barron's revised theory formula.
+
+## Setup and Usage instructions
+1. Download and install Anaconda or download and install any Python software IDE you prefer;
+2. Clone/Fork this repository to a folder of your preference;
+3. To run the codes, check the documentation below depending on the method you want to use.
 
 ## Documentation
 Documentation documents of the software can be found in the link below for both FDM and FVM.

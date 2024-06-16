@@ -49,7 +49,7 @@ In order to create a volumetric mesh of the room, the following steps need to be
 4. Group all the surfaces bounding the internal air volume by selecting everything, right-clicking and clicking "Make Group";
 5. Select the Group and click the "Set selected as an smesh region and define properties" button;
 6. In the "Region Options: gmsh" menu, leave everything as it is. Change only the name of the region by writing ,for example, "RoomVolume" and click "ok";
-7. Open the group by double clicking;
+7. Open the group by double clicking on the object;
 8. Select one or multiple surfaces you want to assign a boundary property;
 9. Click "Add tetgen boundary to selected";
 10. Under "Refine", change the refinement to 1;

@@ -45,9 +45,9 @@ The geometry for this method is defined within SketchUp.
 In order to create a volumetric mesh of the room, the following steps need to be follow in SketchUp:
 1. Create the 3D of the room to simulate in SketchUp, setting the units of the geometry in meters;
 2. In the MeshKit extension banner in SketchUp software, set the active mesher to gmsh by clicking on the "edit configuration button"
-<img src="edit configuration button/editconfigurationbutton.png" width="200">
+<img src="image/editconfigurationbutton.png" width="200">
 
-% [edit configuration button](images/editconfigurationbutton.png);
+
 3. Include the Gmsh Path of the gmsh.exe and select gmsh as the active mesher;
 4. Group the overal geometry (surfaces and edges) bounding the internal air volume by selecting everything, right-clicking and clicking "Make Group";
 5. Select the Group and click the !["Set selected as an smesh region and define properties" button](images/setselectedasansmeshregion.png) in MeshKit;

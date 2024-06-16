@@ -64,10 +64,10 @@ import subprocess
 #INPUT VARIABLES
 ###############################################################################
 # Specify the path to your original Geo file
-geo_file_path = 'MeasurementRoom.geo'
+geo_file_path = 'Lshape.geo'
 #max_mesh_size = 1
-name_gmsh_file = 'MeasurementRoom.msh'
-length_of_mesh = 0.6
+name_gmsh_file = 'Lshape.msh'
+length_of_mesh = 1
 
 #%%
 #import os

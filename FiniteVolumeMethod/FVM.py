@@ -98,7 +98,7 @@ file_name = "Lshape.msh" #Insert file name, msh file created from sketchUp and t
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 
-gmsh.fltk.run() #run the file to see it in gmsh
+#gmsh.fltk.run() #run the file to see it in gmsh
 
 dim = -1 #dimensions of the entities, 0 for points, 1 for curves/edge/lines, 2 for surfaces, 3 for volumes, -1 for all the entities 
 tag = -1 #all the nodes of the room

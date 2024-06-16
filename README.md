@@ -24,7 +24,7 @@ For both the numerical methods, the main software works with the following assoc
 ## Setup and Usage instructions
 1. Download and install Anaconda or download and install any Python software IDE you prefer;
 2. Clone/Fork this repository to a folder of your preference;
-3. To run the codes, check the documentation below depending on the method you want to use.
+3. To run the codes, check the documentation below depending on the method you want to use and check the Tutorial sections of the documentation.
 
 ## Documentation
 Documentation documents of the software can be found in the link below for both FDM and FVM.

@@ -125,4 +125,4 @@ gmsh.finalize()
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(name_gmsh_file) #open the file
 
-#gmsh.fltk.run() #run the file to see it in gmsh
+gmsh.fltk.run() #run the file to see it in gmsh

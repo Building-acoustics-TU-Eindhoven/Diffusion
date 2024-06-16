@@ -45,7 +45,7 @@ The geometry for this method is defined within SketchUp.
 In order to create a volumetric mesh of the room, the following steps need to be follow in SketchUp:
 1. Create the 3D of the room to simulate in SketchUp, setting the units of the geometry in meters;
 2. In the MeshKit extension banner in SketchUp software, set the active mesher to gmsh by clicking on the "edit configuration button"
-<img src="images/editconfigurationbutton.png" width="200">
+[<img src="editconfigurationbutton.png" width="200"/>](images/editconfigurationbutton.png)
 
 
 3. Include the Gmsh Path of the gmsh.exe and select gmsh as the active mesher;

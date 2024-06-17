@@ -6,7 +6,7 @@
 3. Open the Main files through the preferred IDE and test the software;
 4. Download and install SketchUp from [SketchUp website](https://www.sketchup.com/plans-and-pricing/sketchup-free);
 5. Download and install g-mesh from [G-mesh website](https://gmsh.info/);
-6. Install the Meshkit extension of SketchUp from the extension warehouse.
+6. Install the MeshKit extension of SketchUp from the extension warehouse.
 
 ## Libraries
 To properly run the software, the following libraries are needed:
@@ -43,23 +43,23 @@ The software is organised in three sections:
 ### Geometry
 The geometry for this method is defined within SketchUp. 
 In order to create a volumetric mesh of the room, the following steps need to be follow in SketchUp:
-1. In the Meshkit extension banner in SketchUp software, set the active mesher to gmsh by clicking on the "edit configuration button";
-2. Select gmsh as the active mesher;
-3. Create the 3D of the room to simulate, setting the units of the geometry in meters;
-4. Group all the surfaces bounding the internal air volume by selecting everything, right-clicking and clicking "Make Group";
-5. Select the Group and click the "Set selected as an smesh region and define properties" button;
-6. In the "Region Options: gmsh" menu, leave everything as it is. Change only the name of the region by writing ,for example, "RoomVolume" and click "ok";
-7. Open the group by double clicking;
+1. Create the 3D of the room to simulate in SketchUp, setting the units of the geometry in meters;
+2. In the MeshKit extension banner in SketchUp software, set the active mesher to gmsh by clicking on the "edit configuration button"
+![editconfigurationbutton](images/editconfigurationbutton.png)
+3. Include the Gmsh Path of the gmsh.exe and select gmsh as the active mesher;
+4. Group the overal geometry (surfaces and edges) bounding the internal air volume by selecting everything, right-clicking and clicking "Make Group";
+5. Select the Group and click "Set selected as an smesh region and define properties" ![Set selected as an smesh region and define properties](images/setselectedasansmeshregion.png) in MeshKit;
+6. In the "Region Options: gmsh" menu, keep all the default option but change only the name of the region by writing, for example, "RoomVolume" and click "ok";
+7. Open the group by double clicking on the object;
 8. Select one or multiple surfaces you want to assign a boundary property;
-9. Click "Add tetgen boundary to selected";
+9. Click "Add tetgen boundary to selected" ![Add tetgen boundary to selected](images/addtetgenboundary.png) in MeshKit;
 10. Under "Refine", change the refinement to 1;
-11. Under "Name": change the name to "materialname$abscoeff1,abscoeff2,..., abscoeffn" e.g."carpet$0.1515,0.3641,0.64,0.8264,0.8821" so a description of the surface followed by a $, followed by absorption coefficients per each frequency (maximum 5 frequencies) separated by commas for that surface;
-12. After finishing defining all the boundaries, select the group and click the "export to generate mesh" button;
+11. Under "Name": change the name to "materialname" e.g."carpet" and click "ok";
+12. After finishing defining all the boundaries, select the group and click "export to generate mesh" ![export to generate mesh](images/export.png) in MeshKit;
 13. Select Format = "gmsh" en Units = "m" and click "ok";
-14. Leave the options as they are apart from "pointSizes" which should change to True, click "ok" and save the .geo file;
-
-The .geo file needs to be saved in the same folder as the "CreateMeshFVM.py" file and the "FVM.py" file.
-The gmsh.exe file needs also to be positioned in the same folder.
+14. Keep the default options apart from "pointSizes" which should change to True, click "ok" and save the .geo file with the name of your choice;
+15. The .geo file needs to be saved in the same folder as the "CreateMeshFVM.py" file and the "FVM.py" file.
+16. The gmsh.exe file needs also to be positioned in the same folder.
 
 #### Mesh creation
 The volumetric mesh is to be created. The file "CreateMeshFVM.py" allows to create the volumetric mesh using Gmsh software. The only parameters that need to be set in this file is the length_of_mesh. 
@@ -67,11 +67,7 @@ The volumetric mesh is to be created. The file "CreateMeshFVM.py" allows to crea
 The mesh length value is vital to discretize correctly the space and achieve precise and converged results. Through various trials, it has been established that a mesh length of 1 m is generally adequate. However, for computations involving complex geometries or small rooms, a smaller length of mesh (0.5 m or lower) is recommended.
 The choice is contingent upon user preferences for details in parameters values, room dimensions but mostly for the preliminary Reverberation time value calculated with Sabine’s formula.
 
-The method is suitable for any type of geometry.
-
-### Surface materials
-The surface materials are defined in the SketchUp file as mentioned above. 
-Each surface (includeing doors, windows etc...) would require frequency dependent absorption coefficients. 
+The method is suitable for any type of geometry. 
 
 ### Mesh file
 The mesh file will need to be inputted in the main "FVM.py" file in the variable "file_name". This will give the input for the calculation to run a specific room (as a .msh file).
@@ -86,7 +82,15 @@ In this case, there is the option to toggle the sound source on and off or keep 
 - If an impulse source is chosen, the source will be automatically defined.
 
 ### Receiver
-The model allows for the insertion of only one acoustics receiver position per calculation. These are defined as point omnidirectional receivers. The users will input the position of the receiver in the room in the following vaariables $x_\{rec\},y_\{rec\},z_\{rec\}$ in m in the x,y,z directions.
+The model allows for the insertion of only one acoustics receiver position per calculation. These are defined as point omnidirectional receivers. The users will input the position of the receiver in the room in the following variables $x_\{rec\},y_\{rec\},z_\{rec\}$ in m in the x,y,z directions.
+
+### Frequency range
+The frequency resolution should be included as inputs variables $fc_low$ and $fc_high$. The maximum number of frequencies is 5 in octave bands. Normally, $fc_low$ is set to 125Hz and $fc_high$ is set to 2000Hz.
+
+### Surface materials
+The surface materials names are defined in the SketchUp file as mentioned above. 
+Each surface (includeing doors, windows etc...) would require frequency dependent absorption coefficients. During the calculation (quite soon after pressing "Run"), the python script will prompt you with a question regarding the absorption coefficients of the surface of the room. It is important to include the absorption coefficient per each frequency (maximum 5 frequencies) separated by commas as per this example:
+"`Enter absorption coefficient for frequency {fc_low} to {fc_high} for carpet:`0.15,0.17,0.20,0.25,0.25".
 
 ### Discretization variables
 #### Spatial discretization
@@ -95,17 +99,18 @@ The Finite Volume method works with a spatial volumetric discretization. This is
 #### Time discretization dt
 The time discretization will need to be chosen appropriately.
 According the Navarro 2012, to get good converged results, the time discretization dt will need to be defined depending on the length of mesh chosen. 
-To make sure that the predictions converge to a fixed value with a very low error, the following empirical cretirion will need to apply.
+To make sure that the predictions converge to a fixed value with a very low error, the following empirical criterion will need to apply.
 ```{math}
-10^(-8) = (dt)^2 (dv)^(-2)
+10^{(-8)} = (dt)^2 (dv)^{(-2)}
 ```
 where dv is the mesh length chosen.
 The time discretization is defined in seconds. 
 
 ### Total Recording time
-The total recording time is the amount of time for the calculation to run. It is the sum of the source on time and the time for the decay. 
-The decay time needs to be inputted as the 2/3 of the theoretical calculated Sabine reverberation time of the room.
-The total recording time is defined in seconds.
+The total recording time is the amount of time for the calculation to run. It is the sum of the source on time (time at which the source stays switched on) and the time for the decay (time after the source has been switched off). 
+The decay time needs to be inputted as the 2/3 of the theoretical calculated Sabine reverberation time of the room. 
+The source on time needs to be inputted as the 2/3 of the theoretical calculated Sabine reverberation time of the room.
+The total recording time is the sum of decay time and source on time and it is defined in seconds.
 
 ### Air absorption
 The absorption of the air will need to be inputted. The air absorption is defined as $m_\{atm\}$ and in 1/meters. 

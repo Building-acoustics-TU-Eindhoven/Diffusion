@@ -1,9 +1,10 @@
 # Finite Different Method Use
 
 ## Requirements
-1. Download and install Anaconda or download and install any Python software IDE you prefer
-2. Clone/Fork this repository to a folder of your preference
-3. Open the "FDM.py" file through the preferred IDE and test the software
+1. Download and install Anaconda or download and install any Python software IDE you prefer;
+2. Clone/Fork this repository to a folder of your preference;
+3. Open the "DiffEq3D.py" file through the preferred IDE;
+4. After reading the "Libraries" and "Input" sections below, test the software with your preferred inputs.
 
 ## Libraries
 To properly run the software, the following libraries are needed:
@@ -37,11 +38,11 @@ The software is organised in three sections:
 ## Inputs
 
 ### Geometry
-The geometry for this method is defined within the inputs variable section of the main python file "FDM.py".
+The geometry for this method is defined within the inputs variable section of the main python file "DiffEq3D.py".
 The method is suitable for parallelepiped and cuboid spaces and therefore, the only inputs are the length, width and height of the room.
 
 ### Surface materials
-The surface materials are defined within the inputs variable section of the main python file "FDM.py".
+The surface materials are defined within the inputs variable section of the main python file "DiffEq3D.py".
 Currently, the surface material would require only one value of absorption coefficient per surface.
 It is not possible to include doors, windows or other items within a surface. 
 
@@ -67,7 +68,7 @@ A dv of 0.5 m normally would suffice for a correct calculation, although the cho
 According the Navarro 2012, to get good converged results, the time discretization dt will need to be defined depending on the dv chosen. 
 To make sure that the predictions converge to a fixed value with a very low error, the following empirical cretirion will need to apply.
 ```{math}
-10^(-8) = (dt)^2 (dv)^(-2)
+10^{(-8)} = (dt)^2 (dv)^{(-2)}
 ```
 The time discretization is defined in seconds. 
 

@@ -32,6 +32,7 @@ import time as time
 #from matplotlib.animation import FuncAnimation
 #from scipy.sparse import lil_matrix
 import gmsh
+import os
  
 st = time.time() #start time of calculation
 
@@ -47,14 +48,14 @@ m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro p
 dt = 1/20000 #time discretizatione
 
 # Source position
-x_source = 0.5  #position of the source in the x direction [m]
-y_source = 0.5  #position of the source in the y direction [m]
-z_source = 1.0  #position of the source in the z direction [m]
+x_source = 12.0  #position of the source in the x direction [m]
+y_source = 0.7  #position of the source in the y direction [m]
+z_source = 1.5  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 2.0 #position of the receiver in the x direction [m]
-y_rec = 0.5 #position of the receiver in the y direction [m]
-z_rec = 1.0 #position of the receiver in the z direction [m]
+x_rec = 0.7 #position of the receiver in the x direction [m]
+y_rec = 4.0 #position of the receiver in the y direction [m]
+z_rec = 1.5 #position of the receiver in the z direction [m]
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
@@ -76,7 +77,7 @@ tcalc = "decay"
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
 
 sourceon_time =  1.5 #time that the source is ON before interrupting [s]
-recording_time = 4.2 #total time recorded for the calculation [s]
+recording_time = 6.1 #total time recorded for the calculation [s]
 
 # Frequency resolution
 fc_low = 125
@@ -93,11 +94,11 @@ center_freq = fc_low * np.power(2,((np.arange(0,x_frequencies+1) / num_octave)))
 ###############################################################################
     
 
-file_name = "3x3x3.msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "Lshape.msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 
-gmsh.fltk.run() #run the file to see it in gmsh
+#gmsh.fltk.run() #run the file to see it in gmsh
 
 dim = -1 #dimensions of the entities, 0 for points, 1 for curves/edge/lines, 2 for surfaces, 3 for volumes, -1 for all the entities 
 tag = -1 #all the nodes of the room
@@ -527,7 +528,6 @@ coord_rec = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
 #     total_weights_s[i] = weight/sum_weights_s if sum_weights_s != 0 else 0
 # cl_tet_s_keys = cl_tet_s.keys() #take only the keys of the cl_tet_s dictionary (so basically the indexes of the tetrahedrons)
 
-
 #SOURCE INTERPOLATION CALCULATED WITHIN 4 CENTRE CELL SELECTED (TETRAHEDRON)
 #Position of source is the centre of a cell so the minimum distance with the centre of a cell has been calculated to understand which cell is the closest
 dist_source_cc_list = [] #initialise the list for all the distances between each cell centre and the source
@@ -566,6 +566,42 @@ for i,weight in total_weights_s.items():
 
 cl_tet_s_keys = cl_tet_s.keys() #take only the keys of the cl_tet_s dictionary (so basically the indexes of the tetrahedrons)
 
+
+###############################################################################
+###############################################################################
+#To make sure that the source is in the correct tetrahedron position
+node_ids = velemNodes.T
+ori=nodecoords[node_ids[0,:]-1,:]
+#ori = nodecoords[node_indices[node_ids[:,0],:]]
+v_tet_s1=nodecoords[node_ids[1,:]-1,:]-ori
+v_tet_s2=nodecoords[node_ids[2,:]-1,:]-ori
+v_tet_s3=nodecoords[node_ids[3,:]-1,:]-ori
+n_tet=len(node_ids.T)
+v1s = v_tet_s1.T.reshape((3,1,n_tet))
+v2s = v_tet_s2.T.reshape((3,1,n_tet))
+v3s = v_tet_s3.T.reshape((3,1,n_tet))
+mat = np.concatenate((v1s,v2s,v3s), axis=1)
+inv_mat = np.linalg.inv(mat.T).T
+#if coord_source.size==3:  # to make rec has a dimension of (N_rec,3)
+#    rec=rec.reshape((1,3))
+coord_source_array = np.array(coord_source)
+if coord_source_array.size==3:  # to make rec has a dimension of (N_rec,3)
+    coord_source_array=coord_source_array.reshape((1,3))
+N_sou=coord_source_array.shape[0]
+orir=np.repeat(ori[:,:,np.newaxis], N_sou, axis=2)
+newp=np.einsum('imk,kmj->kij',inv_mat,coord_source_array.T-orir)
+val=np.all(newp>=0, axis=1) & np.all(newp <=1, axis=1) & (np.sum(newp, axis=1)<=1)
+id_tet, id_p = np.nonzero(val)
+res = -np.ones(N_sou, dtype=id_tet.dtype) # Sentinel value
+res[id_p]=id_tet
+
+
+
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+
 # #VOLUME CALCULATED WITHIN 4 CENTRE CELL SELECTED (TETRAHEDRON)
 #Calculate volume of the source with the 4 cell centres as the vertices of the tetrahedron
 # vertices_source = np.array([]).reshape(0, 3)  # Initialize as an empty 2D array with 3 columns
@@ -600,7 +636,7 @@ cl_tet_s_keys = cl_tet_s.keys() #take only the keys of the cl_tet_s dictionary (
 # Vs = calculate_volume(vertices_source)
 
 #VOLUME ORIGINAL
-Vs = cell_volume[source_idx] #volume of the source = to volume of cells where the volume is 
+Vs = cell_volume[res[0]] #volume of the source = to volume of cell where the source is 
 # Vs = 1
 
 ################SOURCE INTERPOLATION WITH VERTICES OF TETRAHEDRON IN WHICH SOURCE IS IN
@@ -838,7 +874,9 @@ for iBand in range(len(boundary_areas)):
 
 w_new_band = []
 w_rec_band = []
-w_rec_band_deriv = []
+w_rec_off_band = []
+w_rec_off_deriv_band = []
+p_rec_off_deriv_band = []
     
 for iBand in range(nBands):
     freq = center_freq[iBand]    
@@ -911,11 +949,29 @@ for iBand in range(nBands):
             for tet_s in cl_tet_s_keys:
                  s[tet_s] = source1[0] *total_weights_s[tet_s]
         
+        idx_w_rec = np.argmin(np.abs(t - sourceon_time)) #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
+        w_rec_off = w_rec[idx_w_rec:]
+        p_rec_off = (w_rec[idx_w_rec:])*rho*c0**2
+        t_off = t[idx_w_rec:]
+        
+        #Envelope of Impulse response from the energy density
+        w_rec_off_deriv = w_rec_off #initialising an array of derivative equal to the w_rec_off -> this will be the impulse response after modifying it
+        w_rec_off_deriv = np.delete(w_rec_off_deriv, 0) #delete the first element of the array -> this means shifting the array one step before and therefore do a derivation
+        w_rec_off_deriv = np.append(w_rec_off_deriv,0) #add a zero in the last element of the array -> for derivation and to have the same length as previously
+        impulse = ((w_rec_off - w_rec_off_deriv))/dt#/(rho*c0**2) #This is the difference between the the energy density and the impulse response 
+        
+        #Envelope of Impulse response from the pressure
+        p_rec_off_deriv = p_rec_off #initialising an array of derivative equal to the w_rec_off -> this will be the impulse response after modifying it
+        p_rec_off_deriv = np.delete(p_rec_off_deriv, 0) #delete the first element of the array -> this means shifting the array one step before and therefore do a derivation
+        p_rec_off_deriv = np.append(p_rec_off_deriv,0) #add a zero in the last element of the array -> for derivation and to have the same length as previously
+        
         print(time_steps)
 
     w_new_band.append(w_new)
     w_rec_band.append(w_rec)
-    w_rec_band_deriv.append(w_rec)
+    w_rec_off_band.append(w_rec_off)
+    w_rec_off_deriv_band.append(w_rec_off_deriv)
+    p_rec_off_deriv_band.append(p_rec_off_deriv)
 
 plt.show()
 
@@ -930,8 +986,9 @@ w_rec_y_band = []
 spl_stat_x_band = []
 spl_stat_y_band = []
 spl_r_band = []
+spl_r_off_band = []
 spl_r_norm_band = []
-t60_band = []
+t30_band = []
 sch_db_band = []
 
 for iBand in range(nBands):
@@ -951,13 +1008,15 @@ for iBand in range(nBands):
 
     press_r = ((abs(w_rec_band[iBand]))*rho*(c0**2)) #pressure at the receiver
     spl_r = 10*np.log10(((abs(w_rec_band[iBand]))*rho*(c0**2))/(pRef**2)) #,where=press_r>0, sound pressure level at the receiver
+    spl_r_off = 10*np.log10(((abs(w_rec_off_band[iBand]))*rho*(c0**2))/(pRef**2))
+    
     spl_r_norm = 10*np.log10((((abs(w_rec_band[iBand]))*rho*(c0**2))/(pRef**2)) / np.max(((abs(w_rec_band[iBand]))*rho*(c0**2))/(pRef**2))) #normalised to maximum to 0dB
     spl_r_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_sr) + ((abs(w_rec_band[iBand]))*c0))/(pRef**2)) #spl total (including direct field) at the receiver position????? but it will need to be calculated for a stationary source 100dB
     
     #Find the energy decay part of the overal calculation
-    idx_w_rec = np.argmin(np.abs(t - sourceon_time)) #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
+    #idx_w_rec = np.argmin(np.abs(t - sourceon_time)) #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
     #idx_w_rec = np.where(t == sourceon_time)[0][0] #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
-    w_rec_off = w_rec_band[iBand][idx_w_rec:] #cutting the energy density array at the receiver from the idx_w_rec to the end
+    #w_rec_off = w_rec_band[iBand][idx_w_rec:] #cutting the energy density array at the receiver from the idx_w_rec to the end
     
     #Envelope of impulse response from the energy density
     w_rec_off_deriv = w_rec_off #initialising an array of derivative equal to the w_rec_off -> this will be the impulse response after modifying it
@@ -969,26 +1028,30 @@ for iBand in range(nBands):
     #energy_r_rev = (w_rec_off)[::-1] #reverting the array
     #The energy density is related to the pressure with the following relation: w = p^2
     #energy_r_rev_cum = np.cumsum(energy_r_rev) #cumulative summation of all the item in the array
-    schroeder = w_rec_off #energy_r_rev_cum[::-1] #reverting the array again -> creating the schroder decay
+    schroeder = w_rec_off_band[iBand] #energy_r_rev_cum[::-1] #reverting the array again -> creating the schroder decay
     sch_db = 10.0 * np.log10(schroeder / max(schroeder)) #level of the array: schroeder decay
     
     if tcalc == "decay":
-        t60 = t60_decay(t, sch_db, idx_w_rec) #called function for calculation of t60 [s]
+        t30 = t60_decay(t, sch_db, idx_w_rec, rt='t30') #called function for calculation of t60 [s]
         edt = edt_decay(t, sch_db, idx_w_rec) #called function for calculation of edt [s]
         #Eq_A = 0.16*V/t60 #equivalent absorption area defined from the RT 
-        c80 = clarity(t60, V, Eq_A[iBand], S, c0, dist_sr) #called function for calculation of c80 [dB]
-        d50 = definition(t60, V, Eq_A[iBand], S, c0, dist_sr) #called function for calculation of d50 [%]
-        ts = centretime(t60, Eq_A[iBand], S) #called function for calculation of ts [ms]
+        c80 = clarity(t30, V, Eq_A[iBand], S, c0, dist_sr) #called function for calculation of c80 [dB]
+        d50 = definition(t30, V, Eq_A[iBand], S, c0, dist_sr) #called function for calculation of d50 [%]
+        ts = centretime(t30, Eq_A[iBand], S) #called function for calculation of ts [ms]
         
-        t60_band.append(t60)
+        t30_band.append(t30)
         
     w_rec_x_band.append(w_rec_x_end)
     w_rec_y_band.append(w_rec_y_end)
     spl_stat_x_band.append(spl_stat_x)
     spl_stat_y_band.append(spl_stat_y)
     spl_r_band.append(spl_r)
+    spl_r_off_band.append(spl_r_off)
     spl_r_norm_band.append(spl_r_norm)
     sch_db_band.append(sch_db)
+
+spl_r_off_band = np.array(spl_r_off_band)
+t30_band = np.array(t30_band)
 
 et = time.time() #end time
 elapsed_time = et - st
@@ -1108,10 +1171,13 @@ if tcalc == "stationarysource":
         plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
         plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')
 
-#?????
 #%%
 ###############################################################################
 #SAVING
 ###############################################################################
-np.save('w_rec_band',w_rec_band)
-np.save('w_rec_band_deriv',w_rec_band_deriv)
+=======
+np.save(os.path.join('C:/Users/20225533/Diffusion/FiniteVolumeMethod','dt'),dt)
+np.save(os.path.join('C:/Users/20225533/Diffusion/FiniteVolumeMethod','w_rec_off_band'),w_rec_off_band)
+np.save(os.path.join('C:/Users/20225533/Diffusion/FiniteVolumeMethod','w_rec_off_deriv_band'),w_rec_off_deriv_band)
+np.save(os.path.join('C:/Users/20225533/Diffusion/FiniteVolumeMethod','p_rec_off_deriv_band'),p_rec_off_deriv_band)
+np.save(os.path.join('C:/Users/20225533/Diffusion/FiniteVolumeMethod','t_off'),t_off)

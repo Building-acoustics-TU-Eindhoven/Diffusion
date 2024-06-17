@@ -64,10 +64,10 @@ import subprocess
 #INPUT VARIABLES
 ###############################################################################
 # Specify the path to your original Geo file
-geo_file_path = '3x3x3.geo'
+geo_file_path = 'Lshape.geo'
 #max_mesh_size = 1
-name_gmsh_file = '3x3x3.msh'
-length_of_mesh = 0.5
+name_gmsh_file = 'Lshape.msh'
+length_of_mesh = 1
 
 #%%
 #import os
@@ -125,4 +125,4 @@ gmsh.finalize()
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(name_gmsh_file) #open the file
 
-#gmsh.fltk.run() #run the file to see it in gmsh
+gmsh.fltk.run() #run the file to see it in gmsh

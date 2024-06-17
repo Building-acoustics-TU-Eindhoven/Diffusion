@@ -1018,12 +1018,6 @@ for iBand in range(nBands):
     #idx_w_rec = np.where(t == sourceon_time)[0][0] #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
     #w_rec_off = w_rec_band[iBand][idx_w_rec:] #cutting the energy density array at the receiver from the idx_w_rec to the end
     
-    #Envelope of impulse response from the energy density
-    w_rec_off_deriv = w_rec_off #initialising an array of derivative equal to the w_rec_off -> this will be the impulse response after modifying it
-    w_rec_off_deriv = np.delete(w_rec_off_deriv, 0) #delete the first element of the array -> this means shifting the array one step before and therefore do a derivation
-    w_rec_off_deriv = np.append(w_rec_off_deriv,0) #add a zero in the last element of the array -> for derivation and to have the same length as previously
-    w_rec_off_deriv = w_rec_band_deriv[iBand][idx_w_rec:]
-    
     #Schroeder integration
     #energy_r_rev = (w_rec_off)[::-1] #reverting the array
     #The energy density is related to the pressure with the following relation: w = p^2
@@ -1175,7 +1169,6 @@ if tcalc == "stationarysource":
 ###############################################################################
 #SAVING
 ###############################################################################
-=======
 np.save(os.path.join('C:/Users/20225533/Diffusion/FiniteVolumeMethod','dt'),dt)
 np.save(os.path.join('C:/Users/20225533/Diffusion/FiniteVolumeMethod','w_rec_off_band'),w_rec_off_band)
 np.save(os.path.join('C:/Users/20225533/Diffusion/FiniteVolumeMethod','w_rec_off_deriv_band'),w_rec_off_deriv_band)

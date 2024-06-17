@@ -684,5 +684,4 @@ if tcalc == "stationarysource":
 ###############################################################################
 #SAVING
 ###############################################################################
-np.save('C:/Users/20225533/Diffusion/FiniteVolumeMethod/center_freq', center_freq)
-np.save('C:/Users/20225533/Diffusion/FiniteVolumeMethod/nBands', nBands)
+

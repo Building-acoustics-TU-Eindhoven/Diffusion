@@ -64,9 +64,9 @@ import subprocess
 #INPUT VARIABLES
 ###############################################################################
 # Specify the path to your original Geo file
-geo_file_path = 'Lshape.geo'
+geo_file_path = 'Corridor_vers3.geo'
 #max_mesh_size = 1
-name_gmsh_file = 'Lshape.msh'
+name_gmsh_file = 'Corridor_vers3.msh'
 length_of_mesh = 1
 
 #%%

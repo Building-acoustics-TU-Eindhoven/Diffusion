@@ -28,6 +28,8 @@ Created on Mon Oct 30 08:56:01 2023
 #geom.write_mesh("output.msh")
 
 import gmsh
+import argparse
+
 #import pygmsh as pg
 #import py2gmsh as p2g
 #from py2gmsh import (Mesh, Entity, Field)
@@ -63,12 +65,6 @@ import subprocess
 ###############################################################################
 #INPUT VARIABLES
 ###############################################################################
-# Specify the path to your original Geo file
-geo_file_path = 'Corridor_vers3.geo'
-#max_mesh_size = 1
-name_gmsh_file = 'Corridor_vers3.msh'
-length_of_mesh = 1
-
 #%%
 #import os
 #import subprocess
@@ -93,36 +89,68 @@ length_of_mesh = 1
 ###############################################################################
 #INITIALISE GMSH
 ###############################################################################
-# Read the content of the Geo file
-with open(geo_file_path, 'r') as file:
-    geo_content = file.readlines()
+# Adjusted the code to accept input from terminal: @Hassan
 
-# Specify the line to be removed
-line_to_remove = 'Mesh.RemeshAlgorithm = 1; // automatic\n'
+def generate_mesh(geo_file_path, name_gmsh_file, length_of_mesh):
+    # Read the content of the Geo file
+    with open(geo_file_path, 'r') as file:
+        geo_content = file.readlines()
 
-# Remove the specified line from the content
-if line_to_remove in geo_content:
-    geo_content.remove(line_to_remove)
+    # Specify the line to be removed
+    line_to_remove = 'Mesh.RemeshAlgorithm = 1; // automatic\n'
 
-# Write the modified content back to the Geo file
-with open(geo_file_path, 'w') as file:
-    file.writelines(geo_content)
+    # Remove the specified line from the content
+    if line_to_remove in geo_content:
+        geo_content.remove(line_to_remove)
 
-gmsh.initialize()
-gmsh.open(geo_file_path)
+    # Write the modified content back to the Geo file
+    with open(geo_file_path, 'w') as file:
+        file.writelines(geo_content)
 
-#gmsh.option.setNumber('Mesh.MeshSizeMin', 1)
-#gmsh.option.setNumber('Mesh.MeshSizeMax', max_mesh_size)
+    gmsh.open(geo_file_path)
+    # gmsh.option.setNumber('Mesh.MeshSizeMin', 1)
+    # gmsh.option.setNumber('Mesh.MeshSizeMax', max_mesh_size)
 
-# Set the mesh size factor to control the characteristic length
-gmsh.option.setNumber('Mesh.MeshSizeFactor', length_of_mesh) 
+    gmsh.option.setNumber('Mesh.MeshSizeFactor', length_of_mesh)
 
-gmsh.model.mesh.generate(3)
-print(gmsh.logger.get())
-gmsh.write(name_gmsh_file)
-gmsh.finalize()
+    gmsh.model.mesh.generate(3)
+    print(gmsh.logger.get())
+    gmsh.write(name_gmsh_file)
 
-gmsh.initialize() #Initialize msh file
-mesh = gmsh.open(name_gmsh_file) #open the file
+    mesh = gmsh.open(name_gmsh_file)  # open the file
 
-gmsh.fltk.run() #run the file to see it in gmsh
+    gmsh.fltk.run()  # run the file to see it in gmsh
+    gmsh.finalize()
+
+
+def main():
+    gmsh.initialize()
+    parser = argparse.ArgumentParser(description='process the input path, taking dynamically.')
+    default_geo_file_path = 'Corridor_vers3.geo'
+    default_name_gmsh_file = "Corridor_vers3.msh"
+    default_length_of_mesh = 1
+
+    parser.add_argument(
+        'geo_file_path',
+        type=str,
+        help='Path to the original Geo file',
+        default=default_geo_file_path,
+    )
+    parser.add_argument(
+        'name_gmsh_file',
+        type=str,
+        help='Name for the output Gmsh file',
+        default=default_name_gmsh_file
+    )
+    parser.add_argument(
+        'length_of_mesh',
+        type=int,
+        help='Length of the mesh',
+        default=default_length_of_mesh
+    )
+
+    args = parser.parse_args()
+    generate_mesh(args.geo_file_path, args.name_gmsh_file, args.length_of_mesh)
+
+if __name__ == '__main__':
+    main()

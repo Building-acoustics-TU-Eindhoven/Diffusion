@@ -38,8 +38,8 @@ Each method is distributed with its own Python code. The main application of the
    :maxdepth: 2
    :caption: Tutorials:
 
-   Finite Different Method Tutorial.md
-   Finite Volume Method Tutorial.md
+   Finite Different Method Demo Tutorial.md
+   Finite Volume Method Demo Tutorial.md
 
 Indices and tables
 ==================

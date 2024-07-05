@@ -1,4 +1,4 @@
-# Finite Different Method Tutorial
+# Finite Different Method Demo Tutorial
 
 Test the software with the following inputs (Navarro et al., 2012):
 

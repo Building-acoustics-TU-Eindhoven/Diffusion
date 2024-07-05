@@ -20,6 +20,7 @@ import scipy
 from scipy.io import wavfile
 from scipy import signal
 from scipy import fft
+from scipy.signal import butter, sosfilt, sosfreqz
 
 #%%
 ###############################################################################
@@ -84,19 +85,18 @@ nBands = len(center_freq) #np.load('C:/Users/20225533/Diffusion/Auralization/nBa
 ###############################################################################
 num_samples = int(p_rec_off_deriv_band.shape[1] * fs / original_fs)
 p_rec_off_deriv_band_resampled = np.zeros((p_rec_off_deriv_band.shape[0], num_samples))
-p_rec_off_deriv_band_resampled_n4 = p_rec_off_deriv_band_resampled[4]
-
 
 for i in range(p_rec_off_deriv_band.shape[0]):
+
     p_rec_off_deriv_band_resampled[i, :] = signal.resample_poly(p_rec_off_deriv_band[i, :], up=int(fs), down=int(original_fs))
+    
 
 #Clip negative values to zero
 p_rec_off_deriv_band_resampled = np.clip(p_rec_off_deriv_band_resampled, a_min=0, a_max=None)
-p_rec_off_deriv_band_resampled_clip_n4 = p_rec_off_deriv_band_resampled[4]
 
-#plt.plot(t_off,press_deriv_band[0])
+t_off_resampled = np.linspace(0, t_off[-1], num_samples)
 
-t_off_resampled = np.linspace(0, len(t_off), num_samples)
+plt.plot(t_off,p_rec_off_deriv_band[4])
 plt.plot(t_off_resampled,p_rec_off_deriv_band_resampled[4])
 
 #%%
@@ -118,11 +118,11 @@ plt.plot(t_off_resampled,square_root[4])
 #random = sum(random) #this line of code is used for passing from a row vector to a column vector
 
 #FIRST ATTEMPT of noise creation
-noise = np.random.rand(1, p_rec_off_deriv_band_resampled.shape[1])*2 - 1 #random noise vector with unifrom distribution and with numbers between -1 and 1
-noise = sum(noise) #this line of code is used for passing from a row vector to a column vector
-mean_value = np.mean(noise)
-difference_squared = (noise - mean_value)**2
-variance = np.mean(difference_squared) 
+# noise = np.random.rand(1, p_rec_off_deriv_band_resampled.shape[1])*2 - 1 #random noise vector with unifrom distribution and with numbers between -1 and 1
+# noise = sum(noise) #this line of code is used for passing from a row vector to a column vector
+# mean_value = np.mean(noise)
+# difference_squared = (noise - mean_value)**2
+# variance = np.mean(difference_squared) 
 #In this way the variance is 0.33 and not 1
 
 #SECOND ATTEMPT of noise creation: after speaking with Wouter; the noise needs to be normal distribution and the variance needs to be one
@@ -134,15 +134,23 @@ variance = np.mean(difference_squared)
 #In this way the variance is 0.33 and not 1
 
 #THIRD ATTEMPT of noise creation: after speaking with Wouter; the noise needs to be normalized and the variance needs to be one
-# noise = np.random.normal(0,1,press_deriv_band_resampled.shape[1]) #This is how Gerd does it -> This is not from -1 to 1 but from -4 to 4
+# noise = np.random.normal(0,1,p_rec_off_deriv_band_resampled.shape[1]) #This is how Gerd does it -> This is not from -1 to 1 but from -4 to 4
 # mean_value = np.mean(noise)
 # difference_squared = (noise - mean_value)**2
 # variance = np.mean(difference_squared)
 #Variance here is 0.997 so this could be good -> the variance is 1 but the noise is not between -1 and 1
 
-plt.plot(t_off_resampled,noise)
+#FOURTH ATTEMPT of noise creation
+noise = np.random.rand(1, p_rec_off_deriv_band_resampled.shape[1])*2*(np.sqrt(3)) - (np.sqrt(3)) #random noise vector with unifrom distribution and with numbers between -1 and 1
+noise = sum(noise) #this line of code is used for passing from a row vector to a column vector
+mean_value = np.mean(noise)
+difference_squared = (noise - mean_value)**2
+variance = np.mean(difference_squared) 
+#In this way the variance is 0.33 and not 1
 
-#FOURTH ATTEMPT of noise creation: after speaking with Wouter; the noise needs to be normalized and the variance needs to be one
+#plt.plot(t_off_resampled,noise)
+
+#FIFTH ATTEMPT of noise creation: after speaking with Wouter; the noise needs to be normalized and the variance needs to be one
 # noise = np.random.rand(1, edc_deriv_band.shape[1]) #random noise vector with unifrom distribution and with numbers between 0 and 1
 # noise = sum(noise) #this line of code is used for passing from a row vector to a column vector
 # mean_value = np.mean(noise)
@@ -155,89 +163,152 @@ plt.plot(t_off_resampled,noise)
 #CREATION OF FILTER
 ###############################################################################
 
+######
+#BUTTER FILTER
+######
 Nyquist_freq = int(fs/2) 
-Nb = 5 #number of biquad sections of the desired system
+filter_order = 8 #number of biquad sections of the desired system
+nth_octave = 1  # e.g., 3 for third-octave
 
-h_all=np.zeros(shape=(nBands,Nyquist_freq)) #matrix to store the band-pass filter responses for each band
-
-#Create octave band filters
-h_low=np.zeros(Nyquist_freq)
-h_low[0] = 1
-h_low_all=np.zeros(shape=(nBands,Nyquist_freq))
-for fi in reversed(range(nBands)):
-    wn_low = np.power(2,1./2)*center_freq[fi]/Nyquist_freq #normalized critical frequency for the low-pass filter
-    b_low, a_low  = signal.butter(Nb,wn_low,'low') #coefficients of the Butterworth low-pass filter
-    h_low = signal.lfilter(b_low,a_low,h_low) #applies the filter to the impulse response -> creates the filter impulse response
-    h_low_all[fi,:]=h_low
-
-h_high=np.zeros(Nyquist_freq)
-h_high[0] = 1
-h_high_all=np.zeros(shape=(nBands,Nyquist_freq))
-
-for fi in range(nBands):
-    wn_high =np.power(2,-1./2)*center_freq[fi]/Nyquist_freq #normalized critical frequency for the high-pass filter
-    b_high, a_high = signal.butter(Nb, wn_high,'high') #coefficients of the Butterworth high-pass filter
-    h_high = signal.lfilter(b_high,a_high,h_high)
-    h_high_all[fi,:]=h_high
+# Create filter
+filter_tot = []
+for fc in center_freq:
+    # Calculate low and high cutoff frequencies for each band
+    lowcut = fc / (2 ** (1 / (2 * nth_octave)))
+    highcut = fc * (2 ** (1 / (2 * nth_octave)))
     
-    h=np.convolve(h_high_all[fi,:],h_low_all[fi,:]) #band-pass filter is the result of convolving the corresponding low-pass and high-pass filters. It allows frequencies within a specific range (octave band) to pass while attenuating frequencies outside this range
-    h_all[fi,:]=h[0:Nyquist_freq]
+    # Normalize the cutoff frequencies by the Nyquist frequency
+    low = lowcut / Nyquist_freq
+    high = highcut / Nyquist_freq
+    
+    # Design Butterworth bandpass filter
+    butter_band = butter(filter_order, [low, high], btype='band', output='sos') # butter_band contains the second-order sections representation of the Butterworth filter
+    
+    # Append filter coefficients to filter tot
+    filter_tot.append(butter_band)
 
+# Plot frequency responses
+plt.figure(figsize=(12, 8))
+for band in range(len(filter_tot)):
+    print(band)
+    # Compute the frequency response of each filter
+    w, h = sosfreqz(filter_tot[band], worN=2000, fs=fs)
+    # w is the array of frequencies at which the response is computed
+    # h is the frequency response of the filter
+    
+    # Plot the magnitude response in decibels
+    plt.semilogx(w, 20 * np.log10(abs(h)), label=f'{center_freq[band]}')
 
-# Plot the frequency responses
-freqs = np.linspace(0, Nyquist_freq, Nyquist_freq)
-plt.figure(figsize=(14, 10))
-
-for i in range(nBands):
-    plt.subplot(nBands, 1, i + 1)
-    plt.plot(freqs, 20 * np.log10(np.abs(h_all[i, :])))
-    plt.title(f'Band-pass Filter for Center Frequency {center_freq[i]} Hz')
-    plt.xlabel('Time (s)')
-    plt.ylabel('Magnitude (dB)')
-    plt.grid(True)
-
-plt.tight_layout()
+plt.title('Frequency response of octave band filters')
+plt.xlabel('Frequency [Hz]')
+plt.ylabel('Gain [dB]')
+plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+plt.axhline(0, color='black', linewidth=0.5)
+plt.legend(loc='best')
 plt.show()
 
-# Frequency response
-w, h_low = signal.freqz(b_low, a_low, worN=fs)
-w, h_high = signal.freqz(b_high, a_high, worN=fs)
+######
+#PREVIOUS FILTER
+######
+# Nyquist_freq = int(fs/2) 
+# Nb = 7 #number of biquad sections of the desired system
 
-# Plotting
-plt.figure(figsize=(14, 6))
+# h_all=np.zeros(shape=(nBands,Nyquist_freq)) #matrix to store the band-pass filter responses for each band
 
-# Low-pass filter response
-plt.subplot(2, 1, 1)
-plt.plot(w / np.pi * Nyquist_freq, 20 * np.log10(np.abs(h_low)), 'b')
-plt.title('Low-Pass Filter Frequency Response')
-plt.xlabel('Frequency (Hz)')
-plt.ylabel('Magnitude (dB)')
-plt.grid()
+# #Create octave band filters
+# h_low=np.zeros(Nyquist_freq)
+# h_low[0] = 1
+# h_low_all=np.zeros(shape=(nBands,Nyquist_freq))
+# for fi in reversed(range(nBands)):
+#     wn_low = np.power(2,1./2)*center_freq[fi]/Nyquist_freq #normalized critical frequency for the low-pass filter
+#     b_low, a_low  = signal.butter(Nb,wn_low,'low') #coefficients of the Butterworth low-pass filter
+#     h_low = signal.lfilter(b_low,a_low,h_low) #applies the filter to the impulse response -> creates the filter impulse response
+#     h_low_all[fi,:]=h_low
 
-# High-pass filter response
-plt.subplot(2, 1, 2)
-plt.plot(w / np.pi * Nyquist_freq, 20 * np.log10(np.abs(h_high)), 'r')
-plt.title('High-Pass Filter Frequency Response')
-plt.xlabel('Frequency (Hz)')
-plt.ylabel('Magnitude (dB)')
-plt.grid()
+# h_high=np.zeros(Nyquist_freq)
+# h_high[0] = 1
+# h_high_all=np.zeros(shape=(nBands,Nyquist_freq))
 
-plt.tight_layout()
-plt.show()
+# for fi in range(nBands):
+#     wn_high =np.power(2,-1./2)*center_freq[fi]/Nyquist_freq #normalized critical frequency for the high-pass filter
+#     b_high, a_high = signal.butter(Nb, wn_high,'high') #coefficients of the Butterworth high-pass filter
+#     h_high = signal.lfilter(b_high,a_high,h_high) #-> creates the filter impulse response
+#     h_high_all[fi,:]=h_high
+    
+#     h=np.convolve(h_high_all[fi,:],h_low_all[fi,:])[0:Nyquist_freq] #band-pass filter is the result of convolving the corresponding low-pass and high-pass filters. It allows frequencies within a specific range (octave band) to pass while attenuating frequencies outside this range
+#     h_all[fi,:]=h
+    
+#     # Frequency response
+#     H = np.fft.fft(h)
+#     H = H[:Nyquist_freq]
+    
+#     # Plot the filter response for this band
+#     plt.figure(figsize=(10, 6))
+#     freqs = np.linspace(0, Nyquist_freq, len(H))
+#     plt.plot(freqs, 20 * np.log10(abs(H)))
+#     plt.title(f'Band-pass Filter {fi + 1} ({center_freq[fi]} Hz)')
+#     plt.xlabel('Frequency (Hz)')
+#     plt.ylabel('Magnitude (dB)')
+#     plt.grid()
+#     plt.show()
+
+# # Plot all filter responses combined
+# plt.figure(figsize=(10, 6))
+# for fi in range(nBands):
+#     H = np.fft.fft(h_all[fi, :])
+#     H = H[:Nyquist_freq]
+#     freqs = np.linspace(0, Nyquist_freq, len(H))
+#     plt.plot(freqs, 20 * np.log10(abs(H)), label=f'{center_freq[fi]} Hz')
+# plt.title('All Band-pass Filters Combined')
+# plt.xlabel('Frequency (Hz)')
+# plt.ylabel('Magnitude (dB)')
+# plt.legend()
+# plt.grid()
+# plt.show()
 
 #%%
 ###############################################################################
 #CREATION OF FILTERED RANDOM NOISE
 ###############################################################################
 
-# Determine the length of the convolved result between filter and random noise
-conv_length = len(np.convolve(h_all[0, :], noise))
+#TIME DOMAIN OF THE FILTERED RANDOM NOISE: for each band the sosfilt creates a time domain convolution of the noise with the filter
+filt_noise_band = [sosfilt(band, noise) for band in filter_tot] #this is in the time domain because the sosfilt gives the time domain
 
-#Convolution of random noise with filter
-filt_noise_band = np.empty((nBands, conv_length), dtype=float)
 for fi in range(nBands):
-    filt_noise=np.convolve(h_all[fi,:],noise)
-    filt_noise_band[fi, :] = filt_noise
+    plt.plot(t_off_resampled, 20 * np.log10(abs(filt_noise_band[fi])), label=f'{center_freq[fi]} Hz')
+
+#FREQUENCY DOMAIN OF THE FILTERED RANDOM NOISE: Frequency response of the filtered random noise
+filt_noise_band_freq = np.fft.fft(filt_noise_band)
+
+# fv is the freqeuncy vector for the x axis
+nSamples = len(noise)
+fv = np.arange(nSamples) * (fs/nSamples) #This can also be written with linspace as #np.linspace((0, (nSamples-1)))*fs/nSamples;
+
+#Plot the frequency response
+plt.figure(figsize=(12, 8))
+plt.title('Frequency response of octave band filtered random noise')
+for fi in range(nBands):
+    plt.subplot(nBands, 1, fi+1)
+    plt.semilogx(fv, 20 * np.log10(abs(filt_noise_band_freq[fi, :])), label=f'{center_freq[fi]} Hz')
+
+    plt.xlabel('Frequency [Hz]')
+    plt.ylabel('Gain [dB]')
+    plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+    #plt.axhline(0, color='black', linewidth=0.1)
+    plt.legend(loc='best')
+    plt.show()
+
+#Make the filt_noise_band list into an array
+filt_noise_band = np.array(filt_noise_band)
+
+# # Determine the length of the convolved result between filter and random noise
+# conv_length = len(np.convolve(h_all[0, :], noise))
+
+# #Convolution of random noise with filter
+# filt_noise_band = np.empty((nBands, conv_length), dtype=float)
+# for fi in range(nBands):
+#     filt_noise=np.convolve(h_all[fi,:],noise)
+#     filt_noise_band[fi, :] = filt_noise
 
 #%%
 ###############################################################################
@@ -249,7 +320,18 @@ for fi in range(nBands):
     imp_unfilt = square_root[fi,:] * noise
     imp_unfilt_band.append(imp_unfilt)
 
-plt.plot(t_off_resampled,imp_unfilt_band[4])
+plt.figure(figsize=(12, 8))
+plt.title('Time domain of UNfiltered impulse response per frequency band')
+for fi in range(nBands):
+    plt.subplot(nBands, 1, fi+1)
+    plt.plot(t_off_resampled, imp_unfilt_band[fi], label=f'{center_freq[fi]} Hz')
+    
+    plt.xlabel('Time [s]')
+    plt.ylabel('Magnitude [dB]')
+    plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+    #plt.axhline(0, color='black', linewidth=0.1)
+    plt.legend(loc='best')
+    plt.show()
 
 #Padding the square-root to the same length as the filtered random noise
 pad_length = filt_noise_band.shape[1]-p_rec_off_deriv_band_resampled.shape[1]
@@ -258,49 +340,217 @@ t_off_padded = np.pad(t_off_resampled, ((0,pad_length)) ,mode='constant' )
 
 #Multiplication of SQUARE-ROOT of envelope with filtered random noise (FILTERED)
 imp_filt_band = []
+plt.figure(figsize=(12, 8))
+plt.title('Time domain of filtered impulse response per frequency band')
 for fi in range(nBands):
+    plt.subplot(nBands, 1, fi+1)
     imp_filt = square_root_padded[fi,:]*filt_noise_band[fi,:]
-    #imp_filt=np.convolve(h_all[fi,:],square_root[fi,:]*random_array)
     imp_filt_band.append(imp_filt)
+    
+    plt.plot(t_off_padded, imp_filt_band[fi], label=f'{center_freq[fi]} Hz')
+    
+    plt.xlabel('Time [s]')
+    plt.ylabel('Magnitude [dB]')
+    plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+    #plt.axhline(0, color='black', linewidth=0.1)
+    plt.legend(loc='best')
+    plt.show()
 
-plt.plot(t_off_padded,imp_filt_band[4])
+#%%
+###############################################################################
+#ALL FREQUENCY IMPULSE RESPONSE
+###############################################################################
+#Sum of the bands in the time domain
+imp_tot = [sum(imp_filt_band[i][j] for i in range(len(imp_filt_band))) for j in range(len(imp_filt_band[0]))]
+imp_tot = np.array(imp_tot, dtype=float)
+
+# Plot impulse response in the time domain
+plt.figure(figsize=(12, 8))
+plt.plot(t_off_padded, imp_tot)
+plt.xlabel('Time [s]')
+plt.ylabel('Magnitude [dB]')
+plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+#plt.axhline(0, color='black', linewidth=0.1)
+#plt.legend(loc='best')
+plt.show()
+
+
+#Frequency domain of the total impulse response
+freq_spectrum = 20*np.log10(abs(np.fft.fft(imp_tot)))
+
+# Plot impulse response in the frequency domain
+plt.figure(figsize=(12, 8))
+plt.semilogx(fv, freq_spectrum)
+plt.xlabel('Frequency [Hz]')
+plt.ylabel('Magnitude [dB]')
+plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+#plt.axhline(0, color='black', linewidth=0.1)
+#plt.legend(loc='best')
+plt.show()
+
+# #%%
+# ###############################################################################
+# #ADDING DIRECT SOUND & SHIFT EVERYTHING TO THE DIRECT SOUND ARRIVAL TIME STEP
+# ###############################################################################
+# W = 0.01 #the power is in Watts
+# dist_sr = 1.5
+# rho = 1.21
+# c0 = 343
+
+# #POSSIBLE SOLUTION FOR HAVING A DIFFERENT POWER PER BANDWIDTH??????? i am not sure
+# #???
+# # # Calculate bandwidths for each octave band
+# # bandwidths = center_freq * (2**(1/2) - 2**(-1/2))
+
+# # # Normalize power per band by bandwidth
+# # power_per_band = W * (bandwidths / np.sum(bandwidths))
+
+# # # Calculate direct component for each band
+# # press_dir_sound = np.sqrt(power_per_band / (4 * np.pi * dist_sr**2) * rho * c0)
+# #???
+
+
+# press_dir_sound = np.sqrt((W/(4*np.pi*dist_sr**2))*rho*c0)
+
+# time_dir_sound = dist_sr/c0
+# time_dir_sound_step = int(time_dir_sound/dt_sim)
+# time_dir_sound_step_resampled = int(time_dir_sound_step * fs/ original_fs)
+
+# #Shift everythingto the direct sound arrival
+# zero_array = np.zeros([time_dir_sound_step_resampled]) #array of zeros in front of the impulse response
+# imp_tot = np.hstack([zero_array,imp_tot])
+
+# #Add the direct component to the impulse response at the right time step
+# imp_tot[time_dir_sound_step_resampled] += press_dir_sound
+
+# pad_length_direct = imp_tot.shape[0]-t_off_padded.shape[0]
+# t_off_padded_direct = np.pad(t_off_padded, ((0,pad_length_direct)) ,mode='constant' )
+
+# plt.plot(t_off_padded_direct,imp_tot)
+
+
+
+#%%
+###############################################################################
+#ADDING DIRECT SOUND AND FILTER IT & SHIFT EVERYTHING TO THE DIRECT SOUND ARRIVAL TIME STEP
+###############################################################################
+# W = 0.01 #the power is in Watts
+# dist_sr = 1.5
+# rho = 1.21
+# c0 = 343
+
+# #POSSIBLE SOLUTION FOR HAVING A DIFFERENT POWER PER BANDWIDTH??????? i am not sure
+# #???
+# # # Calculate bandwidths for each octave band
+# # bandwidths = center_freq * (2**(1/2) - 2**(-1/2))
+
+# # # Normalize power per band by bandwidth
+# # power_per_band = W * (bandwidths / np.sum(bandwidths))
+
+# # # Calculate direct component for each band
+# # press_dir_sound = np.sqrt(power_per_band / (4 * np.pi * dist_sr**2) * rho * c0)
+# #???
+
+
+# press_dir_sound = np.sqrt((W/(4*np.pi*dist_sr**2))*rho*c0)
+
+# #Multiplication of press_dir_sound with filtered random noise (FILTERED)
+# press_dir_sound_band = []
+# for fi in range(nBands):
+#     dir_filt = press_dir_sound*h_all[fi,:]
+#     press_dir_sound_band.append(dir_filt)
+
+
+# time_dir_sound = dist_sr/c0
+# time_dir_sound_step = int(time_dir_sound/dt_sim)
+# time_dir_sound_step_resampled = int(time_dir_sound_step * fs/ original_fs)
+
+# #Shift everything to the direct sound arrival
+# zero_array = np.zeros([time_dir_sound_step_resampled]) #array of zeros in front of the impulse response
+# imp_tot = np.hstack([zero_array,imp_tot])
+
+# #Add the direct component to the impulse response at the right time step
+# imp_tot[time_dir_sound_step_resampled] += press_dir_sound
+
+# pad_length_direct = imp_tot.shape[0]-t_off_padded.shape[0]
+# t_off_padded_direct = np.pad(t_off_padded, ((0,pad_length_direct)) ,mode='constant' )
+
+# plt.plot(t_off_padded_direct,imp_tot)
+
 
 #%%
 ###############################################################################
 #ALL FREQUENCY IMPULSE RESPONSE
 ###############################################################################
 #Sum of the bands
-imp_tot = [sum(imp_filt_band[i][j] for i in range(len(imp_filt_band))) for j in range(len(imp_filt_band[0]))]
-imp_tot = np.array(imp_tot, dtype=float)
 
-plt.plot(t_off_padded,imp_tot)
 
-#Create a file wav for impulse response
-scipy.io.wavfile.write("imp_resp.wav", fs, imp_tot)
+# imp_filt_band_direct = [imp_filt_band[i]+press_dir_sound_band[i] for i in range(len(imp_filt_band))]
 
-#Play the impulse response
-sd.play(imp_tot, fs)
 
-#Frequency spectrum
-freq_spectrum = 20*np.log10(abs(np.fft.fft(imp_tot)))
+# imp_tot = [sum(imp_filt_band_direct[i][j] for i in range(len(imp_filt_band_direct))) for j in range(len(imp_filt_band_direct[0]))]
+# imp_tot = np.array(imp_tot, dtype=float)
+
+# plt.plot(t_off_padded,imp_tot)
+
+
+# #Frequency spectrum
+# freq_spectrum = 20*np.log10(abs(np.fft.fft(imp_tot)))
+
+
+
+
+
+
+
+
 
 #%%
 ###############################################################################
-#ADDING DIRECT SOUND
+#CREATE IMPULSE RESPONSE FILE
 ###############################################################################
-W = 0.01 #the power is in Watts? or in Watts/m3????
-dist_sr = 1.5
-rho = 1.21
-c0 = 343
-press_dir_sound = np.sqrt((W/(4*np.pi*dist_sr**2))*rho*c0)
+#Create a file wav for impulse response
+imp_resp_norm = np.int16(imp_tot / np.max(np.abs(imp_tot)) * 32767) 
 
-time_dir_sound = dist_sr/c0
-time_dir_sound_step = int(time_dir_sound/dt_sim)
-time_dir_sound_step_resampled = int(time_dir_sound_step * fs/ original_fs)
+scipy.io.wavfile.write("imp_resp.wav", fs, imp_resp_norm)
 
-imp_tot[time_dir_sound_step_resampled] += press_dir_sound
+#Play the impulse response
+#sd.play(imp_tot, fs)
 
-plt.plot(t_off_padded,imp_tot)
+
+#%%
+###############################################################################
+#TRIAL IMPULSE RESPONSE ONLY FOR ONE BAND
+###############################################################################
+#Create a file wav for impulse response
+
+#125Hz
+imp_resp_band0 = np.int16(imp_filt_band[0] / np.max(np.abs(imp_filt_band[0])) * 32767) 
+
+scipy.io.wavfile.write("imp_resp_band0.wav", fs, imp_resp_band0)
+
+#250Hz
+imp_resp_band1 = np.int16(imp_filt_band[1] / np.max(np.abs(imp_filt_band[1])) * 32767) 
+
+scipy.io.wavfile.write("imp_resp_band1.wav", fs, imp_resp_band1)
+
+#500Hz
+imp_resp_band2 = np.int16(imp_filt_band[2] / np.max(np.abs(imp_filt_band[2])) * 32767) 
+
+scipy.io.wavfile.write("imp_resp_band2.wav", fs, imp_resp_band2)
+
+#1000Hz
+imp_resp_band3 = np.int16(imp_filt_band[3] / np.max(np.abs(imp_filt_band[3])) * 32767) 
+
+scipy.io.wavfile.write("imp_resp_band3.wav", fs, imp_resp_band3)
+
+#2000Hz
+imp_resp_band4 = np.int16(imp_filt_band[4] / np.max(np.abs(imp_filt_band[4])) * 32767) 
+
+scipy.io.wavfile.write("imp_resp_band4.wav", fs, imp_resp_band4)
+
+#Play the impulse response
+#sd.play(imp_tot, fs)
 
 #%%
 ###############################################################################
@@ -324,10 +574,10 @@ plt.plot(ht,imp_tot) #plot the impulse response
 plt.plot(t_conv,sh_conv) #plot the convolved signal
 
 #Play the convolved signal
-sd.play(sh_conv, fs)
+#sd.play(sh_conv, fs)
 
-#Create a file wav for impulse response
-scipy.io.wavfile.write("auralization.wav", fs, sh_conv)
+#Create a file wav for auralization
+#scipy.io.wavfile.write("auralization.wav", fs, sh_conv)
 
 #%%
 ###############################################################################
@@ -358,4 +608,4 @@ dt = 1/fs
 Ci_pred = []
 for fi in range(len(center_freq)):
     Ci = sum(abs(imp_filt_band[fi])**2*dt)/(sum(abs(imp_unfilt_band[fi])**2*dt))
-    Ci_pred.append(Ci)    
+    Ci_pred.append(Ci)

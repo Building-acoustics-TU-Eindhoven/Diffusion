@@ -5,91 +5,93 @@ Created on Mon Oct 30 08:56:01 2023
 @author: 20225533
 """
 
-#Code developed by Ilaria Fichera for the analysis of the FVM method adapted solving the 3D diffusion equation with one intermittent omnidirectional sound source
-#Import modules
+# Code developed by Ilaria Fichera for the analysis of the FVM method adapted solving the 3D diffusion equation with one intermittent omnidirectional sound source
+# Import modules
 
-#import py2gmsh as p2g
-#from py2gmsh import (Mesh, Entity, Field)
+# import py2gmsh as p2g
+# from py2gmsh import (Mesh, Entity, Field)
 
 # Initialize py2gmsh
-#geom = p2g.Geometry()
+# geom = p2g.Geometry()
 
-#Load the Geo file
-#geom.load_file("8x8x8.geo")
+# Load the Geo file
+# geom.load_file("8x8x8.geo")
 
-#Set mesh sizes
-#lc = 0.1  # Set your desired mesh size here
-#geom.set_element_size(lc)
+# Set mesh sizes
+# lc = 0.1  # Set your desired mesh size here
+# geom.set_element_size(lc)
 
 # Generate the mesh
-#geom.generate_mesh()
+# geom.generate_mesh()
 
 # Save the mesh to an MSH file
-#geom.write_mesh("output.msh")
+# geom.write_mesh("output.msh")
 
 import gmsh
 import argparse
 
-#import pygmsh as pg
-#import py2gmsh as p2g
-#from py2gmsh import (Mesh, Entity, Field)
+# import pygmsh as pg
+# import py2gmsh as p2g
+# from py2gmsh import (Mesh, Entity, Field)
 
 import subprocess
 
-#Set your desired mesh size
-#lc = 10
+# Set your desired mesh size
+# lc = 10
 
-#Define the path to your Gmsh executable
-#gmsh_path = "C:\\Users\\20225533\\Diffusion\\FiniteVolumeMethod\\gmsh.exe"
+# Define the path to your Gmsh executable
+# gmsh_path = "C:\\Users\\20225533\\Diffusion\\FiniteVolumeMethod\\gmsh.exe"
 
-#Define the path to your Geo file
-#geo_file = "C:\\Users\\20225533\\Diffusion\\FiniteVolumeMethod\\8x8x8.geo"
+# Define the path to your Geo file
+# geo_file = "C:\\Users\\20225533\\Diffusion\\FiniteVolumeMethod\\8x8x8.geo"
 
-#gmsh.model.mesh.generate()
-#8x8x8.geo -3 -clmax lc -o my_mesh.msh
+# gmsh.model.mesh.generate()
+# 8x8x8.geo -3 -clmax lc -o my_mesh.msh
 
-#mesh = geo_file.generate_mesh(dim=2,algorithm = 6)
+# mesh = geo_file.generate_mesh(dim=2,algorithm = 6)
 
-#Define the path for the output mesh file (MSH format)
-#output_mesh_file = "C:\\Users\\20225533\\Diffusion\\FiniteVolumeMethod\\output.msh"
+# Define the path for the output mesh file (MSH format)
+# output_mesh_file = "C:\\Users\\20225533\\Diffusion\\FiniteVolumeMethod\\output.msh"
 
-#Construct the Gmsh command to generate the mesh
-#command = [gmsh_path, geo_file, "-3", "-clmax", str(lc), "-o", output_mesh_file] #path, file, -3 = 3D mesh, clmax=caracteristic length maximum
+# Construct the Gmsh command to generate the mesh
+# command = [gmsh_path, geo_file, "-3", "-clmax", str(lc), "-o", output_mesh_file] #path, file, -3 = 3D mesh, clmax=caracteristic length maximum
 
-#Run Gmsh to generate the mesh
-#subprocess.run(command)
+# Run Gmsh to generate the mesh
+# subprocess.run(command)
 
 
-
-#%%
+# %%
 ###############################################################################
-#INPUT VARIABLES
+# INPUT VARIABLES
 ###############################################################################
-#%%
-#import os
-#import subprocess
+# %%
+# import os
+# import subprocess
 
 # Assuming lengthOfMesh is a variable in Python
 # and filename is the name of the file without extension
-#if lengthOfMesh == 'H':
+# if lengthOfMesh == 'H':
 #    strimp = f'gmsh -3 -format msh4 {os.getcwd()}/"8x8x8".geo'
 #    subprocess.run(strimp, shell=True)
 #    lengthOfMesh = 2
-#else:
+# else:
 
-#strimp = f'gmsh -3 -format msh4 -clscale {lengthOfMesh} "{os.getcwd()}/"8x8x8".geo"'
-#subprocess.run(strimp, shell=True)
-#lengthOfMesh = float(lengthOfMesh)
+# strimp = f'gmsh -3 -format msh4 -clscale {lengthOfMesh} "{os.getcwd()}/"8x8x8".geo"'
+# subprocess.run(strimp, shell=True)
+# lengthOfMesh = float(lengthOfMesh)
 
 # Assuming msh_file is the path to the generated mesh file
-#msh_file = f'{os.getcwd()}/GeoModels/"8x8x8".msh'
+# msh_file = f'{os.getcwd()}/GeoModels/"8x8x8".msh'
 
 
-#%%
+# %%
 ###############################################################################
-#INITIALISE GMSH
+# INITIALISE GMSH
 ###############################################################################
 # Adjusted the code to accept input from terminal: @Hassan
+
+import os
+
 
 def generate_mesh(geo_file_path, name_gmsh_file, length_of_mesh):
     # Read the content of the Geo file
@@ -123,34 +125,49 @@ def generate_mesh(geo_file_path, name_gmsh_file, length_of_mesh):
     gmsh.finalize()
 
 
+# The variables to be assigned by the user directly
+# Only name of the file
+default_geo_file_path = '3x3x3.geo'
+default_name_gmsh_file = "3x3x3.msh"
+default_length_of_mesh = 1
+
+# The file assumed to be in the same folder as "CreatemeshFVM.py" file
+base_dir = os.path.dirname(os.path.abspath(__file__))  # Directory of the current script
+
+
 def main():
     gmsh.initialize()
     parser = argparse.ArgumentParser(description='process the input path, taking dynamically.')
-    default_geo_file_path = 'Corridor_vers3.geo'
-    default_name_gmsh_file = "Corridor_vers3.msh"
-    default_length_of_mesh = 1
 
     parser.add_argument(
         'geo_file_path',
         type=str,
         help='Path to the original Geo file',
-        default=default_geo_file_path,
+        nargs='?',  # This makes the argument optional
+        default=os.path.join(
+            base_dir, default_geo_file_path
+        ),
     )
     parser.add_argument(
         'name_gmsh_file',
         type=str,
+        nargs='?',  # This makes the argument optional
         help='Name for the output Gmsh file',
-        default=default_name_gmsh_file
+        default=os.path.join(
+            base_dir, default_name_gmsh_file
+        )
     )
     parser.add_argument(
         'length_of_mesh',
         type=int,
+        nargs='?',  # This makes the argument optional
         help='Length of the mesh',
         default=default_length_of_mesh
     )
 
     args = parser.parse_args()
     generate_mesh(args.geo_file_path, args.name_gmsh_file, args.length_of_mesh)
+
 
 if __name__ == '__main__':
     main()

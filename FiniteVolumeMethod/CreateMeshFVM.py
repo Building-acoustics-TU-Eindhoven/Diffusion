@@ -127,9 +127,9 @@ def generate_mesh(geo_file_path, name_gmsh_file, length_of_mesh):
 
 # The variables to be assigned by the user directly
 # Only name of the file
-default_geo_file_path = '3x3x3.geo'
-default_name_gmsh_file = "3x3x3.msh"
-default_length_of_mesh = 1
+name_of_geo_file = '3x3x3.geo'
+name_of_gmsh_file = "3x3x3.msh"
+length_of_mesh = 1
 
 # The file assumed to be in the same folder as "CreatemeshFVM.py" file
 base_dir = os.path.dirname(os.path.abspath(__file__))  # Directory of the current script
@@ -145,7 +145,7 @@ def main():
         help='Path to the original Geo file',
         nargs='?',  # This makes the argument optional
         default=os.path.join(
-            base_dir, default_geo_file_path
+            base_dir, name_of_geo_file
         ),
     )
     parser.add_argument(
@@ -154,7 +154,7 @@ def main():
         nargs='?',  # This makes the argument optional
         help='Name for the output Gmsh file',
         default=os.path.join(
-            base_dir, default_name_gmsh_file
+            base_dir, name_of_gmsh_file
         )
     )
     parser.add_argument(
@@ -162,7 +162,7 @@ def main():
         type=int,
         nargs='?',  # This makes the argument optional
         help='Length of the mesh',
-        default=default_length_of_mesh
+        default=length_of_mesh
     )
 
     args = parser.parse_args()

@@ -96,8 +96,20 @@ p_rec_off_deriv_band_resampled = np.clip(p_rec_off_deriv_band_resampled, a_min=0
 
 t_off_resampled = np.linspace(0, t_off[-1], num_samples)
 
-plt.plot(t_off,p_rec_off_deriv_band[4])
-plt.plot(t_off_resampled,p_rec_off_deriv_band_resampled[4])
+#FIGURE 1
+plt.figure(figsize=(12, 8))
+plt.title('Time domain envelope of squared impulse response per octave band filters')
+for fi in range(nBands):
+    plt.subplot(nBands, 1, fi+1)
+    plt.plot(t_off, p_rec_off_deriv_band[fi], label=f'{center_freq[fi]} Hz')
+    plt.plot(t_off_resampled,p_rec_off_deriv_band_resampled[fi])
+
+    plt.xlabel('Time [s]')
+    plt.ylabel('Magnitude [dB]')
+    plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+    plt.axhline(0, color='black', linewidth=0.5)
+    plt.legend(loc='best')
+    plt.show()
 
 #%%
 ###############################################################################
@@ -105,7 +117,6 @@ plt.plot(t_off_resampled,p_rec_off_deriv_band_resampled[4])
 ###############################################################################
 #From the envelope of the impulse response, we need to get the impulse response
 square_root = np.sqrt(p_rec_off_deriv_band_resampled) #this gives the impulse response at each frequency
-plt.plot(t_off_resampled,square_root[4])
 
 #%%
 ###############################################################################
@@ -148,7 +159,9 @@ difference_squared = (noise - mean_value)**2
 variance = np.mean(difference_squared) 
 #In this way the variance is 0.33 and not 1
 
-#plt.plot(t_off_resampled,noise)
+#FIGURE 2
+plt.figure(figsize=(12, 8))
+plt.plot(t_off_resampled,noise)
 
 #FIFTH ATTEMPT of noise creation: after speaking with Wouter; the noise needs to be normalized and the variance needs to be one
 # noise = np.random.rand(1, edc_deriv_band.shape[1]) #random noise vector with unifrom distribution and with numbers between 0 and 1
@@ -187,10 +200,11 @@ for fc in center_freq:
     # Append filter coefficients to filter tot
     filter_tot.append(butter_band)
 
+#FIGURE 3
 # Plot frequency responses
 plt.figure(figsize=(12, 8))
 for band in range(len(filter_tot)):
-    print(band)
+    #print(band)
     # Compute the frequency response of each filter
     w, h = sosfreqz(filter_tot[band], worN=2000, fs=fs)
     # w is the array of frequencies at which the response is computed
@@ -274,9 +288,22 @@ plt.show()
 #TIME DOMAIN OF THE FILTERED RANDOM NOISE: for each band the sosfilt creates a time domain convolution of the noise with the filter
 filt_noise_band = [sosfilt(band, noise) for band in filter_tot] #this is in the time domain because the sosfilt gives the time domain
 
+#FIGURE 4
+#Plot the time domain of the filtered noise
+plt.figure(figsize=(12, 8))
+plt.title('Time domain response of octave band filtered random noise')
 for fi in range(nBands):
+    plt.subplot(nBands, 1, fi+1)
     plt.plot(t_off_resampled, 20 * np.log10(abs(filt_noise_band[fi])), label=f'{center_freq[fi]} Hz')
 
+    plt.xlabel('Time [s]')
+    plt.ylabel('Magnitude [dB]')
+    plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+    plt.axhline(0, color='black', linewidth=0.5)
+    plt.legend(loc='best')
+    plt.show()
+    
+    
 #FREQUENCY DOMAIN OF THE FILTERED RANDOM NOISE: Frequency response of the filtered random noise
 filt_noise_band_freq = np.fft.fft(filt_noise_band)
 
@@ -284,6 +311,7 @@ filt_noise_band_freq = np.fft.fft(filt_noise_band)
 nSamples = len(noise)
 fv = np.arange(nSamples) * (fs/nSamples) #This can also be written with linspace as #np.linspace((0, (nSamples-1)))*fs/nSamples;
 
+#FIGURE 5
 #Plot the frequency response
 plt.figure(figsize=(12, 8))
 plt.title('Frequency response of octave band filtered random noise')
@@ -320,6 +348,7 @@ for fi in range(nBands):
     imp_unfilt = square_root[fi,:] * noise
     imp_unfilt_band.append(imp_unfilt)
 
+#FIGURE 6
 plt.figure(figsize=(12, 8))
 plt.title('Time domain of UNfiltered impulse response per frequency band')
 for fi in range(nBands):
@@ -340,13 +369,15 @@ t_off_padded = np.pad(t_off_resampled, ((0,pad_length)) ,mode='constant' )
 
 #Multiplication of SQUARE-ROOT of envelope with filtered random noise (FILTERED)
 imp_filt_band = []
+for fi in range(nBands):
+    imp_filt = square_root_padded[fi,:]*filt_noise_band[fi,:]
+    imp_filt_band.append(imp_filt)
+
+#FIGURE 7
 plt.figure(figsize=(12, 8))
 plt.title('Time domain of filtered impulse response per frequency band')
 for fi in range(nBands):
-    plt.subplot(nBands, 1, fi+1)
-    imp_filt = square_root_padded[fi,:]*filt_noise_band[fi,:]
-    imp_filt_band.append(imp_filt)
-    
+    plt.subplot(nBands, 1, fi+1)    
     plt.plot(t_off_padded, imp_filt_band[fi], label=f'{center_freq[fi]} Hz')
     
     plt.xlabel('Time [s]')
@@ -358,12 +389,13 @@ for fi in range(nBands):
 
 #%%
 ###############################################################################
-#ALL FREQUENCY IMPULSE RESPONSE
+#ALL FREQUENCY IMPULSE RESPONSE WITHOUT DIRECT SOUND
 ###############################################################################
 #Sum of the bands in the time domain
 imp_tot = [sum(imp_filt_band[i][j] for i in range(len(imp_filt_band))) for j in range(len(imp_filt_band[0]))]
 imp_tot = np.array(imp_tot, dtype=float)
 
+#FIGURE 8
 # Plot impulse response in the time domain
 plt.figure(figsize=(12, 8))
 plt.plot(t_off_padded, imp_tot)
@@ -378,6 +410,7 @@ plt.show()
 #Frequency domain of the total impulse response
 freq_spectrum = 20*np.log10(abs(np.fft.fft(imp_tot)))
 
+#FIGURE 9
 # Plot impulse response in the frequency domain
 plt.figure(figsize=(12, 8))
 plt.semilogx(fv, freq_spectrum)
@@ -387,6 +420,87 @@ plt.grid(True, which='both', linestyle='--', linewidth=0.5)
 #plt.axhline(0, color='black', linewidth=0.1)
 #plt.legend(loc='best')
 plt.show()
+
+#%%
+###############################################################################
+#CREATING DIRECT SOUND 
+###############################################################################
+W = 0.01 #the power is in Watts
+dist_sr = 1.5
+rho = 1.21
+c0 = 343
+
+# Frequency domain of the direct sound pressure
+press_freq_direct = []
+for fi in range(nBands):
+    #print(fi)
+    pf = 1/(4*np.pi*dist_sr) * np.exp(1j*2*np.pi*center_freq[fi]*dist_sr/c0)
+    press_freq_direct.append(pf)
+
+#This frequency domain pressure needs to be filtered
+press_filt_freq_direct = []
+for fi in range(nBands):
+    fpf = press_freq_direct[fi] * filt_noise_band_freq[fi]
+    press_filt_freq_direct.append(fpf)
+    
+#FIGURE 10
+#Plot the frequency domain of the filtered direct sound
+plt.figure(figsize=(12, 8))
+plt.title('Frequency response of filtered direct sound')
+for fi in range(nBands):
+    plt.subplot(nBands, 1, fi+1)
+    plt.semilogx(fv, 20 * np.log10(abs(press_filt_freq_direct[fi])), label=f'{center_freq[fi]} Hz')
+
+    plt.xlabel('Frequency [Hz]')
+    plt.ylabel('Gain [dB]')
+    plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+    #plt.axhline(0, color='black', linewidth=0.1)
+    plt.legend(loc='best')
+    plt.show()
+
+
+
+#Time domain direct sound -> with ifft
+press_filt_time_direct = []
+for fi in range(nBands):
+    fpt = np.fft.ifft(press_filt_freq_direct[fi])    
+    press_filt_time_direct.append(fpt)   
+
+#FIGURE 11
+#Plot the time domain of the filtered direct sound
+plt.figure(figsize=(12, 8))
+plt.title('Time domain of filtered direct sound per frequency band')
+for fi in range(nBands):
+    plt.subplot(nBands, 1, fi+1)   
+    plt.plot(t_off_padded, press_filt_time_direct[fi], label=f'{center_freq[fi]} Hz')
+    
+    plt.xlabel('Time [s]')
+    plt.ylabel('Magnitude [dB]')
+    plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+    #plt.axhline(0, color='black', linewidth=0.1)
+    plt.legend(loc='best')
+    plt.show()
+
+#%%
+###############################################################################
+#ADDING DIRECT SOUND 
+###############################################################################
+imp_filt_band_direct = [imp_filt_band[i]+press_filt_time_direct[i] for i in range(len(imp_filt_band))]
+
+#FIGURE 12
+plt.figure(figsize=(12, 8))
+plt.title('Time domain of filtered impulse response per frequency band')
+for fi in range(nBands):
+    plt.subplot(nBands, 1, fi+1)
+    plt.plot(t_off_padded, imp_filt_band_direct[fi], label=f'{center_freq[fi]} Hz')
+    
+    plt.xlabel('Time [s]')
+    plt.ylabel('Magnitude [dB]')
+    plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+    #plt.axhline(0, color='black', linewidth=0.1)
+    plt.legend(loc='best')
+    plt.show()
+
 
 # #%%
 # ###############################################################################
@@ -480,29 +594,19 @@ plt.show()
 
 #%%
 ###############################################################################
-#ALL FREQUENCY IMPULSE RESPONSE
+#ALL FREQUENCY IMPULSE RESPONSE WITH DIRECT SOUND
 ###############################################################################
 #Sum of the bands
+imp_tot_direct = [sum(imp_filt_band_direct[i][j] for i in range(len(imp_filt_band_direct))) for j in range(len(imp_filt_band_direct[0]))]
+imp_tot_direct = np.array(imp_tot, dtype=float)
 
-
-# imp_filt_band_direct = [imp_filt_band[i]+press_dir_sound_band[i] for i in range(len(imp_filt_band))]
-
-
-# imp_tot = [sum(imp_filt_band_direct[i][j] for i in range(len(imp_filt_band_direct))) for j in range(len(imp_filt_band_direct[0]))]
-# imp_tot = np.array(imp_tot, dtype=float)
-
-# plt.plot(t_off_padded,imp_tot)
+#FIGURE 13
+plt.figure(figsize=(12, 8))
+plt.plot(t_off_padded,imp_tot_direct)
 
 
 # #Frequency spectrum
-# freq_spectrum = 20*np.log10(abs(np.fft.fft(imp_tot)))
-
-
-
-
-
-
-
+# freq_spectrum = 20*np.log10(abs(np.fft.fft(imp_tot_direct)))
 
 
 #%%
@@ -553,41 +657,41 @@ scipy.io.wavfile.write("imp_resp_band4.wav", fs, imp_resp_band4)
 #sd.play(imp_tot, fs)
 
 #%%
-###############################################################################
-#CONVOLUTION FOR AURALIZATION
-###############################################################################
+# ###############################################################################
+# #CONVOLUTION FOR AURALIZATION
+# ###############################################################################
 
-#Convolution of the impulse_rand with the anechoic signal
-st = np.arange(0,(len(data_signal))/fs,1/fs) #Time vector of the speech signal
-ht = np.arange(0,(len(imp_tot))/fs,1/fs)  #Time vector of the room impulse response
+# #Convolution of the impulse_rand with the anechoic signal
+# st = np.arange(0,(len(data_signal))/fs,1/fs) #Time vector of the speech signal
+# ht = np.arange(0,(len(imp_tot))/fs,1/fs)  #Time vector of the room impulse response
 
-#Create impulse response
-sh_conv = np.convolve(imp_tot,data_signal) #convolution of the impulse response with the anechoic signal
-sh_conv = sh_conv/max(abs(sh_conv)) #normalized to the maximum value of the convolved signal
+# #Create impulse response
+# sh_conv = np.convolve(imp_tot,data_signal) #convolution of the impulse response with the anechoic signal
+# sh_conv = sh_conv/max(abs(sh_conv)) #normalized to the maximum value of the convolved signal
 
-t_conv = np.arange(0,(len(sh_conv))/fs,1/fs) #Time vector of the convolved signal
+# t_conv = np.arange(0,(len(sh_conv))/fs,1/fs) #Time vector of the convolved signal
 
-plt.plot(st,data_signal) #plot the anechoic signal
+# plt.plot(st,data_signal) #plot the anechoic signal
  
-plt.plot(ht,imp_tot) #plot the impulse response
+# plt.plot(ht,imp_tot) #plot the impulse response
 
-plt.plot(t_conv,sh_conv) #plot the convolved signal
+# plt.plot(t_conv,sh_conv) #plot the convolved signal
 
-#Play the convolved signal
-#sd.play(sh_conv, fs)
+# #Play the convolved signal
+# #sd.play(sh_conv, fs)
 
-#Create a file wav for auralization
-#scipy.io.wavfile.write("auralization.wav", fs, sh_conv)
+# #Create a file wav for auralization
+# #scipy.io.wavfile.write("auralization.wav", fs, sh_conv)
 
-#%%
-###############################################################################
-#FROM FLOATING POINT FORMAT TO standard integer format such as 16-bit
-###############################################################################
-# Normalize the floating-point data to the range of int16
-sh_conv_normalized = np.int16(sh_conv / np.max(np.abs(sh_conv)) * 32767) #32767 scales the normalized data to the range of 16-bit integers (-32768 to 32767).
+# #%%
+# ###############################################################################
+# #FROM FLOATING POINT FORMAT TO standard integer format such as 16-bit
+# ###############################################################################
+# # Normalize the floating-point data to the range of int16
+# sh_conv_normalized = np.int16(sh_conv / np.max(np.abs(sh_conv)) * 32767) #32767 scales the normalized data to the range of 16-bit integers (-32768 to 32767).
 
-# Write the normalized data to a WAV file
-scipy.io.wavfile.write("auralization.wav", fs, sh_conv_normalized)
+# # Write the normalized data to a WAV file
+# scipy.io.wavfile.write("auralization.wav", fs, sh_conv_normalized)
 
 #%%
 ###############################################################################

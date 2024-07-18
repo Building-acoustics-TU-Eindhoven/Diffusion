@@ -99,7 +99,7 @@ rho = 1.21 #air density [kg.m^-3] at 20°C
 ###############################################################################
 #INITIALISE GMSH
 ###############################################################################
-file_name = "MeasurementRoom.msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "3x3x3.msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 

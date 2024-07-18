@@ -22,7 +22,6 @@ from math import ceil
 from math import log
 from math import sqrt
 from FunctionRT import *
-from FunctionEDT import *
 from FunctionClarity import *
 from FunctionDefinition import *
 from FunctionCentreTime import *

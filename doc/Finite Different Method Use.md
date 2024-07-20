@@ -68,7 +68,7 @@ A dv of 0.5 m normally would suffice for a correct calculation, although the cho
 According the Navarro 2012, to get good converged results, the time discretization dt will need to be defined depending on the dv chosen. 
 To make sure that the predictions converge to a fixed value with a very low error, the following empirical cretirion will need to apply.
 ```{math}
-10^{-8} = (dt)^2 (dv)^{-2}
+10^{-8} = dt^2 dv^{-2}
 ```
 The time discretization is defined in seconds. 
 
@@ -84,8 +84,8 @@ The absorption of the air will need to be inputted. The air absorption is define
 Within the fixed inputs, there are:
 - Adiabatic speed of sound defined as 343 m/s;
 - Absorption conditions term (Option 1 Sabine, Option 2 Eyring, Option 3 Modified). These are absorption factors for the boundary conditions. Currently, the most accurate absorption factor is set as the Option 3 Modified as it has bee demostrated that this is accurate for low and high absorption coefficients;
-- Reference pressure defined as 2 $\dot{10^{-5}} Pascal;
-- Air density at 20°C defined as 1.21 [kg.m^{-3}].
+- Reference pressure defined as $'2*10^{-5}'$ Pascal;
+- Air density at 20°C defined as 1.21 [$'kg/m^{-3}'$].
 
 ## Acoustics Calculation
 The acoustic calculation is based on the Du Fort and Frankel method (explicit unconditionally stable Finite difference method) solving the diffusion equation (Navarro et al., 2012). More information regarding the Finite Different Method in the paragraph below.
@@ -105,7 +105,7 @@ After predicting the time-dependent sound energy density in the room, the sound 
 ```{math}
 SPL = 20 log_{10}⁡((w(r,t)ρc^2)/p_{ref}^2) 
 ```
-where *p_{ref}* is 2 $\dot{10^{-5}} Pa and ρ is the air density.
+where *p_{ref}* is $'2*10^{-5}'$ Pa and ρ is the air density.
 
 #### Reverberation time and Early Decay Time (EDT)
 From the sound pressure level decay curve, the Reverberation time can be estimated. The RT is defined by the time that it takes for the sound pressure level to decay of 60 dB. Depending on the room geometry, occasionally it is difficult to evaluate 60 dB of decay and therefore, the T30 is evaluated. This is obtained from the slope between -5 and -35 dB of the maximum starting level.  
@@ -117,19 +117,19 @@ The Early Decay time is defined by the time that it takes for the sound pressure
 The Clarity (C80) parameter is the early to late arriving sound energy ratio. Clarity refers to how clear the sound quality is and it is calculated from the impulse response with the following relation:
 
 ```{math}
-C_{80}=10 log⁡(\int_0^{80ms} p^2(t) \, dt)/(\int_{80ms}^\infty p^2 (t) \, dt)   \,  [dB]
+C_{80}=10 log⁡(\int_0^{80ms} p^2(t) \, dt/\int_{80ms}^\infty p^2 (t) \, dt)   \,  [dB]
 ```
 
 The Definition (D50) parameter is the ratio of the early received sound energy (0-50ms after direct sound arrival) to the total received energy. It referres only to the speech and it is defined as: 
 
 ```{math}
-D_{50}=10 log⁡(\int_0^{50ms} p^2(t) \, dt)/(\int_0^\infty p^2(t) \, dt)  \,  [%]
+D_{50}=10 log⁡(\int_0^{50ms} p^2(t) \, dt/\int_0^\infty p^2(t) \, dt)  \,  [%]
 ```
 
 The Centr Time (Ts) parameter is the center of gravity of the squared impulse response. Centre Time avoids the discrete division of the impulse response into early and late periods. 
 
 ```{math}
-T_{s}=10 log⁡(\int_0^\infty tp^2(t) \, dt)/(\int_0^\infty p^2(t) \, dt)   \,  [s]
+T_{s}=10 log⁡(\int_0^\infty tp^2(t) \, dt/\int_0^\infty p^2(t) \, dt)   \,  [s]
 ```
 
 A low value indicate that most of the energy arrives early, a high value reveals that there is much reverberance.

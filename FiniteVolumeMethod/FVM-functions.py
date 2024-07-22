@@ -22,7 +22,6 @@ from math import ceil
 from math import log
 from math import sqrt
 from FunctionRT import *
-from FunctionEDT import *
 from FunctionClarity import *
 from FunctionDefinition import *
 from FunctionCentreTime import *
@@ -1219,120 +1218,6 @@ w_rec_x_band, w_rec_y_band, spl_stat_x_band, spl_stat_y_band, spl_r_band, spl_r_
 
 et = time.time() #end time
 elapsed_time = et - st
-
-#%%
-###############################################################################
-#FIGURES & POST-PROCESSING
-###############################################################################
-
-if tcalc == "decay":
-    for iBand in range(nBands):
-        #Figure 5: Decay of SPL in the recording_time
-        plt.figure(5)
-        plt.plot(t, spl_r_band[iBand])  # plot sound pressure level with Pref = (2e-5)**5
-        plt.title("Figure 5 :SPL over time at the receiver")
-        plt.xlabel("t [s]")
-        plt.ylabel("SPL [dB]")
-        plt.xlim()
-        plt.ylim()
-        plt.xticks(np.arange(0, recording_time + 0.1, 0.5))
-        plt.yticks(np.arange(0, 120, 20))
-    
-        #Figure 6: Decay of SPL in the recording_time normalised to maximum 0dB
-        plt.figure(6)
-        plt.plot(t,spl_r_norm_band[iBand])
-        plt.title("Figure 6: Normalised SPL over time at the receiver")
-        plt.xlabel("t [s]")
-        plt.ylabel("SPL [dB]")
-        plt.xlim()
-        plt.ylim()
-        plt.xticks(np.arange(0, recording_time +0.1, 0.1))
-        plt.yticks(np.arange(0, -60, -10))
-        
-        #Figure 7: Energy density at the receiver over time
-        plt.figure(7)
-        plt.plot(t,w_rec_band[iBand])
-        plt.title("Figure 7: Energy density over time at the receiver")
-        plt.xlabel("t [s]")
-        plt.ylabel("Energy density [kg m^-1 s^-2]")
-        plt.xlim()
-        plt.ylim()
-        plt.xticks(np.arange(0, recording_time +0.1, 0.1))
-        
-        #Figure 8: Schroeder decay
-        plt.figure(8)
-        plt.plot(t[idx_w_rec:],sch_db_band[iBand])
-        plt.title("Figure 8: Schroeder decay (Energy Decay Curve)")
-        plt.xlabel("t [s]")
-        plt.ylabel("Energy decay [dB]")
-        plt.xlim()
-        plt.ylim()
-        plt.xticks(np.arange(t[idx_w_rec], recording_time +0.1, 0.1))
-    
-if tcalc == "stationarysource":
-    for iBand in range(nBands):
-
-        #Figure 3: Decay of SPL in the recording_time at the receiver
-        plt.figure(3)
-        plt.plot(t,spl_r_band[iBand]) #plot sound pressure level with Pref = (2e-5)**5
-        plt.title("Figure 3: SPL over time at the receiver")
-        plt.xlabel("t [s]")
-        plt.ylabel("SPL [dB]")
-        plt.xlim()
-        plt.ylim()
-        plt.xticks(np.arange(0, recording_time +0.1, 0.5))
-        #plt.yticks(np.arange(0, 120, 20))
-    
-        #Figure 4: Decay of SPL in the recording_time normalised to maximum 0dB
-        plt.figure(4)
-        plt.title("Figure 4: Normalised SPL over time at the receiver")
-        plt.plot(t,spl_r_norm_band[iBand])
-        plt.xlabel("t [s]")
-        plt.ylabel("SPL [dB]")
-        plt.xlim()
-        plt.ylim()
-        plt.xticks(np.arange(0, recording_time +0.1, 0.1))
-        plt.yticks(np.arange(0, -60, -10))
-    
-        #Figure 5: Energy density over time at the receiver
-        plt.figure(5)
-        plt.title("Figure 5: Energy density over time at the receiver")
-        plt.plot(t,w_rec_band[iBand])
-        plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
-        plt.xlabel("t [s]")
-        
-        #Figure 6: Sound pressure level stationary over the space y.
-        plt.figure(6)
-        t_dim = len(t)
-        last_time_index = t_dim-1
-        #spl_y = spl_stat_y
-        #data_y = spl_y
-        plt.title("Figure 6: SPL over the y axis")
-        plt.plot(y_axis,spl_stat_y_band[iBand])
-        plt.xticks(np.arange(0, 20, 5))
-        plt.yticks(np.arange(75, 105, 5))
-        plt.ylabel('$\mathrm{Sound \ Pressure\ Level \ [dB]}$')
-        plt.xlabel('$\mathrm{Distance \ along \ y \ axis \ [m]}$')
-        
-        #Figure 7: Sound pressure level stationary over the space x.
-        plt.figure(7)
-        t_dim = len(t)
-        last_time_index = t_dim-1
-        #spl_x = spl_stat_x
-        #data_x = spl_x
-        plt.title("Figure 7: SPL over the x axis")
-        plt.plot(x_axis,spl_stat_x_band[iBand])
-        #plt.xticks(np.arange(0, 35, 5))
-        plt.yticks(np.arange(90, 97, 1))
-        plt.ylabel('$\mathrm{Sound \ Pressure \ Level \ [dB]}$')
-        plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')
-        
-        #Figure 8: Energy density at t=recording_time over the space x.
-        plt.figure(8)
-        plt.title("Figure 8: Energy density over the x axis at t=recording_time")
-        plt.plot(x_axis,w_rec_x_band[iBand])
-        plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
-        plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')
 
 #%%
 ###############################################################################

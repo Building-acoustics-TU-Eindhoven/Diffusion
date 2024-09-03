@@ -5,6 +5,10 @@ Created on Wed Aug  2 16:12:40 2023
 @author: 20225533
 """
 
+#%%
+###############################################################################
+#IMPORT LIBRARIES
+###############################################################################
 #Code developed by Ilaria Fichera for the analysis of the FVM method adapted solving the 3D diffusion equation with one intermittent omnidirectional sound source
 #Import modules
 import math
@@ -18,7 +22,6 @@ from math import ceil
 from math import log
 from math import sqrt
 from FunctionRT import *
-from FunctionEDT import *
 from FunctionClarity import *
 from FunctionDefinition import *
 from FunctionCentreTime import *
@@ -41,45 +44,22 @@ st = time.time() #start time of calculation
 #INPUT VARIABLES
 ###############################################################################
 
-#General settings
-c0= 343 #adiabatic speed of sound [m.s^-1]
-m_atm = 0 #air absorption coefficient [1/m] from Billon 2008 paper and Navarro paper 2012
-
-dt = 1/20000 #time discretizatione
-
 # Source position
-x_source = 12.0  #position of the source in the x direction [m]
-y_source = 0.7  #position of the source in the y direction [m]
-z_source = 1.5  #position of the source in the z direction [m]
+x_source = 0.5  #position of the source in the x direction [m]
+y_source = 0.5  #position of the source in the y direction [m]
+z_source = 1.0  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 0.7 #position of the receiver in the x direction [m]
-y_rec = 4.0 #position of the receiver in the y direction [m]
-z_rec = 1.5 #position of the receiver in the z direction [m]
+x_rec = 2.0 #position of the receiver in the x direction [m]
+y_rec = 0.5 #position of the receiver in the y direction [m]
+z_rec = 1.0 #position of the receiver in the z direction [m]
 
-#Absorption term and Absorption coefficients
-th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
-# options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
-
-#alpha_1 = [1/6,1/6,1/6,1/6,1/6] #Absorption coefficient for Surface1 - Floor
-#alpha_2 = [1/6,1/6,1/6,1/6,1/6] #Absorption coefficient for Surface2 - Ceiling
-#alpha_3 = [1/6,1/6,1/6,1/6,1/6] #Absorption coefficient for Surface3 - Wall Front
-#alpha_4 = [1/6,1/6,1/6,1/6,1/6] #Absorption coefficient for Surface4 - Wall Back
-#alpha_5 = [1/6,1/6,1/6,1/6,1/6] #Absorption coefficient for Surface5 - Wall Left
-#alpha_6 = [1/6,1/6,1/6,1/6,1/6] #Absorption coefficient for Surface6 - Wall Right
-
-#Type of Calculation
+# Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
 #Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
 tcalc = "decay"
 
-#Set initial condition - Source Info (interrupted method)
-Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
-
-sourceon_time =  1.5 #time that the source is ON before interrupting [s]
-recording_time = 6.1 #total time recorded for the calculation [s]
-
-# Frequency resolution
+# Frequency range
 fc_low = 125
 fc_high = 2000
 num_octave = 1
@@ -88,21 +68,106 @@ x_frequencies  = num_octave * log(fc_high/fc_low) / log(2)
 nBands = int(num_octave * log(fc_high/fc_low) / log(2) + 1)
 center_freq = fc_low * np.power(2,((np.arange(0,x_frequencies+1) / num_octave)))
 
+# Time discretization
+dt = 1/20000 #time discretization
+
+# Air absorption coefficient
+m_atm = 0 #air absorption coefficient [1/m]
+
+#%%
+###############################################################################
+#FIXED INPUTS
+###############################################################################
+#General settings
+c0= 343 #adiabatic speed of sound [m.s^-1]
+
+#Set initial condition - Source Info (interrupted method)
+Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
+
+# Absorption term and Absorption coefficients
+th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
+# options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
+
+# Reference pressure in Pa
+pRef = 2 * (10**-5) #Reference pressure in Pa
+
+# Air density
+rho = 1.21 #air density [kg.m^-3] at 20°C
+
 #%%
 ###############################################################################
 #INITIALISE GMSH
 ###############################################################################
-    
-
-file_name = "Corridor_vers3.msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "3x3x3.msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 
 #gmsh.fltk.run() #run the file to see it in gmsh
-
 dim = -1 #dimensions of the entities, 0 for points, 1 for curves/edge/lines, 2 for surfaces, 3 for volumes, -1 for all the entities 
 tag = -1 #all the nodes of the room
 
+#%%
+###############################################################################
+#SURFACE MATERIALS
+###############################################################################
+vGroups = gmsh.model.getPhysicalGroups(-1) #these are the entity tag and physical groups in the msh file. 
+vGroupsNames = [] #these are the entity tag and physical groups in the msh file + their names
+for iGroup in vGroups:
+    dimGroup = iGroup[0]  #entity tag: 1 lines, 2 surfaces, 3 volumes (1D, 2D or 3D)
+    tagGroup = iGroup[1]  #physical tag group (depending on material properties defined in SketchUp)
+    namGroup = gmsh.model.getPhysicalName(dimGroup, tagGroup) #names of the physical groups defined in SketchUp   
+    alist = [dimGroup,tagGroup,namGroup] #creates a list of the entity tag, physical tag group and name
+    #print(alist)
+    vGroupsNames.append(alist)
+    
+# Initialize a list to store surface tags and their absorption coefficients
+surface_absorption = [] #initialization absorption term (alpha*surfaceofwall) for each wall of the room
+triangle_face_absorption = [] #initialization absorption term for each triangle face at the boundary and per each wall
+absorption_coefficient = {}
+
+# Absorption term for boundary conditions 
+def abs_term(th,abscoeff_list):
+    Absx_array = np.array([])
+    for abs_coeff in abscoeff_list:
+        #print(abs_coeff)
+        if th == 1:
+            Absx = (c0*abs_coeff)/4 #Sabine
+        elif th == 2:
+            Absx = (c0*(-log(1-abs_coeff)))/4 #Eyring
+        elif th == 3:
+            Absx = (c0*abs_coeff)/(2*(2-abs_coeff)) #Modified by Xiang
+        Absx_array = np.append(Absx_array, Absx)
+    return Absx_array
+
+for group in vGroupsNames:
+    if group[0] != 2:
+        continue
+    name_group = group[2]
+    name_split = name_group.split("$")
+    name_abs_coeff = name_split[0]
+    abscoeff = input(f"Enter absorption coefficient for frequency {fc_low} to {fc_high} for {name_abs_coeff}:") 
+    abscoeff = abscoeff.split(",")
+    #abscoeff = [float(i) for i in abscoeff][-1] #for one frequency
+    abscoeff_list = [float(i) for i in abscoeff] #for multiple frequencies
+    
+    physical_tag = group[1] #Get the physical group tag
+    entities = gmsh.model.getEntitiesForPhysicalGroup(2, physical_tag) #Retrieve all the entities in this physical group (the entities are the number of walls in the physical group)
+
+    Abs_term = abs_term(th, abscoeff_list) #calculates the absorption term based on the type of boundary condition th
+    for entity in entities:
+        absorption_coefficient[entity] = abscoeff_list
+        surface_absorption.append((entity, Abs_term)) #absorption term (alpha*surfaceofwall) for each wall of the room
+        surface_absorption = sorted(surface_absorption, key=lambda x: x[0])
+
+for entity, Abs_term in surface_absorption:
+    triangle_faces, _ = gmsh.model.mesh.getElementsByType(2, entity) #Get all the triangle faces for the current surface
+    triangle_face_absorption.extend([Abs_term] * len(triangle_faces)) #Append the Abs_term value for each triangle face
+
+print("Correctly inputted surface materials. Starting initial geometry calculations...")
+#%%
+###############################################################################
+#GMSH GEOMETRY CALCULATION
+###############################################################################
 #Nodes
 nodeTags, coords, parametricCoord = gmsh.model.mesh.getNodes(dim,tag) #gets the tags for each node and the coordinates of each node
 nodecoords = coords.reshape((-1,3)) #coordinates reshaped in a matrix 3xnumber of nodes
@@ -196,7 +261,6 @@ cell_volume = np.array(()) #initialization of an array of cell volumes from the 
 for key in vcell_dict:
     cell_volume = np.append(cell_volume,vcell_dict[key])
 
-
 #Calculation of boundary elements area and centre   
 barea_dict = {} #surface of each element boundary initialization
 centre_area = {} #centre of the element tetrahedron initialization
@@ -263,45 +327,13 @@ for item in neighbourVolume:
     
 neighbourVolume = neighbourVolume.reshape((-1,4)) #reshape the array so that we have the 4 tetrahedrons neighbours of the tetrahedron in consideration
 
+print("Completed initial geometry calculation. Starting internal tetrahedrons calculations...")
 
-###############################################################################
-#Absorption term
-###############################################################################
-#Absorption term for boundary conditions 
-def abs_term(th,abscoeff_list):
-    Absx_array = np.array([])
-    for abs_coeff in abscoeff_list:
-        print(abs_coeff)
-        if th == 1:
-            Absx = (c0*abs_coeff)/4 #Sabine
-        elif th == 2:
-            Absx = (c0*(-log(1-abs_coeff)))/4 #Eyring
-        elif th == 3:
-            Absx = (c0*abs_coeff)/(2*(2-abs_coeff)) #Modified by Xiang
-        Absx_array = np.append(Absx_array, Absx)
-    return Absx_array
-
-vGroups = gmsh.model.getPhysicalGroups(-1) #these are the entity tag and physical groups in the msh file. 
-vGroupsNames = [] #these are the entity tag and physical groups in the msh file + their names
-for iGroup in vGroups:
-    dimGroup = iGroup[0]  #entity tag: 1 lines, 2 surfaces, 3 volumes (1D, 2D or 3D)
-    tagGroup = iGroup[1]  #physical tag group (depending on material properties defined in SketchUp)
-    namGroup = gmsh.model.getPhysicalName(dimGroup, tagGroup) #names of the physical groups defined in SketchUp   
-    alist = [dimGroup,tagGroup,namGroup] #creates a list of the entity tag, physical tag group and name
-    #print(alist)
-    vGroupsNames.append(alist)
-
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
-#######################################################################################################
-
-
+# Interior Tetrahedrons calculations
 interior_tet = np.zeros((velement, velement)) #initialization matrix of tetrahedron per tetrahedron
 
 for i in range(velement): #for each tetrahedron, take its centre
-    print(i)
+    #print(i)
     cell_center_i = cell_center[i]
     for j in range(velement): #for each tetrahedron, take its centre
         #cell_center_j = cell_center[j]
@@ -331,43 +363,9 @@ for i in range(velement): #for each tetrahedron, take its centre
                 interior_tet[i, j] = shared_area
 
 interior_tet_sum = np.sum(interior_tet, axis=1) #sum of interior_tet per columns (so per i element)
+print("Completed internal tetrahedrons calculation. Starting boundary tetrahedrons calculations...")
 
-##############################################################################
-##############################################################################
-##############################################################################
-##############################################################################
-
-# Initialize a list to store surface tags and their absorption coefficients
-surface_absorption = [] #initialization absorption term (alpha*surfaceofwall) for each wall of the room
-triangle_face_absorption = [] #initialization absorption term for each triangle face at the boundary and per each wall
-absorption_coefficient = {}
-
-for group in vGroupsNames:
-    if group[0] != 2:
-        continue
-    name_group = group[2]
-    name_split = name_group.split("$")
-    name_abs_coeff = name_split[0]
-    abscoeff = input(f"Enter absorption coefficient for frequency {fc_low} to {fc_high} for {name_abs_coeff}:") 
-    abscoeff = abscoeff.split(",")
-    #abscoeff = [float(i) for i in abscoeff][-1] #for one frequency
-    abscoeff_list = [float(i) for i in abscoeff] #for multiple frequencies
-    
-    physical_tag = group[1] #Get the physical group tag
-    entities = gmsh.model.getEntitiesForPhysicalGroup(2, physical_tag) #Retrieve all the entities in this physical group (the entities are the number of walls in the physical group)
-
-    Abs_term = abs_term(th, abscoeff_list) #calculates the absorption term based on the type of boundary condition th
-    for entity in entities:
-        absorption_coefficient[entity] = abscoeff_list
-        surface_absorption.append((entity, Abs_term)) #absorption term (alpha*surfaceofwall) for each wall of the room
-        surface_absorption = sorted(surface_absorption, key=lambda x: x[0])
-
-for entity, Abs_term in surface_absorption:
-    triangle_faces, _ = gmsh.model.mesh.getElementsByType(2, entity) #Get all the triangle faces for the current surface
-    triangle_face_absorption.extend([Abs_term] * len(triangle_faces)) #Append the Abs_term value for each triangle face
-
-
-#######################################################################################################
+# Calculation surface areas
 surface_areas = {}   
 for entity, Abs_term in surface_absorption:   
     face_nodes_per_entity= gmsh.model.mesh.getElementFaceNodes(2, 3, tag=entity)
@@ -384,13 +382,9 @@ for entity, Abs_term in surface_absorption:
         face_area = 0.5 * np.linalg.norm(np.cross(fc1 - fc0, fc2 - fc0)) #Compute the area using half of the cross product's magnitude
         surf_area_tot += face_area
         surface_areas[entity] = surf_area_tot
-#######################################################################################################
 
-#######################################################################################################
-#######################################################################################################
+
 #FACE AREA & boundary_areas
-#######################################################################################################
-#######################################################################################################
 total_boundArea = 0 #initialization of total surface area of the room
 boundary_areas = []  #Initialize a list to store boundary_areas values for each tetrahedron
 import itertools
@@ -398,7 +392,7 @@ face_areas = np.zeros(len(velemNodes)) #Per each tetrahedron, if there is a face
 for idx, element in enumerate(velemNodes): #for index and element in the number of tetrahedrons
     #if idx == 491:
         tetrahedron_boundary_areas = 0 #initialization tetrahedron face on boundary*its absorption term
-        total_tetrahedron_boundary_areas = np.zeros(5) #initialization total tetrahedron face on boundary*its absorption term if there are more than one face in the tetrahedron that is on the boundary
+        total_tetrahedron_boundary_areas = np.zeros(nBands) #initialization total tetrahedron face on boundary*its absorption term if there are more than one face in the tetrahedron that is on the boundary
         #print(idx)
         node_combinations = [list(nodes) for nodes in itertools.combinations(element, 3)] #all possible combinations of the nodes of the tetrahedrons (it checks also for the order of the nodes in the same combination)
         # Check if the nodes are in any order in bounNode
@@ -440,7 +434,9 @@ for idx, element in enumerate(velemNodes): #for index and element in the number 
                             total_tetrahedron_boundary_areas = tetrahedron_boundary_areas #if there are multiple surfaces on the boundary per each tetrahedron, then add also the second and the third one
                             
         boundary_areas.append(np.array(total_tetrahedron_boundary_areas)) #Append the total boundary_areas for the tetrahedron to the list
-        print(total_tetrahedron_boundary_areas)
+        #print(total_tetrahedron_boundary_areas)
+
+print("Completed boundary tetrahedrons calculation. Starting main diffusion equation calculations over time and frequency...")
 
 gmsh.finalize()
 
@@ -449,26 +445,44 @@ gmsh.finalize()
 #CALCULATION SECTION
 ###############################################################################
 
-#Fixed inputs
-pRef = 2 * (10**-5) #Reference pressure in Pa
-rho = 1.21 #air density [kg.m^-3] at 20°C
-
 V = sum(cell_volume)
 S = total_boundArea #surface area of the room
-
-#Time resolution
-t = np.arange(0, recording_time, dt) #mesh point in time
-recording_steps = ceil(recording_time/dt) #number of time steps to consider in the calculation
 
 sum_alpha_average = 0
 Eq_A = 0
 #Absorption parameters for room
 for entity in surface_areas:
-    print(entity)
+    #print(entity)
     sum_alpha_average += np.multiply(absorption_coefficient[entity],surface_areas[entity])
     Eq_A += np.multiply(absorption_coefficient[entity],surface_areas[entity])
 alpha_average = sum_alpha_average/S #average absorption
 
+#%%
+###############################################################################
+#TOTAL RECORDING TIME AND SOURCE ON TIME
+###############################################################################
+
+RT_Sabine_band = []
+for iBand in range(nBands):
+    freq = center_freq[iBand]
+    RT_Sabine = 0.16*V/Eq_A[iBand]
+    RT_Sabine_band.append(RT_Sabine)
+
+sourceon_time = round(max(RT_Sabine_band),1)#time that the source is ON before interrupting [s]
+recording_time = 2*sourceon_time #total time recorded for the calculation [s]
+
+#%%
+###############################################################################
+#TIME RESOLUTION
+###############################################################################
+#Time resolution
+t = np.arange(0, recording_time, dt) #mesh point in time
+recording_steps = ceil(recording_time/dt) #number of time steps to consider in the calculation
+
+#%%
+###############################################################################
+#DIFFUSION PARAMETERS
+###############################################################################
 #Diffusion parameters
 mean_free_path = (4*V)/S #mean free path for 3D
 mean_free_time= mean_free_path/c0 #mean free time for 3D
@@ -488,6 +502,7 @@ dist_sr = math.sqrt((abs(x_rec - x_source))**2 + (abs(y_rec - y_source))**2 + (a
 coord_source = [x_source,y_source,z_source] #coordinates of the receiver position in an list
 coord_rec = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
 
+#%%
 ###############################################################################
 #SOURCE INTERPOLATION
 ###############################################################################
@@ -566,8 +581,9 @@ for i,weight in total_weights_s.items():
 
 cl_tet_s_keys = cl_tet_s.keys() #take only the keys of the cl_tet_s dictionary (so basically the indexes of the tetrahedrons)
 
-
+#%%
 ###############################################################################
+#SOURCE VOLUME DEFINITION
 ###############################################################################
 #To make sure that the source is in the correct tetrahedron position
 node_ids = velemNodes.T
@@ -595,11 +611,6 @@ id_tet, id_p = np.nonzero(val)
 res = -np.ones(N_sou, dtype=id_tet.dtype) # Sentinel value
 res[id_p]=id_tet
 
-
-
-###############################################################################
-###############################################################################
-###############################################################################
 ###############################################################################
 
 # #VOLUME CALCULATED WITHIN 4 CENTRE CELL SELECTED (TETRAHEDRON)
@@ -696,6 +707,7 @@ for tet_s in cl_tet_s_keys:
 #for i in total_weights_s:
 #    s[source_idx] += source1[0] *total_weights_s[i]
 
+#%%
 ###############################################################################
 #RECEIVER INTERPOLATION
 ###############################################################################
@@ -774,8 +786,9 @@ for i,weight in total_weights_r.items():
 
 cl_tet_r_keys = cl_tet_r.keys() #take only the keys of the cl_tet_s dictionary (so basically the indexes of the tetrahedrons)
 
+#%%
 ###############################################################################
-#CALCULATION OF LENGHT OF ROOM
+#CALCULATION OF LENGTH OF ROOM
 ###############################################################################
 #Extract x-coordinates of all nodes
 x_coordinates = nodecoords[:, 0]
@@ -787,6 +800,7 @@ max_x = np.max(x_coordinates)
 #Calculate the length of the room
 room_length = max_x - min_x
 
+#%%
 ###############################################################################
 #CALCULATION OF WIDTH OF ROOM
 ###############################################################################
@@ -800,6 +814,7 @@ max_y = np.max(y_coordinates)
 #Calculate the length of the room
 room_width = max_y - min_y
 
+#%%
 ###############################################################################
 #LINESPACE LINES OVER THE X AND Y SPACE 
 ###############################################################################
@@ -808,6 +823,7 @@ dx = 0.5
 x_axis = np.arange(0,room_length+dx,dx) #lispace on x_axis with distance dx
 y_axis = np.arange(0,room_width+dx,dx)
 
+#%%
 ###############################################################################
 #CALCULATION OF RECEIVERS IN A X LINE
 ###############################################################################
@@ -825,6 +841,7 @@ for x_chang in x_axis:
     line_rec_x_idx = np.argmin(dist_line_rec_x_cc_list)
     line_rec_x_idx_list.append(line_rec_x_idx)   
 
+#%%
 ###############################################################################
 #CALCULATION OF RECEIVERS IN A Y LINE
 ###############################################################################
@@ -853,6 +870,7 @@ for y_chang in y_axis:
 
 #dist_sr_interpolated = np.linalg.norm(interpolated_receiver_position - coord_source)
 
+#%%
 ###############################################################################
 #CALCULATION OF BETA_ZERO
 ###############################################################################
@@ -861,9 +879,9 @@ boundary_areas = np.array(boundary_areas)
 boundary_areas = boundary_areas.T
 beta_zero_freq = []
 for iBand in range(len(boundary_areas)):
-    print(iBand)
+    #print(iBand)
     #freq = center_freq[iBand]
-    print(boundary_areas[iBand])
+    #print(boundary_areas[iBand])
     beta_zero_element = np.divide(dt*((Dx *interior_tet_sum) + boundary_areas[iBand]),cell_volume) #my interpretation of the beta_zero
     beta_zero_freq.append(beta_zero_element)
 
@@ -878,6 +896,8 @@ w_rec_off_band = []
 w_rec_off_deriv_band = []
 p_rec_off_deriv_band = []
     
+curPercent = 0
+
 for iBand in range(nBands):
     freq = center_freq[iBand]    
     
@@ -965,7 +985,12 @@ for iBand in range(nBands):
         p_rec_off_deriv = np.delete(p_rec_off_deriv, 0) #delete the first element of the array -> this means shifting the array one step before and therefore do a derivation
         p_rec_off_deriv = np.append(p_rec_off_deriv,0) #add a zero in the last element of the array -> for derivation and to have the same length as previously
         
-        print(time_steps)
+        #print(time_steps)
+        
+    percentDone = round(100*iBand/nBands);
+    #if (percentDone > curPercent):
+    print(str(percentDone) + "% of main calculation completed")
+        #curPercent += 1;
 
     w_new_band.append(w_new)
     w_rec_band.append(w_rec)
@@ -975,8 +1000,9 @@ for iBand in range(nBands):
 
 plt.show()
 
-#%%
+print("100% of main calculation completed")
 
+#%%
 ###############################################################################
 #RESULTS
 ###############################################################################
@@ -989,6 +1015,7 @@ spl_r_band = []
 spl_r_off_band = []
 spl_r_norm_band = []
 t30_band = []
+edt_band = []
 sch_db_band = []
 
 for iBand in range(nBands):
@@ -1027,13 +1054,14 @@ for iBand in range(nBands):
     
     if tcalc == "decay":
         t30 = t60_decay(t, sch_db, idx_w_rec, rt='t30') #called function for calculation of t60 [s]
-        edt = edt_decay(t, sch_db, idx_w_rec) #called function for calculation of edt [s]
+        edt = t60_decay(t, sch_db, idx_w_rec, rt='edt') #called function for calculation of edt [s]
         #Eq_A = 0.16*V/t60 #equivalent absorption area defined from the RT 
         c80 = clarity(t30, V, Eq_A[iBand], S, c0, dist_sr) #called function for calculation of c80 [dB]
         d50 = definition(t30, V, Eq_A[iBand], S, c0, dist_sr) #called function for calculation of d50 [%]
         ts = centretime(t30, Eq_A[iBand], S) #called function for calculation of ts [ms]
         
         t30_band.append(t30)
+        edt_band.append(edt)
         
     w_rec_x_band.append(w_rec_x_end)
     w_rec_y_band.append(w_rec_y_end)
@@ -1099,7 +1127,6 @@ if tcalc == "decay":
         plt.ylim()
         plt.xticks(np.arange(t[idx_w_rec], recording_time +0.1, 0.1))
     
-#???????
 if tcalc == "stationarysource":
     for iBand in range(nBands):
 
@@ -1169,8 +1196,32 @@ if tcalc == "stationarysource":
 ###############################################################################
 #SAVING
 ###############################################################################
-np.save(os.path.join('C:/Users/20225533/Diffusion/FiniteVolumeMethod','dt'),dt)
-np.save(os.path.join('C:/Users/20225533/Diffusion/FiniteVolumeMethod','w_rec_off_band'),w_rec_off_band)
-np.save(os.path.join('C:/Users/20225533/Diffusion/FiniteVolumeMethod','w_rec_off_deriv_band'),w_rec_off_deriv_band)
-np.save(os.path.join('C:/Users/20225533/Diffusion/FiniteVolumeMethod','p_rec_off_deriv_band'),p_rec_off_deriv_band)
-np.save(os.path.join('C:/Users/20225533/Diffusion/FiniteVolumeMethod','t_off'),t_off)
+np.save(os.path.join('dt'),dt)
+np.save(os.path.join('w_rec_off_band'),w_rec_off_band)
+np.save(os.path.join('w_rec_off_deriv_band'),w_rec_off_deriv_band)
+np.save(os.path.join('p_rec_off_deriv_band'),p_rec_off_deriv_band)
+np.save(os.path.join('t_off'),t_off)
+
+
+import pickle
+import types
+
+# Save all variables to a file
+def save(filename):
+    with open(filename, 'wb') as f:
+        # Filter out modules, functions, and other unsupported types
+        filtered_variables = {}
+        for k, v in globals().items():
+            try:
+                # Check if the object can be pickled
+                pickle.dumps(v)
+                # Exclude some types explicitly known to cause issues
+                if not k.startswith('__') and not isinstance(v, (types.ModuleType, types.FunctionType, types.BuiltinFunctionType, types.LambdaType, types.MethodType, types.MappingProxyType)):
+                    filtered_variables[k] = v
+            except Exception as e:
+                print(f"Could not pickle {k}: {str(e)}")
+
+        pickle.dump(filtered_variables, f)
+
+# To save all current variables
+save('results.pkl')

@@ -122,7 +122,6 @@ def generate_mesh(geo_file_path, name_gmsh_file, length_of_mesh):
     mesh = gmsh.open(name_gmsh_file)  # open the file
 
     gmsh.fltk.run()  # run the file to see it in gmsh
-    gmsh.finalize()
 
 
 # The variables to be assigned by the user directly
@@ -167,7 +166,7 @@ def main():
 
     args = parser.parse_args()
     generate_mesh(args.geo_file_path, args.name_gmsh_file, args.length_of_mesh)
-
+    gmsh.finalize()
 
 if __name__ == '__main__':
     main()

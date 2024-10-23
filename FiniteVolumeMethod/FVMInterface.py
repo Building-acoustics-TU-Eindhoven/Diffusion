@@ -1069,6 +1069,8 @@ def de_method(json_file_path=None):
         w_rec_off_deriv_band = []
         p_rec_off_deriv_band = []
 
+        prevPercentDone = 0;
+
         for iBand in range(nBands):
 
             w_new = np.zeros(len(voluEl))  # unknown w at new time level (n+1)
@@ -1162,17 +1164,17 @@ def de_method(json_file_path=None):
 
                 # print(time_steps)
 
-            percentDone = round(100 * iBand / nBands);
-            # if (percentDone > curPercent):
-            print(str(percentDone) + "% of main calculation completed")
-            if result_container:
-                result_container['results'][0]['percentage'] = percentDone
-                with open(json_file_path, 'w') as percentage_update:
-                    percentage_update.write(
-                        json.dumps(result_container, indent=4)
-                    )
-            # curPercent += 1;
-
+                percentDone = round(100 * (iBand / nBands + steps / recording_steps * 1 / nBands));
+                if (percentDone > prevPercentDone):
+                    print(str(percentDone) + "% of main calculation completed")
+                    if result_container:
+                        result_container['results'][0]['percentage'] = percentDone
+                        with open(json_file_path, 'w') as percentage_update:
+                            percentage_update.write(
+                                json.dumps(result_container, indent=4)
+                            )
+                prevPercentDone = percentDone;
+            
             w_new_band.append(w_new)
             w_rec_band.append(w_rec)
             w_rec_off_band.append(w_rec_off)

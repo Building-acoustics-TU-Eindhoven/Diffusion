@@ -26,8 +26,8 @@ import types
 
 # Silvin: debugging
 import logging
-logger = logging.getLogger(__name__)
 import traceback
+logger = logging.getLogger(__name__)
 
 # %%
 ###############################################################################
@@ -278,8 +278,6 @@ def de_method(json_file_path=None):
         return nodecoords, node_indices, bounEl, bounNode, voluEl, voluNode, belemNodes, velemNodes, boundaryEl_dict, volumeEl_dict
 
     # FUNCTION CALLED HERE
-    if check_should_cancel(json_file_path):
-        return
     nodecoords, node_indices, bounEl, bounNode, voluEl, voluNode, belemNodes, velemNodes, boundaryEl_dict, volumeEl_dict = get_nodes_elem()
 
     # %%
@@ -327,8 +325,6 @@ def de_method(json_file_path=None):
         return cell_center, cell_volume
 
     # FUNCTION CALLED HERE
-    if check_should_cancel(json_file_path):
-        return
     cell_center, cell_volume = velem_volume_centre()
 
     # %%
@@ -501,8 +497,6 @@ def de_method(json_file_path=None):
         return surface_areas
 
     # FUNCTION CALLED HERE
-    if check_should_cancel(json_file_path):
-        return
     surface_areas = surface_area()
 
     # %%
@@ -1205,6 +1199,11 @@ def de_method(json_file_path=None):
 
                 percentDone = round(100 * (iBand / nBands + steps / recording_steps * 1 / nBands));
                 if (percentDone > prevPercentDone):
+                    # Checking whether the user has cancelled the simulation (only one time per percentage increase)
+                    if check_should_cancel(json_file_path):
+                        print("breaking out of inner loop")
+                        break
+
                     print(str(percentDone) + "% of main calculation completed")
                     if result_container:
                         result_container['results'][0]['percentage'] = percentDone
@@ -1212,10 +1211,6 @@ def de_method(json_file_path=None):
                             percentage_update.write(
                                 json.dumps(result_container, indent=4)
                             )
-                    # Checking whether the user has cancelled the simulation (only one time per percentage increase)
-                    if check_should_cancel(json_file_path):
-                        print("breaking out of inner loop")
-                        break
 
                 prevPercentDone = percentDone;
             

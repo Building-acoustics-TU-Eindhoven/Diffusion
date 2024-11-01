@@ -24,6 +24,10 @@ import json
 import pickle
 import types
 
+# Silvin: debugging
+import logging
+logger = logging.getLogger(__name__)
+import traceback
 
 # %%
 ###############################################################################
@@ -37,6 +41,26 @@ def de_method(json_file_path=None):
         with open(json_file_path, 'r') as json_file:
             result_container = json.load(json_file)
 
+    # Checking whether the 'should_cancel' flag has been set to True by the user
+    # Do not call this function all the time, as it is quite heavy
+    # This function should be called in the main calculation loop
+    def check_should_cancel(json_file_path_in):
+        try:
+            if json_file_path_in is not None:
+                with open(json_file_path_in, 'r') as json_file_to_check:
+                    data = json.load(json_file_to_check)
+
+            # Update the specified field value
+            if 'should_cancel' in data:
+                return data['should_cancel']
+
+        except Exception as e:
+            print("check_should_cancel returned: " + str(e))
+            print(traceback.format_exc())
+
+    if check_should_cancel(json_file_path):
+        return
+
     # %%
     ###############################################################################
     # INPUT VARIABLES
@@ -44,7 +68,7 @@ def de_method(json_file_path=None):
 
     # Source position
     coord_source = [0.5, 0.5,
-                    1.0]  # coordinates of the receiver position in an list: x , y and z direction in meters [m]
+                    1.0]  # coordinates of the source position in an list: x , y and z direction in meters [m]
 
     # Receiver position
     coord_rec = [2.0, 0.5, 1.0]  # coordinates of the receiver position in an list: x , y and z direction in meters [m]
@@ -254,6 +278,8 @@ def de_method(json_file_path=None):
         return nodecoords, node_indices, bounEl, bounNode, voluEl, voluNode, belemNodes, velemNodes, boundaryEl_dict, volumeEl_dict
 
     # FUNCTION CALLED HERE
+    if check_should_cancel(json_file_path):
+        return
     nodecoords, node_indices, bounEl, bounNode, voluEl, voluNode, belemNodes, velemNodes, boundaryEl_dict, volumeEl_dict = get_nodes_elem()
 
     # %%
@@ -301,6 +327,8 @@ def de_method(json_file_path=None):
         return cell_center, cell_volume
 
     # FUNCTION CALLED HERE
+    if check_should_cancel(json_file_path):
+        return
     cell_center, cell_volume = velem_volume_centre()
 
     # %%
@@ -391,6 +419,8 @@ def de_method(json_file_path=None):
         return fxt, txt, neighbourVolume
 
     # FUNCTION CALLED HERE
+    if check_should_cancel(json_file_path):
+        return
     fxt, txt, neighbourVolume = get_neighbour_faces()
     print("Completed initial geometry calculation. Starting internal tetrahedrons calculations...")
 
@@ -439,6 +469,8 @@ def de_method(json_file_path=None):
         return interior_tet, interior_tet_sum
 
     # FUNCTION CALLED HERE
+    if check_should_cancel(json_file_path):
+        return
     interior_tet, interior_tet_sum = interior_tetra()
     print("Completed internal tetrahedrons calculation. Starting boundary tetrahedrons calculations...")
 
@@ -469,6 +501,8 @@ def de_method(json_file_path=None):
         return surface_areas
 
     # FUNCTION CALLED HERE
+    if check_should_cancel(json_file_path):
+        return
     surface_areas = surface_area()
 
     # %%
@@ -538,6 +572,8 @@ def de_method(json_file_path=None):
         return boundary_areas, total_boundArea
 
     # FUNCTION CALLED HERE
+    if check_should_cancel(json_file_path):
+        return
     boundary_areas, total_boundArea = boundary_triang()
     print(
         "Completed boundary tetrahedrons calculation. Starting main diffusion equation calculations over time and frequency...")
@@ -1073,6 +1109,9 @@ def de_method(json_file_path=None):
 
         for iBand in range(nBands):
 
+            if check_should_cancel(json_file_path):
+                break
+
             w_new = np.zeros(len(voluEl))  # unknown w at new time level (n+1)
             # w_old = np.zeros(len(voluEl))
             w = w_new  # w at n level
@@ -1173,6 +1212,11 @@ def de_method(json_file_path=None):
                             percentage_update.write(
                                 json.dumps(result_container, indent=4)
                             )
+                    # Checking whether the user has cancelled the simulation (only one time per percentage increase)
+                    if check_should_cancel(json_file_path):
+                        print("breaking out of inner loop")
+                        break
+
                 prevPercentDone = percentDone;
             
             w_new_band.append(w_new)
@@ -1181,10 +1225,23 @@ def de_method(json_file_path=None):
             w_rec_off_deriv_band.append(w_rec_off_deriv)
             p_rec_off_deriv_band.append(p_rec_off_deriv)
 
+            if check_should_cancel(json_file_path):
+                print("breaking out of outer loop")
+                break
+
+        if check_should_cancel(json_file_path):
+            print("returning empty data")
+            return [], [], [], [], [], 0, []
+
         return w_new_band, w_rec_band, w_rec_off_band, w_rec_off_deriv_band, p_rec_off_deriv_band, idx_w_rec, t_off
 
     # FUNCTION CALLED HERE
     w_new_band, w_rec_band, w_rec_off_band, w_rec_off_deriv_band, p_rec_off_deriv_band, idx_w_rec, t_off = computing_energy_density()
+
+    if check_should_cancel(json_file_path):
+        print("returning to simulation_service")
+        return
+
     print("100% of main calculation completed")
     if result_container:
         result_container['results'][0]['percentage'] = 100
@@ -1294,28 +1351,40 @@ def de_method(json_file_path=None):
 
         return w_rec_x_band, w_rec_y_band, spl_stat_x_band, spl_stat_y_band, spl_r_band, spl_r_off_band, spl_r_norm_band, sch_db_band, t20_band, t30_band, edt_band, c80_band, d50_band, ts_band, spl_r_t0_band
 
-    w_rec_x_band, w_rec_y_band, spl_stat_x_band, spl_stat_y_band, spl_r_band, spl_r_off_band, spl_r_norm_band, sch_db_band, t20_band, t30_band, edt_band, c80_band, d50_band, ts_band, spl_r_t0_band = freq_parameters()
+    if not check_should_cancel(json_file_path):
+        w_rec_x_band, w_rec_y_band, spl_stat_x_band, spl_stat_y_band, spl_r_band, spl_r_off_band, spl_r_norm_band, sch_db_band, t20_band, t30_band, edt_band, c80_band, d50_band, ts_band, spl_r_t0_band = freq_parameters()
 
     # added by @hassan
     if result_container:
+        if check_should_cancel(json_file_path):
+            result_container['results'][0]['responses'][0]['parameters']['edt'] = []
+            result_container['results'][0]['responses'][0]['parameters']['t20'] = []
+            result_container['results'][0]['responses'][0]['parameters']['t30'] = []
+            result_container['results'][0]['responses'][0]['parameters']['c80'] = []
+            result_container['results'][0]['responses'][0]['parameters']['d50'] = []
+            result_container['results'][0]['responses'][0]['parameters']['ts'] = []
+            result_container['results'][0]['responses'][0]['parameters']['spl_t0_freq'] = []
 
-        result_container['results'][0]['responses'][0]['parameters']['edt'] = edt_band.tolist()
-        result_container['results'][0]['responses'][0]['parameters']['t20'] = t20_band.tolist()
-        result_container['results'][0]['responses'][0]['parameters']['t30'] = t30_band.tolist()
-        result_container['results'][0]['responses'][0]['parameters']['c80'] = c80_band.tolist()
-        result_container['results'][0]['responses'][0]['parameters']['d50'] = d50_band.tolist()
-        result_container['results'][0]['responses'][0]['parameters']['ts'] = ts_band.tolist()
-        result_container['results'][0]['responses'][0]['parameters']['spl_t0_freq'] = spl_r_t0_band.tolist()
+            result_container['results'][0]['responses'][0]['receiverResults'] = []
 
-        # result_container['frequenci[0]es'] = center_freq
+        else:
+            result_container['results'][0]['responses'][0]['parameters']['edt'] = edt_band.tolist()
+            result_container['results'][0]['responses'][0]['parameters']['t20'] = t20_band.tolist()
+            result_container['results'][0]['responses'][0]['parameters']['t30'] = t30_band.tolist()
+            result_container['results'][0]['responses'][0]['parameters']['c80'] = c80_band.tolist()
+            result_container['results'][0]['responses'][0]['parameters']['d50'] = d50_band.tolist()
+            result_container['results'][0]['responses'][0]['parameters']['ts'] = ts_band.tolist()
+            result_container['results'][0]['responses'][0]['parameters']['spl_t0_freq'] = spl_r_t0_band.tolist()
 
-        for (index, edc_detail) in enumerate(spl_r_off_band):
-            result_container['results'][0]['responses'][0]['receiverResults'].append({
-                "data": edc_detail.tolist(),
-                "t": (t_off - t_off[0]).tolist(),
-                "frequency": result_container['results'][0]['frequencies'][index],
-                "type": "edc"
-            })
+            # result_container['frequenci[0]es'] = center_freq
+
+            for (index, edc_detail) in enumerate(spl_r_off_band):
+                result_container['results'][0]['responses'][0]['receiverResults'].append({
+                    "data": edc_detail.tolist(),
+                    "t": (t_off - t_off[0]).tolist(),
+                    "frequency": result_container['results'][0]['frequencies'][index],
+                    "type": "edc"
+                })
 
         with open(json_file_path, 'w') as new_result_json:
             new_result_json.write(

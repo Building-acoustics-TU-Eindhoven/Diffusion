@@ -36,6 +36,7 @@ import time as time
 #from scipy.sparse import lil_matrix
 import gmsh
 import os
+from scipy.spatial import cKDTree
  
 st = time.time() #start time of calculation
 
@@ -811,17 +812,32 @@ y_coordinates = nodecoords[:, 1]
 min_y = np.min(y_coordinates)
 max_y = np.max(y_coordinates)
 
-#Calculate the length of the room
+#Calculate the width of the room
 room_width = max_y - min_y
 
 #%%
 ###############################################################################
-#LINESPACE LINES OVER THE X AND Y SPACE 
+#CALCULATION OF HEIGHT OF ROOM
+###############################################################################
+#Extract y-coordinates of all nodes
+z_coordinates = nodecoords[:, 2]
+
+#Find the minimum and maximum x-coordinates to determine the width of the room
+min_z = np.min(z_coordinates)
+max_z = np.max(z_coordinates)
+
+#Calculate the height of the room
+room_height = max_z - min_z
+
+#%%
+###############################################################################
+#LINESPACE LINES OVER THE X AND Y SPACE AND Z AXIS
 ###############################################################################
 #Arange linespace lines
 dx = 0.5
 x_axis = np.arange(0,room_length+dx,dx) #lispace on x_axis with distance dx
 y_axis = np.arange(0,room_width+dx,dx)
+z_axis = np.arange(0,room_height+dx,dx)
 
 #%%
 ###############################################################################
@@ -872,6 +888,19 @@ for y_chang in y_axis:
 
 #%%
 ###############################################################################
+#CALCULATION OF RECEIVERS IN A GRID LINE (HEATMAP)
+###############################################################################
+target_height = 1.5  # height in meters where the heatmap is desired
+grid_x, grid_y = np.meshgrid(x_axis,y_axis) #Definition of the grid at the target height
+
+#Find the closest tetrahedron center point for each grid point
+tetra_points_2d = cell_center[:, :2]  # Only x, y coordinates
+tree = cKDTree(tetra_points_2d)
+grid_points_2d = np.c_[grid_x.ravel(), grid_y.ravel()]
+distances, indices = tree.query(grid_points_2d)
+
+#%%
+###############################################################################
 #CALCULATION OF BETA_ZERO
 ###############################################################################
 
@@ -895,6 +924,7 @@ w_rec_band = []
 w_rec_off_band = []
 w_rec_off_deriv_band = []
 p_rec_off_deriv_band = []
+w_t0_band = []
     
 curPercent = 0
 
@@ -992,6 +1022,7 @@ for iBand in range(nBands):
     print(str(percentDone) + "% of main calculation completed")
         #curPercent += 1;
 
+    w_t0_band.append(w_t0)
     w_new_band.append(w_new)
     w_rec_band.append(w_rec)
     w_rec_off_band.append(w_rec_off)
@@ -1017,18 +1048,34 @@ spl_r_norm_band = []
 t30_band = []
 edt_band = []
 sch_db_band = []
+spl_new_band = []
+spl_t0_band = []
+w_rec_x_t0_band = []
+w_rec_y_t0_band = []
+spl_rec_x_t0_band = []
+spl_rec_y_t0_band = []
 
 for iBand in range(nBands):
     
     w_rec_x_end = np.array([])
+    w_rec_x_t0 = np.array([])
     for xr in line_rec_x_idx_list:
-        w_rec_x = w_new_band[iBand][xr]
-        w_rec_x_end = np.append(w_rec_x_end, w_rec_x)
+        w_rec_x_new = w_new_band[iBand][xr]
+        w_rec_x_end = np.append(w_rec_x_end, w_rec_x_new)
+        w_rec_x0 = w_t0_band[iBand][xr]
+        w_rec_x_t0 = np.append(w_rec_x_t0, w_rec_x0)
         
     w_rec_y_end = np.array([])
+    w_rec_y_t0 = np.array([])
     for yr in line_rec_y_idx_list:
         w_rec_y = w_new_band[iBand][yr]
         w_rec_y_end = np.append(w_rec_y_end, w_rec_y)
+        w_rec_y0 = w_t0_band[iBand][yr]
+        w_rec_y_t0 = np.append(w_rec_y_t0, w_rec_y0)
+        
+    spl_t0 = 10*np.log10(((abs(w_t0_band[iBand]))*rho*(c0**2))/(pRef**2))
+
+    spl_new = 10*np.log10(((abs(w_new_band[iBand]))*rho*(c0**2))/(pRef**2))
 
     spl_stat_x = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_x**2))) + ((abs(w_rec_x_end)*c0)))/(pRef**2))
     spl_stat_y = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_y**2))) + ((abs(w_rec_y_end)*c0)))/(pRef**2)) #It should be the spl stationary 
@@ -1040,6 +1087,8 @@ for iBand in range(nBands):
     spl_r_norm = 10*np.log10((((abs(w_rec_band[iBand]))*rho*(c0**2))/(pRef**2)) / np.max(((abs(w_rec_band[iBand]))*rho*(c0**2))/(pRef**2))) #normalised to maximum to 0dB
     spl_r_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_sr) + ((abs(w_rec_band[iBand]))*c0))/(pRef**2)) #spl total (including direct field) at the receiver position????? but it will need to be calculated for a stationary source 100dB
     
+    spl_rec_x_t0 = 10*np.log10(((abs(w_rec_x_t0))*rho*(c0**2))/(pRef**2))
+    spl_rec_y_t0 = 10*np.log10(((abs(w_rec_y_t0))*rho*(c0**2))/(pRef**2))
     #Find the energy decay part of the overal calculation
     #idx_w_rec = np.argmin(np.abs(t - sourceon_time)) #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
     #idx_w_rec = np.where(t == sourceon_time)[0][0] #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
@@ -1071,7 +1120,14 @@ for iBand in range(nBands):
     spl_r_off_band.append(spl_r_off)
     spl_r_norm_band.append(spl_r_norm)
     sch_db_band.append(sch_db)
-
+    spl_t0_band.append(spl_t0)
+    spl_new_band.append(spl_new)
+    w_rec_x_t0_band.append(w_rec_x_t0)
+    w_rec_y_t0_band.append(w_rec_y_t0)
+    spl_rec_x_t0_band.append(spl_rec_x_t0)
+    spl_rec_y_t0_band.append(spl_rec_y_t0)
+    
+    
 spl_r_off_band = np.array(spl_r_off_band)
 t30_band = np.array(t30_band)
 
@@ -1126,6 +1182,30 @@ if tcalc == "decay":
         plt.xlim()
         plt.ylim()
         plt.xticks(np.arange(t[idx_w_rec], recording_time +0.1, 0.1))
+        
+        #Figure 9: SPL at t=sourceoff_step over the space x. reverb sound only
+        plt.figure(9)
+        plt.title("Figure 9: SPL REVERB over the x axis at t=0")
+        plt.plot(x_axis,spl_rec_x_t0_band[iBand])
+        plt.ylabel('$\mathrm{SPL \ [dB]}$')
+        plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
+        
+        #Figure 10: SPL at t=sourceoff_step over the space y. reverb sound only
+        plt.figure(10)
+        plt.title("Figure 10: SPL REVERB over the y axis at t=0")
+        plt.plot(y_axis,spl_rec_y_t0_band[iBand])
+        plt.ylabel('$\mathrm{SPL \ [dB]}$')
+        plt.xlabel('$\mathrm{Distance \ along \ y \ axis \ [m]}$')
+        
+        #Plot the heatmap
+        grid_values = spl_t0_band[iBand][indices].reshape(grid_x.shape) #map the spl to the grid
+        plt.figure()
+        plt.contourf(grid_x, grid_y, grid_values, levels=50, cmap='viridis')
+        plt.colorbar(label="Sound Pressure Level (SPL)")
+        plt.title(f"Sound Pressure Level Heatmap at {target_height} m")
+        plt.xlabel("X (m)")
+        plt.ylabel("Y (m)")
+        #plt.show()
     
 if tcalc == "stationarysource":
     for iBand in range(nBands):

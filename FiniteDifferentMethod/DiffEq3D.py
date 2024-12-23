@@ -46,14 +46,14 @@ width = 8.0 #point y finish at the length of the room in the y direction [m] %Wi
 height = 8.0 #point z finish at the length of the room in the x direction [m] %Height
 
 # Source position
-x_source = 4  #position of the source in the x direction [m]
-y_source = 4  #position of the source in the y direction [m]
-z_source = 4  #position of the source in the z direction [m]
+x_source = 6  #position of the source in the x direction [m]
+y_source = 6  #position of the source in the y direction [m]
+z_source = 7  #position of the source in the z direction [m]
 
 # Receiver position
 x_rec = 2 #position of the receiver in the x direction [m]
 y_rec = 2 #position of the receiver in the y direction [m]
-z_rec = 2 #position of the receiver in the z direction [m]
+z_rec = 5 #position of the receiver in the z direction [m]
 
 #Spatial discretization
 dx = 0.5 #distance between grid points x direction [m] #See Documentation for more insight about dt and dx
@@ -68,10 +68,10 @@ th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):"))
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
 
 alpha_1 = 1/6 #Absorption coefficient for Surface1 - Floor
-alpha_2 = 1/6 #Absorption coefficient for Surface2 - Ceiling
+alpha_2 = 0.05 #Absorption coefficient for Surface2 - Ceiling
 alpha_3 = 1/6 #Absorption coefficient for Surface3 - Wall Front
-alpha_4 = 1/6 #Absorption coefficient for Surface4 - Wall Back
-alpha_5 = 1/6 #Absorption coefficient for Surface5 - Wall Left
+alpha_4 = 0.05 #Absorption coefficient for Surface4 - Wall Back
+alpha_5 = 0.05 #Absorption coefficient for Surface5 - Wall Left
 alpha_6 = 1/6 #Absorption coefficient for Surface6 - Wall Right
 
 #Type of Calculation
@@ -628,7 +628,7 @@ sch_db = 10.0 * np.log10(schroeder / max(schroeder)) #level of the array: schroe
 
 if tcalc == "decay":
     t30 = t60_decay(t, sch_db, idx_w_rec, rt='t30') #called function for calculation of t60 [s]
-    edt = edt_decay(t, sch_db, idx_w_rec) #called function for calculation of edt [s]
+    edt = t60_decay(t, sch_db, idx_w_rec, rt='edt') #called function for calculation of edt [s]
     c80 = clarity(t30, V, Eq_A, S, c0, dist_sr) #called function for calculation of c80 [dB]
     d50 = definition(t30, V, Eq_A, S, c0, dist_sr) #called function for calculation of d50 [%]
     ts = centretime(t30, Eq_A, S) #called function for calculation of ts [ms]

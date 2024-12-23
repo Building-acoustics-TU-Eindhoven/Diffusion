@@ -137,15 +137,15 @@ The diffusion equation method predicts the time-dependent and spatial-dependent 
 #### Sound Density Level
 The sound density level can be expressed as function of sound energy density w(r, t) as:
 ```{math}
-SDL = 10 log_10⁡(w(r,t))
+SDL = 10 log_{10}⁡(w(r,t))
 ```
 
 #### Sound Pressure Level
 After predicting the time-dependent sound energy density in the room, the sound pressure level decay curve can be expressed as function of sound energy density w(r, t) as:
 ```{math}
-SPL = 20 log_10⁡((w(r,t)*ρ*c^2)/p_{ref}^2) 
+SPL = 20 log_{10}⁡((w(r,t)ρc^2)/p_{ref}^2) 
 ```
-where p_{ref} is 2 × 10−5 Pa and ρ is the air density.
+where *p_{ref}* is $'2*10^{-5}'$ Pa and ρ is the air density.
 
 #### Reverberation time and Early Decay Time (EDT)
 From the sound pressure level decay curve, the Reverberation time can be estimated. The RT is defined by the time that it takes for the sound pressure level to decay of 60 dB. Depending on the room geometry, occasionally it is difficult to evaluate 60 dB of decay and therefore, the T30 is evaluated. This is obtained from the slope between -5 and -35 dB of the maximum starting level.  
@@ -154,15 +154,21 @@ The Early Decay time is defined by the time that it takes for the sound pressure
 
 #### Clarity, Definition and Centre Time
 The Clarity (C80) parameter is the early to late arriving sound energy ratio. Clarity refers to how clear the sound quality is and it is calculated from the impulse response with the following relation:
-C_80=10 log⁡〖(∫_0^80ms〖p^2 (t)〗 dt)/(∫_80ms^∞〖p^2 (t)〗 dt)〗    [dB]
+```{math}
+C_{80}=10 log⁡(\int_0^{80ms} p^2(t) \, dt/\int_{80ms}^\infty p^2 (t) \, dt)   \,  [dB]
+```
 
 The Definition (D50) parameter is the ratio of the early received sound energy (0-50ms after direct sound arrival) to the total received energy. It referres only to the speech and it is defined as: 
 
-D_50=10 log⁡〖(∫_0^50ms〖p^2 (t)  dt〗)/(∫_50ms^∞〖p^2 (t) 〗 dt)〗    [%]
+```{math}
+D_{50}=10 log⁡(\int_0^{50ms} p^2(t) \, dt/\int_0^\infty p^2(t) \, dt)  \,  [%]
+```
 
-The Center Time (Ts) parameter is the center of gravity of the squared impulse response. Center Time avoids the discrete division of the impulse response into early and late periods. 
+The Centr Time (Ts) parameter is the center of gravity of the squared impulse response. Centre Time avoids the discrete division of the impulse response into early and late periods. 
 
-T_s=10 log⁡〖(∫_0^∞〖τ∙p^2 (t)  dt〗)/(∫_0^∞〖p^2 (t) 〗  dt)〗    [s]
+```{math}
+T_{s}=10 log⁡(\int_0^\infty tp^2(t) \, dt/\int_0^\infty p^2(t) \, dt)   \,  [s]
+```
 A low value indicate that most of the energy arrives early, a high value reveals that there is much reverberance.
 
 The values for all these parameters are calculated from the Barron’s revisited theory formulas (Vorlander, 2008) with the influence of the direct field neglected.

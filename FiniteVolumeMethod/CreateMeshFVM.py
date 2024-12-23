@@ -127,9 +127,9 @@ def generate_mesh(geo_file_path, name_gmsh_file, length_of_mesh):
 
 # The variables to be assigned by the user directly
 # Only name of the file
-name_of_geo_file = 'FirstFloorShortCorridor.geo'
-name_of_gmsh_file = "FirstFloorShortCorridor.msh"
-length_of_mesh = 0.8
+name_of_geo_file = '3x3x3.geo'
+name_of_gmsh_file = "3x3x3.msh"
+length_of_mesh = 1
 
 # The file assumed to be in the same folder as "CreatemeshFVM.py" file
 base_dir = os.path.dirname(os.path.abspath(__file__))  # Directory of the current script

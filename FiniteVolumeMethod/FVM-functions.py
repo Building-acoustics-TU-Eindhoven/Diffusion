@@ -45,10 +45,10 @@ st = time.time() #start time of calculation
 ###############################################################################
 
 # Source position
-coord_source = [28.8,0.66,1.5] #coordinates of the receiver position in an list: x , y and z direction in meters [m]
+coord_source = [0.5,0.5,1.0] #coordinates of the receiver position in an list: x , y and z direction in meters [m]
 
 # Receiver position
-coord_rec = [26.8,0.66,1.5] #coordinates of the receiver position in an list: x , y and z direction in meters [m]
+coord_rec = [2.0,0.5,1.0] #coordinates of the receiver position in an list: x , y and z direction in meters [m]
 
 # Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
@@ -57,7 +57,7 @@ tcalc = "decay"
 
 # Frequency range
 fc_low = 125
-fc_high = 8000
+fc_high = 2000
 num_octave = 1
 
 x_frequencies  = num_octave * log(fc_high/fc_low) / log(2)
@@ -94,7 +94,7 @@ rho = 1.21 #air density [kg.m^-3] at 20°C
 ###############################################################################
 #INITIALISE GMSH
 ###############################################################################
-file_name = "FirstFloorCorridor.msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "3x3x3.msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 
@@ -1058,8 +1058,8 @@ def computing_energy_density():
             for tet_r in cl_tet_r_keys:
                 w_rec[steps] += w_new[tet_r] *total_weights_r[tet_r]   
             
-            #if steps == sourceon_steps:
-                 #print("Steps for source:",steps)
+            # if steps == sourceon_steps:
+            #     #print("Steps for source:",steps)
             #     w_t0 = w_new
         
             # if steps == round(1*mean_free_time_step + sourceon_steps + (dist_sr/c0)):
@@ -1140,7 +1140,6 @@ def freq_parameters():
     spl_stat_y_band = []
     spl_r_band = []
     spl_r_off_band = []
-    spl_r_t0_band = []
     spl_r_norm_band = []
     t30_band = []
     edt_band = []
@@ -1167,8 +1166,6 @@ def freq_parameters():
         #press_r = ((abs(w_rec_band[iBand]))*rho*(c0**2)) #pressure at the receiver
         spl_r = 10*np.log10(((abs(w_rec_band[iBand]))*rho*(c0**2))/(pRef**2)) #,where=press_r>0, sound pressure level at the receiver
         spl_r_off = 10*np.log10(((abs(w_rec_off_band[iBand]))*rho*(c0**2))/(pRef**2))
-        
-        spl_r_t0 = spl_r_off[0]
         
         spl_r_norm = 10*np.log10((((abs(w_rec_band[iBand]))*rho*(c0**2))/(pRef**2)) / np.max(((abs(w_rec_band[iBand]))*rho*(c0**2))/(pRef**2))) #normalised to maximum to 0dB
         #spl_r_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_sr) + ((abs(w_rec_band[iBand]))*c0))/(pRef**2)) #spl total (including direct field) at the receiver position????? but it will need to be calculated for a stationary source 100dB
@@ -1207,19 +1204,17 @@ def freq_parameters():
         spl_r_off_band.append(spl_r_off)
         spl_r_norm_band.append(spl_r_norm)
         sch_db_band.append(sch_db)
-        spl_r_t0_band.append(spl_r_t0)
     
     spl_r_off_band = np.array(spl_r_off_band)
-    spl_r_t0_band = np.array(spl_r_t0_band)
     t30_band = np.array(t30_band)
     edt_band = np.array(edt_band)
     c80_band = np.array(c80_band)
     d50_band = np.array(d50_band)
     ts_band = np.array(ts_band)
     
-    return w_rec_x_band, w_rec_y_band, spl_stat_x_band, spl_stat_y_band, spl_r_band, spl_r_off_band, spl_r_norm_band, sch_db_band, t30_band, edt_band, c80_band, d50_band, ts_band, spl_r_t0_band
+    return w_rec_x_band, w_rec_y_band, spl_stat_x_band, spl_stat_y_band, spl_r_band, spl_r_off_band, spl_r_norm_band, sch_db_band, t30_band, edt_band, c80_band, d50_band, ts_band
 
-w_rec_x_band, w_rec_y_band, spl_stat_x_band, spl_stat_y_band, spl_r_band, spl_r_off_band, spl_r_norm_band, sch_db_band, t30_band, edt_band, c80_band, d50_band, ts_band, spl_r_t0_band = freq_parameters()
+w_rec_x_band, w_rec_y_band, spl_stat_x_band, spl_stat_y_band, spl_r_band, spl_r_off_band, spl_r_norm_band, sch_db_band, t30_band, edt_band, c80_band, d50_band, ts_band = freq_parameters()
 
 et = time.time() #end time
 elapsed_time = et - st

@@ -115,7 +115,7 @@ for fi in range(nBands):
 ###############################################################################
 #SQUARE-ROOT of ENVELOPE
 ###############################################################################
-#From the squared envelope of the impulse response, we need to get the envelope of the impulse response
+#From the envelope of the impulse response, we need to get the impulse response
 square_root = np.sqrt(p_rec_off_deriv_band_resampled) #this gives the impulse response at each frequency
 
 #%%
@@ -307,7 +307,7 @@ for fi in range(nBands):
 #FREQUENCY DOMAIN OF THE FILTERED RANDOM NOISE: Frequency response of the filtered random noise
 filt_noise_band_freq = np.fft.fft(filt_noise_band)
 
-# fv is the frequency vector for the x axis
+# fv is the freqeuncy vector for the x axis
 nSamples = len(noise)
 fv = np.arange(nSamples) * (fs/nSamples) #This can also be written with linspace as #np.linspace((0, (nSamples-1)))*fs/nSamples;
 
@@ -340,15 +340,6 @@ filt_noise_band = np.array(filt_noise_band)
 
 #%%
 ###############################################################################
-#PADDING THE SQUARE-ROOT TO THE SAME LENGTH AS THE FILTERED RANDOM NOISE
-###############################################################################
-#Padding the square-root to the same length as the filtered random noise
-pad_length = filt_noise_band.shape[1]-p_rec_off_deriv_band_resampled.shape[1]
-square_root_padded = np.pad(square_root, ((0,0),(0,pad_length)) ,mode='constant' )
-t_off_padded = np.pad(t_off_resampled, ((0,pad_length)) ,mode='constant' )
-
-#%%
-###############################################################################
 #MULTIPLICATION OF SQUARE-ROOT with FILTERED RANDOM NOISE
 ###############################################################################
 #Multiplication of SQUARE-ROOT of envelope with random noise only (UNFILTERED)
@@ -370,6 +361,11 @@ for fi in range(nBands):
     #plt.axhline(0, color='black', linewidth=0.1)
     plt.legend(loc='best')
     plt.show()
+
+#Padding the square-root to the same length as the filtered random noise
+pad_length = filt_noise_band.shape[1]-p_rec_off_deriv_band_resampled.shape[1]
+square_root_padded = np.pad(square_root, ((0,0),(0,pad_length)) ,mode='constant' )
+t_off_padded = np.pad(t_off_resampled, ((0,pad_length)) ,mode='constant' )
 
 #Multiplication of SQUARE-ROOT of envelope with filtered random noise (FILTERED)
 imp_filt_band = []
@@ -426,70 +422,8 @@ plt.grid(True, which='both', linestyle='--', linewidth=0.5)
 plt.show()
 
 #%%
-# ###############################################################################
-# #CREATING DIRECT SOUND 
-# ###############################################################################
-# W = 0.01 #the power is in Watts
-# dist_sr = 1.5
-# rho = 1.21
-# c0 = 343
-
-# # Frequency domain of the direct sound pressure
-# press_freq_direct = []
-# for fi in range(nBands):
-#     #print(fi)
-#     pf = 1/(4*np.pi*dist_sr) * np.exp(1j*2*np.pi*center_freq[fi]*dist_sr/c0)
-#     press_freq_direct.append(pf)
-
-
-# #This frequency domain pressure needs to be filtered
-# press_filt_freq_direct = []
-# for fi in range(nBands):
-#     fpf = press_freq_direct[fi] * filt_noise_band_freq[fi]
-#     press_filt_freq_direct.append(fpf)
-    
-# #FIGURE 10
-# #Plot the frequency domain of the filtered direct sound
-# plt.figure(figsize=(12, 8))
-# plt.title('Frequency response of filtered direct sound')
-# for fi in range(nBands):
-#     plt.subplot(nBands, 1, fi+1)
-#     plt.semilogx(fv, 20 * np.log10(abs(press_filt_freq_direct[fi])), label=f'{center_freq[fi]} Hz')
-
-#     plt.xlabel('Frequency [Hz]')
-#     plt.ylabel('Gain [dB]')
-#     plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-#     #plt.axhline(0, color='black', linewidth=0.1)
-#     plt.legend(loc='best')
-#     plt.show()
-
-
-
-# #Time domain direct sound -> with ifft
-# press_filt_time_direct = []
-# for fi in range(nBands):
-#     fpt = np.fft.ifft(press_filt_freq_direct[fi])    
-#     press_filt_time_direct.append(fpt)   
-
-# #FIGURE 11
-# #Plot the time domain of the filtered direct sound
-# plt.figure(figsize=(12, 8))
-# plt.title('Time domain of filtered direct sound per frequency band')
-# for fi in range(nBands):
-#     plt.subplot(nBands, 1, fi+1)   
-#     plt.plot(t_off_padded, press_filt_time_direct[fi], label=f'{center_freq[fi]} Hz')
-    
-#     plt.xlabel('Time [s]')
-#     plt.ylabel('Magnitude [dB]')
-#     plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-#     #plt.axhline(0, color='black', linewidth=0.1)
-#     plt.legend(loc='best')
-#     plt.show()
-
-
-#%%
 ###############################################################################
-#CREATION OF DIRECT SOUND 2
+#CREATING DIRECT SOUND 
 ###############################################################################
 W = 0.01 #the power is in Watts
 dist_sr = 1.5
@@ -497,183 +431,75 @@ rho = 1.21
 c0 = 343
 
 # Frequency domain of the direct sound pressure
-press_freq_direct = 1/(4*np.pi*dist_sr) * np.exp(-1j*2*np.pi*fv*dist_sr/c0)
-# for fi in range(nBands):
-#     #print(fi)
-#     pf = 1/(4*np.pi*dist_sr) * np.exp(1j*2*np.pi*fv*dist_sr/c0)
-#     press_freq_direct.append(pf)
-#    # pfv = np.ones((len(fv)))*pf
-#     #press_freq_direct_vector.append(pfv) 
+press_freq_direct = []
+for fi in range(nBands):
+    #print(fi)
+    pf = 1/(4*np.pi*dist_sr) * np.exp(1j*2*np.pi*center_freq[fi]*dist_sr/c0)
+    press_freq_direct.append(pf)
 
-press_freq_direct_level = 20*np.log10(press_freq_direct)
-
+#This frequency domain pressure needs to be filtered
+press_filt_freq_direct = []
+for fi in range(nBands):
+    fpf = press_freq_direct[fi] * filt_noise_band_freq[fi]
+    press_filt_freq_direct.append(fpf)
+    
+#FIGURE 10
+#Plot the frequency domain of the filtered direct sound
 plt.figure(figsize=(12, 8))
 plt.title('Frequency response of filtered direct sound')
-#for fi in range(nBands):
-    #plt.subplot(nBands, 1, fi+1)
-plt.plot(fv, press_freq_direct_level)
-plt.xlabel('Frequency [Hz]')
-plt.ylabel('Gain [dB]')
-plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-#plt.axhline(0, color='black', linewidth=0.1)
-plt.legend(loc='best')
-plt.show()
+for fi in range(nBands):
+    plt.subplot(nBands, 1, fi+1)
+    plt.semilogx(fv, 20 * np.log10(abs(press_filt_freq_direct[fi])), label=f'{center_freq[fi]} Hz')
+
+    plt.xlabel('Frequency [Hz]')
+    plt.ylabel('Gain [dB]')
+    plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+    #plt.axhline(0, color='black', linewidth=0.1)
+    plt.legend(loc='best')
+    plt.show()
+
 
 
 #Time domain direct sound -> with ifft
-press_time_direct = (np.fft.ifft(press_freq_direct))*fs 
-# for fi in range(nBands):
-#     fpt = np.fft.ifft(press_freq_direct[fi])    
-#     press_time_direct.append(fpt) 
+press_filt_time_direct = []
+for fi in range(nBands):
+    fpt = np.fft.ifft(press_filt_freq_direct[fi])    
+    press_filt_time_direct.append(fpt)   
 
-
-#This frequency domain pressure needs to be filtered
-# press_filt_time_direct = []
-# for fi in range(nBands):
-#     fpf = press_time_direct[fi] * filt_noise_band[fi]
-#     press_filt_time_direct.append(fpf)
-    
-# #FIGURE 10
-# #Plot the frequency domain of the filtered direct sound
-# plt.figure(figsize=(12, 8))
-# plt.title('Frequency response of filtered direct sound')
-# for fi in range(nBands):
-#     plt.subplot(nBands, 1, fi+1)
-#     plt.semilogx(fv, 20 * np.log10(abs(press_filt_freq_direct[fi])), label=f'{center_freq[fi]} Hz')
-
-#     plt.xlabel('Frequency [Hz]')
-#     plt.ylabel('Gain [dB]')
-#     plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-#     #plt.axhline(0, color='black', linewidth=0.1)
-#     plt.legend(loc='best')
-#     plt.show()
-
-
-#Circshift the time domain
-press_time_direct = np.roll(press_time_direct,round(len(press_time_direct)/2))
-
-#FIGURE 11
-#Plot the time domain of the direct sound
-plt.figure(figsize=(12, 8))
-plt.title('Time domain of direct sound')
-#for fi in range(nBands):
-    #plt.subplot(nBands, 1, fi+1)   
-plt.plot(t_off_padded, press_time_direct)
-
-plt.xlabel('Time [s]')
-plt.ylabel('Magnitude [dB]')
-plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-#plt.axhline(0, color='black', linewidth=0.1)
-plt.legend(loc='best')
-plt.show()
-
-
-
-
-
-
-
-#%%
-###############################################################################
-#CREATION OF TOTAL BUTTER FILTER FOR DIRECT SOUND
-###############################################################################
-Nyquist_freq = int(fs/2) 
-filter_order = 8 #number of biquad sections of the desired system
-nth_octave = 1  # e.g., 3 for third-octave
-
-# Create filter
-filter_tot = []
-# Calculate low and high cutoff frequencies for each band
-lowlowcut = center_freq[0] / (2 ** (1 / (2 * nth_octave)))
-highhighcut = center_freq[-1] * (2 ** (1 / (2 * nth_octave)))
-
-# Normalize the cutoff frequencies by the Nyquist frequency
-low = lowlowcut / Nyquist_freq
-high = highhighcut / Nyquist_freq
-
-# Design Butterworth bandpass filter
-butter_band_direct = butter(filter_order, [low, high], btype='band', output='sos') # butter_band contains the second-order sections representation of the Butterworth filter
-
-# Plot frequency responses
-plt.figure(figsize=(12, 8))
-#print(band)
-# Compute the frequency response of each filter
-w, h = sosfreqz(butter_band_direct, worN=2000, fs=fs)
-# w is the array of frequencies at which the response is computed
-# h is the frequency response of the filter
-# Plot the magnitude response in decibels
-plt.semilogx(w, 20 * np.log10(abs(h)), label=f'{center_freq[band]}')
-plt.title('Frequency response of octave band filters')
-plt.xlabel('Frequency [Hz]')
-plt.ylabel('Gain [dB]')
-plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-plt.axhline(0, color='black', linewidth=0.5)
-plt.legend(loc='best')
-plt.show()
-
-
-#%%
-###############################################################################
-#MULTIPLICATION OF TOTAL BUTTER FILTER with DIRECT SOUND
-###############################################################################
-#TIME DOMAIN OF THE FILTERED DIRECT SOUND: for each band the sosfilt creates a time domain convolution of the noise with the filter
-filt_direct_sound = sosfilt(butter_band_direct, press_time_direct) #this is in the time domain because the sosfilt gives the time domain
-
-#filt_direct_sound_flipped = np.flip(filt_direct_sound,axis=0)
 #FIGURE 11
 #Plot the time domain of the filtered direct sound
 plt.figure(figsize=(12, 8))
 plt.title('Time domain of filtered direct sound per frequency band')
-#for fi in range(nBands):
-    #plt.subplot(nBands, 1, fi+1)   
-plt.plot(t_off_padded, filt_direct_sound)
-
-plt.xlabel('Time [s]')
-plt.ylabel('Magnitude [dB]')
-plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-#plt.axhline(0, color='black', linewidth=0.1)
-plt.legend(loc='best')
-plt.show()
-
-#%%
-###############################################################################
-#SHIFT THE IMP TOT AND THE DIRECT SOUND TO THE RIGHT POSITION
-###############################################################################
-#Shift back to the beginning of the time vector plus the distance source receiver
-filt_direct_sound = np.roll(filt_direct_sound,-round(len(filt_direct_sound)/2))
-
-time_dir_sound = dist_sr/c0
-time_dir_sound_step = int(time_dir_sound/dt_sim)
-time_dir_sound_step_resampled = int(time_dir_sound_step * fs/ original_fs)
-
-filt_direct_sound_roll = np.roll(filt_direct_sound,time_dir_sound_step_resampled)
-
-
-#Shift everythingto the direct sound arrival
-zero_array = np.zeros([time_dir_sound_step_resampled]) #array of zeros in front of the impulse response
-imp_tot = np.hstack([zero_array,imp_tot])
-
-imp_tot = imp_tot[:-len(zero_array)]
-
-#%%
-# ###############################################################################
-# #ADDING DIRECT SOUND 
-# ###############################################################################
-# imp_filt_band_direct = [imp_filt_band[i]+press_time_direct[i] for i in range(len(imp_filt_band))]
-
-# #FIGURE 12
-# plt.figure(figsize=(12, 8))
-# plt.title('Time domain of filtered impulse response per frequency band')
-# for fi in range(nBands):
-#     plt.subplot(nBands, 1, fi+1)
-#     plt.plot(t_off_padded, imp_filt_band_direct[fi], label=f'{center_freq[fi]} Hz')
+for fi in range(nBands):
+    plt.subplot(nBands, 1, fi+1)   
+    plt.plot(t_off_padded, press_filt_time_direct[fi], label=f'{center_freq[fi]} Hz')
     
-#     plt.xlabel('Time [s]')
-#     plt.ylabel('Magnitude [dB]')
-#     plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-#     #plt.axhline(0, color='black', linewidth=0.1)
-#     plt.legend(loc='best')
-#     plt.show()
+    plt.xlabel('Time [s]')
+    plt.ylabel('Magnitude [dB]')
+    plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+    #plt.axhline(0, color='black', linewidth=0.1)
+    plt.legend(loc='best')
+    plt.show()
+
+#%%
+###############################################################################
+#ADDING DIRECT SOUND 
+###############################################################################
+imp_filt_band_direct = [imp_filt_band[i]+press_filt_time_direct[i] for i in range(len(imp_filt_band))]
+
+#FIGURE 12
+plt.figure(figsize=(12, 8))
+plt.title('Time domain of filtered impulse response per frequency band')
+for fi in range(nBands):
+    plt.subplot(nBands, 1, fi+1)
+    plt.plot(t_off_padded, imp_filt_band_direct[fi], label=f'{center_freq[fi]} Hz')
+    
+    plt.xlabel('Time [s]')
+    plt.ylabel('Magnitude [dB]')
+    plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+    #plt.axhline(0, color='black', linewidth=0.1)
+    plt.legend(loc='best')
+    plt.show()
 
 
 # #%%
@@ -697,6 +523,7 @@ imp_tot = imp_tot[:-len(zero_array)]
 # # press_dir_sound = np.sqrt(power_per_band / (4 * np.pi * dist_sr**2) * rho * c0)
 # #???
 
+
 # press_dir_sound = np.sqrt((W/(4*np.pi*dist_sr**2))*rho*c0)
 
 # time_dir_sound = dist_sr/c0
@@ -714,6 +541,9 @@ imp_tot = imp_tot[:-len(zero_array)]
 # t_off_padded_direct = np.pad(t_off_padded, ((0,pad_length_direct)) ,mode='constant' )
 
 # plt.plot(t_off_padded_direct,imp_tot)
+
+
+
 #%%
 ###############################################################################
 #ADDING DIRECT SOUND AND FILTER IT & SHIFT EVERYTHING TO THE DIRECT SOUND ARRIVAL TIME STEP
@@ -744,6 +574,7 @@ imp_tot = imp_tot[:-len(zero_array)]
 #     dir_filt = press_dir_sound*h_all[fi,:]
 #     press_dir_sound_band.append(dir_filt)
 
+
 # time_dir_sound = dist_sr/c0
 # time_dir_sound_step = int(time_dir_sound/dt_sim)
 # time_dir_sound_step_resampled = int(time_dir_sound_step * fs/ original_fs)
@@ -760,39 +591,23 @@ imp_tot = imp_tot[:-len(zero_array)]
 
 # plt.plot(t_off_padded_direct,imp_tot)
 
-#%%
-###############################################################################
-#SCALE IMPULSE_TOT TO THE GREEN FUNCTION OF THE DIRECT SOUND
-###############################################################################
-Eq_A = sum(np.load('C:/Users/20225533/Diffusion/Auralization/Eq_A.npy'))
-imp_tot = np.sqrt(4*100*rho*c0/(Eq_A)) * imp_tot #20*imp_tot #(4*W/(c0*Eq_A)) * imp_tot
-
-#A factor of 20 seems to be maybe ok?! Not sure at all
-
-#Eq. 5.37 Kutruff
-#w_r = 0.01 * 1/ V *np.exp(-2*c*Eq_A/8*V*t)
-
 
 #%%
 ###############################################################################
 #ALL FREQUENCY IMPULSE RESPONSE WITH DIRECT SOUND
 ###############################################################################
 #Sum of the bands
-imp_tot_direct = imp_tot+filt_direct_sound
-#imp_tot_direct = np.array(imp_tot, dtype=float)
+imp_tot_direct = [sum(imp_filt_band_direct[i][j] for i in range(len(imp_filt_band_direct))) for j in range(len(imp_filt_band_direct[0]))]
+imp_tot_direct = np.array(imp_tot, dtype=float)
 
 #FIGURE 13
 plt.figure(figsize=(12, 8))
-#plt.plot(t_off_padded, imp_tot)
 plt.plot(t_off_padded,imp_tot_direct)
-#plt.plot(t_off_padded, imp_tot)
-plt.grid(True, which='both', linestyle='--', linewidth=0.5)
 
 
 # #Frequency spectrum
 # freq_spectrum = 20*np.log10(abs(np.fft.fft(imp_tot_direct)))
 
-plt.plot(t_off_padded, imp_tot)
 
 #%%
 ###############################################################################

@@ -119,9 +119,9 @@ def generate_mesh(geo_file_path, name_gmsh_file, length_of_mesh):
     print(gmsh.logger.get())
     gmsh.write(name_gmsh_file)
 
-    mesh = gmsh.open(name_gmsh_file)  # open the file
+    # mesh = gmsh.open(name_gmsh_file)  # open the file
 
-    gmsh.fltk.run()  # run the file to see it in gmsh
+    # gmsh.fltk.run()  # run the file to see it in gmsh
 
 
 # The variables to be assigned by the user directly

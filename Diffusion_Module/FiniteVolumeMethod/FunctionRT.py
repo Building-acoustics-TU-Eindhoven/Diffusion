@@ -42,7 +42,11 @@ def t60_decay(t, sch_db, idx_w_rec, rt='t30'):
     #Linear regression
     idxL1 = np.argmin(np.abs(sch_db - init)) #np.where(sch_db <= init)[0][0] #index at which the rtdecay is equal to -5
     idxL2 = np.argmin(np.abs(sch_db - end)) #np.where(sch_db <= end)[0][0] #index at which the rtdecay is equal to -35
-       
+
+    if idxL2 > len(t):
+        print(rt + " can not be calculated. Simulation time is too short.")
+        return 0
+
     timeL1 = t[idxL1] #index at which the time vector is equal to the idxL1
     timeL2 = t[idxL2] #index at which the time vector is equal to the idxL2
     

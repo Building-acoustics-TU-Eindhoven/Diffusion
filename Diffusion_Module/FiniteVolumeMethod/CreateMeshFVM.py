@@ -93,7 +93,7 @@ import subprocess
 import os
 
 
-def generate_mesh(geo_file_path, name_gmsh_file, length_of_mesh):
+def generate_mesh(geo_file_path, name_gmsh_file, characteristic_length):
     # Read the content of the Geo file
     with open(geo_file_path, 'r') as file:
         geo_content = file.readlines()
@@ -104,21 +104,27 @@ def generate_mesh(geo_file_path, name_gmsh_file, length_of_mesh):
     # Remove the specified line from the content
     if line_to_remove in geo_content:
         geo_content.remove(line_to_remove)
-
+        
     # Write the modified content back to the Geo file
     with open(geo_file_path, 'w') as file:
         file.writelines(geo_content)
 
-    gmsh.open(geo_file_path)
-    # gmsh.option.setNumber('Mesh.MeshSizeMin', 1)
-    # gmsh.option.setNumber('Mesh.MeshSizeMax', max_mesh_size)
+    # If an lc is given in the geo file, we want to compensate for this
+    for line in geo_content:
+        if "lc =" in line:
+            lc_value = float(line.split('=')[1].strip().strip(';'))
+            print("Extracted value:", lc_value)
+            break
 
-    gmsh.option.setNumber('Mesh.MeshSizeFactor', length_of_mesh)
+    gmsh.open(geo_file_path)
+
+    # Divide by the lc value given in the .geo file to get a correct characteristic length 
+    gmsh.option.setNumber('Mesh.MeshSizeFactor', characteristic_length / lc_value)
 
     gmsh.model.mesh.generate(3)
     print(gmsh.logger.get())
     gmsh.write(name_gmsh_file)
-
+    
     # mesh = gmsh.open(name_gmsh_file)  # open the file
 
     # gmsh.fltk.run()  # run the file to see it in gmsh

@@ -110,6 +110,7 @@ def generate_mesh(geo_file_path, name_gmsh_file, characteristic_length):
         file.writelines(geo_content)
 
     # If an lc is given in the geo file, we want to compensate for this
+    lc_value = 1 # set to 1 by default
     for line in geo_content:
         if "lc =" in line:
             lc_value = float(line.split('=')[1].strip().strip(';'))

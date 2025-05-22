@@ -11,12 +11,20 @@ Created on Wed Aug  2 16:12:40 2023
 ###############################################################################
 # Code developed by Ilaria Fichera for the analysis of the FVM method adapted solving the 3D diffusion equation with one intermittent omnidirectional sound source
 # Import modules
+import math
 from math import ceil
 from math import log
-from Diffusion.FiniteVolumeMethod.FunctionRT import t60_decay
-from Diffusion.FiniteVolumeMethod.FunctionClarity import *
-from Diffusion.FiniteVolumeMethod.FunctionDefinition import *
-from Diffusion.FiniteVolumeMethod.FunctionCentreTime import *
+
+from Diffusion_Module.FiniteVolumeMethod.FunctionRT import t60_decay
+from Diffusion_Module.FiniteVolumeMethod.FunctionClarity import *
+from Diffusion_Module.FiniteVolumeMethod.FunctionDefinition import *
+from Diffusion_Module.FiniteVolumeMethod.FunctionCentreTime import *
+
+from Diffusion_Module.FiniteVolumeMethod.CreateMeshFVM import generate_mesh
+
+import numpy as np
+import pandas as pd
+
 import time as time
 import gmsh
 import os
@@ -98,7 +106,6 @@ def de_method(json_file_path=None):
     # FIXED INPUTS
     ###############################################################################
     # General settings
-    c0 = 343  # adiabatic speed of sound [m.s^-1]
 
     # Set initial condition - Source Info (interrupted method)
     Ws = 0.01  # Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
@@ -117,7 +124,7 @@ def de_method(json_file_path=None):
     ###############################################################################
     # INITIALISE GMSH
     ###############################################################################
-    file_name = "C:\\Users\\20225521\\Desktop\\Room_acoustics\\ui_backend\\Diffusion\\FiniteVolumeMethod\\3x3x3.msh"  # Insert file name, msh file created from sketchUp and then gmsh
+    msh_file_path = "C:\\Users\\20225521\\Desktop\\Room_acoustics\\ui_backend\\Diffusion\\FiniteVolumeMethod\\3x3x3.msh"  # Insert file name, msh file created from sketchUp and then gmsh
 
     # gmsh.fltk.run() #run the file to see it in gmsh
     dim = -1  # dimensions of the entities, 0 for points, 1 for curves/edge/lines, 2 for surfaces, 3 for volumes, -1 for all the entities
@@ -129,6 +136,10 @@ def de_method(json_file_path=None):
     ###############################################################################
 
     if result_container:
+        simulation_settings = result_container["simulationSettings"]
+        
+        c0 = simulation_settings['c0']
+
         coord_source = [
             result_container["results"][0]['sourceX'],
             result_container["results"][0]['sourceY'],
@@ -140,9 +151,13 @@ def de_method(json_file_path=None):
             result_container["results"][0]['responses'][0]['y'],
             result_container["results"][0]['responses'][0]['z']
         ]
-        file_name = result_container['msh_path']
+        geo_file_path = result_container['geo_path']
+        msh_file_path = result_container['msh_path']
+        generate_mesh (geo_file_path, msh_file_path, 1) # TODO: make this dependent on the room dimensions. We don't need an lc of 1 meter at all times..
+    else:
+        c0 = 343  # adiabatic speed of sound [m.s^-1]
 
-    mesh = gmsh.open(file_name)  # open the file
+    mesh = gmsh.open(msh_file_path)  # open the file
 
     # Absorption term for boundary conditions
     def abs_term(th, abscoeff_list):
@@ -607,7 +622,13 @@ def de_method(json_file_path=None):
             RT_Sabine_band.append(RT_Sabine)
 
         sourceon_time = round(max(RT_Sabine_band), 1)  # time that the source is ON before interrupting [s]
-        recording_time = 2 * sourceon_time  # total time recorded for the calculation [s]
+        if result_container:
+            if simulation_settings["sim_len_type"] == "ir_length":
+                recording_time = sourceon_time + simulation_settings["de_ir_length"]
+            else:
+                recording_time = sourceon_time + (sourceon_time / 60 * simulation_settings["edt"])
+        else:
+            recording_time = 2 * sourceon_time  # total time recorded for the calculation [s]
 
         # Time resolution
         t = np.arange(0, recording_time, dt)  # mesh point in time
@@ -618,6 +639,9 @@ def de_method(json_file_path=None):
     # FUNCTION CALLED HERE
     RT_Sabine_band, sourceon_time, recording_time, t, recording_steps = rec_time()
 
+    print ("Source on time: " + str(sourceon_time))
+    print ("Total recording time: " + str(recording_time))
+    
     # %%
     ###############################################################################
     # CALCULATION OF DIFFUSION PARAMETERS
@@ -1099,7 +1123,7 @@ def de_method(json_file_path=None):
         w_rec_off_deriv_band = []
         p_rec_off_deriv_band = []
 
-        prevPercentDone = 0;
+        prevPercentDone = 0
 
         for iBand in range(nBands):
 
@@ -1212,7 +1236,7 @@ def de_method(json_file_path=None):
                                 json.dumps(result_container, indent=4)
                             )
 
-                prevPercentDone = percentDone;
+                prevPercentDone = percentDone
             
             w_new_band.append(w_new)
             w_rec_band.append(w_rec)
@@ -1373,18 +1397,25 @@ def de_method(json_file_path=None):
 
             # result_container['frequenci[0]es'] = center_freq
 
-            for (index, edc_detail) in enumerate(spl_r_off_band):
+            df = pd.DataFrame()
+            for (index, (edc_detail, pressure_detail)) in enumerate(zip(spl_r_off_band, p_rec_off_deriv_band)):
                 result_container['results'][0]['responses'][0]['receiverResults'].append({
                     "data": edc_detail.tolist(),
+                    # "data_pressure": pressure_detail.tolist(),
                     "t": (t_off - t_off[0]).tolist(),
                     "frequency": result_container['results'][0]['frequencies'][index],
                     "type": "edc"
                 })
+                if 't' not in df.columns:
+                    df['t'] = (t_off - t_off[0]).tolist()
+                df[str(result_container['results'][0]['frequencies'][index]) + 'Hz'] = pressure_detail.tolist()
 
         with open(json_file_path, 'w') as new_result_json:
             new_result_json.write(
                 json.dumps(result_container, indent=4)
             )
+        with open(json_file_path.replace('.json', '_pressure.csv'), 'w', newline="") as pressure_result_csv:
+            df.to_csv(pressure_result_csv, index=False)
 
     et = time.time()  # end time
     elapsed_time = et - st

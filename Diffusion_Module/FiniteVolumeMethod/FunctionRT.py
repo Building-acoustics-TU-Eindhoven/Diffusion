@@ -4,7 +4,6 @@ Created on Fri Feb 17 08:56:15 2023
 
 @author: 20225533
 """
-import matplotlib.pyplot as plt #import matplotlib as mpl
 import numpy as np
 from scipy import stats
 
@@ -64,19 +63,5 @@ def t60_decay(t, sch_db, idx_w_rec, rt='t30'):
     t60 = (-60/CoefAlpha[0]) #t60 according to polyfit approach
     
     y_axis = (slope*t[idx_w_rec:] + intercept) + slope
-
-    # plt.figure(3)
-    # plt.plot(t[idx_w_rec:],sch_db, color ='b', linewidth = 1.8)
-    # plt.plot(t[idx_w_rec:],y_axis,color='r',linewidth=2)
-    # plt.plot(t[idx_w_rec:][idxL1],np.real(sch_db[idxL1]),'o',linewidth=2)
-    # plt.plot(t[idx_w_rec:][idxL2],np.real(sch_db[idxL2]),'o',linewidth=2)
-    # plt.axvline(x=t60,ymin=-100,ymax=0,linestyle='--',linewidth=2)
-    # plt.ylabel('Normalized Magnitude (dB)')
-    # plt.xlabel('Time (s)')
-    # plt.legend(['EDC','Line Fitting','Upper Point','Lower Point','Estimate T_{30}'])
-    # plt.title("Figure 3: 'T_{30} = ' + str(round(t60,2)) + ' s.'")
-    # plt.grid(True)
-    # plt.ylim([-100,0])
-    #plt.show()
     
     return t60

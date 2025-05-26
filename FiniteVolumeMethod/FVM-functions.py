@@ -13,19 +13,16 @@ Created on Wed Aug  2 16:12:40 2023
 #Import modules
 import itertools
 import math
-import os
 import pickle
-import sys
 import time
 import types
+
+from math import ceil
+from math import log
 
 import gmsh
 import numpy as np
 
-from math import ceil
-from math import log
-from math import sqrt
-import matplotlib
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from matplotlib import cm

@@ -9,13 +9,11 @@ import math
 import time
 from math import ceil
 from math import log
-import sys
 
 import numpy as np
 #uncomment this if you need drawnow
 #from drawnow import drawnow
 
-import matplotlib
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm

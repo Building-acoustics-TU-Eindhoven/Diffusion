@@ -15,18 +15,15 @@ import itertools
 import math
 import pickle
 import os
-import sys
 import time
 import types
 
 from math import ceil
 from math import log
-from math import sqrt
 
 import gmsh
 import numpy as np
 
-import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator

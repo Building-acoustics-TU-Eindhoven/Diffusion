@@ -6,13 +6,14 @@ Created on Thu Feb 22 14:33:58 2024
 """
 
 import numpy as np
-#import matplotlib
+
 import matplotlib.pyplot as plt
-from FunctionRT import *
 import sounddevice as sd
 import soundfile as sf
 import scipy
-from scipy.io import wavfile
+from scipy import stats
+
+from FunctionRT import *
 
 #Import anechoic signal
 filename = 'C:/Users/20225533/Diffusion/Auralization/Frequency(english).wav' #name of the anechoic signal file
@@ -105,7 +106,6 @@ x = t[idxL1:idxL2]
 y = sch_db[idxL1:idxL2]
 
 # Linregress approach
-from scipy import stats
 slope,intercept = stats.linregress(t[idxL1:idxL2],sch_db[idxL1:idxL2])[0:2] #calculating the slope and the interception of the line connecting the two points
 db_regress_init = (init - intercept) / slope #dB initial
 db_regress_end = (end - intercept) / slope #dB End

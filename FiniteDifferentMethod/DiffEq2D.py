@@ -5,8 +5,6 @@ Created on Tue Feb 28 10:39:42 2023
 @author: 20225533
 """
 #Code developed by Ilaria Fichera for the analysis of the FDM method Du Fort & Frankel on the 1D diffusion equation with one impulse source
-import math
-import sys
 from math import ceil
 from math import log
 from math import pi

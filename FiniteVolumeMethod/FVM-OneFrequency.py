@@ -19,7 +19,6 @@ from math import ceil
 from math import log
 from math import sqrt
 
-import matplotlib
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm

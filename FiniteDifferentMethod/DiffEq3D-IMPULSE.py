@@ -6,28 +6,31 @@ Created on Tue Feb 28 10:39:42 2023
 """
 #Code developed by Ilaria Fichera for the analysis of the FDM method Du Fort & Frankel solving the 3D diffusion equation with one intermittent omnidirectional sound source
 import math
-import matplotlib
-import matplotlib.pyplot as plt
-import numpy as np
-# from scipy.integrate import simps
-from scipy import linalg
-import sys
-#uncomment this if you need drawnow
-#from drawnow import drawnow
+import time
 from math import ceil
 from math import log
+import sys
+
+import numpy as np
+#uncomment this if you need drawnow
+#from drawnow import drawnow
+
+import matplotlib
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator
+from matplotlib.animation import FuncAnimation
+
+from scipy import linalg
+from scipy import stats
+from scipy.interpolate import griddata
+# from scipy.integrate import simps
+
 from FunctionRT import *
 from FunctionClarity import *
 from FunctionDefinition import *
 from FunctionCentreTime import *
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
-from matplotlib import cm
-from matplotlib.ticker import LinearLocator
-import time
-from scipy import stats
-from scipy.interpolate import griddata
-from matplotlib.animation import FuncAnimation
 
 st = time.time() #start time of calculation
 

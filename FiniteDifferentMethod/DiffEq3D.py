@@ -9,7 +9,7 @@ import math
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.integrate import simps
+# from scipy.integrate import simps
 from scipy import linalg
 import sys
 #uncomment this if you need drawnow

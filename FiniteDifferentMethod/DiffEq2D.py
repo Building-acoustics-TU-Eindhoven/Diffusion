@@ -8,7 +8,7 @@ Created on Tue Feb 28 10:39:42 2023
 import math
 import matplotlib.pyplot as plt #import matplotlib as mpl
 import numpy as np
-from scipy.integrate import simps
+# from scipy.integrate import simps
 from scipy import linalg
 import sys
 from drawnow import drawnow

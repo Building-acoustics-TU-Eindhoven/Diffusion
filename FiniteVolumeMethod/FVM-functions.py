@@ -34,10 +34,10 @@ from matplotlib.ticker import LinearLocator
 # from scipy import linalg#from matplotlib.animation import FuncAnimation
 # from scipy.sparse import lil_matrix
 
-from FunctionClarity import *
-from FunctionDefinition import *
-from FunctionCentreTime import *
-from FunctionRT import *
+from FunctionClarity import clarity
+from FunctionDefinition import definition
+from FunctionCentreTime import centretime
+from FunctionRT import t60_decay
 
 st = time.time() #start time of calculation
 

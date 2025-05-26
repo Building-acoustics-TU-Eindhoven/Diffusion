@@ -37,10 +37,10 @@ from mpl_toolkits.mplot3d import Axes3D
 # from scipy.sparse import lil_matrix
 from scipy.spatial import cKDTree
 
-from FunctionRT import *
-from FunctionClarity import *
-from FunctionDefinition import *
-from FunctionCentreTime import *
+from FunctionRT import t60_decay
+from FunctionClarity import clarity
+from FunctionDefinition import definition
+from FunctionCentreTime import centretime
 
 st = time.time() #start time of calculation
 

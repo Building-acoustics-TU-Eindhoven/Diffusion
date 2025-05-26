@@ -24,7 +24,7 @@ from acoustics.room import t60_impulse
 # from acoustics.utils import _is_1d
 # from acoustics.bands import (_check_band_type, octave_low, octave_high, third_low, third_high)
 
-from FunctionRT import *
+from FunctionRT import t60_decay
 
 #General settings
 c0= 343 #sound particle velocity [m.s^-1]

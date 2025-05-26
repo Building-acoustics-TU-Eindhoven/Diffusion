@@ -9,9 +9,9 @@ import math
 import matplotlib.pyplot as plt #import matplotlib as mpl
 import numpy as np
 
-from FunctionClarity import *
-from FunctionDefinition import *
-from FunctionCentreTime import *
+from FunctionClarity import clarity
+from FunctionDefinition import definition
+from FunctionCentreTime import centretime
 
 #Values calculated with the Barron revised theory
 c0= 343 #sound particle velocity [m.s^-1]

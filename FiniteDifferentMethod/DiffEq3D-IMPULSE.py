@@ -25,10 +25,10 @@ from scipy import stats
 from scipy.interpolate import griddata
 # from scipy.integrate import simps
 
-from FunctionRT import *
-from FunctionClarity import *
-from FunctionDefinition import *
-from FunctionCentreTime import *
+from FunctionRT import t60_decay
+from FunctionClarity import clarity
+from FunctionDefinition import definition
+from FunctionCentreTime import centretime
 
 st = time.time() #start time of calculation
 

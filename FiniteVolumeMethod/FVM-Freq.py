@@ -10,7 +10,6 @@ Created on Wed Aug  2 16:12:40 2023
 import itertools
 import math
 import time
-import sys
 from math import ceil
 from math import log
 from math import sqrt
@@ -31,10 +30,11 @@ from matplotlib import cm
 from matplotlib.animation import FuncAnimation
 from matplotlib.ticker import LinearLocator
 
-from FunctionRT import *
-from FunctionClarity import *
-from FunctionDefinition import *
-from FunctionCentreTime import *
+from FunctionRT import t60_decay
+from FunctionClarity import clarity
+from FunctionDefinition import definition
+from FunctionCentreTime import centretime
+
 st = time.time() #start time of calculation
 
 #%%

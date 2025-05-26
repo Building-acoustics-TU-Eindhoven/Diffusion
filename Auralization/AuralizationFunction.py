@@ -13,7 +13,7 @@ import soundfile as sf
 import scipy
 from scipy import stats
 
-from FunctionRT import *
+from FunctionRT import t60_decay
 
 #Import anechoic signal
 filename = 'C:/Users/20225533/Diffusion/Auralization/Frequency(english).wav' #name of the anechoic signal file

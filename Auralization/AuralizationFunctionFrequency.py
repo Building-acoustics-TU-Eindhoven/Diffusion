@@ -18,7 +18,7 @@ import scipy
 from scipy import signal
 from scipy.signal import butter, sosfilt, sosfreqz
 
-from FunctionRT import *
+from FunctionRT import t60_decay
 
 #%%
 ###############################################################################

@@ -7,31 +7,34 @@ Created on Wed Aug  2 16:12:40 2023
 
 #Code developed by Ilaria Fichera for the analysis of the FVM method adapted solving the 3D diffusion equation with one intermittent omnidirectional sound source
 #Import modules
+import itertools
 import math
-import matplotlib
-import matplotlib.pyplot as plt
-import numpy as np
-# from scipy.integrate import simps
-from scipy import linalg
+import time
 import sys
 from math import ceil
 from math import log
 from math import sqrt
+
+import gmsh
+import numpy as np
+
+# from scipy.integrate import simps
+from scipy import linalg
+from scipy import stats
+from scipy.interpolate import griddata
+from scipy.sparse import lil_matrix
+from scipy.sparse import csr_matrix
+
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+from matplotlib.animation import FuncAnimation
+from matplotlib.ticker import LinearLocator
+
 from FunctionRT import *
 from FunctionClarity import *
 from FunctionDefinition import *
 from FunctionCentreTime import *
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
-from matplotlib import cm
-from matplotlib.ticker import LinearLocator
-import time
-from scipy import stats
-from scipy.interpolate import griddata
-from matplotlib.animation import FuncAnimation
-from scipy.sparse import lil_matrix
-import gmsh
- 
 st = time.time() #start time of calculation
 
 #%%
@@ -306,8 +309,6 @@ for i in range(velement): #for each tetrahedron, take its centre
 
 #Fmat = lil_matrix(interior_tet) #this is like sparse in matlab
 
-from scipy.sparse import csr_matrix
-
 Fmat = csr_matrix(interior_tet)
 
 interior_tet_sum = np.sum(interior_tet, axis=1) #sum of interior_tet per columns (so per i element)
@@ -370,7 +371,7 @@ for entity, Abs_term in surface_absorption:
 #######################################################################################################
 total_boundArea = 0 #initialization of total surface area of the room
 boundary_areas = []  #Initialize a list to store boundary_areas values for each tetrahedron
-import itertools
+
 face_areas = np.zeros(len(velemNodes)) #Per each tetrahedron, if there is a face that is on the boundary, include the area, otehrwise zero
 for idx, element in enumerate(velemNodes): #for index and element in the number of tetrahedrons
     #if idx == 491:

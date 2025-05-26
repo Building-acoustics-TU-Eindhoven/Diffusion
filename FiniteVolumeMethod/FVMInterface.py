@@ -11,18 +11,22 @@ Created on Wed Aug  2 16:12:40 2023
 ###############################################################################
 # Code developed by Ilaria Fichera for the analysis of the FVM method adapted solving the 3D diffusion equation with one intermittent omnidirectional sound source
 # Import modules
+import itertools
+import json
+import os
+import pickle
+import time
+import types
+
 from math import ceil
 from math import log
+
+import gmsh
+
 from Diffusion.FiniteVolumeMethod.FunctionRT import t60_decay
 from Diffusion.FiniteVolumeMethod.FunctionClarity import *
 from Diffusion.FiniteVolumeMethod.FunctionDefinition import *
 from Diffusion.FiniteVolumeMethod.FunctionCentreTime import *
-import time
-import gmsh
-import os
-import json
-import pickle
-import types
 
 
 # %%
@@ -479,7 +483,6 @@ def de_method(json_file_path=None):
     def boundary_triang():
         total_boundArea = 0  # initialization of total surface area of the room
         boundary_areas = []  # Initialize a list to store boundary_areas values for each tetrahedron
-        import itertools
         face_areas = np.zeros(
             len(velemNodes))  # Per each tetrahedron, if there is a face that is on the boundary, include the area, otehrwise zero
         for idx, element in enumerate(velemNodes):  # for index and element in the number of tetrahedrons

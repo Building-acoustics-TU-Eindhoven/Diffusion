@@ -24,7 +24,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator
-import time as time
+import time
 from scipy import stats
 from scipy.interpolate import griddata
 from matplotlib.animation import FuncAnimation

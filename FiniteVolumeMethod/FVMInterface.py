@@ -17,7 +17,7 @@ from Diffusion.FiniteVolumeMethod.FunctionRT import t60_decay
 from Diffusion.FiniteVolumeMethod.FunctionClarity import *
 from Diffusion.FiniteVolumeMethod.FunctionDefinition import *
 from Diffusion.FiniteVolumeMethod.FunctionCentreTime import *
-import time as time
+import time
 import gmsh
 import os
 import json

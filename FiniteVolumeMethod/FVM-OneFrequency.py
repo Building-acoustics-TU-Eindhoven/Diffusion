@@ -10,7 +10,6 @@ Created on Wed Aug  2 16:12:40 2023
 import itertools
 import math
 import time
-import sys
 
 import gmsh
 import numpy as np

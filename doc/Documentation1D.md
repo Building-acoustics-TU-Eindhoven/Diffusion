@@ -18,7 +18,7 @@ To properly run the cose, the following libraries are needed:
 - from drawnow import drawnow
 - from math import ceil
 - from math import log
-- from FunctionRT import *
+- from FunctionRT import t60_decay
 
 ## Inputs
 The inputs are:

@@ -8,9 +8,10 @@ Created on Thu Jul 18 11:18:22 2024
 ###############################################################################
 #IMPORT RESULTS FROM FVM.py
 ###############################################################################
-#import numpy as np
 #import os
 import pickle
+import matplotlib.pyplot as plt
+import numpy as np
 
 def load(filename):
     with open(filename, 'rb') as f:
@@ -32,9 +33,6 @@ load('results.pkl')
 ###############################################################################
 #POST-PROCESS AND FIGURES
 ###############################################################################
-import matplotlib.pyplot as plt
-import numpy as np
-
 if tcalc == "decay":
     t_off = t_off - t_off[0] #removing the t_off[0] to make the vector start from zero.
     

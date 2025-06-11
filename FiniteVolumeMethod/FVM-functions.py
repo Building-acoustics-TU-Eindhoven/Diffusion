@@ -11,32 +11,34 @@ Created on Wed Aug  2 16:12:40 2023
 ###############################################################################
 #Code developed by Ilaria Fichera for the analysis of the FVM method adapted solving the 3D diffusion equation with one intermittent omnidirectional sound source
 #Import modules
+import itertools
 import math
-import matplotlib
-import matplotlib.pyplot as plt
-import numpy as np
-#from scipy.integrate import simps
-#from scipy import linalg
-import sys
+import pickle
+import time
+import types
+
 from math import ceil
 from math import log
-from math import sqrt
-from FunctionRT import *
-from FunctionClarity import *
-from FunctionDefinition import *
-from FunctionCentreTime import *
+
+import gmsh
+import numpy as np
+
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator
-import time as time
-#from scipy import stats
-#from scipy.interpolate import griddata
-#from matplotlib.animation import FuncAnimation
-#from scipy.sparse import lil_matrix
-import gmsh
-import os
- 
+
+# from scipy import stats
+# from scipy.interpolate import griddata
+# from scipy.integrate import simps
+# from scipy import linalg#from matplotlib.animation import FuncAnimation
+# from scipy.sparse import lil_matrix
+
+from FunctionClarity import clarity
+from FunctionDefinition import definition
+from FunctionCentreTime import centretime
+from FunctionRT import t60_decay
+
 st = time.time() #start time of calculation
 
 #%%
@@ -442,7 +444,6 @@ surface_areas = surface_area()
 def boundary_triang():
     total_boundArea = 0 #initialization of total surface area of the room
     boundary_areas = []  #Initialize a list to store boundary_areas values for each tetrahedron
-    import itertools
     face_areas = np.zeros(len(velemNodes)) #Per each tetrahedron, if there is a face that is on the boundary, include the area, otehrwise zero
     for idx, element in enumerate(velemNodes): #for index and element in the number of tetrahedrons
         #if idx == 491:
@@ -596,7 +597,6 @@ def source_interp():
     #     dist_source_cc = math.sqrt(np.sum((cell_center[i] - coord_source)**2))
     #     dist_source_cc_list.append(dist_source_cc)
     # source_idx = np.argmin(dist_source_cc_list)
-    # import math
     # #cl_tet_s stands for cl=closest, tet=tetrahedron, s=to the source
     # cl_tet_s = {} #initialise dictionary fro closest tetrahedrons to the source
     # for i in range(len(dist_source_cc_list)):
@@ -1228,9 +1228,6 @@ elapsed_time = et - st
 #np.save(os.path.join('w_rec_off_deriv_band'),w_rec_off_deriv_band)
 #np.save(os.path.join('p_rec_off_deriv_band'),p_rec_off_deriv_band)
 #np.save(os.path.join('t_off'),t_off)
-
-import pickle
-import types
 
 # Save all variables to a file
 def save(filename):

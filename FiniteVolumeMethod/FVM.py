@@ -11,33 +11,37 @@ Created on Wed Aug  2 16:12:40 2023
 ###############################################################################
 #Code developed by Ilaria Fichera for the analysis of the FVM method adapted solving the 3D diffusion equation with one intermittent omnidirectional sound source
 #Import modules
+import itertools
 import math
-import matplotlib
-import matplotlib.pyplot as plt
-import numpy as np
-#from scipy.integrate import simps
-#from scipy import linalg
-import sys
+import pickle
+import os
+import time
+import types
+
 from math import ceil
 from math import log
-from math import sqrt
-from FunctionRT import *
-from FunctionClarity import *
-from FunctionDefinition import *
-from FunctionCentreTime import *
-from mpl_toolkits.mplot3d import Axes3D
+
+import gmsh
+import numpy as np
+
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator
-import time as time
-#from scipy import stats
-#from scipy.interpolate import griddata
-#from matplotlib.animation import FuncAnimation
-#from scipy.sparse import lil_matrix
-import gmsh
-import os
+from mpl_toolkits.mplot3d import Axes3D
+# from matplotlib.animation import FuncAnimation
+
+# from scipy import linalg
+# from scipy.integrate import simps
+# from scipy import stats
+# from scipy.interpolate import griddata
+# from scipy.sparse import lil_matrix
 from scipy.spatial import cKDTree
- 
+
+from FunctionRT import t60_decay
+from FunctionClarity import clarity
+from FunctionDefinition import definition
+from FunctionCentreTime import centretime
+
 st = time.time() #start time of calculation
 
 #%%
@@ -388,7 +392,7 @@ for entity, Abs_term in surface_absorption:
 #FACE AREA & boundary_areas
 total_boundArea = 0 #initialization of total surface area of the room
 boundary_areas = []  #Initialize a list to store boundary_areas values for each tetrahedron
-import itertools
+
 face_areas = np.zeros(len(velemNodes)) #Per each tetrahedron, if there is a face that is on the boundary, include the area, otehrwise zero
 for idx, element in enumerate(velemNodes): #for index and element in the number of tetrahedrons
     #if idx == 491:
@@ -558,7 +562,6 @@ selected_source_cc_list = dist_source_cc_list_sorted[:4] #take only the first fo
 dist_source_cc_list_sorted_indices = np.argsort(dist_source_cc_list)[:4] #takes the indeces of the minimum distances
 selected_source_cc_list_indices = dist_source_cc_list_sorted_indices[:4] #does exactly the same as the previous line
 
-import math
 #cl_tet_s stands for cl=closest, tet=tetrahedron, s=to the source
 cl_tet_s = {} #initialise dictionary for closest tetrahedrons to the source
 for i in range(len(dist_source_cc_list_sorted_indices)): #for each of the 4 tetra closest to the source
@@ -763,7 +766,6 @@ selected_rec_cc_list = dist_rec_cc_list_sorted[:4] #take only the first four ele
 dist_rec_cc_list_sorted_indices = np.argsort(dist_rec_cc_list)[:4] #takes the indeces of the minimum distances
 selected_rec_cc_list_indices = dist_rec_cc_list_sorted_indices[:4] #does exactly the same as the previous line
 
-import math
 #cl_tet_s stands for cl=closest, tet=tetrahedron, s=to the source
 cl_tet_r = {} #initialise dictionary for closest tetrahedrons to the source
 for i in range(len(dist_rec_cc_list_sorted_indices)): #for each of the 4 tetra closest to the source
@@ -1282,9 +1284,6 @@ np.save(os.path.join('w_rec_off_deriv_band'),w_rec_off_deriv_band)
 np.save(os.path.join('p_rec_off_deriv_band'),p_rec_off_deriv_band)
 np.save(os.path.join('t_off'),t_off)
 
-
-import pickle
-import types
 
 # Save all variables to a file
 def save(filename):

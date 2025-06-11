@@ -9,6 +9,10 @@ import math
 import matplotlib.pyplot as plt #import matplotlib as mpl
 import numpy as np
 
+from FunctionClarity import clarity
+from FunctionDefinition import definition
+from FunctionCentreTime import centretime
+
 #Values calculated with the Barron revised theory
 c0= 343 #sound particle velocity [m.s^-1]
 
@@ -63,9 +67,6 @@ l = ((31200*t60E)/V)*(math.exp(-(0.04*dist)/t60E))*(math.exp(-(1.11/t60E))) #lat
 c80dr = 10*math.log10((d+er)/l) #with direct and reverberant field
 c80l = 10*math.log10((er)/l) #with direct field only
 
-from FunctionClarity import *
-from FunctionDefinition import *
-from FunctionCentreTime import *
 c80 = clarity(t60E, V, Eq_A, S, c0, dist) #called function for calculation of c80 [dB]
 d50 = definition(t60E, V, Eq_A, S, c0, dist) #called function for calculation of d50 [%]
 ts = centretime(t60E, Eq_A, S) #called function for calculation of ts [ms]

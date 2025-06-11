@@ -5,7 +5,6 @@ Created on Thu Mar  9 15:25:01 2023
 @author: 20225533
 """
 import math
-import numpy as np
 
 def definition(t60, V, Eq_A, S, c0, dist):
     """

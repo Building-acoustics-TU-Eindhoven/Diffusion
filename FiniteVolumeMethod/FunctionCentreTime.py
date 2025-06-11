@@ -4,8 +4,6 @@ Created on Thu Mar  9 15:25:01 2023
 
 @author: 20225533
 """
-import math
-import numpy as np
 
 def centretime(t60, Eq_A, S):
     """

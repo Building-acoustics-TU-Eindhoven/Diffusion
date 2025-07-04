@@ -11,16 +11,14 @@ Created on Thu Feb 22 14:33:58 2024
 ###############################################################################
 
 import numpy as np
-#import matplotlib
 import matplotlib.pyplot as plt
-from FunctionRT import *
-import sounddevice as sd
+# import sounddevice as sd
 import soundfile as sf
 import scipy
-from scipy.io import wavfile
 from scipy import signal
-from scipy import fft
 from scipy.signal import butter, sosfilt, sosfreqz
+
+from FunctionRT import t60_decay
 
 #%%
 ###############################################################################

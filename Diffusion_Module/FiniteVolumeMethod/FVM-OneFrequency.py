@@ -7,31 +7,34 @@ Created on Wed Aug  2 16:12:40 2023
 
 #Code developed by Ilaria Fichera for the analysis of the FVM method adapted solving the 3D diffusion equation with one intermittent omnidirectional sound source
 #Import modules
+import itertools
 import math
-import matplotlib
-import matplotlib.pyplot as plt
+import time
+
+import gmsh
 import numpy as np
-#from scipy.integrate import simps
-#from scipy import linalg
-import sys
+
 from math import ceil
 from math import log
 from math import sqrt
-from FunctionRT import *
-from FunctionClarity import *
-from FunctionDefinition import *
-from FunctionCentreTime import *
-from mpl_toolkits.mplot3d import Axes3D
+
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator
-import time as time
-#from scipy import stats
-#from scipy.interpolate import griddata
-#from matplotlib.animation import FuncAnimation
-#from scipy.sparse import lil_matrix
-import gmsh
- 
+# from matplotlib.animation import FuncAnimation
+
+# from scipy.integrate import simps
+# from scipy import linalg
+# from scipy import stats
+# from scipy.interpolate import griddata
+# from scipy.sparse import lil_matrix
+
+from FunctionRT import t60_decay
+from FunctionClarity import clarity
+from FunctionDefinition import definition
+from FunctionCentreTime import centretime
+
 st = time.time() #start time of calculation
 
 #%%
@@ -321,7 +324,6 @@ for entity, Abs_term in surface_absorption:
 #######################################################################################################
 total_boundArea = 0 #initialization of total surface area of the room
 boundary_areas = []  #Initialize a list to store boundary_areas values for each tetrahedron
-import itertools
 face_areas = np.zeros(len(velemNodes)) #Per each tetrahedron, if there is a face that is on the boundary, include the area, otehrwise zero
 for idx, element in enumerate(velemNodes): #for index and element in the number of tetrahedrons
     #if idx == 491:
@@ -473,7 +475,6 @@ coord_rec = [x_rec,y_rec,z_rec] #coordinates of the receiver position in an list
 #     dist_source_cc = math.sqrt(np.sum((cell_center[i] - coord_source)**2))
 #     dist_source_cc_list.append(dist_source_cc)
 # source_idx = np.argmin(dist_source_cc_list)
-# import math
 # #cl_tet_s stands for cl=closest, tet=tetrahedron, s=to the source
 # cl_tet_s = {} #initialise dictionary fro closest tetrahedrons to the source
 # for i in range(len(dist_source_cc_list)):
@@ -509,7 +510,6 @@ selected_source_cc_list = dist_source_cc_list_sorted[:4] #take only the first fo
 dist_source_cc_list_sorted_indices = np.argsort(dist_source_cc_list)[:4] #takes the indeces of the minimum distances
 selected_source_cc_list_indices = dist_source_cc_list_sorted_indices[:4] #does exactly the same as the previous line
 
-import math
 #cl_tet_s stands for cl=closest, tet=tetrahedron, s=to the source
 cl_tet_s = {} #initialise dictionary for closest tetrahedrons to the source
 for i in range(len(dist_source_cc_list_sorted_indices)): #for each of the 4 tetra closest to the source
@@ -681,7 +681,6 @@ selected_rec_cc_list = dist_rec_cc_list_sorted[:4] #take only the first four ele
 dist_rec_cc_list_sorted_indices = np.argsort(dist_rec_cc_list)[:4] #takes the indeces of the minimum distances
 selected_rec_cc_list_indices = dist_rec_cc_list_sorted_indices[:4] #does exactly the same as the previous line
 
-import math
 #cl_tet_s stands for cl=closest, tet=tetrahedron, s=to the source
 cl_tet_r = {} #initialise dictionary for closest tetrahedrons to the source
 for i in range(len(dist_rec_cc_list_sorted_indices)): #for each of the 4 tetra closest to the source
@@ -1026,4 +1025,3 @@ if tcalc == "stationarysource":
 ###############################################################################
 #SAVING
 ###############################################################################
-

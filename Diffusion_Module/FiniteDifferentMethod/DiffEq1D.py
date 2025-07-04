@@ -5,22 +5,26 @@ Created on Fri Jan 20 09:26:51 2023
 @author: 20225533
 """
 #Code developed by Ilaria Fichera for the analysis of the FDM method Du Fort & Frankel on the 1D diffusion equation with one impulse source
-import math
-import matplotlib.pyplot as plt #import matplotlib as mpl
-import numpy as np
-from scipy.integrate import simps
-from scipy import linalg
-import sys
-from drawnow import drawnow
 from math import ceil
 from math import log
 from math import pi
-from scipy.io import wavfile
+
+import numpy as np
+# from drawnow import drawnow
+
 from scipy import stats
-from acoustics.utils import _is_1d
-from acoustics.signal import bandpass
-from acoustics.bands import (_check_band_type, octave_low, octave_high, third_low, third_high)
-from FunctionRT import *
+from scipy import linalg
+from scipy.io import wavfile
+from scipy.integrate import simps
+
+import matplotlib.pyplot as plt  # import matplotlib as mpl
+
+from acoustics.room import t60_impulse
+# from acoustics.signal import bandpass
+# from acoustics.utils import _is_1d
+# from acoustics.bands import (_check_band_type, octave_low, octave_high, third_low, third_high)
+
+from FunctionRT import t60_decay
 
 #General settings
 c0= 343 #sound particle velocity [m.s^-1]
@@ -189,11 +193,3 @@ sch_db[sch_db == -np.inf] = 0 #replace the -inf with zero in the decay
 
 bands = np.array([63,125,250,500,1000,2000,4000]) #array of frequency bands 
 t60 = t60_impulse(t, sch_db, fspatial, rt='t30') #called function for calculation of t60 
-
-
-
-
-
-
-
-

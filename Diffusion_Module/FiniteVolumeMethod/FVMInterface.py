@@ -11,26 +11,22 @@ Created on Wed Aug  2 16:12:40 2023
 ###############################################################################
 # Code developed by Ilaria Fichera for the analysis of the FVM method adapted solving the 3D diffusion equation with one intermittent omnidirectional sound source
 # Import modules
-import math
+import itertools
+import json
+import os
+import pickle
+import time
+import types
+
 from math import ceil
 from math import log
 
-from Diffusion_Module.FiniteVolumeMethod.FunctionRT import t60_decay
-from Diffusion_Module.FiniteVolumeMethod.FunctionClarity import *
-from Diffusion_Module.FiniteVolumeMethod.FunctionDefinition import *
-from Diffusion_Module.FiniteVolumeMethod.FunctionCentreTime import *
-
-from Diffusion_Module.FiniteVolumeMethod.CreateMeshFVM import generate_mesh
-
-import numpy as np
-import pandas as pd
-
-import time as time
 import gmsh
-import os
-import json
-import pickle
-import types
+
+from Diffusion.FiniteVolumeMethod.FunctionRT import t60_decay
+from Diffusion.FiniteVolumeMethod.FunctionClarity import *
+from Diffusion.FiniteVolumeMethod.FunctionDefinition import *
+from Diffusion.FiniteVolumeMethod.FunctionCentreTime import *
 
 # Silvin: debugging
 import logging
@@ -522,7 +518,6 @@ def de_method(json_file_path=None):
     def boundary_triang():
         total_boundArea = 0  # initialization of total surface area of the room
         boundary_areas = []  # Initialize a list to store boundary_areas values for each tetrahedron
-        import itertools
         face_areas = np.zeros(
             len(velemNodes))  # Per each tetrahedron, if there is a face that is on the boundary, include the area, otehrwise zero
         for idx, element in enumerate(velemNodes):  # for index and element in the number of tetrahedrons

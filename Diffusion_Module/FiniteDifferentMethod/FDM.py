@@ -908,3 +908,26 @@ np.save('t30',t30)
 np.save('spl_r_off_diff',spl_r_off_diff)
 np.save('x_axis',x)
 np.save('t_off',t[idx_w_rec:])
+
+import pickle
+import types
+
+# Save all variables to a file
+def save(filename):
+    with open(filename, 'wb') as f:
+        # Filter out modules, functions, and other unsupported types
+        filtered_variables = {}
+        for k, v in globals().items():
+            try:
+                # Check if the object can be pickled
+                pickle.dumps(v)
+                # Exclude some types explicitly known to cause issues
+                if not k.startswith('__') and not isinstance(v, (types.ModuleType, types.FunctionType, types.BuiltinFunctionType, types.LambdaType, types.MethodType, types.MappingProxyType)):
+                    filtered_variables[k] = v
+            except Exception as e:
+                print(f"Could not pickle {k}: {str(e)}")
+
+        pickle.dump(filtered_variables, f)
+
+# To save all current variables
+save('resultsFDM.pkl')

@@ -5,9 +5,18 @@ The software is based on the Du Fort and Frankel method (explicit unconditionall
 ## Theory of Diffusion Equation model
 
 The model for the sound energy density w(r,t) at position r and at time t on a domain V is based on the following partial differential equation:
-```{math}
+<!-- ```{math}
 ∂w(r,t)/∂t- D((∂^2 w(r,t))/(∂x^2 )+(∂^2 w(r,t))/(∂y^2 )+(∂^2 w(r,t))/(∂z^2 ))+ cmw(r,t)=P(t)δ(r-r_s ) in V
-```
+``` -->
+
+$$
+\frac{\partial w(\mathbf{r}, t)}{\partial t} 
+- D \left( \frac{\partial^2 w(\mathbf{r}, t)}{\partial x^2} 
++ \frac{\partial^2 w(\mathbf{r}, t)}{\partial y^2} 
++ \frac{\partial^2 w(\mathbf{r}, t)}{\partial z^2} \right) 
++ cmw(\mathbf{r}, t) = P(t)\delta(\mathbf{r} - \mathbf{r}_s)
+$$
+
 where ∂^2/dv is the Laplace operator and D = (λc)/3 is the so-called diffusion coefficient with c being the speed of sound. The diffusion coefficient is a constant value that takes into account the room geometry and volume trough the mean free path defined for proportionate rooms as 4*V/S with volume V of the room and S the total surface area. The term P(t) indicates a sound source term at position r_s. The term cmw(r, t) accounts for the atmospheric attenuation within the room, where m is the absorption coefficient of air (Billon et al., 2008).
 
 The main partial differential equation is associated with mixed boundary conditions on a domain ∂V, as follows:

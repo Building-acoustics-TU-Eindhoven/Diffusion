@@ -14,15 +14,15 @@ import numpy as np
 #uncomment this if you need drawnow
 #from drawnow import drawnow
 
-import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator
-from matplotlib.animation import FuncAnimation
 
 from scipy import linalg
 from scipy import stats
 from scipy.interpolate import griddata
+from matplotlib.animation import FuncAnimation
 # from scipy.integrate import simps
 
 from FunctionRT import t60_decay
@@ -57,16 +57,17 @@ y_rec = 2 #position of the receiver in the y direction [m]
 z_rec = 2 #position of the receiver in the z direction [m]
 
 #Spatial discretization
-dx = 0.1 #distance between grid points x direction [m] #See Documentation for more insight about dt and dx
+dx = 0.5 #distance between grid points x direction [m] #See Documentation for more insight about dt and dx
 dy = dx #distance between grid points y direction [m]
 dz = dx #distance between grid points z direction [m]
 
 #Time discretization
-dt = 1/64000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
+dt = 1/20000 #distance between grid points on the time discretization [s] #See Documentation for more insight about dt and dx
 
 #Absorption term and Absorption coefficients
 th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
 # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
+
 alpha_1 = 1/6 #Absorption coefficient for Surface1 - Floor
 alpha_2 = 1/6 #Absorption coefficient for Surface2 - Ceiling
 alpha_3 = 1/6 #Absorption coefficient for Surface3 - Wall Front
@@ -81,8 +82,7 @@ tcalc = "decay"
 
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
-sourceon_time =  0 #time that the source is ON before interrupting [s]
-recording_time = 1 #total time recorded for the calculation [s]
+
 
 #%%
 ###############################################################################
@@ -95,10 +95,6 @@ rho = 1.21 #air density [kg.m^-3] at 20°C
 
 #Frequency resolution & spatial parameters
 fsample = 1/dt #frequency spatial resolution (sampling period)
-
-#Time resolution
-t = np.arange(0, recording_time, dt) #mesh point in time
-recording_steps = ceil(recording_time/dt) #number of time steps to consider in the calculation
 
 #Room characteristics
 S1,S2 = length*width, length*width #xy planes
@@ -145,13 +141,31 @@ Abs_6 = abs_term(th,alpha_6) #absorption term for S6
 alpha_average = (alpha_1*S1 + alpha_2*S2 + alpha_3*S3 + alpha_4*S4 + alpha_5*S5 + alpha_6*S6)/S #average absorption
 Eq_A = alpha_1*S1 + alpha_2*S2 + alpha_3*S3 + alpha_4*S4 + alpha_5*S5 + alpha_6*S6 #equivalent absorption area of the room
 
+RT_Sabine = 0.16*V/Eq_A
+sourceon_time = round(RT_Sabine,1)#time that the source is ON before interrupting [s]
+recording_time = 2*sourceon_time #total time recorded for the calculation [s]
+
+#Time resolution
+t = np.arange(0, recording_time, dt) #mesh point in time
+recording_steps = ceil(recording_time/dt) #number of time steps to consider in the calculation
+
+t_35dB = round(35/60*RT_Sabine,4)
+idx_t35dB = np.argmin(np.abs(t - t_35dB))#[0][0] #index at which the t array is equal to the t_ at the decay of -35dB
+
 #Diffusion parameters
-lambda_path = (4*V)/S #mean free path for 3D
-lambda_time= lambda_path/c0 #mean free time for 3D
-lambda_time_step = int(lambda_time/dt)
-Dx = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms x direction
-Dy = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms y direction
-Dz = (lambda_path*c0)/3 #diffusion coefficient for proportionate rooms z direction
+mean_free_path = (4*V)/S #mean free path for 3D
+mean_free_time= mean_free_path/c0 #mean free time for 3D
+mean_free_time_step = int(mean_free_time/dt)
+D_th = (mean_free_path*c0)/3
+Dx = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms x direction
+Dy = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms y direction
+Dz = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms z direction
+
+
+#Longest dimension in the room
+longest_dimension = math.sqrt(length**2+width**2)
+longest_dimension_time = longest_dimension/c0
+longest_dimension_step = int(longest_dimension_time/dt)
 
 #Mesh numbers
 beta_zero_x = (2*Dx*dt)/(dx**2) #mesh number in x direction
@@ -168,8 +182,8 @@ if beta_zero_condition >1:
 Vs=dx*dy*dz  #Volume of the source
 w1=Ws/Vs #w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
 sourceon_steps = ceil(sourceon_time/dt) #time steps at which the source is calculated/considered in the calculation
-
-
+s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position
+source1 = np.append(s1, np.zeros(recording_steps-sourceon_steps)) #This would be equal to s1 if and only if recoding_steps = sourceon_steps
 
 ###############################################################################
 #SOURCE INTERPOLATION
@@ -193,6 +207,18 @@ weight_col_lr_s = 1 - weight_col_up_s
 weight_dep_up_s = (z_source / dz) - dep_lr_s
 weight_dep_lr_s = 1 - weight_dep_up_s
 
+s = np.zeros((Nx,Ny,Nz)) #matrix of zeros for source
+
+# Perform linear interpolation
+s[row_lr_s, col_lr_s, dep_lr_s] += source1[0] * weight_row_lr_s * weight_col_lr_s * weight_dep_lr_s
+s[row_lr_s, col_lr_s, dep_up_s] += source1[0] * weight_row_lr_s * weight_col_lr_s * weight_dep_up_s
+s[row_lr_s, col_up_s, dep_lr_s] += source1[0] * weight_row_lr_s * weight_col_up_s * weight_dep_lr_s
+s[row_lr_s, col_up_s, dep_up_s] += source1[0] * weight_row_lr_s * weight_col_up_s * weight_dep_up_s
+s[row_up_s, col_lr_s, dep_lr_s] += source1[0] * weight_row_up_s * weight_col_lr_s * weight_dep_lr_s
+s[row_up_s, col_lr_s, dep_up_s] += source1[0] * weight_row_up_s * weight_col_lr_s * weight_dep_up_s
+s[row_up_s, col_up_s, dep_lr_s] += source1[0] * weight_row_up_s * weight_col_up_s * weight_dep_lr_s
+s[row_up_s, col_up_s, dep_up_s] += source1[0] * weight_row_up_s * weight_col_up_s * weight_dep_up_s
+
 ###############################################################################
 #RECEIVER INTERPOLATION
 ###############################################################################
@@ -215,62 +241,63 @@ weight_col_lr_r = 1 - weight_col_up_r #weight y lower
 weight_dep_up_r = (z_rec / dz) - dep_lr_r #weight z upper
 weight_dep_lr_r = 1 - weight_dep_up_r #weight z lower
 
+
 #distance between source and receiver
 dist_sr = math.sqrt((abs(x_rec - x_source))**2 + (abs(y_rec - y_source))**2 + (abs(z_rec - z_source))**2) #distance between source and receiver
 
 #distance between source and each mesh point in the x direction 
-dist_x = np.sqrt((((xx[:, col_lr_s, dep_lr_s]*(weight_row_lr_s * weight_col_lr_s * weight_dep_lr_s))+\
-    (xx[:, col_lr_s, dep_up_s]*(weight_row_lr_s * weight_col_lr_s * weight_dep_up_s))+\
-        (xx[:, col_up_s, dep_lr_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_lr_s))+\
-            (xx[:, col_up_s, dep_up_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_up_s))+\
-                (xx[:, col_lr_s, dep_lr_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_lr_s))+\
-                    (xx[:, col_lr_s, dep_up_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_up_s))+\
-                        (xx[:, col_up_s, dep_lr_s]*(weight_row_up_s * weight_col_up_s * weight_dep_lr_s))+\
-                            (xx[:, col_up_s, dep_up_s]*(weight_row_up_s * weight_col_up_s * weight_dep_up_s))) - x_source)**2 +\
-                 (((yy[row_lr_s, col_lr_s, dep_lr_s]*(weight_row_lr_s * weight_col_lr_s* weight_dep_lr_s))+\
-                     (yy[row_lr_s, col_lr_s, dep_up_s]*(weight_row_lr_s * weight_col_lr_s * weight_dep_up_s))+\
-                         (yy[row_lr_s, col_up_s, dep_lr_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_lr_s))+\
-                             (yy[row_lr_s, col_up_s, dep_up_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_up_s))+\
-                                 (yy[row_up_s, col_lr_s, dep_lr_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_lr_s))+\
-                                     (yy[row_up_s, col_lr_s, dep_up_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_up_s))+\
-                                         (yy[row_up_s, col_up_s, dep_lr_s]*(weight_row_up_s * weight_col_up_s * weight_dep_lr_s))+\
-                                             (yy[row_up_s, col_up_s, dep_up_s]*(weight_row_up_s * weight_col_up_s * weight_dep_up_s))) - y_source)**2 +\
-                     (((zz[row_lr_s, col_lr_s, dep_lr_s]*(weight_row_lr_s * weight_col_lr_s * weight_dep_lr_s))+\
-                         (zz[row_lr_s, col_lr_s, dep_up_s]*(weight_row_lr_s * weight_col_lr_s * weight_dep_up_s))+\
-                             (zz[row_lr_s, col_up_s, dep_lr_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_lr_s))+\
-                                 (zz[row_lr_s, col_up_s, dep_up_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_up_s))+\
-                                     (zz[row_up_s, col_lr_s, dep_lr_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_lr_s))+\
-                                         (zz[row_up_s, col_lr_s, dep_up_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_up_s))+\
-                                             (zz[row_up_s, col_up_s, dep_lr_s]*(weight_row_up_s * weight_col_up_s * weight_dep_lr_s))+\
-                                                 (zz[row_up_s, col_up_s, dep_up_s]*(weight_row_up_s * weight_col_up_s * weight_dep_up_s))) - z_source)**2)
+dist_x = np.sqrt((((xx[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
+    (xx[:, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
+        (xx[:, col_up_r, dep_lr_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_lr_r))+\
+            (xx[:, col_up_r, dep_up_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_up_r))+\
+                (xx[:, col_lr_r, dep_lr_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_lr_r))+\
+                    (xx[:, col_lr_r, dep_up_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_up_r))+\
+                        (xx[:, col_up_r, dep_lr_r]*(weight_row_up_r * weight_col_up_r * weight_dep_lr_r))+\
+                            (xx[:, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r))) - x_source)**2 +\
+                 (((yy[row_lr_r, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r* weight_dep_lr_r))+\
+                     (yy[row_lr_r, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
+                         (yy[row_lr_r, col_up_r, dep_lr_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_lr_r))+\
+                             (yy[row_lr_r, col_up_r, dep_up_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_up_r))+\
+                                 (yy[row_up_r, col_lr_r, dep_lr_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_lr_r))+\
+                                     (yy[row_up_r, col_lr_r, dep_up_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_up_r))+\
+                                         (yy[row_up_r, col_up_r, dep_lr_r]*(weight_row_up_r * weight_col_up_r * weight_dep_lr_r))+\
+                                             (yy[row_up_r, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r))) - y_source)**2 +\
+                     (((zz[row_lr_r, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
+                         (zz[row_lr_r, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
+                             (zz[row_lr_r, col_up_r, dep_lr_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_lr_r))+\
+                                 (zz[row_lr_r, col_up_r, dep_up_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_up_r))+\
+                                     (zz[row_up_r, col_lr_r, dep_lr_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_lr_r))+\
+                                         (zz[row_up_r, col_lr_r, dep_up_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_up_r))+\
+                                             (zz[row_up_r, col_up_r, dep_lr_r]*(weight_row_up_r * weight_col_up_r * weight_dep_lr_r))+\
+                                                 (zz[row_up_r, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r))) - z_source)**2)
 
 
+#distance between source and each mesh point in the y direction  
+dist_y = np.sqrt((((xx[row_lr_r, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
+    (xx[row_lr_r, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
+        (xx[row_lr_r, col_up_r, dep_lr_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_lr_r))+\
+            (xx[row_lr_r, col_up_r, dep_up_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_up_r))+\
+                (xx[row_up_r, col_lr_r, dep_lr_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_lr_r))+\
+                    (xx[row_up_r, col_lr_r, dep_up_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_up_r))+\
+                        (xx[row_up_r, col_up_r, dep_lr_r]*(weight_row_up_r * weight_col_up_r * weight_dep_lr_r))+\
+                            (xx[row_up_r, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r))) - x_source)**2 +\
+                 (((yy[row_lr_r, :, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r* weight_dep_lr_r))+\
+                     (yy[row_lr_r, :, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
+                         (yy[row_lr_r, :, dep_lr_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_lr_r))+\
+                             (yy[row_lr_r, :, dep_up_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_up_r))+\
+                                 (yy[row_up_r, :, dep_lr_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_lr_r))+\
+                                     (yy[row_up_r, :, dep_up_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_up_r))+\
+                                         (yy[row_up_r, :, dep_lr_r]*(weight_row_up_r * weight_col_up_r * weight_dep_lr_r))+\
+                                             (yy[row_up_r, :, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r))) - y_source)**2 +\
+                     (((zz[row_lr_r, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
+                         (zz[row_lr_r, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
+                             (zz[row_lr_r, col_up_r, dep_lr_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_lr_r))+\
+                                 (zz[row_lr_r, col_up_r, dep_up_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_up_r))+\
+                                     (zz[row_up_r, col_lr_r, dep_lr_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_lr_r))+\
+                                         (zz[row_up_r, col_lr_r, dep_up_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_up_r))+\
+                                             (zz[row_up_r, col_up_r, dep_lr_r]*(weight_row_up_r * weight_col_up_r * weight_dep_lr_r))+\
+                                                 (zz[row_up_r, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r))) - z_source)**2)
 
-#distance between source and each mesh point in the y direction 
-dist_y = np.sqrt((((xx[row_lr_s, col_lr_s, dep_lr_s]*(weight_row_lr_s * weight_col_lr_s * weight_dep_lr_s))+\
-    (xx[row_lr_s, col_lr_s, dep_up_s]*(weight_row_lr_s * weight_col_lr_s * weight_dep_up_s))+\
-        (xx[row_lr_s, col_up_s, dep_lr_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_lr_s))+\
-            (xx[row_lr_s, col_up_s, dep_up_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_up_s))+\
-                (xx[row_lr_s, col_lr_s, dep_lr_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_lr_s))+\
-                    (xx[row_lr_s, col_lr_s, dep_up_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_up_s))+\
-                        (xx[row_lr_s, col_up_s, dep_lr_s]*(weight_row_up_s * weight_col_up_s * weight_dep_lr_s))+\
-                            (xx[row_lr_s, col_up_s, dep_up_s]*(weight_row_up_s * weight_col_up_s * weight_dep_up_s))) - x_source)**2 +\
-                 (((yy[row_lr_s, :, dep_lr_s]*(weight_row_lr_s * weight_col_lr_s* weight_dep_lr_s))+\
-                     (yy[row_lr_s, :, dep_up_s]*(weight_row_lr_s * weight_col_lr_s * weight_dep_up_s))+\
-                         (yy[row_lr_s, :, dep_lr_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_lr_s))+\
-                             (yy[row_lr_s, :, dep_up_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_up_s))+\
-                                 (yy[row_up_s, :, dep_lr_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_lr_s))+\
-                                     (yy[row_up_s, :, dep_up_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_up_s))+\
-                                         (yy[row_up_s, :, dep_lr_s]*(weight_row_up_s * weight_col_up_s * weight_dep_lr_s))+\
-                                             (yy[row_up_s, :, dep_up_s]*(weight_row_up_s * weight_col_up_s * weight_dep_up_s))) - y_source)**2 +\
-                     (((zz[row_lr_s, col_lr_s, dep_lr_s]*(weight_row_lr_s * weight_col_lr_s * weight_dep_lr_s))+\
-                         (zz[row_lr_s, col_lr_s, dep_up_s]*(weight_row_lr_s * weight_col_lr_s * weight_dep_up_s))+\
-                             (zz[row_lr_s, col_up_s, dep_lr_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_lr_s))+\
-                                 (zz[row_lr_s, col_up_s, dep_up_s]*(weight_row_lr_s * weight_col_up_s * weight_dep_up_s))+\
-                                     (zz[row_up_s, col_lr_s, dep_lr_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_lr_s))+\
-                                         (zz[row_up_s, col_lr_s, dep_up_s]*(weight_row_up_s * weight_col_lr_s * weight_dep_up_s))+\
-                                             (zz[row_up_s, col_up_s, dep_lr_s]*(weight_row_up_s * weight_col_up_s * weight_dep_lr_s))+\
-                                                 (zz[row_up_s, col_up_s, dep_up_s]*(weight_row_up_s * weight_col_up_s * weight_dep_up_s))) - z_source)**2)
 
 #Function to draw figure
 ##def draw_fig():
@@ -283,11 +310,11 @@ dist_y = np.sqrt((((xx[row_lr_s, col_lr_s, dep_lr_s]*(weight_row_lr_s * weight_c
 #TRIAL 4D PLOT
 ############################################################################
 #Initialize the figure and axes
-##if tcalc == "decay":
-##    plt.figure()
-##    ax = fig.add_subplot(111, projection='3d')
-##    plt.title("4D plot")
-##    ax.view_init(elev=30, azim=45) #Set the initial view angle
+#if tcalc == "decay":
+#    plt.figure()
+#    ax = fig.add_subplot(111, projection='3d')
+#    plt.title("4D plot")
+#    ax.view_init(elev=30, azim=45) #Set the initial view angle
 
 #%%
 ###############################################################################
@@ -295,21 +322,13 @@ dist_y = np.sqrt((((xx[row_lr_s, col_lr_s, dep_lr_s]*(weight_row_lr_s * weight_c
 ############################################################################### 
 
 w_new = np.zeros((Nx,Ny,Nz)) #unknown w at new time level (n+1)
-w = np.zeros((Nx,Ny,Nz))
-
-w[row_lr_s, col_lr_s, dep_lr_s] += w1 * (weight_row_lr_s * weight_col_lr_s * weight_dep_lr_s)
-w[row_lr_s, col_lr_s, dep_up_s] += w1 * (weight_row_lr_s * weight_col_lr_s * weight_dep_up_s)
-w[row_lr_s, col_up_s, dep_lr_s] += w1 * (weight_row_lr_s * weight_col_up_s * weight_dep_lr_s)
-w[row_lr_s, col_up_s, dep_up_s] += w1 * (weight_row_lr_s * weight_col_up_s * weight_dep_up_s)
-w[row_up_s, col_lr_s, dep_lr_s] += w1 * (weight_row_up_s * weight_col_lr_s * weight_dep_lr_s)
-w[row_up_s, col_lr_s, dep_up_s] += w1 * (weight_row_up_s * weight_col_lr_s * weight_dep_up_s)
-w[row_up_s, col_up_s, dep_lr_s] += w1 * (weight_row_up_s * weight_col_up_s * weight_dep_lr_s)
-w[row_up_s, col_up_s, dep_up_s] += w1 * (weight_row_up_s * weight_col_up_s * weight_dep_up_s)
-
-w_old = np.zeros((Nx,Ny,Nz)) #w at n-1 level
+w = w_new #w at n level
+w_old = w #w_old at n-1 level
 
 w_rec = np.arange(0,recording_time,dt) #energy density at the receiver
 w_rec_all = np.zeros((1,len(x))) 
+
+curPercent = 0
 
 #Computing w;
 for steps in range(0, recording_steps):
@@ -352,6 +371,7 @@ for steps in range(0, recording_steps):
     #Computing w_new (w at n+1 time step)
     w_new = np.divide((np.multiply(w_old,(1-beta_zero))),(1+beta_zero)) - \
         np.divide((2*dt*c0*m_atm*w),(1+beta_zero)) + \
+            np.divide((2*dt*s),(1+beta_zero)) + \
                 np.divide((np.multiply(beta_zero_x,(w_iplus1+w_iminus1))),(1+beta_zero)) + \
                     np.divide((np.multiply(beta_zero_y,(w_jplus1+w_jminus1))),(1+beta_zero)) + \
                         np.divide((np.multiply(beta_zero_z,(w_kplus1+w_kminus1))),(1+beta_zero))
@@ -391,26 +411,33 @@ for steps in range(0, recording_steps):
                             (w_new[row_up_r, col_up_r, dep_lr_r]*(weight_row_up_r * weight_col_up_r * weight_dep_lr_r))+\
                                 (w_new[row_up_r, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r)))
             
-    if steps == 1:
+    if steps == sourceon_steps:
         #print("Steps for source:",steps)
         w_t0 = w_new
 
-    if steps == round(1*lambda_time_step): #+ sourceon_steps + (dist_sr/c0)):
+    if steps == round(1*mean_free_time_step + sourceon_steps):
         index_1l = steps
         w_1l = w_new
         
-    if steps == round(2*lambda_time_step): #+ sourceon_steps + (dist_sr/c0)):
+    if steps == round(2*mean_free_time_step + sourceon_steps):
         index_2l = steps
         w_2l = w_new
         
-    if steps == round(3*lambda_time_step): #+ sourceon_steps + (dist_sr/c0)):
+    if steps == round(3*mean_free_time_step + sourceon_steps):
         index_3l = steps
         w_3l = w_new
 
-    if steps == round(5*lambda_time_step): #+ sourceon_steps + (dist_sr/c0)):
+    if steps == round(5*mean_free_time_step + sourceon_steps):
         index_5l = steps
         w_5l = w_new
+    
+    if steps == round(2*longest_dimension_step + sourceon_steps):
+        index_2ld = steps
+        w_2ld = w_new
         
+    if steps == round(4*longest_dimension_step + sourceon_steps):
+        index_4ld = steps
+        w_4ld = w_new
     #4D Visualization????
     #Flatten the coordinates and w_new values for scatter plot
     ##coords = np.column_stack([xx.ravel(), yy.ravel(), zz.ravel()])
@@ -446,19 +473,31 @@ for steps in range(0, recording_steps):
     ##plt.pause(0.01)  # Adjust the pause duration as needed
     
     #Updating the source term
-    
+    if tcalc == "decay":
+        s[row_lr_s, col_lr_s, dep_lr_s] = source1[steps] * (weight_row_lr_s * weight_col_lr_s * weight_dep_lr_s)
+        s[row_lr_s, col_lr_s, dep_up_s] = source1[steps] * (weight_row_lr_s * weight_col_lr_s * weight_dep_up_s)
+        s[row_lr_s, col_up_s, dep_lr_s] = source1[steps] * (weight_row_lr_s * weight_col_up_s * weight_dep_lr_s)
+        s[row_lr_s, col_up_s, dep_up_s] = source1[steps] * (weight_row_lr_s * weight_col_up_s * weight_dep_up_s)
+        s[row_up_s, col_lr_s, dep_lr_s] = source1[steps] * (weight_row_up_s * weight_col_lr_s * weight_dep_lr_s)
+        s[row_up_s, col_lr_s, dep_up_s] = source1[steps] * (weight_row_up_s * weight_col_lr_s * weight_dep_up_s)
+        s[row_up_s, col_up_s, dep_lr_s] = source1[steps] * (weight_row_up_s * weight_col_up_s * weight_dep_lr_s)
+        s[row_up_s, col_up_s, dep_up_s] = source1[steps] * (weight_row_up_s * weight_col_up_s * weight_dep_up_s)
     if tcalc == "stationarysource":
-        
-        w_old[row_lr_s, col_lr_s, dep_lr_s] = w1 * (weight_row_lr_s * weight_col_lr_s * weight_dep_lr_s)
-        w_old[row_lr_s, col_lr_s, dep_up_s] = w1 * (weight_row_lr_s * weight_col_lr_s * weight_dep_up_s)
-        w_old[row_lr_s, col_up_s, dep_lr_s] = w1 * (weight_row_lr_s * weight_col_up_s * weight_dep_lr_s)
-        w_old[row_lr_s, col_up_s, dep_lr_s] = w1 * (weight_row_lr_s * weight_col_up_s * weight_dep_up_s)
-        w_old[row_up_s, col_lr_s, dep_lr_s] = w1 * (weight_row_up_s * weight_col_lr_s * weight_dep_lr_s)
-        w_old[row_up_s, col_lr_s, dep_up_s] = w1 * (weight_row_up_s * weight_col_lr_s * weight_dep_up_s)
-        w_old[row_up_s, col_up_s, dep_lr_s] = w1 * (weight_row_up_s * weight_col_up_s * weight_dep_lr_s)
-        w_old[row_up_s, col_up_s, dep_up_s] = w1 * (weight_row_up_s * weight_col_up_s * weight_dep_up_s)
+        s[row_lr_s, col_lr_s, dep_lr_s] = source1[0] * (weight_row_lr_s * weight_col_lr_s * weight_dep_lr_s)
+        s[row_lr_s, col_lr_s, dep_up_s] = source1[0] * (weight_row_lr_s * weight_col_lr_s * weight_dep_up_s)
+        s[row_lr_s, col_up_s, dep_lr_s] = source1[0] * (weight_row_lr_s * weight_col_up_s * weight_dep_lr_s)
+        s[row_lr_s, col_up_s, dep_up_s] = source1[0] * (weight_row_lr_s * weight_col_up_s * weight_dep_up_s)
+        s[row_up_s, col_lr_s, dep_lr_s] = source1[0] * (weight_row_up_s * weight_col_lr_s * weight_dep_lr_s)
+        s[row_up_s, col_lr_s, dep_up_s] = source1[0] * (weight_row_up_s * weight_col_lr_s * weight_dep_up_s)
+        s[row_up_s, col_up_s, dep_lr_s] = source1[0] * (weight_row_up_s * weight_col_up_s * weight_dep_lr_s)
+        s[row_up_s, col_up_s, dep_up_s] = source1[0] * (weight_row_up_s * weight_col_up_s * weight_dep_up_s)
     
-    print(time_steps)
+    
+    #print(time_steps)
+    percentDone = round(100*time_steps/recording_time);
+    if (percentDone > curPercent):
+        print(str(curPercent + 1) + "% done")
+        curPercent += 1;
 
 plt.show()
 
@@ -472,7 +511,7 @@ w_rec_x_end = ((w_new[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r 
                             (w_new[:, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r)))
 
 spl_rec_x_end = 10*np.log10(rho*c0**2*abs(w_rec_x_end)/pRef**2)
-
+    
 w_rec_x_1l = ((w_1l[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
      (w_1l[:, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
          (w_1l[:, col_up_r, dep_lr_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_lr_r))+\
@@ -483,7 +522,7 @@ w_rec_x_1l = ((w_1l[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * 
                              (w_1l[:, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r)))
 
 spl_rec_x_1l = 10*np.log10(rho*c0**2*abs(w_rec_x_1l)/pRef**2)
-    
+
 w_rec_x_2l = ((w_2l[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
        (w_2l[:, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
            (w_2l[:, col_up_r, dep_lr_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_lr_r))+\
@@ -494,7 +533,7 @@ w_rec_x_2l = ((w_2l[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * 
                                (w_2l[:, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r)))
 
 spl_rec_x_2l = 10*np.log10(rho*c0**2*abs(w_rec_x_2l)/pRef**2)
-
+    
 w_rec_x_3l = ((w_3l[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
        (w_3l[:, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
            (w_3l[:, col_up_r, dep_lr_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_lr_r))+\
@@ -505,7 +544,7 @@ w_rec_x_3l = ((w_3l[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * 
                                (w_3l[:, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r)))
 
 spl_rec_x_3l = 10*np.log10(rho*c0**2*abs(w_rec_x_3l)/pRef**2)
-    
+
 w_rec_x_5l = ((w_5l[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
     (w_5l[:, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
         (w_5l[:, col_up_r, dep_lr_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_lr_r))+\
@@ -514,9 +553,31 @@ w_rec_x_5l = ((w_5l[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * 
                     (w_5l[:, col_lr_r, dep_up_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_up_r))+\
                         (w_5l[:, col_up_r, dep_lr_r]*(weight_row_up_r * weight_col_up_r * weight_dep_lr_r))+\
                             (w_5l[:, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r)))    
-    
-    
+
 spl_rec_x_5l = 10*np.log10(rho*c0**2*abs(w_rec_x_5l)/pRef**2)
+
+w_rec_x_2ld = ((w_2ld[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
+    (w_2ld[:, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
+        (w_2ld[:, col_up_r, dep_lr_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_lr_r))+\
+            (w_2ld[:, col_up_r, dep_up_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_up_r))+\
+                (w_2ld[:, col_lr_r, dep_lr_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_lr_r))+\
+                    (w_2ld[:, col_lr_r, dep_up_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_up_r))+\
+                        (w_2ld[:, col_up_r, dep_lr_r]*(weight_row_up_r * weight_col_up_r * weight_dep_lr_r))+\
+                            (w_2ld[:, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r)))    
+
+spl_rec_x_2ld = 10*np.log10(rho*c0**2*abs(w_rec_x_2ld)/pRef**2)
+
+w_rec_x_4ld = ((w_4ld[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
+    (w_4ld[:, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
+        (w_4ld[:, col_up_r, dep_lr_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_lr_r))+\
+            (w_4ld[:, col_up_r, dep_up_r]*(weight_row_lr_r * weight_col_up_r * weight_dep_up_r))+\
+                (w_4ld[:, col_lr_r, dep_lr_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_lr_r))+\
+                    (w_4ld[:, col_lr_r, dep_up_r]*(weight_row_up_r * weight_col_lr_r * weight_dep_up_r))+\
+                        (w_4ld[:, col_up_r, dep_lr_r]*(weight_row_up_r * weight_col_up_r * weight_dep_lr_r))+\
+                            (w_4ld[:, col_up_r, dep_up_r]*(weight_row_up_r * weight_col_up_r * weight_dep_up_r)))    
+
+spl_rec_x_4ld = 10*np.log10(rho*c0**2*abs(w_rec_x_4ld)/pRef**2)
+
     
 w_rec_x_t0 = ((w_t0[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
     (w_t0[:, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
@@ -546,8 +607,9 @@ w_rec_y_end = ((w_new[row_lr_r, :, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r 
 
 
 spl_stat_x_t0 = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_x**2))) + ((abs(w_rec_x_t0)*c0)))/(pRef**2)) #with direct sound
-spl_stat_x_5l = 10*np.log10(rho*c0**2*w_rec_x_5l/pRef**2)
+spl_stat_x_5l = 10*np.log10(rho*c0**2*abs(w_rec_x_5l)/pRef**2)
 
+spl_stat_x_rev = 10*np.log10(rho*c0*(((abs(w_rec_x_end)*c0)))/(pRef**2))
 
 spl_stat_x = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_x**2))) + ((abs(w_rec_x_end)*c0)))/(pRef**2))
 spl_stat_y = 10*np.log10(rho*c0*(((Ws)/(4*math.pi*(dist_y**2))) + ((abs(w_rec_y_end)*c0)))/(pRef**2)) #It should be the spl stationary
@@ -557,19 +619,33 @@ spl_r = 10*np.log10(((abs(w_rec))*rho*(c0**2))/(pRef**2)) #,where=press_r>0, sou
 spl_r_norm = 10*np.log10((((abs(w_rec))*rho*(c0**2))/(pRef**2)) / np.max(((abs(w_rec))*rho*(c0**2))/(pRef**2))) #normalised to maximum to 0dB
 spl_r_tot = 10*np.log10(rho*c0*((Ws/(4*math.pi*dist_sr**2))*np.exp(-m_atm*dist_sr) + ((abs(w_rec))*c0))/(pRef**2)) #spl total (including direct field) at the receiver position????? but it will need to be calculated for a stationary source 100dB
 
+#Find the energy decay part of the overal calculation
+idx_w_rec = np.argmin(np.abs(t - sourceon_time)) #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
+#idx_w_rec = np.where(t == sourceon_time)[0][0] #index at which the t array is equal to the sourceon_time; I want the RT to calculate from when the source stops.
+w_rec_off = w_rec[idx_w_rec:] #cutting the energy density array at the receiver from the idx_w_rec to the end
+spl_r_off = 10*np.log10(((abs(w_rec_off))*rho*(c0**2))/(pRef**2))
+
+#Impulse response from the energy density
+w_rec_off_deriv = w_rec_off #initialising an array of derivative equal to the w_rec_off -> this will be the impulse response after modifying it
+w_rec_off_deriv = np.delete(w_rec_off_deriv, 0) #delete the first element of the array -> this means shifting the array one step before and therefore do a derivation
+w_rec_off_deriv = np.append(w_rec_off_deriv,0) #add a zero in the last element of the array -> for derivation and to have the same length as previously
+impulse = ((w_rec_off - w_rec_off_deriv))/dt#/(rho*c0**2) #This is the difference between the the energy density and the impulse response 
+
+spl_r_off_diff = 10*np.log10(((abs(impulse))*rho*(c0**2))/(pRef**2)) #spl att he recevier when the source is off and differentiated
+
 #Schroeder integration
-energy_r_rev = (w_rec)[::-1] #reverting the array
+#energy_r_rev = (w_rec_off)[::-1] #reverting the array
 #The energy density is related to the pressure with the following relation: w = p^2
-energy_r_rev_cum = np.cumsum(energy_r_rev) #cumulative summation of all the item in the array
-schroeder = (energy_r_rev_cum[::-1])*dt#reverting the array again -> creating the schroder decay
+#energy_r_rev_cum = np.cumsum(energy_r_rev) #cumulative summation of all the item in the array
+schroeder = w_rec_off #energy_r_rev_cum[::-1] #reverting the array again -> creating the schroder decay
 sch_db = 10.0 * np.log10(schroeder / max(schroeder)) #level of the array: schroeder decay
 
 if tcalc == "decay":
-    t60 = t60_decay(t, sch_db, 0) #called function for calculation of t60 [s]
-    edt = edt_decay(t, sch_db, 0) #called function for calculation of edt [s]
-    c80 = clarity(t60, V, Eq_A, S, c0, dist_sr) #called function for calculation of c80 [dB]
-    d50 = definition(t60, V, Eq_A, S, c0, dist_sr) #called function for calculation of d50 [%]
-    ts = centretime(t60, Eq_A, S) #called function for calculation of ts [ms]
+    t30 = t60_decay(t, sch_db, idx_w_rec, rt='t30') #called function for calculation of t60 [s]
+    edt = t60_decay(t, sch_db, idx_w_rec, rt='edt') #called function for calculation of edt [s]
+    c80 = clarity(t30, V, Eq_A, S, c0, dist_sr) #called function for calculation of c80 [dB]
+    d50 = definition(t30, V, Eq_A, S, c0, dist_sr) #called function for calculation of d50 [%]
+    ts = centretime(t30, Eq_A, S) #called function for calculation of ts [ms]
 
 et = time.time() #end time
 elapsed_time = et - st
@@ -614,7 +690,7 @@ if tcalc == "decay":
     
     #Figure 8: Schroeder decay
     plt.figure(8)
-    plt.plot(t,sch_db)
+    plt.plot(t[idx_w_rec:],sch_db)
     plt.title("Figure 8: Schroeder decay (Energy Decay Curve)")
     plt.xlabel("t [s]")
     plt.ylabel("Energy decay [dB]")
@@ -673,59 +749,87 @@ if tcalc == "decay":
     plt.ylabel('$\mathrm{SPL \ [dB]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
        
-    #Figure 15: Energy density at t=1*lambda over the space x.
+    #Figure 15: Energy density at t=1*mean_free over the space x.
     plt.figure(15)
-    plt.title("Figure 15: Energy density over the x axis at t=1*lambda_time")
+    plt.title("Figure 15: Energy density over the x axis at t=1*mean_free_time")
     plt.plot(x,w_rec_x_1l)
     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
     
-    #Figure 16: SPL at  t=1*lambda over the space x. reverb sound only
+    #Figure 16: SPL at  t=1*mean_free over the space x. reverb sound only
     plt.figure(16)
-    plt.title("Figure 16: SPL REVERB over the x axis at t=1*lambda")
+    plt.title("Figure 16: SPL REVERB over the x axis at t=1*mean_free")
     plt.plot(x,spl_rec_x_1l)
     plt.ylabel('$\mathrm{SPL \ [dB]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')    
     
-    #Figure 17: Energy density at t=2*lambda over the space x.
+    #Figure 17: Energy density at t=2*mean_free over the space x.
     plt.figure(17)
-    plt.title("Figure 17: Energy density over the x axis at t=2*lambda_time")
+    plt.title("Figure 17: Energy density over the x axis at t=2*mean_free_time")
     plt.plot(x,w_rec_x_2l)
     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
     
-    #Figure 18: SPL at  t=2*lambda over the space x. reverb sound only
+    #Figure 18: SPL at  t=2*mean_free over the space x. reverb sound only
     plt.figure(18)
-    plt.title("Figure 18: SPL REVERB over the x axis at t=2*lambda")
+    plt.title("Figure 18: SPL REVERB over the x axis at t=2*mean_free")
     plt.plot(x,spl_rec_x_2l)
     plt.ylabel('$\mathrm{SPL \ [dB]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')      
     
-    #Figure 19: Energy density at t=3*lambda over the space x.
+    #Figure 19: Energy density at t=3*mean_free over the space x.
     plt.figure(19)
-    plt.title("Figure 19: Energy density over the x axis at t=3*lambda_time")
+    plt.title("Figure 19: Energy density over the x axis at t=3*mean_free_time")
     plt.plot(x,w_rec_x_3l)
     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
     
-    #Figure 20: SPL at  t=3*lambda over the space x. reverb sound only
+    #Figure 20: SPL at  t=3*mean_free over the space x. reverb sound only
     plt.figure(20)
-    plt.title("Figure 20: SPL REVERB over the x axis at t=3*lambda")
+    plt.title("Figure 20: SPL REVERB over the x axis at t=3*mean_free")
     plt.plot(x,spl_rec_x_3l)
     plt.ylabel('$\mathrm{SPL \ [dB]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
     
-    #Figure 21: Energy density at t=5*lambda over the space x.
+    #Figure 21: Energy density at t=5*mean_free over the space x.
     plt.figure(21)
-    plt.title("Figure 21: Energy density over the x axis at t=5*lambda_time")
+    plt.title("Figure 21: Energy density over the x axis at t=5*mean_free_time")
     plt.plot(x,w_rec_x_5l)
     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
     
-    #Figure 22: SPL at  t=5*lambda over the space x. reverb sound only
+    #Figure 22: SPL at  t=5*mean_free over the space x. reverb sound only
     plt.figure(22)
-    plt.title("Figure 22: SPL REVERB over the x axis at t=5*lambda")
+    plt.title("Figure 22: SPL REVERB over the x axis at t=5*mean_free")
     plt.plot(x,spl_rec_x_5l)
+    plt.ylabel('$\mathrm{SPL \ [dB]}$')
+    plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
+    
+    #Figure 23: Energy density at t=2*ld over the space x.
+    plt.figure(23)
+    plt.title("Figure 23: Energy density over the x axis at t=2*longest_dimension_time")
+    plt.plot(x,w_rec_x_2ld)
+    plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
+    plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
+    
+    #Figure 24: SPL at  t=2*ld over the space x. reverb sound only
+    plt.figure(24)
+    plt.title("Figure 24: SPL REVERB over the x axis at t=2*longest_dimension_time")
+    plt.plot(x,spl_rec_x_2ld)
+    plt.ylabel('$\mathrm{SPL \ [dB]}$')
+    plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
+    
+    #Figure 25: Energy density at t=4*ld over the space x.
+    plt.figure(25)
+    plt.title("Figure 25: Energy density over the x axis at t=4*longest_dimension_time")
+    plt.plot(x,w_rec_x_4ld)
+    plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
+    plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
+    
+    #Figure 26: SPL at  t=4*ld over the space x. reverb sound only
+    plt.figure(26)
+    plt.title("Figure 26: SPL REVERB over the x axis at t=4*longest_dimension_time")
+    plt.plot(x,spl_rec_x_4ld)
     plt.ylabel('$\mathrm{SPL \ [dB]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
     
@@ -783,7 +887,7 @@ if tcalc == "stationarysource":
     plt.title("Figure 7: SPL over the x axis")
     plt.plot(x,data_x)
     #plt.xticks(np.arange(0, 35, 5))
-    #plt.yticks(np.arange(65, 105, 5))
+    #plt.yticks(np.arange(90, 97, 1))
     plt.ylabel('$\mathrm{Sound \ Pressure \ Level \ [dB]}$')
     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')
     
@@ -798,23 +902,9 @@ if tcalc == "stationarysource":
 ###############################################################################
 #SAVING
 ###############################################################################
-np.save('w_rec_imp',w_rec)
-#np.save('w_rec_off',w_rec_off)
-
+np.save('w_rec_off',w_rec_off)
+np.save('spl_r_off',spl_r_off)
+np.save('t30',t30)
+np.save('spl_r_off_diff',spl_r_off_diff)
 np.save('x_axis',x)
-
-np.save('w_rec_x_t0_imp',w_rec_x_t0)
-np.save('w_rec_x_1l_imp',w_rec_x_1l)
-np.save('w_rec_x_2l_imp',w_rec_x_2l)
-np.save('w_rec_x_3l_imp',w_rec_x_3l)
-np.save('w_rec_x_5l_imp',w_rec_x_5l)
-
-np.save('spl_rec_x_t0_imp',spl_rec_x_t0)
-np.save('spl_rec_x_1l_imp',spl_rec_x_1l)
-np.save('spl_rec_x_2l_imp',spl_rec_x_2l)
-np.save('spl_rec_x_3l_imp',spl_rec_x_3l)
-np.save('spl_rec_x_5l_imp',spl_rec_x_5l)
-
-np.save('w_rec_x_imp',w_rec_x_end)
-np.save('w_rec_y_imp',w_rec_y_end)
-np.save('D0',Dx)
+np.save('t_off',t[idx_w_rec:])

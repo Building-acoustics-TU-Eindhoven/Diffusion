@@ -82,8 +82,7 @@ tcalc = "decay"
 
 #Set initial condition - Source Info (interrupted method)
 Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
-sourceon_time =  0.85 #time that the source is ON before interrupting [s]
-recording_time = 1.70 #total time recorded for the calculation [s]
+
 
 #%%
 ###############################################################################
@@ -96,10 +95,6 @@ rho = 1.21 #air density [kg.m^-3] at 20°C
 
 #Frequency resolution & spatial parameters
 fsample = 1/dt #frequency spatial resolution (sampling period)
-
-#Time resolution
-t = np.arange(0, recording_time, dt) #mesh point in time
-recording_steps = ceil(recording_time/dt) #number of time steps to consider in the calculation
 
 #Room characteristics
 S1,S2 = length*width, length*width #xy planes
@@ -146,10 +141,22 @@ Abs_6 = abs_term(th,alpha_6) #absorption term for S6
 alpha_average = (alpha_1*S1 + alpha_2*S2 + alpha_3*S3 + alpha_4*S4 + alpha_5*S5 + alpha_6*S6)/S #average absorption
 Eq_A = alpha_1*S1 + alpha_2*S2 + alpha_3*S3 + alpha_4*S4 + alpha_5*S5 + alpha_6*S6 #equivalent absorption area of the room
 
+RT_Sabine = 0.16*V/Eq_A
+sourceon_time = round(RT_Sabine,1)#time that the source is ON before interrupting [s]
+recording_time = 2*sourceon_time #total time recorded for the calculation [s]
+
+#Time resolution
+t = np.arange(0, recording_time, dt) #mesh point in time
+recording_steps = ceil(recording_time/dt) #number of time steps to consider in the calculation
+
+t_35dB = round(35/60*RT_Sabine,4)
+idx_t35dB = np.argmin(np.abs(t - t_35dB))#[0][0] #index at which the t array is equal to the t_ at the decay of -35dB
+
 #Diffusion parameters
 mean_free_path = (4*V)/S #mean free path for 3D
 mean_free_time= mean_free_path/c0 #mean free time for 3D
 mean_free_time_step = int(mean_free_time/dt)
+D_th = (mean_free_path*c0)/3
 Dx = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms x direction
 Dy = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms y direction
 Dz = (mean_free_path*c0)/3 #diffusion coefficient for proportionate rooms z direction
@@ -321,6 +328,8 @@ w_old = w #w_old at n-1 level
 w_rec = np.arange(0,recording_time,dt) #energy density at the receiver
 w_rec_all = np.zeros((1,len(x))) 
 
+curPercent = 0
+
 #Computing w;
 for steps in range(0, recording_steps):
     #Compute w at inner mesh points
@@ -484,7 +493,11 @@ for steps in range(0, recording_steps):
         s[row_up_s, col_up_s, dep_up_s] = source1[0] * (weight_row_up_s * weight_col_up_s * weight_dep_up_s)
     
     
-    print(time_steps)
+    #print(time_steps)
+    percentDone = round(100*time_steps/recording_time);
+    if (percentDone > curPercent):
+        print(str(curPercent + 1) + "% done")
+        curPercent += 1;
 
 plt.show()
 
@@ -629,7 +642,7 @@ sch_db = 10.0 * np.log10(schroeder / max(schroeder)) #level of the array: schroe
 
 if tcalc == "decay":
     t30 = t60_decay(t, sch_db, idx_w_rec, rt='t30') #called function for calculation of t60 [s]
-    edt = edt_decay(t, sch_db, idx_w_rec) #called function for calculation of edt [s]
+    edt = t60_decay(t, sch_db, idx_w_rec, rt='edt') #called function for calculation of edt [s]
     c80 = clarity(t30, V, Eq_A, S, c0, dist_sr) #called function for calculation of c80 [dB]
     d50 = definition(t30, V, Eq_A, S, c0, dist_sr) #called function for calculation of d50 [%]
     ts = centretime(t30, Eq_A, S) #called function for calculation of ts [ms]
@@ -891,6 +904,7 @@ if tcalc == "stationarysource":
 ###############################################################################
 np.save('w_rec_off',w_rec_off)
 np.save('spl_r_off',spl_r_off)
+np.save('t30',t30)
 np.save('spl_r_off_diff',spl_r_off_diff)
 np.save('x_axis',x)
 np.save('t_off',t[idx_w_rec:])

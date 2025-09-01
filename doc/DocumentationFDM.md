@@ -8,7 +8,7 @@ The model for the sound energy density w(r,t) at position r and at time t on a d
 <!-- ```{math}
 ∂w(r,t)/∂t- D((∂^2 w(r,t))/(∂x^2 )+(∂^2 w(r,t))/(∂y^2 )+(∂^2 w(r,t))/(∂z^2 ))+ cmw(r,t)=P(t)δ(r-r_s ) in V
 ``` -->
-
+```markdown
 $$
 \frac{\partial w(\mathbf{r}, t)}{\partial t} 
 - D \left( \frac{\partial^2 w(\mathbf{r}, t)}{\partial x^2} 

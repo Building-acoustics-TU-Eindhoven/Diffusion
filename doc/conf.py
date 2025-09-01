@@ -39,7 +39,11 @@ extensions = ["sphinx.ext.autodoc",
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
     'myst_parser']
-source_suffix = ['.rst', '.md']
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'myst',
+}
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

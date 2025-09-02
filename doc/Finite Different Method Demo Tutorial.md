@@ -19,3 +19,5 @@ Test if the software provides the following results (Navarro et al., 2012):
 - Clarity ($C_{80}$): 2.08 dB;
 - Definition ($D_{50}$): 45.63 %
 - Centre Time ($T_{s}$): 85.33 ms
+
+The result file is a pickle file called resultsFDM.pkl. All the results are included in this file.

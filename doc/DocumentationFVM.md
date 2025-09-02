@@ -35,11 +35,11 @@ As for the finite element method, the finite volume method consists on the creat
 
 For the discretization, the following are important:
 - $j$ control volume;
-- $k$ \text{control volume adjacent to } $j$;
-- $w_j$ \text{energy density computed at the centre of control volume } $j$;
+- $k \text{control volume adjacent to } j$;
+- $w_j \text{energy density computed at the centre of control volume } j$;
 - $w_k$ energy density computed at the centre of control volume $k$;
-- $S_{j,k}$ \text{common area between control volume} $j$ \text{and control volume} $k$;
-- $d_{j,k}$ \text{distance between centre of control volume} $j$ \text{and centre of control volume} $k$.
+- $S_{j,k} \text{common area between control volume} $j$ \text{and control volume} k$;
+- $d_{j,k} \text{distance between centre of control volume} $j$ \text{and centre of control volume} k$.
 
 The diffusion equation need to be integrated over one element $j$ via the following equation:
 

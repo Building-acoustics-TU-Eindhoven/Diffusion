@@ -33,10 +33,10 @@ The Dufort and Frankel method is an expansion of the Forward-Time-Centere-space 
 
 According to the Dufort and Frankel method, the discretization is based on the following:
 
-- $i$ \text{is the spatial element along} $x$ direction;
-- $j$ \text{is the spatial element along} $y$ direction;
-- $k$ \text{is the spatial element along} $z$ direction;
-- $n$ is the temporal element.
+- $i \text{ is the spatial element along } x$ direction;
+- $j \text{ is the spatial element along } y$ direction;
+- $k \text{ is the spatial element along } z$ direction;
+- $n is the temporal element.
 
 with the following surface definition:
 

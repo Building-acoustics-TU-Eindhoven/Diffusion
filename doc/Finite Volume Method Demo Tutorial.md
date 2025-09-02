@@ -22,4 +22,4 @@ Therefore, to test the software:
 "`Enter absorption coefficient for frequency {fc_low} to {fc_high} for Wall1:`0.15,0.36,0.64,0.83,0.88".
 6. Once you have done that for all the different surface material types, the software should continue running without any prompt. The simulation time depends on the room dimensions but mostly on the mesh dimension.
 
-The software should provide results of Sound Pressure Levels at the receiver position, Reverberation time, Clarity and other energetic parameters.
+The software should provide results of Sound Pressure Levels at the receiver position, Reverberation time, Clarity and other energetic parameters in a pickle file called resultsFVM.pkl.

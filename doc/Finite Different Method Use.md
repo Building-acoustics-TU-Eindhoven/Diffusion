@@ -99,7 +99,7 @@ After predicting the time-dependent sound energy density in the room, the sound 
 ```{math}
 SPL = 20 log_{10} \left⁡( \frac{w(\mathbf{r}, t) \rho c^2}{p_{ref}^2} \right ) 
 ```
-where *p_{ref}* is $2 \cdot 10^{-5}$ Pa and $\rho $ is the air density.
+where $p_{ref}$ is $2 \cdot 10^{-5}$ Pa and $\rho $ is the air density.
 
 #### Reverberation time (RT) and Early Decay Time (EDT)
 From the sound pressure level decay curve, the Reverberation time can be estimated. The RT is defined by the time that it takes for the sound pressure level to decay of 60 dB. Depending on the room geometry, occasionally it is difficult to evaluate 60 dB of decay and therefore, the $T_{30}$ is evaluated. This is obtained from the slope between -5 and -35 dB of the maximum starting level.  
@@ -117,7 +117,7 @@ C_{80} = 10 log⁡ \left( \frac{\int_0^{80ms} p^2(t) \, dt}{\int_{80ms}^\infty p
 The Definition ($D_{50}$) parameter is the ratio of the early received sound energy (0-50ms after direct sound arrival) to the total received energy. It referres only to the speech and it is defined as: 
 
 ```{math}
-D_{50}=10 log \left⁡(\frac{\int_0^{50ms} p^2(t) \, dt}{\int_0^\infty p^2(t) \, dt} \right )  \,  [%]
+D_{50}=10 log \left⁡( \frac{\int_0^{50ms} p^2(t) \, dt}{\int_0^\infty p^2(t) \, dt} \right )  \,  [%]
 ```
 
 The Centre Time (T_s) parameter is the center of gravity of the squared impulse response. Centre Time avoids the discrete division of the impulse response into early and late periods. 

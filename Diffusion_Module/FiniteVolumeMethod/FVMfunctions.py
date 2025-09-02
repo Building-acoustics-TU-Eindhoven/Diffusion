@@ -50,6 +50,13 @@ logger = logging.getLogger(__name__)
 #SURFACE MATERIALS FUNCTIONS
 ###############################################################################
 
+def number_freq():
+    x_frequencies  = num_octave * log(fc_high/fc_low) / log(2)
+    nBands = int(num_octave * log(fc_high/fc_low) / log(2) + 1)
+    center_freq = fc_low * np.power(2,((np.arange(0,x_frequencies+1) / num_octave)))
+    return x_frequencies, nBands,center_freq
+
+
 # Absorption term for boundary conditions 
 def abs_term(th,abscoeff_list):
     Absx_array = np.array([])
@@ -1124,150 +1131,150 @@ def save(filename):
 if __name__ == '__main__':
     st = time.time() #start time of calculation
 
-    #%%
-    ###############################################################################
-    #INPUT VARIABLES
-    ###############################################################################
+    # #%%
+    # ###############################################################################
+    # #INPUT VARIABLES
+    # ###############################################################################
 
-    # Source position
-    coord_source = [0.5,0.5,1.0] #coordinates of the receiver position in an list: x , y and z direction in meters [m]
+    # # Source position
+    # coord_source = [0.5,0.5,1.0] #coordinates of the receiver position in an list: x , y and z direction in meters [m]
 
-    # Receiver position
-    coord_rec = [2.0,0.5,1.0] #coordinates of the receiver position in an list: x , y and z direction in meters [m]
+    # # Receiver position
+    # coord_rec = [2.0,0.5,1.0] #coordinates of the receiver position in an list: x , y and z direction in meters [m]
 
-    # Type of Calculation
-    #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
-    #Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
-    tcalc = "decay"
+    # # Type of Calculation
+    # #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
+    # #Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
+    # tcalc = "decay"
 
-    # Frequency range
-    fc_low = 125
-    fc_high = 2000
-    num_octave = 1
+    # # Frequency range
+    # fc_low = 125
+    # fc_high = 2000
+    # num_octave = 1
 
-    x_frequencies  = num_octave * log(fc_high/fc_low) / log(2)
-    nBands = int(num_octave * log(fc_high/fc_low) / log(2) + 1)
-    center_freq = fc_low * np.power(2,((np.arange(0,x_frequencies+1) / num_octave)))
+    # x_frequencies  = num_octave * log(fc_high/fc_low) / log(2)
+    # nBands = int(num_octave * log(fc_high/fc_low) / log(2) + 1)
+    # center_freq = fc_low * np.power(2,((np.arange(0,x_frequencies+1) / num_octave)))
 
-    # Time discretization
-    dt = 1/20000 #time discretization
+    # # Time discretization
+    # dt = 1/20000 #time discretization
 
-    # Air absorption coefficient
-    m_atm = 0 #air absorption coefficient [1/m]
+    # # Air absorption coefficient
+    # m_atm = 0 #air absorption coefficient [1/m]
 
-    #%%
-    ###############################################################################
-    #FIXED INPUTS
-    ###############################################################################
-    #General settings
-    c0= 343 #adiabatic speed of sound [m.s^-1]
+    # #%%
+    # ###############################################################################
+    # #FIXED INPUTS
+    # ###############################################################################
+    # #General settings
+    # c0= 343 #adiabatic speed of sound [m.s^-1]
 
-    #Set initial condition - Source Info (interrupted method)
-    Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
+    # #Set initial condition - Source Info (interrupted method)
+    # Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
 
-    # Absorption term and Absorption coefficients
-    th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
-    # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
+    # # Absorption term and Absorption coefficients
+    # th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
+    # # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
 
-    # Reference pressure in Pa
-    pRef = 2 * (10**-5) #Reference pressure in Pa
+    # # Reference pressure in Pa
+    # pRef = 2 * (10**-5) #Reference pressure in Pa
 
-    # Air density
-    rho = 1.21 #air density [kg.m^-3] at 20°C
+    # # Air density
+    # rho = 1.21 #air density [kg.m^-3] at 20°C
 
-    #%%
-    ###############################################################################
-    #INITIALISE GMSH
-    ###############################################################################
-    file_name = "MeasurementRoom_0e463ae32fd74c0994cee13e4b0ed471.msh" #Insert file name, msh file created from sketchUp and then gmsh
+    # #%%
+    # ###############################################################################
+    # #INITIALISE GMSH
+    # ###############################################################################
+    # file_name = "MeasurementRoom_0e463ae32fd74c0994cee13e4b0ed471.msh" #Insert file name, msh file created from sketchUp and then gmsh
 
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    # Full path to the file
-    file_path = os.path.join(script_dir, file_name)
+    # script_dir = os.path.dirname(os.path.abspath(__file__))
+    # # Full path to the file
+    # file_path = os.path.join(script_dir, file_name)
 
-    gmsh.initialize() #Initialize msh file
-    mesh = gmsh.open(file_path) #open the file
+    # gmsh.initialize() #Initialize msh file
+    # mesh = gmsh.open(file_path) #open the file
 
-    #gmsh.fltk.run() #run the file to see it in gmsh
-    dim = -1 #dimensions of the entities, 0 for points, 1 for curves/edge/lines, 2 for surfaces, 3 for volumes, -1 for all the entities 
-    tag = -1 #all the nodes of the room
+    # #gmsh.fltk.run() #run the file to see it in gmsh
+    # dim = -1 #dimensions of the entities, 0 for points, 1 for curves/edge/lines, 2 for surfaces, 3 for volumes, -1 for all the entities 
+    # tag = -1 #all the nodes of the room
 
 
-    vGroupsNames = create_vgroups_names()
+    # vGroupsNames = create_vgroups_names()
 
-    # Initialize a list to store surface tags and their absorption coefficients
-    surface_absorption = [] #initialization absorption term (alpha*surfaceofwall) for each wall of the room
-    triangle_face_absorption = [] #initialization absorption term for each triangle face at the boundary and per each wall
-    absorption_coefficient_dict = {}
+    # # Initialize a list to store surface tags and their absorption coefficients
+    # surface_absorption = [] #initialization absorption term (alpha*surfaceofwall) for each wall of the room
+    # triangle_face_absorption = [] #initialization absorption term for each triangle face at the boundary and per each wall
+    # absorption_coefficient_dict = {}
 
-    for group in vGroupsNames:
-        if group[0] != 2:
-            continue
+    # for group in vGroupsNames:
+    #     if group[0] != 2:
+    #         continue
 
-        name_group = group[2]
-        name_split = name_group.split("$")
-        name_abs_coeff = name_split[0]
+    #     name_group = group[2]
+    #     name_split = name_group.split("$")
+    #     name_abs_coeff = name_split[0]
 
-        abscoeff = input(f"Enter absorption coefficient for frequency {fc_low} to {fc_high} for {name_abs_coeff}:") 
-        surface_materials (group, abscoeff, surface_absorption, absorption_coefficient_dict)
+    #     abscoeff = input(f"Enter absorption coefficient for frequency {fc_low} to {fc_high} for {name_abs_coeff}:") 
+    #     surface_materials (group, abscoeff, surface_absorption, absorption_coefficient_dict)
 
-    for entity, Abs_term in surface_absorption:
-        triangle_faces, _ = gmsh.model.mesh.getElementsByType(2, entity) #Get all the triangle faces for the current surface
-        triangle_face_absorption.extend([Abs_term] * len(triangle_faces)) #Append the Abs_term value for each triangle face
+    # for entity, Abs_term in surface_absorption:
+    #     triangle_faces, _ = gmsh.model.mesh.getElementsByType(2, entity) #Get all the triangle faces for the current surface
+    #     triangle_face_absorption.extend([Abs_term] * len(triangle_faces)) #Append the Abs_term value for each triangle face
 
-    print("Correctly inputted surface materials. Starting initial geometry calculations...")
+    # print("Correctly inputted surface materials. Starting initial geometry calculations...")
 
-    nodecoords, node_indices, bounEl, bounNode, voluEl, voluNode, belemNodes, velemNodes, boundaryEl_dict, volumeEl_dict = get_nodes_elem()
-    cell_center, cell_volume = velem_volume_centre()
+    # nodecoords, node_indices, bounEl, bounNode, voluEl, voluNode, belemNodes, velemNodes, boundaryEl_dict, volumeEl_dict = get_nodes_elem()
+    # cell_center, cell_volume = velem_volume_centre()
 
-    barea_dict, centre_area = belem_area_centre()
+    # barea_dict, centre_area = belem_area_centre()
 
-    fxt, txt, neighbourVolume = get_neighbour_faces()
-    print("Completed initial geometry calculation. Starting internal tetrahedrons calculations...")
+    # fxt, txt, neighbourVolume = get_neighbour_faces()
+    # print("Completed initial geometry calculation. Starting internal tetrahedrons calculations...")
 
-    interior_tet, interior_tet_sum = interior_tetra()
-    print("Completed internal tetrahedrons calculation. Starting boundary tetrahedrons calculations...")
+    # interior_tet, interior_tet_sum = interior_tetra()
+    # print("Completed internal tetrahedrons calculation. Starting boundary tetrahedrons calculations...")
     
-    surface_areas = surface_area(surface_absorption)
+    # surface_areas = surface_area(surface_absorption)
 
-    boundary_areas, total_boundArea = boundary_triang()
-    print("Completed boundary tetrahedrons calculation. Starting main diffusion equation calculations over time and frequency...")
+    # boundary_areas, total_boundArea = boundary_triang()
+    # print("Completed boundary tetrahedrons calculation. Starting main diffusion equation calculations over time and frequency...")
 
-    gmsh.finalize()
+    # gmsh.finalize()
 
-    V,S,Eq_A = equiv_absorp(surface_areas)
+    # V,S,Eq_A = equiv_absorp(surface_areas)
 
-    sourceon_time = calculate_sourceon_time()
+    # sourceon_time = calculate_sourceon_time()
 
-    recording_time, t, recording_steps = rec_time(sourceon_time, dt)
+    # recording_time, t, recording_steps = rec_time(sourceon_time, dt)
 
-    Dx, Dy, Dz = diff_coeff()
+    # Dx, Dy, Dz = diff_coeff()
 
-    dist_sr = dist_source_receiver()
+    # dist_sr = dist_source_receiver()
 
-    cl_tet_s_keys, total_weights_s = source_interp()
+    # cl_tet_s_keys, total_weights_s = source_interp()
 
-    Vs = source_volume()
+    # Vs = source_volume()
 
-    source1, sourceon_steps = initial_cond()
+    # source1, sourceon_steps = initial_cond()
 
-    s = source_matrix()
+    # s = source_matrix()
 
-    cl_tet_r_keys, total_weights_r = receiver_interp()
+    # cl_tet_r_keys, total_weights_r = receiver_interp()
 
-    room_length, room_width, room_height = room_dimensions()
+    # room_length, room_width, room_height = room_dimensions()
 
-    x_axis, y_axis, line_rec_x_idx_list, dist_x, line_rec_y_idx_list, dist_y = line_receivers()
+    # x_axis, y_axis, line_rec_x_idx_list, dist_x, line_rec_y_idx_list, dist_y = line_receivers()
 
-    beta_zero_freq = beta_zero()
+    # beta_zero_freq = beta_zero()
 
-    w_new_band, w_rec_band, w_rec_off_band, w_rec_off_deriv_band, p_rec_off_deriv_band, idx_w_rec, t_off = computing_energy_density()
-    print("100% of main calculation completed")
+    # w_new_band, w_rec_band, w_rec_off_band, w_rec_off_deriv_band, p_rec_off_deriv_band, idx_w_rec, t_off = computing_energy_density()
+    # print("100% of main calculation completed")
 
-    w_rec_x_band, w_rec_y_band, spl_stat_x_band, spl_stat_y_band, spl_r_band, spl_r_off_band, spl_r_norm_band, sch_db_band, t30_band, edt_band, c80_band, d50_band, ts_band = freq_parameters()
+    # w_rec_x_band, w_rec_y_band, spl_stat_x_band, spl_stat_y_band, spl_r_band, spl_r_off_band, spl_r_norm_band, sch_db_band, t30_band, edt_band, c80_band, d50_band, ts_band = freq_parameters()
 
-    et = time.time() #end time
-    elapsed_time = et - st
+    # et = time.time() #end time
+    # elapsed_time = et - st
 
-    # To save all current variables
-    save('results.pkl')
+    # # To save all current variables
+    # save('results.pkl')

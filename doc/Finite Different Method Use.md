@@ -97,7 +97,7 @@ SDL = 10 log_{10}⁡(w(\mathbf{r}, t))
 #### Sound Pressure Level
 After predicting the time-dependent sound energy density in the room, the sound pressure level decay curve can be expressed as function of sound energy density w(r, t) as:
 ```{math}
-SPL = 20 log_{10} \Big⁡( \frac{w(\mathbf{r}, t) \rho c^2}{p_{ref}^2} \Big) 
+SPL = 20 log_{10} \left( \frac{w(\mathbf{r}, t) \rho c^2}{p_{ref}^2} \right )
 ```
 where $p_{ref}$ is $2 \cdot 10^{-5}$ Pa and $\rho $ is the air density.
 
@@ -117,7 +117,7 @@ C_{80} = 10 log⁡ \left( \frac{\int_0^{80ms} p^2(t) \, dt}{\int_{80ms}^\infty p
 The Definition ($D_{50}$) parameter is the ratio of the early received sound energy (0-50ms after direct sound arrival) to the total received energy. It referres only to the speech and it is defined as: 
 
 ```{math}
-D_{50}=10 log ⁡\Big( \frac{\int_0^{50ms} p^2(t) \, dt}{\int_0^\infty p^2(t) \, dt} \Big)  \,  [%]
+D_{50} = 10 log \left( \frac{\int_0^{50ms} p^2(t) \, dt}{\int_0^\infty p^2 (t) \, dt} \right ) \,  [%]
 ```
 
 The Centre Time (T_s) parameter is the center of gravity of the squared impulse response. Centre Time avoids the discrete division of the impulse response into early and late periods. 

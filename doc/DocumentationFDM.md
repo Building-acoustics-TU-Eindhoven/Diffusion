@@ -33,10 +33,10 @@ The Dufort and Frankel method is an expansion of the Forward-Time-Centere-space 
 
 According to the Dufort and Frankel method, the discretization is based on the following:
 
-- $i \text{ is the spatial element along } x$ direction;
-- $j \text{ is the spatial element along } y$ direction;
-- $k \text{ is the spatial element along } z$ direction;
-- $n is the temporal element.
+- $i$ is the spatial element along $x$ direction;
+- $j$ is the spatial element along $y$ direction;
+- $k$ is the spatial element along $z$ direction;
+- $n$ is the temporal element.
 
 with the following surface definition:
 
@@ -44,10 +44,18 @@ with the following surface definition:
 
 The full discretised partial differential equation is:
 
+```math
+\begin{align}
+w_{i,j,k}^{n+1} = \frac{1}{1+ \beta_{0}} \Big(& w_{i,j,k}^{n-1} (1- \beta_{0} ) - 2\Delta t\, c\, m\, w_{i,j,k}^n - 2 \Delta t\, P_{i_s,j_s,k_s}^n \\
+& + \beta_{0{x}}(w_{i+1,j,k}^n + w_{i-1,j,k}^n) + \beta_{0{y}}(w_{i,j+1,k}^n + w_{i,j-1,k}^n) + \beta_{0{z}}(w_{i,j,k+1}^n + w_{i,j,k-1}^n) \Big)
+\end{align}
+```
+
+<!-- 
 ```{math}
 w_{i,j,k}^{n+1}=  \frac{(w_{i,j,k}^{n-1} (1- \beta_{0} )- 2\Delta t c m w_{i,j,k}^n - 2 \Delta t P_{i_s,j_s,k_s}^n + \beta_{0{x}}(w_{i+1,j,k}^n+ w_{i-1,j,k}^n )+
 + \beta_{0{y}}(w_{i,j+1,k}^n+ w_{i,j-1,k}^n )+ \beta_{0{z}}(w_{i,j,k+1}^n+ w_{i,j,k-1}^n ))}{1+ \beta_{0}}
-```
+``` -->
 
 Where:
 ```{math}

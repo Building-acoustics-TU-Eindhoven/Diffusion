@@ -6,9 +6,9 @@ Test the software with the following inputs (Navarro et al., 2012):
 - Time discretization: $\Delta t = 1/8000 s$;
 - Recording total time: $T = 2.0 s$;
 - Room dimension: 8.0 m x 8.0 m x 8.0 m;
-- Absorption Coefficient surface i: 1/6 ≈ 0.17;
-- Air absorption: 0.0 1/m;
-- Absorption term: A_{M};
+- Absorption Coefficient surface $i$: $\alpha = 1/6 \approx 0.17$;
+- Air absorption: $m = 0.0$ 1/m;
+- Absorption term: Modified Absorption Term $A_{M}$;
 - Source position coordinates: 4.0 m, 4.0 m, 4.0 m;
 - Receiver position coordinates: 2.0 m, 2.0 m, 2.0 m;
 
@@ -20,4 +20,4 @@ Test if the software provides the following results (Navarro et al., 2012):
 - Definition ($D_{50}$): 45.63 %
 - Centre Time ($T_{s}$): 85.33 ms
 
-The result file is a pickle file called resultsFDM.pkl. All the results are included in this file.
+The result file is a pickle file called _resultsFDM.pkl_. All the results are included in this file.

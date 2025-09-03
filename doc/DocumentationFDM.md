@@ -45,11 +45,14 @@ with the following surface definition:
 The full discretised partial differential equation is:
 
 ```math
-\begin{align}
-w_{i,j,k}^{n+1} = \frac{1}{1+ \beta_{0}} \Big(& w_{i,j,k}^{n-1} (1- \beta_{0} ) - 2\Delta t\, c\, m\, w_{i,j,k}^n - 2 \Delta t\, P_{i_s,j_s,k_s}^n \\
-& + \beta_{0{x}}(w_{i+1,j,k}^n + w_{i-1,j,k}^n) + \beta_{0{y}}(w_{i,j+1,k}^n + w_{i,j-1,k}^n) + \beta_{0{z}}(w_{i,j,k+1}^n + w_{i,j,k-1}^n) \Big)
-\end{align}
+w_{i,j,k}^{n+1} = \frac{1}{1+ \beta_{0}} \Big( 
+(w_{i,j,k}^{n-1} (1- \beta_{0}) - 2\Delta t \, c_{l} \, w_{i,j,k}^{n} - 2 \Delta t \, P_{i_s,j_s,k_s}^{n}) \\
++ \beta_{0x}(w_{i+1,j,k}^{n} + w_{i-1,j,k}^{n}) 
++ \beta_{0y}(w_{i,j+1,k}^{n} + w_{i,j-1,k}^{n}) 
++ \beta_{0z}(w_{i,j,k+1}^{n} + w_{i,j,k-1}^{n}) 
+\Big)
 ```
+
 
 <!-- 
 ```{math}

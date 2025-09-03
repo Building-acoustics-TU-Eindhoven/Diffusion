@@ -59,10 +59,8 @@ The term $n$ indicates the vector normal to the surface and the term $h_{(b)j,k}
 The full discretised partial differential diffusion equation is:
 
 ```math
-\begin{align}
 \frac{V_j (w_{j}^{n+1} - w_{j}^{n-1})}{2 \Delta t} - D \sum_{k=1}^{N_f} \frac{S_{i,k}}{h_{j,k}} \Big(w_{k}^{n} - \frac{w_{j}^{n+1} - w_{j}^{n-1}}{2}\Big) \\
-& - \sum_{k=1}^{N_{bf}} S_{i,k}  h_{(b)j,k} \Big(\frac{w_{j}^{n+1} - w_{j}^{n-1}}{2} \Big) = V_j P_{j}^{n}
-\end{align}
+- \sum_{k=1}^{N_{bf}} S_{i,k}  h_{(b)j,k} \Big(\frac{w_{j}^{n+1} - w_{j}^{n-1}}{2} \Big) = V_j P_{j}^{n}
 ```
 
 <!-- 

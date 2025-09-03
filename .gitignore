@@ -13,3 +13,6 @@ DiffEq3DAxis.py
 results.pkl
 FVM-varD.py
 gmsh.exe
+resultsFVM.pkl
+imp_resp.wav
+auralization.wav

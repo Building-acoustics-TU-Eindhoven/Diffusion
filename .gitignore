@@ -11,3 +11,5 @@ ConvVsMult.mlx
 forMichalis.m
 DiffEq3DAxis.py
 results.pkl
+FVM-varD.py
+gmsh.exe

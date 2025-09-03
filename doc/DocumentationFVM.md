@@ -35,11 +35,11 @@ As for the finite element method, the finite volume method consists on the creat
 
 For the discretization, the following are important:
 - $j$ control volume;
-- $k \text{control volume adjacent to } j$;
-- $w_j \text{energy density computed at the centre of control volume } j$;
+- $k$ control volume adjacent to $j$;
+- $w_j$ energy density computed at the centre of control volume $j$;
 - $w_k$ energy density computed at the centre of control volume $k$;
-- $S_{j,k} \text{common area between control volume} $j$ \text{and control volume} k$;
-- $d_{j,k} \text{distance between centre of control volume} $j$ \text{and centre of control volume} k$.
+- $S_{j,k}$ common area between control volume $j$ and control volume $k$;
+- $d_{j,k}$ distance between centre of control volume $j$ and centre of control volume $k$.
 
 The diffusion equation need to be integrated over one element $j$ via the following equation:
 
@@ -57,9 +57,19 @@ The term $n$ indicates the vector normal to the surface and the term $h_{(b)j,k}
 
 ### Discretization
 The full discretised partial differential diffusion equation is:
-```{math}
-\frac{V_j (w_{j}^{n+1} - w_{j}^{n-1})}{2 \Delta t} - D \sum_{k=1}^{N_f} \frac{S_{i,k}}{h_{j,k}} \frac{w_{k}^{n} - (w_{j}^{n+1} - w_{j}^{n-1}}{2}) - \sum_{k=1}^{N_{bf}} S_{i,k}  h_{(b)j,k} \frac{(w_{j}^{n+1} - w_{j}^{n-1}}{2} = V_j P_{j}^{n}
+
+```math
+\begin{align}
+\frac{V_j (w_{j}^{n+1} - w_{j}^{n-1})}{2 \Delta t} - D \sum_{k=1}^{N_f} \frac{S_{i,k}}{h_{j,k}} \Big(w_{k}^{n} - \frac{w_{j}^{n+1} - w_{j}^{n-1}}{2}\Big) \\
+& - \sum_{k=1}^{N_{bf}} S_{i,k}  h_{(b)j,k} \Big(\frac{w_{j}^{n+1} - w_{j}^{n-1}}{2} \Big) = V_j P_{j}^{n}
+\end{align}
 ```
+
+<!-- 
+
+```{math}
+\frac{V_j (w_{j}^{n+1} - w_{j}^{n-1})}{2 \Delta t} - D \sum_{k=1}^{N_f} \frac{S_{i,k}}{h_{j,k}} \Big(w_{k}^{n} - \frac{w_{j}^{n+1} - w_{j}^{n-1}}{2}\Big) - \sum_{k=1}^{N_{bf}} S_{i,k}  h_{(b)j,k} \Big(\frac{w_{j}^{n+1} - w_{j}^{n-1}}{2} \Big) = V_j P_{j}^{n}
+``` -->
 
 ## References
 - R. P. Muñoz, "Numerical modeling for urban sound propagation: developments in wave-based and energy based methods," PhD Thesis, Technische Universiteit Eindhoven, 2019.

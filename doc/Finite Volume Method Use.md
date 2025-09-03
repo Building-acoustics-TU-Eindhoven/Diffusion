@@ -100,7 +100,7 @@ The time discretization for this method is defined within the _FVM.py_ python sc
 The time discretization will need to be chosen appropriately.
 According the Navarro 2012, to get good converged results, the time discretization $\Delta t$ will need to be defined depending on the length of mesh chosen. To make sure that the predictions converge to a fixed value with a very low error, the following empirical criterion will need to apply.
 ```{math}
-10^{(-8)} = \Delta t^2 \Delta v^{(-2)}
+10^{-8} = \Delta t^2 \Delta v^{-2}
 ```
 where $\Delta v$ is the mesh length chosen.
 The time discretization is defined in seconds. 
@@ -140,7 +140,7 @@ SDL = 10 log_{10}⁡(w(\mathbf{r}, t))
 #### Sound Pressure Level
 After predicting the time-dependent sound energy density in the room, the sound pressure level decay curve can be expressed as function of sound energy density w(r, t) as:
 ```{math}
-SPL = 20 log_{10} \left⁡( \frac{w(\mathbf{r}, t) \rho c^2}{p_{ref}^2} \right) 
+SPL = 20 log_{10} ⁡( \frac{w(\mathbf{r}, t) \rho c^2}{p_{ref}^2} ) 
 ```
 where $p_{ref}$ is $2 \cdot 10^{-5}$ Pa and $\rho $ is the air density.
 
@@ -159,7 +159,7 @@ C_{80} = 10 log⁡ \left( \frac{\int_0^{80ms} p^2(t) \, dt}{\int_{80ms}^\infty p
 The Definition ($D_{50}$) parameter is the ratio of the early received sound energy (0-50ms after direct sound arrival) to the total received energy. It referres only to the speech and it is defined as: 
 
 ```{math}
-D_{50}=10 log \left⁡( \frac{\int_0^{50ms} p^2(t) \, dt}{\int_0^\infty p^2(t) \, dt} \right )  \,  [%]
+D_{50}=10 log ⁡( \frac{\int_0^{50ms} p^2(t) \, dt}{\int_0^\infty p^2(t) \, dt} )  \,  [%]
 ```
 
 The Centre Time (T_s) parameter is the center of gravity of the squared impulse response. Centre Time avoids the discrete division of the impulse response into early and late periods. 

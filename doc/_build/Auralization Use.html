@@ -1,0 +1,205 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auralization Use &mdash; Diffusion Equation for Acoustics 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=2709fde1"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Diffusion Equation Finite Different Method (FDM) documentation" href="DocumentationFDM.html" />
+    <link rel="prev" title="Finite Volume Method Use" href="Finite%20Volume%20Method%20Use.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Diffusion Equation for Acoustics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Software Presentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Overview.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Use:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Different%20Method%20Use.html">Finite Different Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Volume%20Method%20Use.html">Finite Volume Method Use</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Auralization Use</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#libraries">Libraries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#python-running-files">Python running files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#algorithm">Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inputs">Inputs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#anechoic-signal">Anechoic signal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#energy-density-pressure">Energy density/Pressure</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#outputs">Outputs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#impulse-response-file">Impulse response file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#auralization-file">Auralization file</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Theory:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="DocumentationFDM.html">Diffusion Equation Finite Different Method (FDM) documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DocumentationFVM.html">Diffusion Equation Finite Volume Method (FVM) Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DocumentationAuralization.html">Auralization Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Different%20Method%20Demo%20Tutorial.html">Finite Different Method Demo Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Volume%20Method%20Demo%20Tutorial.html">Finite Volume Method Demo Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Diffusion Equation for Acoustics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Auralization Use</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Auralization Use.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="auralization-use">
+<h1>Auralization Use<a class="headerlink" href="#auralization-use" title="Link to this heading"></a></h1>
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Download and install Anaconda or download and install any Python software IDE you prefer;</p></li>
+<li><p>Clone/Fork this repository to a folder of your preference;</p></li>
+<li><p>Run the “FVM.py” file through the preferred IDE and get the results;</p></li>
+<li><p>Open the “Auralization.py” file through the preferred IDE and run it.</p></li>
+</ol>
+</section>
+<section id="libraries">
+<h2>Libraries<a class="headerlink" href="#libraries" title="Link to this heading"></a></h2>
+<p>To properly run the software, the following libraries are needed:</p>
+<ul class="simple">
+<li><p>Python version 3.10.9 or above</p></li>
+</ul>
+<p>Libraries for python:</p>
+<ul class="simple">
+<li><p>math</p></li>
+<li><p>matplotlib</p></li>
+<li><p>soundfile</p></li>
+<li><p>scipy</p></li>
+<li><p>pickle</p></li>
+<li><p>os</p></li>
+</ul>
+</section>
+<section id="python-running-files">
+<h2>Python running files<a class="headerlink" href="#python-running-files" title="Link to this heading"></a></h2>
+<p>The main files for users to run the software is <em>Auralization.py</em> to run the auralization. The <em>Auralization.py</em> can be run <strong>only if</strong> the results from the <em>FVM.py</em> have been obtained.</p>
+</section>
+<section id="algorithm">
+<h2>Algorithm<a class="headerlink" href="#algorithm" title="Link to this heading"></a></h2>
+<p>The software is organised in multiple sections:</p>
+<ul class="simple">
+<li><p>Input variables:
+The inputs are the final results of the <em>FVM.py</em> simulation and the anechoic signal.</p></li>
+<li><p>Creation of impulse response:
+From the energy density gotten from the <em>FVM.py</em> calculation, a full impulse response is generated. This impulse response include only the reverberant part of the decay.</p></li>
+<li><p>Auralization:
+From the impulse response, a convolution with the anechoic signal is made to generate the .wav file.</p></li>
+</ul>
+</section>
+<section id="inputs">
+<h2>Inputs<a class="headerlink" href="#inputs" title="Link to this heading"></a></h2>
+<section id="anechoic-signal">
+<h3>Anechoic signal<a class="headerlink" href="#anechoic-signal" title="Link to this heading"></a></h3>
+<p>The anechoic signal is a wav file needed for the convolution with the impulse response of the room in question. An anechoic file is a sound/speech recorder inside a fully absorbing chamber and therefore without any reflections. In the repository only one anechoic file is present; the user could decide to use their own. This anechoic file has been provided by ODEON software.</p>
+</section>
+<section id="energy-density-pressure">
+<h3>Energy density/Pressure<a class="headerlink" href="#energy-density-pressure" title="Link to this heading"></a></h3>
+<p>The energy density and pressure curves are obtained simulating the room in question by the <em>FVM.py</em> script. it include the pressure curve over time at each frequency band per receiver.</p>
+</section>
+</section>
+<section id="outputs">
+<h2>Outputs<a class="headerlink" href="#outputs" title="Link to this heading"></a></h2>
+<section id="impulse-response-file">
+<h3>Impulse response file<a class="headerlink" href="#impulse-response-file" title="Link to this heading"></a></h3>
+<p>An impulse response wav file representing the reverberant fingerprint of the room is the outoput of the calculation.</p>
+</section>
+<section id="auralization-file">
+<h3>Auralization file<a class="headerlink" href="#auralization-file" title="Link to this heading"></a></h3>
+<p>The calculation include also the creating of a auralization wav file.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Finite%20Volume%20Method%20Use.html" class="btn btn-neutral float-left" title="Finite Volume Method Use" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="DocumentationFDM.html" class="btn btn-neutral float-right" title="Diffusion Equation Finite Different Method (FDM) documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Ilaria Fichera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

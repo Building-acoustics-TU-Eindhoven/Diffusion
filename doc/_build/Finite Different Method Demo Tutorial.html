@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
@@ -5,24 +7,22 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Finite Different Method Demo Tutorial &mdash; Diffusion Equation for Acoustics 0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=2709fde1"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=2709fde1"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Finite Volume Method Demo Tutorial" href="Finite%20Volume%20Method%20Demo%20Tutorial.html" />
-    <link rel="prev" title="Diffusion Equation Finite Volume Method (FVM) Documentation" href="DocumentationFVM.html" /> 
+    <link rel="prev" title="Auralization Documentation" href="DocumentationAuralization.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -52,13 +52,15 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="Finite%20Different%20Method%20Use.html">Finite Different Method Use</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Finite%20Volume%20Method%20Use.html">Finite Volume Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Auralization%20Use.html">Auralization Use</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Software Theory:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="DocumentationFDM.html">Diffusion Equation Finite Different Method (FDM) documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DocumentationFVM.html">Diffusion Equation Finite Volume Method (FVM) Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DocumentationAuralization.html">Auralization Documentation</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Application Programming Interface (API) reference:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Finite Different Method Demo Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Finite%20Volume%20Method%20Demo%20Tutorial.html">Finite Volume Method Demo Tutorial</a></li>
@@ -88,36 +90,36 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="finite-different-method-demo-tutorial">
+  <section class="tex2jax_ignore mathjax_ignore" id="finite-different-method-demo-tutorial">
 <h1>Finite Different Method Demo Tutorial<a class="headerlink" href="#finite-different-method-demo-tutorial" title="Link to this heading"></a></h1>
 <p>Test the software with the following inputs (Navarro et al., 2012):</p>
 <ul class="simple">
-<li><p>Spatial discretization: dx = 0.5 m;</p></li>
-<li><p>Time discretization: dt = 1/8000 s;</p></li>
-<li><p>Recording total time: T = 2.0 s;</p></li>
+<li><p>Spatial discretization: <span class="math notranslate nohighlight">\(\Delta x = 0.5 m\)</span>;</p></li>
+<li><p>Time discretization: <span class="math notranslate nohighlight">\(\Delta t = 1/8000 s\)</span>;</p></li>
+<li><p>Recording total time: <span class="math notranslate nohighlight">\(T = 2.0 s\)</span>;</p></li>
 <li><p>Room dimension: 8.0 m x 8.0 m x 8.0 m;</p></li>
-<li><p>Absorption Coefficient surface i: 1/6 ≈ 0.17;</p></li>
-<li><p>Air absorption: 0.0 1/m;</p></li>
-<li><p>Absorption term: A_{M};</p></li>
-<li><p>Source On time: S = 1.0 s;</p></li>
-<li><p>Source position coordinates: 4.0, 4.0, 4.0;</p></li>
-<li><p>Receiver position coordinates: 2.0, 2.0, 2.0;</p></li>
+<li><p>Absorption Coefficient surface <span class="math notranslate nohighlight">\(i\)</span>: <span class="math notranslate nohighlight">\(\alpha = 1/6 \approx 0.17\)</span>;</p></li>
+<li><p>Air absorption: <span class="math notranslate nohighlight">\(m = 0.0\)</span> 1/m;</p></li>
+<li><p>Absorption term: Modified Absorption Term <span class="math notranslate nohighlight">\(A_{M}\)</span>;</p></li>
+<li><p>Source position coordinates: 4.0 m, 4.0 m, 4.0 m;</p></li>
+<li><p>Receiver position coordinates: 2.0 m, 2.0 m, 2.0 m;</p></li>
 </ul>
 <p>Test if the software provides the following results (Navarro et al., 2012):</p>
 <ul class="simple">
 <li><p>Reverberation time (RT): 1.18 s;</p></li>
-<li><p>Early Decay Time (RDT): 1.18 s;</p></li>
-<li><p>Clarity (C_{80}): 2.08 dB;</p></li>
-<li><p>Definition (D_{50}): 45.63 %</p></li>
-<li><p>Centre Time (T_{s}): 85.33 ms</p></li>
+<li><p>Early Decay Time (EDT): 1.18 s;</p></li>
+<li><p>Clarity (<span class="math notranslate nohighlight">\(C_{80}\)</span>): 2.08 dB;</p></li>
+<li><p>Definition (<span class="math notranslate nohighlight">\(D_{50}\)</span>): 45.63 %</p></li>
+<li><p>Centre Time (<span class="math notranslate nohighlight">\(T_{s}\)</span>): 85.33 ms</p></li>
 </ul>
+<p>The result file is a pickle file called <em>resultsFDM.pkl</em>. All the results are included in this file.</p>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="DocumentationFVM.html" class="btn btn-neutral float-left" title="Diffusion Equation Finite Volume Method (FVM) Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="DocumentationAuralization.html" class="btn btn-neutral float-left" title="Auralization Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="Finite%20Volume%20Method%20Demo%20Tutorial.html" class="btn btn-neutral float-right" title="Finite Volume Method Demo Tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

@@ -26,6 +26,7 @@ Each method is distributed with its own Python code. The main application of the
 
    Finite Different Method Use.md
    Finite Volume Method Use.md
+   Auralization Use.md
 
 .. toctree::
    :maxdepth: 2
@@ -33,6 +34,7 @@ Each method is distributed with its own Python code. The main application of the
 
    DocumentationFDM.md
    DocumentationFVM.md
+   DocumentationAuralization.md
 
 .. toctree::
    :maxdepth: 2
@@ -43,7 +45,7 @@ Each method is distributed with its own Python code. The main application of the
     :undoc-members:
     :show-inheritance:
    
-   .. toctree::
+.. toctree::
    :maxdepth: 2
    :caption: Tutorials:
 

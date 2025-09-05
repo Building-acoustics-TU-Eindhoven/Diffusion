@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
@@ -5,20 +7,17 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Finite Different Method Use &mdash; Diffusion Equation for Acoustics 0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=2709fde1"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=2709fde1"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -62,8 +61,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#sound-source">Sound source</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#receiver">Receiver</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#discretization-variables">Discretization variables</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#spatial-discretization-dv">Spatial discretization dv</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#time-discretization-dt">Time discretization dt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#spatial-discretization-delta-v">Spatial discretization <span class="math notranslate nohighlight">\(\Delta v\)</span></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#time-discretization-delta-t">Time discretization <span class="math notranslate nohighlight">\(\Delta t\)</span></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#total-recording-time">Total Recording time</a></li>
@@ -75,7 +74,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#acoustics-parameters">Acoustics parameters</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#sound-density-level">Sound Density Level</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#sound-pressure-level">Sound Pressure Level</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#reverberation-time-and-early-decay-time-edt">Reverberation time and Early Decay Time (EDT)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reverberation-time-rt-and-early-decay-time-edt">Reverberation time (RT) and Early Decay Time (EDT)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#clarity-definition-and-centre-time">Clarity, Definition and Centre Time</a></li>
 </ul>
 </li>
@@ -83,13 +82,15 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Finite%20Volume%20Method%20Use.html">Finite Volume Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Auralization%20Use.html">Auralization Use</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Software Theory:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="DocumentationFDM.html">Diffusion Equation Finite Different Method (FDM) documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DocumentationFVM.html">Diffusion Equation Finite Volume Method (FVM) Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DocumentationAuralization.html">Auralization Documentation</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Application Programming Interface (API) reference:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="Finite%20Different%20Method%20Demo%20Tutorial.html">Finite Different Method Demo Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Finite%20Volume%20Method%20Demo%20Tutorial.html">Finite Volume Method Demo Tutorial</a></li>
@@ -119,14 +120,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="finite-different-method-use">
+  <section class="tex2jax_ignore mathjax_ignore" id="finite-different-method-use">
 <h1>Finite Different Method Use<a class="headerlink" href="#finite-different-method-use" title="Link to this heading"></a></h1>
 <section id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
 <ol class="arabic simple">
 <li><p>Download and install Anaconda or download and install any Python software IDE you prefer;</p></li>
 <li><p>Clone/Fork this repository to a folder of your preference;</p></li>
-<li><p>Open the “DiffEq3D.py” file through the preferred IDE;</p></li>
+<li><p>Open the “FDM.py” file through the preferred IDE;</p></li>
 <li><p>After reading the “Libraries” and “Input” sections below, test the software with your preferred inputs.</p></li>
 </ol>
 </section>
@@ -149,80 +150,70 @@
 </section>
 <section id="python-running-files">
 <h2>Python running files<a class="headerlink" href="#python-running-files" title="Link to this heading"></a></h2>
-<p>Currently, in the repository there are a lot of python files. This is because the software is still in development.
-Currently, the updated files for users to run the software are:</p>
-<ul class="simple">
-<li><p>DiffEq1D.py: to simulate a line geometry;</p></li>
-<li><p>DiffEq2D.py: to simulate a surface geometry;</p></li>
-<li><p>DiffEq3D.py: to simulate a 3D geometry.</p></li>
-</ul>
+<p>The main files for users to run the software is <em>FDM.py</em> to simulate a 3D geometry. The other files <em>FunctionRT.py</em> etc… are functions used by the main file. The user must work only on <em>FDM.py</em> file.</p>
 </section>
 <section id="algorithm">
 <h2>Algorithm<a class="headerlink" href="#algorithm" title="Link to this heading"></a></h2>
 <p>The software is organised in three sections:</p>
 <ul class="simple">
 <li><p>Input variables:
-The inputs regarding the room dimensions, source and receiver positions along with other are to be inserted for the specific room in question.</p></li>
+The inputs regarding the room dimensions, source and receiver positions, materials properties along with others are to be inserted for the specific room in question.</p></li>
 <li><p>Calculation loop:
-The “for loop” would loop over the time to calculate the energy density at each position in the mesh grid and at each time step.</p></li>
+The <em>for loop</em> would loop over the time to calculate the energy density at each position in the mesh grid and at each time step.</p></li>
 <li><p>Results and Post-processing
-Results of SPL and other are included in this section together with graphs for the analysis.</p></li>
+Results of Sound Pressure Level (SPL) at the receiver and other parameters are included in this section together with graphs for the analysis.</p></li>
 </ul>
 </section>
 <section id="inputs">
 <h2>Inputs<a class="headerlink" href="#inputs" title="Link to this heading"></a></h2>
 <section id="geometry">
 <h3>Geometry<a class="headerlink" href="#geometry" title="Link to this heading"></a></h3>
-<p>The geometry for this method is defined within the inputs variable section of the main python file “DiffEq3D.py”.
+<p>The geometry for this method is defined within the inputs variable section of the main python file <em>FDM.py</em>.
 The method is suitable for parallelepiped and cuboid spaces and therefore, the only inputs are the length, width and height of the room.</p>
 </section>
 <section id="surface-materials">
 <h3>Surface materials<a class="headerlink" href="#surface-materials" title="Link to this heading"></a></h3>
-<p>The surface materials are defined within the inputs variable section of the main python file “DiffEq3D.py”.
+<p>The surface materials are defined within the inputs variable section of the main python file <em>FDM.py</em>.
 Currently, the surface material would require only one value of absorption coefficient per surface.
 It is not possible to include doors, windows or other items within a surface.</p>
 </section>
 <section id="sound-source">
 <h3>Sound source<a class="headerlink" href="#sound-source" title="Link to this heading"></a></h3>
 <p>The model allows for the insertion of only one source position per calculation.
-The sound source is defined as an omnidirectional source. The users can input the sound power of the source $W_s$ in Watts and its position in the room in the following variables $x_{source},y_{source},z_{source}$ in m in the x,y,z directions.</p>
-<p>The source can be defined as an interrupted noise source or an impulse source.</p>
-<ul class="simple">
-<li><p>If an interrupted noise source is chosen, then the time within which the source stays on before getting switch off need to be defined. The variable is $sourceon_{time}$. The time is defined in seconds and it will need to be long enough for the room to be filled with sound before switching it off. The source on time needs to be inputted as the 2/3 of the theoretical calculated Sabine reverberation time of the room.
-In this case, there is the option to to toggle the sound source on and off or keep it stationary. This can be done by changing the variable “tcalc” from “decay” to “stationarysource”.</p></li>
-<li><p>If an impulse source is chosen, the source will be automatically defined.</p></li>
-</ul>
+The sound source is defined as an omnidirectional source. The users can input the sound power of the source <em>W_{s}</em> in Watts and its position in the room in the following variables <em>x_{source}</em>,<em>y_{source}</em>,<em>z_{source}</em> in meters in the x,y,z directions.</p>
+<p>The source can be defined as an interrupted noise source. The time within which the source stays on before getting switch off is defined automatically by the software with the variable <em>sourceon_{time}</em>. The time is defined in seconds and it is long enough for the room to be filled with sound before switching it off. The <em>sourceon_{time}</em> is considered as the theoretical calculated Sabine reverberation time of the room.
+In this case, there is the option to to toggle the sound source on and off or keep it stationary. This can be done by changing the variable <em>tcalc</em> from “decay” to “stationarysource”.</p>
 </section>
 <section id="receiver">
 <h3>Receiver<a class="headerlink" href="#receiver" title="Link to this heading"></a></h3>
-<p>The model allows for the insertion of only one acoustics receiver position per calculation. These are defined as point omnidirectional receivers. The users will input the position of the receiver in the room in the following vaariables $x_{rec},y_{rec},z_{rec}$ in m in the x,y,z directions.</p>
+<p>The model allows for the insertion of only one acoustics receiver position per calculation. These are defined as point omnidirectional receivers. The users will input the position of the receiver in the room in the following variables <em>x_{rec}</em>,<em>y_{rec}</em>,<em>z_{rec}</em> in meters in the x,y,z directions. The receiver position cannot be equal to the source position, otherwise it will give an error.</p>
 </section>
 <section id="discretization-variables">
 <h3>Discretization variables<a class="headerlink" href="#discretization-variables" title="Link to this heading"></a></h3>
-<section id="spatial-discretization-dv">
-<h4>Spatial discretization dv<a class="headerlink" href="#spatial-discretization-dv" title="Link to this heading"></a></h4>
-<p>The Finite Different method works with a spatial discretization. The space is defined by a mesh grid of points at a distance dv between each other. The distance dv is equal for each dimension x,y,z, therefore dv = dx = dy = dz, and it is defined in meters.
-It is important to choose an appropriate dv for the precision of the calculation.
-A dv of 0.5 m normally would suffice for a correct calculation, although the choice is contingent upon user preferences for details in parameters values and room dimensions. It is strongly advised that dv is a factor of the dimensions of the room (e.g. for a room of 3x3x3, dv could be 0.5 m or 0.2 m or 0.1 m but it should not be 0.4 m).</p>
+<section id="spatial-discretization-delta-v">
+<h4>Spatial discretization <span class="math notranslate nohighlight">\(\Delta v\)</span><a class="headerlink" href="#spatial-discretization-delta-v" title="Link to this heading"></a></h4>
+<p>The Finite Different method works with a spatial discretization. The space is defined by a mesh grid of points at a distance <span class="math notranslate nohighlight">\(\Delta v\)</span> between each other. The distance <span class="math notranslate nohighlight">\(\Delta v\)</span> is equal for each dimension <span class="math notranslate nohighlight">\(x,y,z\)</span>, therefore <span class="math notranslate nohighlight">\(\Delta v = \Delta x = \Delta y = \Delta z\)</span>, and it is defined in meters.
+It is important to choose an appropriate <span class="math notranslate nohighlight">\(\Delta v\)</span> for the precision of the calculation.
+A <span class="math notranslate nohighlight">\(\Delta v\)</span> of 0.5 meters normally would suffice for a correct calculation, although the choice is contingent upon user preferences for details in parameters values and room dimensions. It is strongly advised that <span class="math notranslate nohighlight">\(\Delta v\)</span> is a factor of the dimensions of the room (e.g. for a room of 3 x 3 x 3 <span class="math notranslate nohighlight">\(m^3\)</span>, <span class="math notranslate nohighlight">\(\Delta v\)</span> could be 0.5 meters or 0.2 meters or 0.1 meters but it should not be 0.4 meters).</p>
 </section>
-<section id="time-discretization-dt">
-<h4>Time discretization dt<a class="headerlink" href="#time-discretization-dt" title="Link to this heading"></a></h4>
-<p>According the Navarro 2012, to get good converged results, the time discretization dt will need to be defined depending on the dv chosen.
+<section id="time-discretization-delta-t">
+<h4>Time discretization <span class="math notranslate nohighlight">\(\Delta t\)</span><a class="headerlink" href="#time-discretization-delta-t" title="Link to this heading"></a></h4>
+<p>According the Navarro 2012, to get good converged results, the time discretization <span class="math notranslate nohighlight">\(\Delta t\)</span> will need to be defined depending on the <span class="math notranslate nohighlight">\(\Delta v\)</span> chosen.
 To make sure that the predictions converge to a fixed value with a very low error, the following empirical cretirion will need to apply.</p>
 <div class="math notranslate nohighlight">
-\[10^{(-8)} = (dt)^2 (dv)^{(-2)}\]</div>
+\[10^{-8} = \Delta t^2 \Delta v^{-2}\]</div>
 <p>The time discretization is defined in seconds.</p>
 </section>
 </section>
 <section id="total-recording-time">
 <h3>Total Recording time<a class="headerlink" href="#total-recording-time" title="Link to this heading"></a></h3>
 <p>The total recording time is the amount of time for the calculation to run. It is the sum of the source on time and the time for the decay.
-The decay time needs to be inputted as the 2/3 of the theoretical calculated Sabine reverberation time of the room.
+The decay time is automatically defined depending on the the theoretical calculated Sabine reverberation time of the room.
 The total recording time is defined in seconds.</p>
 </section>
 <section id="air-absorption">
 <h3>Air absorption<a class="headerlink" href="#air-absorption" title="Link to this heading"></a></h3>
-<p>The absorption of the air will need to be inputted. The air absorption is defined as $m_{atm}$ and in 1/meters.</p>
+<p>The absorption of the air will need to be inputted. The air absorption is defined as <em>m_{atm}</em> and in 1/meters.</p>
 </section>
 </section>
 <section id="fixed-inputs">
@@ -230,9 +221,9 @@ The total recording time is defined in seconds.</p>
 <p>Within the fixed inputs, there are:</p>
 <ul class="simple">
 <li><p>Adiabatic speed of sound defined as 343 m/s;</p></li>
-<li><p>Absorption conditions term (Option 1 Sabine, Option 2 Eyring, Option 3 Modified). These are absorption factors for the boundary conditions. Currently, the most accurate absorption factor is set as the Option 3 Modified as it has bee demostrated that this is accurate for low and high absorption coefficients;</p></li>
-<li><p>Reference pressure defined as 2 * (10^(-5)) Pascal;</p></li>
-<li><p>Air density at 20°C defined as 1.21 [kg.m^-3].</p></li>
+<li><p>Absorption conditions term (Option 1 Sabine, Option 2 Eyring, Option 3 Modified). These are absorption factors for the boundary conditions. Currently, the most accurate absorption factor is set as the Option 3 Modified as it has been demostrated that this is accurate for low and high absorption coefficients;</p></li>
+<li><p>Reference pressure defined as <span class="math notranslate nohighlight">\(2 \cdot 10^{-5}\)</span> Pascal;</p></li>
+<li><p>Air density at 20°C defined as 1.21 <span class="math notranslate nohighlight">\(kg/m^{-3}\)</span>.</p></li>
 </ul>
 </section>
 <section id="acoustics-calculation">
@@ -241,42 +232,45 @@ The total recording time is defined in seconds.</p>
 </section>
 <section id="acoustics-parameters">
 <h2>Acoustics parameters<a class="headerlink" href="#acoustics-parameters" title="Link to this heading"></a></h2>
-<p>The diffusion equation method predicts the time-dependent propagation of the sound energy density w(r, t) in the evaluated frequency band.</p>
+<p>The diffusion equation method predicts the time-dependent propagation of the sound energy density <span class="math notranslate nohighlight">\(w(\mathbf{r}, t)\)</span> in the evaluated frequency band.</p>
 <section id="sound-density-level">
 <h3>Sound Density Level<a class="headerlink" href="#sound-density-level" title="Link to this heading"></a></h3>
-<p>The sound density level can be expressed as function of sound energy density w(r, t) as:</p>
+<p>The sound density level can be expressed as function of sound energy density <span class="math notranslate nohighlight">\(w(\mathbf{r}, t)\)</span> as:</p>
 <div class="math notranslate nohighlight">
-\[SDL = 10 log_10⁡(w(r,t))\]</div>
+\[SDL = 10 log_{10}⁡(w(\mathbf{r}, t))\]</div>
 </section>
 <section id="sound-pressure-level">
 <h3>Sound Pressure Level<a class="headerlink" href="#sound-pressure-level" title="Link to this heading"></a></h3>
 <p>After predicting the time-dependent sound energy density in the room, the sound pressure level decay curve can be expressed as function of sound energy density w(r, t) as:</p>
 <div class="math notranslate nohighlight">
-\[SPL = 20 log_10⁡((w(r,t)*ρ*c^2)/p_{ref}^2) \]</div>
-<p>where p_{ref} is 2 × 10−5 Pa and ρ is the air density.</p>
+\[SPL = 20 log_{10} \left( \frac{w(\mathbf{r}, t) \rho c^2}{p_{ref}^2} \right )\]</div>
+<p>where <span class="math notranslate nohighlight">\(p_{ref}\)</span> is <span class="math notranslate nohighlight">\(2 \cdot 10^{-5}\)</span> Pa and <span class="math notranslate nohighlight">\(\rho \)</span> is the air density.</p>
 </section>
-<section id="reverberation-time-and-early-decay-time-edt">
-<h3>Reverberation time and Early Decay Time (EDT)<a class="headerlink" href="#reverberation-time-and-early-decay-time-edt" title="Link to this heading"></a></h3>
-<p>From the sound pressure level decay curve, the Reverberation time can be estimated. The RT is defined by the time that it takes for the sound pressure level to decay of 60 dB. Depending on the room geometry, occasionally it is difficult to evaluate 60 dB of decay and therefore, the T30 is evaluated. This is obtained from the slope between -5 and -35 dB of the maximum starting level.</p>
+<section id="reverberation-time-rt-and-early-decay-time-edt">
+<h3>Reverberation time (RT) and Early Decay Time (EDT)<a class="headerlink" href="#reverberation-time-rt-and-early-decay-time-edt" title="Link to this heading"></a></h3>
+<p>From the sound pressure level decay curve, the Reverberation time can be estimated. The RT is defined by the time that it takes for the sound pressure level to decay of 60 dB. Depending on the room geometry, occasionally it is difficult to evaluate 60 dB of decay and therefore, the <span class="math notranslate nohighlight">\(T_{30}\)</span> is evaluated. This is obtained from the slope between -5 and -35 dB of the maximum starting level.</p>
 <p>The Early Decay time is defined by the time that it takes for the sound pressure level to decay of 10 dB and it is calculated in a similar way. This is obtained from the slope between 0 and -10 dB of the maximum starting level.</p>
 </section>
 <section id="clarity-definition-and-centre-time">
 <h3>Clarity, Definition and Centre Time<a class="headerlink" href="#clarity-definition-and-centre-time" title="Link to this heading"></a></h3>
-<p>The Clarity (C80) parameter is the early to late arriving sound energy ratio. Clarity refers to how clear the sound quality is and it is calculated from the impulse response with the following relation:
-C_80=10 log⁡〖(∫_0^80ms〖p^2 (t)〗 dt)/(∫_80ms^∞〖p^2 (t)〗 dt)〗    [dB]</p>
-<p>The Definition (D50) parameter is the ratio of the early received sound energy (0-50ms after direct sound arrival) to the total received energy. It referres only to the speech and it is defined as:</p>
-<p>D_50=10 log⁡〖(∫_0^50ms〖p^2 (t)  dt〗)/(∫_50ms^∞〖p^2 (t) 〗 dt)〗    [%]</p>
-<p>The Centr Time (Ts) parameter is the center of gravity of the squared impulse response. Centre Time avoids the discrete division of the impulse response into early and late periods.</p>
-<p>T_s=10 log⁡〖(∫_0^∞〖τ∙p^2 (t)  dt〗)/(∫_0^∞〖p^2 (t) 〗  dt)〗    [s]
-A low value indicate that most of the energy arrives early, a high value reveals that there is much reverberance.</p>
+<p>The Clarity (<span class="math notranslate nohighlight">\(C_{80}\)</span>) parameter is the early to late arriving sound energy ratio. Clarity refers to how clear the sound quality is and it is calculated from the impulse response with the following relation:</p>
+<div class="math notranslate nohighlight">
+\[C_{80} = 10 log⁡ \left( \frac{\int_0^{80ms} p^2(t) \, dt}{\int_{80ms}^\infty p^2 (t) \, dt} \right ) \,  [dB]\]</div>
+<p>The Definition (<span class="math notranslate nohighlight">\(D_{50}\)</span>) parameter is the ratio of the early received sound energy (0-50ms after direct sound arrival) to the total received energy. It referres only to the speech and it is defined as:</p>
+<div class="math notranslate nohighlight">
+\[D_{50} = 10 log \left( \frac{\int_0^{50ms} p^2(t) \, dt}{\int_0^\infty p^2 (t) \, dt} \right ) \,  [%]\]</div>
+<p>The Centre Time (T_s) parameter is the center of gravity of the squared impulse response. Centre Time avoids the discrete division of the impulse response into early and late periods.</p>
+<div class="math notranslate nohighlight">
+\[T_{s}=10 log⁡ \left( \frac{\int_0^\infty tp^2(t) \, dt}{\int_0^\infty p^2(t) \, dt} \right)   \,  [s]\]</div>
+<p>A low value indicate that most of the energy arrives early, a high value reveals that there is much reverberance.</p>
 <p>The values for all these parameters are calculated from the Barron’s revisited theory formulas (Vorlander, 2008) with the influence of the direct field neglected.</p>
 </section>
 </section>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>J. M. Navarro, J. Escolano and J. J. Lopez, Implementation and evaluation of a diffusion equa-tion model based on finite difference schemes for sound field prediction in rooms,Appl. Acoust.73(2012) 659–665.</p></li>
-<li><p>Vorländer M. Auralization: fundamentals of acoustics, modelling, simulation,algorithms and acoustic virtual reality. Springer 2008</p></li>
+<li><p>J. M. Navarro, J. Escolano and J. J. Lopez, Implementation and evaluation of a diffusion equa-tion model based on finite difference schemes for sound field prediction in rooms, Applied Acoustics 73(2012) 659–665.</p></li>
+<li><p>Vorländer M. Auralization: fundamentals of acoustics, modelling, simulation,algorithms and acoustic virtual reality. Springer 2008.</p></li>
 </ul>
 </section>
 </section>

@@ -3,7 +3,7 @@
 An auralization, is an audible file that is created by the convolution of an anaechoic audio signal with a simulated room impulse response. It shows how a specific sound (the sound produced by the anechoic file) would sound in the room specifically simulated (room impulse response). The diffusion eqaution method is the method used to produce the energy densities inside the room, which needs to be converted into a time-domain impulse reponse usable for auralization.
 
 In order to create an auralization, the first step is to get the results from the diffusion equation method. 
-In particular, the diffusion equation simulator provides the energy density at the receiver position. To make it audible, acoustic pressure is needed which is related to the energy density by the formula $p_{rec}^2 = w_{rec} rho c_0^2$, where w_{rec} is the energy density at the receiver, $rho$ is the air density in $\frac{kg}{m^3}$ and $c_0$ is the speed of sound.   
+In particular, the diffusion equation simulator provides the energy density at the receiver position. To make it audible, acoustic pressure is needed which is related to the energy density by the formula $p_{rec}^2 = w_{rec} \rho c_0^2$, where w_{rec} is the energy density at the receiver, $\rho$ is the air density in $\frac{kg}{m^3}$ and $c_0$ is the speed of sound.   
 
 By using the _FVM.py_ script, the acoustic pressure is already converted into an Envelope of the square impulse response at the receiver position for each frequency band, called *p_\{rec\}_\{off\}_\{deriv\}_\{band\}*. This is calculated by doing the opposite of a backward integration of the pressure (basically differenziation).
 

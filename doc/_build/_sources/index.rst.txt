@@ -24,19 +24,33 @@ Each method is distributed with its own Python code. The main application of the
    :maxdepth: 2
    :caption: Software Use:
 
-   Documentation1D.md
-   Documentation2D.md
-   DocumentationFDM.md
-   DocumentationFVM.md
+   Finite Different Method Use.md
+   Finite Volume Method Use.md
+   Auralization Use.md
 
 .. toctree::
    :maxdepth: 2
    :caption: Software Theory:
 
-   Documentation1D.md
-   Documentation2D.md
    DocumentationFDM.md
    DocumentationFVM.md
+   DocumentationAuralization.md
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Application Programming Interface (API) reference:
+   
+   .. automodule:: FVM.py
+    :members:
+    :undoc-members:
+    :show-inheritance:
+   
+.. toctree::
+   :maxdepth: 2
+   :caption: Tutorials:
+
+   Finite Different Method Demo Tutorial.md
+   Finite Volume Method Demo Tutorial.md
 
 Indices and tables
 ==================

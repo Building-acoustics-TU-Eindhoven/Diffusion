@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
@@ -5,25 +7,20 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Diffusion Equation Code 2D documentation &mdash; Diffusion Equation for Acoustics 0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=2709fde1"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=2709fde1"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Diffusion Equation Code 3D documentation" href="DocumentationFDM.html" />
-    <link rel="prev" title="Diffusion Equation Code 1D documentation" href="Documentation1D.html" /> 
+    <link rel="search" title="Search" href="search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -47,39 +44,24 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Software Presentation:</span></p>
 <ul>
-
 <li class="toctree-l1"><a class="reference internal" href="Overview.html">Overview</a></li>
-
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Software Use:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Documentation1D.html">Diffusion Equation Code 1D documentation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Diffusion Equation Code 2D documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#objectives-what-it-can-do">Objectives/what it can do</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#libraries">Libraries</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#inputs">Inputs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#implementation">Implementation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="DocumentationFDM.html">Diffusion Equation Code 3D documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DocumentationFVM.html">Diffusion Equation Code Finite Volume Method Documentation</a></li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Different%20Method%20Use.html">Finite Different Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Volume%20Method%20Use.html">Finite Volume Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Auralization%20Use.html">Auralization Use</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Software Theory:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Documentation1D.html">Diffusion Equation Code 1D documentation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Diffusion Equation Code 2D documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#objectives-what-it-can-do">Objectives/what it can do</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#libraries">Libraries</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#inputs">Inputs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#implementation">Implementation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="DocumentationFDM.html">Diffusion Equation Finite Different Method (FDM) documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DocumentationFVM.html">Diffusion Equation Finite Volume Method (FVM) Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DocumentationAuralization.html">Auralization Documentation</a></li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="DocumentationFDM.html">Diffusion Equation Code 3D documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DocumentationFVM.html">Diffusion Equation Code Finite Volume Method Documentation</a></li>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Different%20Method%20Demo%20Tutorial.html">Finite Different Method Demo Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Volume%20Method%20Demo%20Tutorial.html">Finite Volume Method Demo Tutorial</a></li>
 </ul>
 
         </div>
@@ -106,7 +88,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="diffusion-equation-code-2d-documentation">
+  <section class="tex2jax_ignore mathjax_ignore" id="diffusion-equation-code-2d-documentation">
 <h1>Diffusion Equation Code 2D documentation<a class="headerlink" href="#diffusion-equation-code-2d-documentation" title="Link to this heading"></a></h1>
 <p>The code is based on the Du Fort and Frankel method (explicit unconditionally stable Finite difference method).</p>
 <section id="objectives-what-it-can-do">
@@ -129,7 +111,7 @@
 <li><p>from math import ceil</p></li>
 <li><p>from math import log</p></li>
 <li><p>from math import pi</p></li>
-<li><p>from FunctionRT import *</p></li>
+<li><p>from FunctionRT import t60_decay</p></li>
 </ul>
 </section>
 <section id="inputs">
@@ -288,10 +270,7 @@ The values are calculate from the Barron’s revisited theory formulas (Vorlande
 
            </div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="Documentation1D.html" class="btn btn-neutral float-left" title="Diffusion Equation Code 1D documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="DocumentationFDM.html" class="btn btn-neutral float-right" title="Diffusion Equation Code 3D documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
+          <footer>
 
   <hr/>
 

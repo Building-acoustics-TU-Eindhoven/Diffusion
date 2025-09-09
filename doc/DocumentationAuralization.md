@@ -7,29 +7,20 @@ In particular, the diffusion equation simulator provides the energy density at t
 
 By using the _FVM.py_ script, the acoustic pressure is already converted into an Envelope of the square impulse response at the receiver position for each frequency band, called *p_\{rec\}_\{off\}_\{deriv\}_\{band\}*. This is calculated by doing the opposite of a backward integration of the pressure (basically differenziation).
 
-## Step 1
 After getting the file signal depending on the characteristics of the room from the _FVM.py_ script, the envelope of the square impulse response at the receiver position for each frequency band is resampled to the sampling frequency of the anechoic signal chosen. This is to have consistent temporal resolutions between the two signals.
 
-## Step 2
 This consists only of square rooting the resampled envelope of the squared impulse response, since energy is proportional to pressure squared. From the squared envelope of the impulse response, the envelope of the impulse response is calculated. This step converts energy information into amplitude information.
 
-## Step 3
 This step include the creation of random noise, to represent the random phase fluctuations of the diffuse sound field. In particular a sequence of uniformly distributed random numbers with a mean of zero and a variance of one is introduced, ensuring that the noise is 'neutral' before being shaped by filters.
 
-## Step 4
 Since each octave band is modeled separately in the diffusion equation model, a Butterwoth bandpass filter ensures that the random noise occupies the correct frequency range. This step include the creation of the filter for the random noise. A order 8 for the bandpass filter ensures that the transition band is shapr enough to isolate the frequency regions while keeping stability.
 
-## Step 5
 The filtered random noise is created by convolving the time domain of the Butterworth bandpass filter and the random noise for each frequency band. This gives the noise in each frequency the correct spectral charateristic. 
 
-## Step 6
 The square-root of the envelope of the impulse response (calculated at step 2) is to be padded to get the same length of the filtered random noise (calculated at step 5). Padding ensures temporal alignment without distorting the envelope and allows for element-wise multiplication.
 
-## Step 7 
 This step involves the multiplication between the filtered random noise and the square root of the resampled envolope of the squared impulse response. It shapes the noise in time according to how energy decays in the room.
 
-## Step 8
 The time vectors for each frequency band are summed element-wise, creating the total broadband impulse response without direct sound.
 
-## Step 9 
 The final step is the convolution of the total broadband simulated impulse response to a dry recording (anechoic file). This allows the listener to enter the simulated room acoustics environment and hear how the soundwould propagate in that specific room.

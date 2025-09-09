@@ -15,4 +15,5 @@ FVM-varD.py
 gmsh.exe
 resultsFVM.pkl
 imp_resp.wav
-auralization.wav
+Auralization/auralization.wav
+doc\_build

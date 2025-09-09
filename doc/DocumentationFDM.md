@@ -44,7 +44,7 @@ with the following surface definition:
 
 The full discretised partial differential equation is:
 
-```math
+```{math}
 w_{i,j,k}^{n+1} = \frac{1}{1+ \beta_{0}} \Big( 
 (w_{i,j,k}^{n-1} (1- \beta_{0}) - 2\Delta t \, c_{l} \, w_{i,j,k}^{n} - 2 \Delta t \, P_{i_s,j_s,k_s}^{n}) \\
 + \beta_{0x}(w_{i+1,j,k}^{n} + w_{i-1,j,k}^{n}) 
@@ -52,13 +52,6 @@ w_{i,j,k}^{n+1} = \frac{1}{1+ \beta_{0}} \Big(
 + \beta_{0z}(w_{i,j,k+1}^{n} + w_{i,j,k-1}^{n}) 
 \Big)
 ```
-
-
-<!-- 
-```{math}
-w_{i,j,k}^{n+1}=  \frac{(w_{i,j,k}^{n-1} (1- \beta_{0} )- 2\Delta t c m w_{i,j,k}^n - 2 \Delta t P_{i_s,j_s,k_s}^n + \beta_{0{x}}(w_{i+1,j,k}^n+ w_{i-1,j,k}^n )+
-+ \beta_{0{y}}(w_{i,j+1,k}^n+ w_{i,j-1,k}^n )+ \beta_{0{z}}(w_{i,j,k+1}^n+ w_{i,j,k-1}^n ))}{1+ \beta_{0}}
-``` -->
 
 Where:
 ```{math}
@@ -122,10 +115,14 @@ w_{L_{x}}^{n+1}=   \frac{4w_{L_{x-1}}^{n+1}-2w_{L_{x-2}}^{n+1}}{3+\frac{2 A_{x_{
 ```
 
 ## References
-- J. M. Navarro, J. Escolano and J. J. Lopez, Implementation and evaluation of a diffusion equa-tion model based on finite difference schemes for sound field prediction in rooms, Applied Acoustics 73 (2012), 659–665.
-- Billon A, Picaut J, Foy C, Valeau V, Sakout A. Introducing atmospheric attenuation within a diffusion model for room-acoustic predictions. Journal of the Acoustical Society America 2008 Jun; 123(6):4040-3.
-- Picaut, J., L. Simon, and J. D. Polack. 1997. “A Mathematical Model of Diffuse Sound Field Based on a Diffusion Equation.” Acta Acustica United with Acustica 83 (4): 614–621.
-- Valeau, V., J. Picaut, and M. Hodgson. 2006. “On the Use of a Diffusion Equation for Room-Acoustic Prediction.” Journal of the Acoustical Society of America 119 (3): 1504–1513.
-- Jing, Y., and N. Xiang. 2007. “A Modified Diffusion Equation for Room-Acoustic Predication (L).” Journal of the Acoustical Society of America 121 (6): 3284–3287.
-- Billon, A., J. Picaut, and A. Sakout. 2008. “Prediction of the Reverberation Time in High Absorbent Room Using a Modified-Diffusion Model.” Applied Acoustics 69 (1): 68–74.
-- Jing, Y., and N. Xiang. 2008. “On Boundary Conditions for the Diffusion Equation in Room Acoustic Predictions: Theory, Simulations, and Experiments.” Journal of the Acoustical Society of America 123 (1): 145–153.
+- J. M. Navarro, J. Escolano, J. J. Lopez, Implementation and evaluation of a diffusion equation model based on finite difference schemes for sound field prediction in rooms, Applied Acoustics 73 (6-7) (2012) 659–665.
+
+- A. Billon, J. Picaut, C. Foy, V. Valeau, A. Sakout, Introducing atmospheric attenuation within a diffusion model for room-acoustic predictions, The Journal of the Acoustical Society of America 123 (6) (2008) 4040–4043.
+
+- J. Picaut, L. Simon, A Mathematical Model of Diffuse Sound Field Based on a Diffusion Equation, ACUSTICA acta acustica 83 (1997) 614–621.
+
+- V. Valeau, J. Picaut, M. Hodgson, On the use of a diffusion equation for room-acoustic prediction, The Journal of the Acoustical Society of America 119 (3) (2006) 1504–1513.
+
+- Y. Jing, N. Xiang, A modified diffusion equation for room-acoustic predication, The Journal of the Acoustical Society of America 121 (6) (2007) 3284–3287.
+
+- Y. Jing, N. Xiang, On boundary conditions for the diffusion equation in room-acoustic prediction: Theory, simulations, and experiments, The Journal of the Acoustical Society of America 123 (1) (2008) 145–153.

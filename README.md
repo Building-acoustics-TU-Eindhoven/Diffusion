@@ -31,11 +31,12 @@ The [documentation](https://building-acoustics-tu-eindhoven.github.io/Diffusion/
 Software is being developed by Ilaria Fichera at Eindhoven University of Technology (TU/e). 
 
 ## Funding
-This research is founded by the Dutch Research Council (<u>[NWO](https://www.nwo.nl/projecten/19430)),Applied and Engineering Sciences (AES) under grant agreement No. 19430, with project title ”A new era of room acoustics simulation software: from academic advances to a sustainable open-source project and community”.
+This research is founded by the Dutch Research Council (<u>[NWO](https://www.nwo.nl/projecten/19430)), Applied and Engineering Sciences (AES) under grant agreement No. 19430, with project title ”A new era of room acoustics simulation software: from academic advances to a sustainable open-source project and community”.
 
 ## License
 Diffusion is under copyright of Building Acoustics Group at the Eindhoven University of Technology and is licensed under GNU General Public License v2.0. See LICENSE.md for more details.
 
 ## References
-+ J. M. Navarro, J. Escolano and J. J. Lopez, Implementation and evaluation of a diffusion equation model based on finite difference schemes for sound field prediction in rooms, Appl. Acoust.73 (2012) 659–665.
-+ R. P. Muñoz, "Numerical modeling for urban sound propagation: developments in wave-based and energy based methods," PhD Thesis, Technische Universiteit Eindhoven, 2019.
++ J. M. Navarro, J. Escolano and J. J. Lopez, Implementation and evaluation of a diffusion equation model based on finite difference schemes for sound field prediction in rooms, Applied Acoustics 73 (2012) 659–665.
+
++ R. P. Muñoz, Numerical modeling for urban sound propagation: developments in wave-based and energy based methods, PhD Thesis, Technische Universiteit Eindhoven, 2019.

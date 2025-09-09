@@ -16,4 +16,4 @@ gmsh.exe
 resultsFVM.pkl
 imp_resp.wav
 Auralization/auralization.wav
-doc\_build
+doc/_build

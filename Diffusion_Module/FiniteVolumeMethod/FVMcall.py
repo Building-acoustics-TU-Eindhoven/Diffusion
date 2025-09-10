@@ -17,6 +17,8 @@ import os
 from math import log
 import gmsh
 import numpy as np
+import json
+import pandas as pd
 from Diffusion_Module.FiniteVolumeMethod.FunctionClarity import clarity
 from Diffusion_Module.FiniteVolumeMethod.FunctionDefinition import definition
 from Diffusion_Module.FiniteVolumeMethod.FunctionCentreTime import centretime
@@ -29,100 +31,169 @@ from Diffusion_Module.FiniteVolumeMethod.FVMfunctions import *
 #INPUT VARIABLES
 ###############################################################################
 
-# Source position
-coord_source = [0.5,0.5,1.0] #coordinates of the receiver position in an list: x , y and z direction in meters [m]
+# # Source position
+# coord_source = [0.5,0.5,1.0] #coordinates of the receiver position in an list: x , y and z direction in meters [m]
 
-# Receiver position
-coord_rec = [2.0,0.5,1.0] #coordinates of the receiver position in an list: x , y and z direction in meters [m]
+# # Receiver position
+# coord_rec = [2.0,0.5,1.0] #coordinates of the receiver position in an list: x , y and z direction in meters [m]
 
-# Type of Calculation
-#Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
-#Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
-tcalc = "decay"
+# # Type of Calculation
+# #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
+# #Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
+# tcalc = "decay"
 
-# Frequency range
-fc_low = 125
-fc_high = 2000
-num_octave = 1    
+# # Frequency range
+# fc_low = 125
+# fc_high = 2000
+# num_octave = 1    
 
-# Time discretization
-dt = 1/20000 #time discretization
+# # Time discretization
+# dt = 1/20000 #time discretization
 
-# Air absorption coefficient
-m_atm = 0 #air absorption coefficient [1/m]
+# # Air absorption coefficient
+# m_atm = 0 #air absorption coefficient [1/m]
 
-# Absorption term and Absorption coefficients
-th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
-# options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
+# # Absorption term and Absorption coefficients
+# th = 3 #int(input("Enter type Absortion conditions (option 1,2,3):")) 
+# # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
 
-file_name = "3x3x3.msh" #Insert file name, msh file created from sketchUp and then gmsh
+# file_name = "3x3x3.msh" #Insert file name, msh file created from sketchUp and then gmsh
 
-#%%
-###############################################################################
-#FIXED INPUTS AND INITIALISE GMSH
-###############################################################################
-#Folder where to run
-script_dir = os.path.dirname(os.path.abspath(__file__))
-file_path = os.path.join(script_dir, file_name) # Full path to the file
+# #%%
+# ###############################################################################
+# #FIXED INPUTS AND INITIALISE GMSH
+# ###############################################################################
+# #Folder where to run
+# script_dir = os.path.dirname(os.path.abspath(__file__))
+# file_path = os.path.join(script_dir, file_name) # Full path to the file
 
-####?????? Ilaria: here it initialise the file. This is also important because the gmsh.exe file needs to be in the same folder as the code!!!
-gmsh.initialize() #Initialize msh file
-mesh = gmsh.open(file_path) #open the file
+# # ####?????? Ilaria: here it initialise the file. This is also important because the gmsh.exe file needs to be in the same folder as the code!!!
+# # gmsh.initialize() #Initialize msh file
+# # mesh = gmsh.open(file_path) #open the file
 
-dim = -1 #dimensions of the entities, 0 for points, 1 for curves/edge/lines, 2 for surfaces, 3 for volumes, -1 for all the entities 
-tag = -1 #all the nodes of the room
+# # dim = -1 #dimensions of the entities, 0 for points, 1 for curves/edge/lines, 2 for surfaces, 3 for volumes, -1 for all the entities 
+# # tag = -1 #all the nodes of the room
 
-#Calling function %create_vgroups_names% (This needs to stay outside the run_sim function because then it is used for the input of the absorption coefficient)
-vGroupsNames = create_vgroups_names()
+# #Calling function %create_vgroups_names% (This needs to stay outside the run_sim function because then it is used for the input of the absorption coefficient)
+# vGroupsNames = create_vgroups_names(file_path)
 
-#Calling function %number_freq%
-x_frequencies, nBands, center_freq = number_freq(num_octave,fc_high,fc_low)
+# #Calling function %number_freq%
+# x_frequencies, nBands, center_freq = number_freq(num_octave,fc_high,fc_low)
 
-#General settings
-c0= 343 #adiabatic speed of sound [m.s^-1]
 
-#Set initial condition - Source Info (interrupted method)
-Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
+# #%%
+# ###############################################################################
+# #INPUTS ABSORPTION COEFFICIENT VIA CSV
+# ###############################################################################
 
-# Reference pressure in Pa
-pRef = 2 * (10**-5) #Reference pressure in Pa
+# import pandas as pd
+# import sys
 
-# Air density
-rho = 1.21 #air density [kg.m^-3] at 20°C
+# # Define frequency bands
+# freq_bands = center_freq  # e.g., [125, 250, 500, 1000, 2000]
+# column_names = ["Surface"] + [f"{int(fc)}Hz" for fc in freq_bands]
+# csv_path = os.path.join(script_dir, "absorption_coefficients.csv")
 
-#%%
-###############################################################################
-#ABSORPTION COEFFICIENT INPUT
-###############################################################################
-# Initialize a list to store surface tags and their absorption coefficients
-surface_absorption = [] #initialization absorption term (alpha*surfaceofwall) for each wall of the room
-triangle_face_absorption = [] #initialization absorption term for each triangle face at the boundary and per each wall
-absorption_coefficient_dict = {}
+# # Check if CSV exists, otherwise create template
+# if not os.path.exists(csv_path):
+#     surface_names = [group[2] for group in vGroupsNames if group[0] == 2]
+#     df_template = pd.DataFrame(columns=column_names)
+#     df_template["Material"] = surface_names
+#     df_template.to_csv(csv_path, index=False)
+#     print(f"Template created: {csv_path}. Please fill in the absorption coefficients.")
+#     sys.exit()
 
-for group in vGroupsNames:
-    if group[0] != 2:
-        continue
 
-    name_group = group[2]
-    name_split = name_group.split("$")
-    name_abs_coeff = name_split[0]
+# #General settings
+# c0= 343 #adiabatic speed of sound [m.s^-1]
 
-    abscoeff = input(f"Enter absorption coefficient for frequency {fc_low} to {fc_high} for {name_abs_coeff}:") 
-    surface_materials (group, abscoeff, surface_absorption, absorption_coefficient_dict,nBands,th,c0)
+# #Set initial condition - Source Info (interrupted method)
+# Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
 
-for entity, Abs_term in surface_absorption:
-    triangle_faces, _ = gmsh.model.mesh.getElementsByType(2, entity) #Get all the triangle faces for the current surface
-    triangle_face_absorption.extend([Abs_term] * len(triangle_faces)) #Append the Abs_term value for each triangle face
+# # Reference pressure in Pa
+# pRef = 2 * (10**-5) #Reference pressure in Pa
 
-print("Correctly inputted surface materials. Starting initial geometry calculations...")
+# # Air density
+# rho = 1.21 #air density [kg.m^-3] at 20°C
+
+# #%%
+# ###############################################################################
+# #ABSORPTION COEFFICIENT INPUT
+# ###############################################################################
+
+# # Load filled CSV
+# df_abs = pd.read_csv(csv_path)
+
+
+# # Initialize a list to store surface tags and their absorption coefficients
+# surface_absorption = [] #initialization absorption term (alpha*surfaceofwall) for each wall of the room
+# triangle_face_absorption = [] #initialization absorption term for each triangle face at the boundary and per each wall
+# absorption_coefficient_dict = {}
+
+# for group in vGroupsNames:
+#     if group[0] != 2:
+#         continue
+
+#     name_group = group[2]
+#     row = df_abs[df_abs["Material"] == name_group]
+#     if row.empty:
+#         raise ValueError(f"No absorption data found for surface: {name_group}")
+
+#     abscoeff = row.iloc[0, 1:].values.astype(float).tolist() #input(f"Enter absorption coefficient for frequency {fc_low} to {fc_high} for {name_abs_coeff}:") 
+#     surface_materials (group, abscoeff, surface_absorption, absorption_coefficient_dict,nBands,th,c0)
+
+# for entity, Abs_term in surface_absorption:
+#     triangle_faces, _ = gmsh.model.mesh.getElementsByType(2, entity) #Get all the triangle faces for the current surface
+#     triangle_face_absorption.extend([Abs_term] * len(triangle_faces)) #Append the Abs_term value for each triangle face
+
+# print("Correctly inputted surface materials. Starting initial geometry calculations...")
+
+
+# Load input data
+with open("simulation_inputs.json", "r") as f:
+    inputs = json.load(f)
+
 
 #%%
 ###############################################################################
 #RUN SIMULATION FUNCTION
 ###############################################################################
-def run_sim(coord_source, coord_rec,fc_low,fc_high,num_octave, dt,m_atm , c0, Ws, th, pRef, rho, file_name,  dim, tag, center_freq, tcalc = "decay"):
+#def run_sim(coord_source, coord_rec,fc_low,fc_high,num_octave, dt,m_atm , c0, Ws, th, pRef, rho, file_name,  dim, tag, center_freq, tcalc = "decay"):
+def run_sim(inputs, abs_coeff_path):
     
     st = time.time() #start time of calculation
+         
+    # Access input variables
+    coord_source = inputs["coord_source"]
+    coord_rec = inputs["coord_rec"]
+    fc_low = inputs["fc_low"]
+    fc_high = inputs["fc_high"]
+    num_octave = inputs["num_octave"]
+    dt = inputs["dt"]
+    m_atm = inputs["m_atm"]
+    th = inputs["th"]
+    file_name = inputs["file_name"]
+    center_freq = inputs["center_freq"]
+    nBands = inputs["nBands"]
+    x_frequencies = inputs["x_frequencies"]
+    vGroupsNames = inputs["vGroupsNames"]
+    tcalc = inputs.get("tcalc", "decay")  # default fallback
+    
+    df_abs = pd.read_csv(abs_coeff_path)
+    # validate and convert to dictionary
+    if df_abs.isnull().values.any():
+        raise ValueError("Absorption coefficient file contains missing values.")
+        
+    c0= 343 #adiabatic speed of sound [m.s^-1]
+    Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
+    pRef = 2 * (10**-5) #Reference pressure in Pa
+    rho = 1.21 #air density [kg.m^-3] at 20°C
+    
+    gmsh.initialize() #Initialize msh file
+    mesh = gmsh.open(file_name) #open the file
+    
+    dim = -1
+    tag = -1
     
     #Calling function %get_nodes_elem%
     nodecoords, node_indices, bounEl, bounNode, voluEl, voluNode, belemNodes, velemNodes, boundaryEl_dict, volumeEl_dict = get_nodes_elem(dim,tag)
@@ -140,6 +211,9 @@ def run_sim(coord_source, coord_rec,fc_low,fc_high,num_octave, dt,m_atm , c0, Ws
     #Calling function %interior_tetra%
     interior_tet, interior_tet_sum = interior_tetra(voluEl, cell_center, velemNodes, nodecoords, node_indices)
     print("Completed internal tetrahedrons calculation. Starting boundary tetrahedrons calculations...")
+    
+    #Calling function %surface_absorption%
+    surface_absorption, triangle_face_absorption, absorption_coefficient_dict = surface_absorption_fun(vGroupsNames,df_abs,nBands,th,c0)
     
     #Calling function %surface_area%
     surface_areas = surface_area(surface_absorption, nodecoords, node_indices)
@@ -207,4 +281,5 @@ def run_sim(coord_source, coord_rec,fc_low,fc_high,num_octave, dt,m_atm , c0, Ws
     return results
 
 #Calling function %run_sim%
-results = run_sim(coord_source, coord_rec,fc_low,fc_high,num_octave, dt,m_atm , c0, Ws, th, pRef, rho, file_name, dim, tag, center_freq,tcalc = "decay")
+#results = run_sim(coord_source, coord_rec,fc_low,fc_high,num_octave, dt,m_atm , c0, Ws, th, pRef, rho, file_name, dim, tag, center_freq,tcalc = "decay")
+results = run_sim(inputs,'absorption_coefficients.csv')

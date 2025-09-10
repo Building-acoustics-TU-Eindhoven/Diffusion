@@ -71,7 +71,11 @@ def abs_term(th,abscoeff_list,c0):
         Absx_array = np.append(Absx_array, Absx)
     return Absx_array
 
-def create_vgroups_names():
+def create_vgroups_names(file_path):
+    gmsh.initialize() #Initialize msh file
+    mesh = gmsh.open(file_path) #open the file
+    dim = -1 #dimensions of the entities, 0 for points, 1 for curves/edge/lines, 2 for surfaces, 3 for volumes, -1 for all the entities 
+    tag = -1 #all the nodes of the room
     vGroups = gmsh.model.getPhysicalGroups(-1) #these are the entity tag and physical groups in the msh file. 
     vGroupsNames = [] #these are the entity tag and physical groups in the msh file + their names
     for iGroup in vGroups:
@@ -87,7 +91,7 @@ def create_vgroups_names():
 # Gives absorption coefficients to a material (group) and links it to the surfaces
 def surface_materials(group, abscoeff, surface_absorption, absorption_coefficient_dict, nBands,th,c0):
 
-    abscoeff = abscoeff.split(",")
+    #abscoeff = abscoeff.split(",")
     if len(abscoeff) != nBands:
         logger.error("Number of absorption coefficients doesn't match the number of frequency bands")
         raise Exception("Number of absorption coefficients doesn't match the number of frequency bands")
@@ -112,7 +116,7 @@ def surface_materials(group, abscoeff, surface_absorption, absorption_coefficien
 ###############################################################################
 def get_nodes_elem(dim,tag):
     # Nodes
-    tag = -1  # all the nodes of the room
+    #tag = -1  # all the nodes of the room
     nodeTags, coords, parametricCoord = gmsh.model.mesh.getNodes(dim,
                                                                     tag)  # gets the tags for each node and the coordinates of each node
     nodecoords = coords.reshape((-1, 3))  # coordinates reshaped in a matrix 3xnumber of nodes
@@ -333,6 +337,38 @@ def interior_tetra(voluEl,cell_center,velemNodes,nodecoords,node_indices):
     interior_tet_sum = np.sum(interior_tet, axis=1) #sum of interior_tet per columns (so per i element)
     
     return interior_tet, interior_tet_sum
+
+#%%
+###############################################################################
+#CALCULATION OF 
+###############################################################################
+# Calculation surface areas
+def surface_absorption_fun(vGroupsNames,df_abs,nBands,th,c0):
+    #Initialize a list to store surface tags and their absorption coefficients
+    surface_absorption = [] #initialization absorption term (alpha*surfaceofwall) for each wall of the room
+    triangle_face_absorption = [] #initialization absorption term for each triangle face at the boundary and per each wall
+    absorption_coefficient_dict = {}
+
+    for group in vGroupsNames:
+        if group[0] != 2:
+            continue
+
+        name_group = group[2]
+        row = df_abs[df_abs["Material"] == name_group]
+        if row.empty:
+            raise ValueError(f"No absorption data found for surface: {name_group}")
+
+        abscoeff = row.iloc[0, 1:].values.astype(float).tolist() #input(f"Enter absorption coefficient for frequency {fc_low} to {fc_high} for {name_abs_coeff}:") 
+        surface_materials (group, abscoeff, surface_absorption, absorption_coefficient_dict,nBands,th,c0)
+
+    for entity, Abs_term in surface_absorption:
+        triangle_faces, _ = gmsh.model.mesh.getElementsByType(2, entity) #Get all the triangle faces for the current surface
+        triangle_face_absorption.extend([Abs_term] * len(triangle_faces)) #Append the Abs_term value for each triangle face
+
+    return surface_absorption, triangle_face_absorption, absorption_coefficient_dict
+
+
+
 
 #%%
 ###############################################################################

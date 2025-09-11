@@ -24,8 +24,9 @@ docs = [
 dev = ["Diffusion[docs]"]
 
 [project.urls]
+Tracker = "https://github.com/building-acoustics-tu-eindhoven/Diffusion/issues"
 Documentation = "https://building-acoustics-tu-eindhoven.github.io/Diffusion/"
-Repository = "https://github.com/building-acoustics-tu-eindhoven/Diffusion"
+Source = "https://github.com/building-acoustics-tu-eindhoven/Diffusion"
 
 
 [build-system]

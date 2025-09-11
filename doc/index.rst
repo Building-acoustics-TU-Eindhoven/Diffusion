@@ -38,12 +38,9 @@ Each method is distributed with its own Python code. The main application of the
 
 .. toctree::
    :maxdepth: 2
-   :caption: Application Programming Interface (API) reference:
-   
-   .. automodule:: FVM.py
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :caption: API reference:
+
+   Diffusion_Module/FVMfunctions
    
 .. toctree::
    :maxdepth: 2

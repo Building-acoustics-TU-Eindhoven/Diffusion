@@ -12,6 +12,14 @@ keywords = [
     "room acoustics", 
     "diffusion", 
 ]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved ::  GPL-2.0 License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+]
 dependencies = [
     "numpy<2.0.0",
     "scipy",

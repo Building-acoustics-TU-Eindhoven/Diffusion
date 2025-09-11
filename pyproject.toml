@@ -5,6 +5,9 @@ description = "Acoustics Simulation using the Diffusion Equation"
 readme = "README.md"
 license = {file = "LICENSE.md"}
 requires-python = ">=3.10"
+authors = [
+    {name = "Your name here", email = "your.email@example.com"}
+]
 keywords = [
     "room acoustics", 
     "diffusion", 

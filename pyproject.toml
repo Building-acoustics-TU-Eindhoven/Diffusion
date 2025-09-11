@@ -16,6 +16,7 @@ dependencies = [
     "pandas",
 ]
 
+[project.optional-dependencies]
 docs = [
     "sphinx",
 ]

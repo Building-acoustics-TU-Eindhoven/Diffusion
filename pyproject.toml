@@ -5,6 +5,10 @@ description = "Acoustics Simulation using the Diffusion Equation"
 readme = "README.md"
 license = {file = "LICENSE.md"}
 requires-python = ">=3.10"
+keywords = [
+    "room acoustics", 
+    "diffusion", 
+]
 dependencies = [
     "numpy<2.0.0",
     "scipy",

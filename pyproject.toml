@@ -2,6 +2,53 @@
 name = "Diffusion_Module"
 version = "0.1.0"
 description = "Acoustics Simulation using the Diffusion Equation"
+readme = "README.md"
+license = {file = "LICENSE.md"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Ilaria Fichera", email = "i.fichera@tue.nl"}
+    # {name = "Cédric Van hoorickx", email = "i.fichera@tue.nl"}
+    # {name = "Maarten Hoornikx", email = "m.c.j.hornikx@tue.nl"}
+]
+keywords = [
+    "room acoustics", 
+    "acoustic diffusion equation",
+    "acoustic simulations" 
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved ::  GPL-2.0 License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+]
+dependencies = [
+    "numpy<2.0.0",
+    "scipy",
+    "matplotlib<3.7.0",
+    "drawnow",
+    "gmsh",
+    "soundfile",
+    "sounddevice",
+    "pandas",
+    "sys",
+    "os",
+    "pickle",
+]
+
+[project.optional-dependencies]
+docs = [
+    "sphinx",
+]
+
+dev = ["Diffusion[docs]"]
+
+[project.urls]
+Tracker = "https://github.com/building-acoustics-tu-eindhoven/Diffusion/issues"
+Documentation = "https://building-acoustics-tu-eindhoven.github.io/Diffusion/"
+Source = "https://github.com/building-acoustics-tu-eindhoven/Diffusion"
+
 
 [build-system]
 build-backend = "flit_core.buildapi"

@@ -17,3 +17,5 @@ resultsFVM.pkl
 imp_resp.wav
 Auralization/auralization.wav
 doc/_build
+Diffusion_Module/FiniteVolumeMethod/absorption_coefficients.csv
+Diffusion_Module/FiniteVolumeMethod/simulation_inputs.json

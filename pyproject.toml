@@ -32,9 +32,6 @@ dependencies = [
     "soundfile",
     "sounddevice",
     "pandas",
-    "sys",
-    "os",
-    "pickle",
 ]
 
 [project.optional-dependencies]

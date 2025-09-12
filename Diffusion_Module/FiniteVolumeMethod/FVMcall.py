@@ -148,9 +148,10 @@ from Diffusion_Module.FiniteVolumeMethod.FVMfunctions import *
 
 # print("Correctly inputted surface materials. Starting initial geometry calculations...")
 
+script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Load input data
-with open("simulation_inputs.json", "r") as f:
+with open(os.path.join(script_dir,"simulation_inputs.json"), "r") as f:
     inputs = json.load(f)
 
 
@@ -160,6 +161,18 @@ with open("simulation_inputs.json", "r") as f:
 ###############################################################################
 #def run_sim(coord_source, coord_rec,fc_low,fc_high,num_octave, dt,m_atm , c0, Ws, th, pRef, rho, file_name,  dim, tag, center_freq, tcalc = "decay"):
 def run_sim(inputs, abs_coeff_path):
+    """Function for running the full calculation. It will use all the fucntions defined in FVMfunctions.py file
+
+    Args:
+        inputs (_dict_): json file inputs 
+        abs_coeff_path (_str_): csv file of the absorption coefficient inputs
+
+    Raises:
+        ValueError: If the values in the absorption coefficient csv file are missing, it will flag an error.
+
+    Returns:
+        results (_dict_): all the variable calculated in the simulations
+    """
     
     st = time.time() #start time of calculation
          
@@ -275,13 +288,13 @@ def run_sim(inputs, abs_coeff_path):
     
     results = locals()
     
-    #Calling function %save%
-    save('resultsFVM.pkl', results)
-    
     return results
 
 #Calling function %run_sim%
 #results = run_sim(coord_source, coord_rec,fc_low,fc_high,num_octave, dt,m_atm , c0, Ws, th, pRef, rho, file_name, dim, tag, center_freq,tcalc = "decay")
 results = run_sim(inputs,'absorption_coefficients.csv')
+
+#Calling function %save%
+save('resultsFVM.pkl', results)
 
 print("Simulation finished successfully! Results in results.pkl file")

@@ -43,7 +43,7 @@ input_data["nBands"] = nBands
 input_data["x_frequencies"] = x_frequencies
 
 # Save to JSON
-with open("simulation_inputs.json", "w") as f:
+with open(os.path.join(script_dir,"simulation_inputs.json"), "w") as f:
     json.dump(input_data, f, indent=4)
 
 print("Input file successfully created: simulation_inputs.json")
@@ -67,16 +67,3 @@ if not os.path.exists(csv_path):
     df_template.to_csv(csv_path, index=False)
     print(f"Template created: {csv_path}. Please fill in the absorption coefficients.")
     sys.exit()
-
-
-# # Load and validate CSV
-# df_abs = pd.read_csv(csv_path)
-
-# # Check for missing values
-# if df_abs.isnull().values.any():
-#     print("Absorption coefficient file contains missing values. Please complete all fields.")
-#     sys.exit()
-
-# # Convert to dictionary
-# absorption_dict = df_abs.set_index("Material").T.to_dict()
-# input_data["absorption_coefficients"] = absorption_dict

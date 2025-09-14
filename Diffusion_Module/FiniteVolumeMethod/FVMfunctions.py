@@ -59,8 +59,9 @@ def number_freq(num_octave,fc_high,fc_low):
         fc_low (int): the lowest frequency in the calculation
 
     Returns:
-        nBands (int): number of frequency bands
-        center_freq (array of floats): array of all the frequencies to calculate
+        tuple:
+            nBands (int): number of frequency bands
+            center_freq (array of floats): array of all the frequencies to calculate
     """
     x_frequencies  = num_octave * log(fc_high/fc_low) / log(2)
     nBands = int(num_octave * log(fc_high/fc_low) / log(2) + 1)
@@ -78,7 +79,8 @@ def abs_term(th,abscoeff_list,c0):
         c0 (int): speed of sound 
 
     Returns:
-        Absx_array (array of floats): calculated absorption term for each absorption coefficient for each frequency
+        tuple:
+            Absx_array (array of floats): calculated absorption term for each absorption coefficient for each frequency
     """
     Absx_array = np.array([])
     for abs_coeff in abscoeff_list:
@@ -99,7 +101,8 @@ def create_vgroups_names(file_path):
         file_path (str): full path to the mesh file
 
     Returns:
-        vGroupsNames (list): list of the names of the materials in the msh file (the material name are the same as the one assigned in the SketchUp file)
+        tuple:
+            vGroupsNames (list): list of the names of the materials in the msh file (the material name are the same as the one assigned in the SketchUp file)
     """
     gmsh.initialize() #Initialize msh file
     mesh = gmsh.open(file_path) #open the file
@@ -134,8 +137,9 @@ def surface_materials(group, abscoeff, surface_absorption, absorption_coefficien
         Exception: If the number of absorption coefficient typed are higher than the number of frequency bands it will raise an error
 
     Returns:
-        absorption_coefficient_dict (dict): absorption coefficients per each surface and per each frequency
-        surface_absorption (list of tuples): absorption term for each surface and for each frequency
+        tuple:
+            absorption_coefficient_dict (dict): absorption coefficients per each surface and per each frequency
+            surface_absorption (list of tuples): absorption term for each surface and for each frequency
     """
 
     #abscoeff = abscoeff.split(",")
@@ -169,6 +173,7 @@ def get_nodes_elem(dim,tag):
         tag (int): indication for nodes (-1 indicates all the nodes of the room) 
 
     Returns:
+        tuple:
         nodecoords (array of floats): the coordinates of each node in the mesh
         node_indices (dict): indeces of all the nodes in the mesh
         bounEl (array of int): indeces of all the boundary surfaces in the mesh

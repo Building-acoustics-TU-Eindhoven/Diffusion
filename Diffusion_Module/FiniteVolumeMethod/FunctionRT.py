@@ -8,7 +8,7 @@ import numpy as np
 from scipy import stats
 
 def t60_decay(t, sch_db, idx_w_rec, rt='t30'):
-        """
+    """
     Calculation of reverberation time from a Schroeder decay (Schroeder 1965)
 
     Parameters
@@ -25,6 +25,7 @@ def t60_decay(t, sch_db, idx_w_rec, rt='t30'):
         t60 : float
             Reverberation time T_{60}
     """  
+        
     if rt == 't30':
         init = -5.0 #because I want the T30, I need to start at -5
         end = -35.0 #because I want the T30, I need to finish at -35

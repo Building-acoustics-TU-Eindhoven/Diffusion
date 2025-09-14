@@ -78,16 +78,22 @@ def number_freq(num_octave,fc_high,fc_low):
 
 # Absorption term for boundary conditions 
 def abs_term(th,abscoeff_list,c0):
-    """Calculate the absorption term (Sabine, Eyring or Modified)
+    """
+    Calculate the absorption term (Sabine, Eyring or Modified)
 
-    Args:
-        th (int): indicates the options for the absorption term; Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
-        abscoeff_list (list): list of the absrption coefficient for each frequency
-        c0 (int): speed of sound 
+    Parameters
+    ----------
+        th : int
+            The options for the absorption term; Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
+        abscoeff_list : list
+            Absrption coefficient for each frequency
+        c0 : int 
+            Speed of sound 
 
-    Returns:
-        tuple:
-            Absx_array (array of floats): calculated absorption term for each absorption coefficient for each frequency
+    Returns
+    -------
+        Absx_array: array of floats
+            Calculated absorption term for each absorption coefficient for each frequency
     """
     Absx_array = np.array([])
     for abs_coeff in abscoeff_list:
@@ -102,14 +108,18 @@ def abs_term(th,abscoeff_list,c0):
     return Absx_array
 
 def create_vgroups_names(file_path):
-    """Create a list of the material names assigned in SketchUp
+    """
+    Create a list of the material names assigned in SketchUp
 
-    Args:
-        file_path (str): full path to the mesh file
+    Parameters
+    ----------
+        file_path : str
+            Full path to the mesh file
 
-    Returns:
-        tuple:
-            vGroupsNames (list): list of the names of the materials in the msh file (the material name are the same as the one assigned in the SketchUp file)
+    Returns
+    -------
+        vGroupsNames : list
+            Names of the materials in the msh file (the material name are the same as the one assigned in the SketchUp file)
     """
     gmsh.initialize() #Initialize msh file
     mesh = gmsh.open(file_path) #open the file
@@ -129,24 +139,36 @@ def create_vgroups_names(file_path):
 
 # Gives absorption coefficients to a material (group) and links it to the surfaces
 def surface_materials(group, abscoeff, surface_absorption, absorption_coefficient_dict, nBands,th,c0):
-    """Calculation of absorption term for each material
+    """
+    Calculation of absorption term for each material
 
-    Args:
-        group (list): material name in the msh file
-        abscoeff (list of strings): absorption coefficient of the group (material name)
-        surface_absorption (list of tuples): list initialization of absorption term for each surface and for each frequency
-        absorption_coefficient_dict (dict): dictionary initialization of absorption coefficients per each surface and per each frequency 
-        nBands (int): number of frequency bands
-        th (int): option for the absorption term; Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
-        c0 (int): speed of sound 
+    Parameters
+    ----------
+        group : list
+            Material name in the msh file
+        abscoeff : list of strings
+            Absorption coefficient of the group (material name)
+        surface_absorption : list of tuples
+            List initialization of absorption term for each surface and for each frequency
+        absorption_coefficient_dict : dict
+            Dictionary initialization of absorption coefficients per each surface and per each frequency 
+        nBands : int
+            Number of frequency bands
+        th : int
+            Option for the absorption term; Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
+        c0 : int
+            Speed of sound 
 
-    Raises:
+    Raises
+    ------
         Exception: If the number of absorption coefficient typed are higher than the number of frequency bands it will raise an error
 
-    Returns:
-        tuple:
-            absorption_coefficient_dict (dict): absorption coefficients per each surface and per each frequency
-            surface_absorption (list of tuples): absorption term for each surface and for each frequency
+    Returns
+    -------
+        absorption_coefficient_dict : dict
+            absorption coefficients per each surface and per each frequency
+        surface_absorption : list of tuples
+            Absorption term for each surface and for each frequency
     """
 
     #abscoeff = abscoeff.split(",")
@@ -173,24 +195,38 @@ def surface_materials(group, abscoeff, surface_absorption, absorption_coefficien
 #GMSH GET NODES, VOLUME ELEMENTS AND BOUNDARY ELEMENTS
 ###############################################################################
 def get_nodes_elem(dim,tag):
-    """Calculates the number of volumetric and boundary elements in the mesh
+    """
+    Calculates the number of volumetric and boundary elements in the mesh
 
-    Args:
-        dim (int): dimensions of the entities, 0 for points, 1 for curves/edge/lines, 2 for surfaces, 3 for volumes, -1 for all the entities 
-        tag (int): indication for nodes (-1 indicates all the nodes of the room) 
+    Parameters
+    ----------
+        dim : int 
+            Dimensions of the entities, 0 for points, 1 for curves/edge/lines, 2 for surfaces, 3 for volumes, -1 for all the entities 
+        tag : int
+            Indication for nodes (-1 indicates all the nodes of the room) 
 
-    Returns:
-        tuple:
-        nodecoords (array of floats): the coordinates of each node in the mesh
-        node_indices (dict): indeces of all the nodes in the mesh
-        bounEl (array of int): indeces of all the boundary surfaces in the mesh
-        bounNode (array of int): indeces of all the boundary nodes per each boundary surface in the mesh
-        voluEl (array of int): indeces of all the bolume elements (tetrahedra) in the mesh
-        voluNode (array of int): indeces of all the volumetric nodes per each colume element in the mesh
-        belemNodes (array of int): indeces of all the boundary nodes per each boundary surface in the mesh
-        velemNodes (array of int): indeces of all the volumetric nodes per each colume element in the mesh
-        boundaryEl_dict (dict): dictionary with key the index of the boundary element (boudnary surface) and value the indeces of the nodes of the surface
-        volumeEl_dict (dict): dictionary with key the index of the volumetric element (tetrahedra) and value the indeces of the nodes of the tetrahedra
+    Returns
+    -------
+        nodecoords : array of floats
+            The coordinates of each node in the mesh
+        node_indices : dict 
+            Indeces of all the nodes in the mesh
+        bounEl : array of int 
+            Indeces of all the boundary surfaces in the mesh
+        bounNode : array of int 
+            Indeces of all the boundary nodes per each boundary surface in the mesh
+        voluEl : array of int
+            Indeces of all the bolume elements (tetrahedra) in the mesh
+        voluNode : array of int 
+            Indeces of all the volumetric nodes per each colume element in the mesh
+        belemNodes : array of int
+            Indeces of all the boundary nodes per each boundary surface in the mesh
+        velemNodes : array of int 
+            Indeces of all the volumetric nodes per each colume element in the mesh
+        boundaryEl_dict : dict
+            Dictionary with key the index of the boundary element (boudnary surface) and value the indeces of the nodes of the surface
+        volumeEl_dict : dict 
+            Dictionary with key the index of the volumetric element (tetrahedra) and value the indeces of the nodes of the tetrahedra
     """
     # Nodes
     #tag = -1  # all the nodes of the room
@@ -255,16 +291,24 @@ def get_nodes_elem(dim,tag):
 ###############################################################################
 
 def velem_volume_centre(volumeEl_dict,nodecoords,node_indices):
-    """Calculation of the volume of each cell and its center
+    """
+    Calculation of the volume of each cell and its center
 
-    Args:
-        volumeEl_dict (dict): dictionary with key the index of the volumetric element (tetrahedra) and value the indeces of the nodes of the tetrahedra
-        nodecoords (array of floats): the coordinates of each node in the mesh
-        node_indices (dict): indeces of all the nodes in the mesh
+    Parameters
+    ----------
+        volumeEl_dict : dict 
+            Dictionary with key the index of the volumetric element (tetrahedra) and value the indeces of the nodes of the tetrahedra
+        nodecoords : array of floats 
+            The coordinates of each node in the mesh
+        node_indices : dict
+            Indeces of all the nodes in the mesh
 
-    Returns:
-        cell_center (array of floats): the coordinates of the center of the cell element per each element
-        cell_volume (array of floats): the volume of each element cell
+    Returns
+    -------
+        cell_center : array of floats 
+            The coordinates of the center of the cell element per each element
+        cell_volume : array of floats 
+            The volume of each element cell
     """
     #Calculation of volume cells and centre of volume    
     vcell_dict = {} #volume of each element tetrahedron initialization
@@ -308,16 +352,24 @@ def velem_volume_centre(volumeEl_dict,nodecoords,node_indices):
 ###############################################################################
 #Calculation of boundary elements area and centre 
 def belem_area_centre(boundaryEl_dict,nodecoords,node_indices):
-    """Calculation of the area of each boundary surface and its center
+    """
+    Calculation of the area of each boundary surface and its center
 
-    Args:
-        boundaryEl_dict (dict): dictionary with key the index of the boundary element (boudnary surface) and value the indeces of the nodes of the surface
-        nodecoords (array of floats): the coordinates of each node in the mesh
-        node_indices (dict): indeces of all the nodes in the mesh
+    Parameters
+    ----------
+        boundaryEl_dict : dict
+            Dictionary with key the index of the boundary element (boudnary surface) and value the indeces of the nodes of the surface
+        nodecoords : array of floats
+            The coordinates of each node in the mesh
+        node_indices : dict
+            Indeces of all the nodes in the mesh
 
-    Returns:
-        barea_dict (dict): area of each boundary surface element
-        centre_area (dict): center point of each boundary surface element
+    Returns
+    -------
+        barea_dict : dict 
+            Area of each boundary surface element
+        centre_area : dict 
+            Center point of each boundary surface element
     """
     barea_dict = {} #surface of each element boundary initialization
     centre_area = {} #centre of the element tetrahedron initialization
@@ -350,15 +402,21 @@ def belem_area_centre(boundaryEl_dict,nodecoords,node_indices):
 ###############################################################################
 #Neighbours calculation; What are the neighbours faces of each volume? 3 per each minimum?
 def get_neighbour_faces(voluEl):
-    """Calculation of nighbours volumetric elements and faces
+    """
+    Calculation of nighbours volumetric elements and faces
 
-    Args:
-        voluEl (array of int): indeces of all the bolume elements (tetrahedra) in the mesh
+    Parameters
+    ----------
+        voluEl : array of int 
+            Indeces of all the bolume elements (tetrahedra) in the mesh
 
     Returns:
-        fxt (dict): dictionary with keys as the nodes of each face and values the volume elements of which this face is neighbour
-        txt (dict): dictionary with keys as the tetrahedron tag and values as the tet that are neighbours (the tet at the boundary are not counted)
-        neighbourVolume (array of floats): array with the neighbours tetrahedron per each tetrahedron in order from 0 to the number of tetrahedrons
+        fxt : dict 
+            Dictionary with keys as the nodes of each face and values the volume elements of which this face is neighbour
+        txt : dict 
+            Dictionary with keys as the tetrahedron tag and values as the tet that are neighbours (the tet at the boundary are not counted)
+        neighbourVolume : array of floats 
+            Array with the neighbours tetrahedron per each tetrahedron in order from 0 to the number of tetrahedrons
     """
     facenodes = gmsh.model.mesh.getElementFaceNodes(4,
                                                     3)  # 4 is the element type (tetrahedron) and three are the nodes per each face #get all the face tags of all the faces of the tetrahedrons
@@ -411,18 +469,28 @@ def get_neighbour_faces(voluEl):
 # Interior Tetrahedrons calculations
 
 def interior_tetra(voluEl,cell_center,velemNodes,nodecoords,node_indices):
-    """Calculation of shared area divided shared distance between tetrahedrons
+    """
+    Calculation of shared area divided shared distance between tetrahedrons
 
-    Args:
-        voluEl (array of int): indeces of all the bolume elements (tetrahedra) in the mesh
-        cell_center (array of floats): the coordinates of the center of the cell element per each element
-        velemNodes (array of int): indeces of all the volumetric nodes per each colume element in the mesh
-        nodecoords (array of floats): the coordinates of each node in the mesh
-        node_indices (dict): indeces of all the nodes in the mesh
+    Parameters
+    ----------
+        voluEl : array of int 
+            Indeces of all the bolume elements (tetrahedra) in the mesh
+        cell_center : array of floats
+            The coordinates of the center of the cell element per each element
+        velemNodes : array of int 
+            Indeces of all the volumetric nodes per each colume element in the mesh
+        nodecoords : array of floats 
+            The coordinates of each node in the mesh
+        node_indices : dict 
+            Indeces of all the nodes in the mesh
 
-    Returns:
-        interior_tet (array of floats): matrix of tetrahedron per tetrahedron of the division between shared area and shared distance
-        interior_tet_sum (array of floats): sum of interior_tet per columns
+    Returns
+    -------
+        interior_tet : array of floats
+            Matrix of tetrahedron per tetrahedron of the division between shared area and shared distance
+        interior_tet_sum : array of floats
+            Sum of interior_tet per columns
     """
     interior_tet = np.zeros((len(voluEl), len(voluEl))) #initialization matrix of tetrahedron per tetrahedron
     
@@ -466,22 +534,34 @@ def interior_tetra(voluEl,cell_center,velemNodes,nodecoords,node_indices):
 ###############################################################################
 # Calculation surface areas
 def surface_absorption_fun(vGroupsNames,df_abs,nBands,th,c0):
-    """Assign the absoprtion term to each triangle boundary face depending on the surface material and the frequency
+    """
+    Assign the absoprtion term to each triangle boundary face depending on the surface material and the frequency
 
-    Args:
-        vGroupsNames (list): list of the names of the materials in the msh file (the material name are the same as the one assigned in the SketchUp file)
-        df_abs (Dataframe): absoprtion coefficient for each material assigned
-        nBands (int): number of frequency bands
-        th (int): option for the absorption term; Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
-        c0 (int): speed of sound 
+    Parameters
+    ----------
+        vGroupsNames : list 
+            List of the names of the materials in the msh file (the material name are the same as the one assigned in the SketchUp file)
+        df_abs : Dataframe 
+            Absoprtion coefficient for each material assigned
+        nBands : int 
+            Number of frequency bands
+        th : int
+            Option for the absorption term; Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
+        c0 : int 
+            Speed of sound 
 
-    Raises:
+    Raises
+    ------
         ValueError: If there are not values in the csv file, it will raise it as an error.
 
-    Returns:
-        surface_absorption (list of tuples): list of absorption term for each surface and for each frequency
-        triangle_face_absorption (list of arrays): absorption term value for each triangle face at the boundary
-        absorption_coefficient_dict (dict): dictionary initialization of absorption coefficients per each surface and per each frequency 
+    Returns
+    -------
+        surface_absorption : list of tuples
+            List of absorption term for each surface and for each frequency
+        triangle_face_absorption : list of arrays 
+            Absorption term value for each triangle face at the boundary
+        absorption_coefficient_dict : dict
+            Dictionary initialization of absorption coefficients per each surface and per each frequency 
     """
     #Initialize a list to store surface tags and their absorption coefficients
     surface_absorption = [] #initialization absorption term (alpha*surfaceofwall) for each wall of the room
@@ -515,15 +595,22 @@ def surface_absorption_fun(vGroupsNames,df_abs,nBands,th,c0):
 ###############################################################################
 # Calculation surface areas
 def surface_area(surface_absorption, nodecoords, node_indices):
-    """Calculation of total surface area for each model surface
+    """
+    Calculation of total surface area for each model surface
 
-    Args:
-        surface_absorption (list of tuples): list of absorption term for each surface and for each frequency
-        nodecoords (array of floats): the coordinates of each node in the mesh
-        node_indices (dict): indeces of all the nodes in the mesh
+    Parameters
+    ----------
+        surface_absorption : list of tuples 
+            List of absorption term for each surface and for each frequency
+        nodecoords : array of floats 
+            The coordinates of each node in the mesh
+        node_indices :dict 
+            Indeces of all the nodes in the mesh
 
-    Returns:
-        surface_areas (dict): surface are for each surface of the model
+    Returns
+    -------
+        surface_areas : dict
+            Surface are for each surface of the model
     """
     surface_areas = {}   
     for entity, Abs_term in surface_absorption:   
@@ -549,19 +636,30 @@ def surface_area(surface_absorption, nodecoords, node_indices):
 ###############################################################################
 #FACE AREA & boundary_areas
 def boundary_triang(velemNodes, nBands, bounNode, nodecoords, node_indices, triangle_face_absorption):
-    """Assign the correct equaivalent area to each surface to each tetrahedra
+    """
+    Assign the correct equaivalent area to each surface to each tetrahedra
 
-    Args:
-        velemNodes (array of int): indeces of all the volumetric nodes per each colume element in the mesh
-        nBands (int): number of frequency bands
-        bounNode (array of int): indeces of all the boundary nodes per each boundary surface in the mesh
-        nodecoords (array of floats): the coordinates of each node in the mesh
-        node_indices (dict): indeces of all the nodes in the mesh
-        triangle_face_absorption (list of arrays): absorption term value for each triangle face at the boundary
+    Parameters
+    ----------
+        velemNodes : array of int
+            Indeces of all the volumetric nodes per each colume element in the mesh
+        nBands : int 
+            Number of frequency bands
+        bounNode : array of int 
+            Indeces of all the boundary nodes per each boundary surface in the mesh
+        nodecoords : array of floats
+            The coordinates of each node in the mesh
+        node_indices : dict 
+            Indeces of all the nodes in the mesh
+        triangle_face_absorption : list of arrays
+            Absorption term value for each triangle face at the boundary
 
-    Returns:
-        boundary_areas (array of floats): product between the area and the correspondent absorption term for each surface for each tetrahedron
-        total_boundArea (float): total surface area of the room
+    Returns
+    -------
+        boundary_areas : array of floats 
+            Product between the area and the correspondent absorption term for each surface for each tetrahedron
+        total_boundArea : float
+            Total surface area of the room
     """
     total_boundArea = 0  # initialization of total surface area of the room
     boundary_areas = []  # Initialize a list to store boundary_areas values for each tetrahedron
@@ -629,18 +727,28 @@ def boundary_triang(velemNodes, nBands, bounNode, nodecoords, node_indices, tria
 #CALCULATION OF EQUIVALENT ABSORPTION AREA
 ###############################################################################
 def equiv_absorp(cell_volume, total_boundArea, surface_areas_in, absorption_coefficient_dict):
-    """Calculation of the eqauivalent absorption area
+    """
+    Calculation of the eqauivalent absorption area
 
-    Args:
-        cell_volume (array of floats): the volume of each element cell
-        total_boundArea (float): total surface area of the room
-        surface_areas_in (dict): surface are for each surface of the model
-        absorption_coefficient_dict (dict): dictionary of absorption coefficients per each surface and per each frequency
+    Parameters
+    ----------
+        cell_volume : array of floats
+            The volume of each element cell
+        total_boundArea : float 
+            Total surface area of the room
+        surface_areas_in : dict
+            Surface are for each surface of the model
+        absorption_coefficient_dict : dict 
+            Dictionary of absorption coefficients per each surface and per each frequency
 
-    Returns:
-        V (float): volume of the room
-        S (float): total surface are of the room
-        Eq_A (array of floats): equivalent absorption area
+    Returns
+    -------
+        V : float
+            Volume of the room
+        S : float
+            Total surface are of the room
+        Eq_A : array of floats
+            Equivalent absorption area
     """
     V = sum(cell_volume) #volume of the room
     S = total_boundArea #total surface area of the room
@@ -658,15 +766,22 @@ def equiv_absorp(cell_volume, total_boundArea, surface_areas_in, absorption_coef
 
 
 def calculate_sourceon_time(nBands, V, Eq_A):
-    """Calculation of the time the sources stays on
+    """
+    Calculation of the time the sources stays on
 
-    Args:
-        nBands (int): number of frequency bands
-        V (float): volume of the room
-        Eq_A (array of floats): equivalent absorption
+    Parameters
+    ----------
+        nBands : int
+            Number of frequency bands
+        V : float
+            Volume of the room
+        Eq_A : array of floats
+            Equivalent absorption
 
-    Returns:
-        sourceon_time (float): time that the source stays on
+    Returns
+    -------
+        sourceon_time : float
+            Time that the source stays on
     """
     RT_Sabine_band = []
     for iBand in range(nBands):
@@ -685,18 +800,28 @@ def calculate_sourceon_time(nBands, V, Eq_A):
 ###############################################################################
 
 def rec_time(sourceon_time, dt, edt=-1, ir_length=-1):
-    """Calculation of the simulation time run
+    """
+    Calculation of the simulation time run
 
-    Args:
-        sourceon_time (float): time that the source stays on
-        dt (float): time step
-        edt (int, optional): early decay time. Defaults to -1.
-        ir_length (int, optional): impulse response length. Defaults to -1.
+    Parameters
+    ----------
+        sourceon_time : float
+            Time that the source stays on
+        dt : float
+            Time step
+        edt : int, optional
+            Early decay time. Defaults to -1.
+        ir_length : int, optional
+            Impulse response length. Defaults to -1.
 
-    Returns:
-        recording_time (float): length of the simulaton run
-        t (array of floats): time array of time steps
-        recording_steps (int): number of time steps
+    Returns
+    -------
+        recording_time : float
+            Length of the simulaton run
+        t : array of floats
+            Time array of time steps
+        recording_steps : int
+            Number of time steps
     """
     if edt == -1 & ir_length == -1:
         recording_time = sourceon_time * 2
@@ -717,17 +842,26 @@ def rec_time(sourceon_time, dt, edt=-1, ir_length=-1):
 ###############################################################################
 #Diffusion parameters
 def diff_coeff(V, S, c0):
-    """Calculation of the theoretical diffusion coefficient
+    """
+    Calculation of the theoretical diffusion coefficient
 
-    Args:
-        V (float): volume of the room
-        S (float): total surface are of the room
-        c0 (int): speed of sound 
+    Parameters
+    ----------
+        V : float
+            Volume of the room
+        S : float
+            Total surface are of the room
+        c0 : int
+            Speed of sound 
 
-    Returns:
-        Dx (float): diffusion coefficient in the x direction (equal to the theoretical diffusion coefficient)
-        Dy (float): diffusion coefficient in the y direction (equal to the theoretical diffusion coefficient)
-        Dz (float): diffusion coefficient in the z direction (equal to the theoretical diffusion coefficient)
+    Returns
+    -------
+        Dx : float 
+            Diffusion coefficient in the x direction (equal to the theoretical diffusion coefficient)
+        Dy : float 
+            Diffusion coefficient in the y direction (equal to the theoretical diffusion coefficient)
+        Dz : float
+            Diffusion coefficient in the z direction (equal to the theoretical diffusion coefficient)
     """
     mean_free_path = (4*V)/S #mean free path for 3D
     #mean_free_time = mean_free_path/c0 #mean free time for 3D
@@ -743,14 +877,20 @@ def diff_coeff(V, S, c0):
 ###############################################################################
 
 def dist_source_receiver(coord_rec, coord_source):
-    """Calculation of the distance between source and receiver positions
+    """
+    Calculation of the distance between source and receiver positions
 
-    Args:
-        coord_rec (list): coordinates of the receiver position
-        coord_source (list): coordinates of the source position
+    Parameters
+    ----------
+        coord_rec : list 
+            Coordinates of the receiver position
+        coord_source : list
+            Coordinates of the source position
 
-    Returns:
-        dist_sr (float): distance between source and receiver position
+    Returns
+    -------
+        dist_sr : float
+            Distance between source and receiver position
     """
     #distance between source and receiver
     dist_sr = math.sqrt((abs(coord_rec[0] - coord_source[0]))**2 + (abs(coord_rec[1] - coord_source[1]))**2 + (abs(coord_rec[2] - coord_source[2]))**2) #distance between source and receiver
@@ -761,15 +901,22 @@ def dist_source_receiver(coord_rec, coord_source):
 #SOURCE INTERPOLATION
 ###############################################################################
 def source_interp(cell_center, coord_source):
-    """Interpolation of the source position
+    """
+    Interpolation of the source position
 
-    Args:
-        cell_center (array of floats): the coordinates of the center of the cell element per each element
-        coord_source (list): coordinates of the source position
+    Parameters
+    ----------
+        cell_center : array of floats
+            The coordinates of the center of the cell element per each element
+        coord_source : list
+            Coordinates of the source position
 
-    Returns:
-        cl_tet_s_keys (dict keys): clossest tetrahedrons indeces to the source
-        total_weights_s (dict): weights for each 4 closest points to the source position for interpolation
+    Returns
+    -------
+        cl_tet_s_keys : Dict keys
+            Clossest tetrahedrons indeces to the source
+        total_weights_s : dict
+            Weights for each 4 closest points to the source position for interpolation
     """
     
     #SOURCE INTERPOLATION CALCULATED WITHIN 4 CENTRE CELL SELECTED (TETRAHEDRON)
@@ -817,16 +964,24 @@ def source_interp(cell_center, coord_source):
 ###############################################################################
 
 def source_volume(velemNodes, nodecoords, coord_source, cell_volume):
-    """Calculation of the volume of the source
+    """
+    Calculation of the volume of the source
 
-    Args:
-        velemNodes (array of int): indeces of all the volumetric nodes per each colume element in the mesh
-        nodecoords (array of floats): the coordinates of each node in the mesh
-        coord_source (list): coordinates of the source position
-        cell_volume (array of floats): the volume of each element cell
+    Parameters
+    ----------
+        velemNodes : array of int
+            Indeces of all the volumetric nodes per each colume element in the mesh
+        nodecoords : array of floats
+            The coordinates of each node in the mesh
+        coord_source : list
+            Coordinates of the source position
+        cell_volume : array of floats
+            The volume of each element cell
 
-    Returns:
-        Vs (float): volume of the source
+    Returns
+    -------
+        Vs : float
+            Volume of the source
     """
     #To make sure that the source is in the correct tetrahedron position
     node_ids = velemNodes.T
@@ -866,18 +1021,28 @@ def source_volume(velemNodes, nodecoords, coord_source, cell_volume):
 ###############################################################################
 #Initial condition - Source Info (interrupted method)
 def initial_cond(Ws, Vs, sourceon_time, dt, recording_steps):
-    """Definition of initial conditions
+    """
+    Definition of initial conditions
 
-    Args:
-        Ws (float): power of the source
-        Vs (float): volume of the source
-        sourceon_time (float): time that the source stays on
-        dt (float): time step
-        recording_steps (int): number of time steps
+    Parameters
+    ----------
+        Ws : float
+            Power of the source
+        Vs : float
+            Volume of the source
+        sourceon_time : float
+            Time that the source stays on
+        dt : float
+            Time step
+        recording_steps : int
+            Number of time steps
 
-    Returns:
-        source1 (array of floats): energy density of source number 1 at each time step position
-        sourceon_steps (int): number of time steps while the source is on
+    Returns
+    -------
+        source1 : array of floats
+            Energy density of source number 1 at each time step position
+        sourceon_steps : int
+            Number of time steps while the source is on
     """
     w1=Ws/Vs #w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
     sourceon_steps = ceil(sourceon_time/dt) #time steps at which the source is calculated/considered in the calculation
@@ -890,16 +1055,24 @@ def initial_cond(Ws, Vs, sourceon_time, dt, recording_steps):
 #DEFINITION OF SOURCE MATRIX
 ###############################################################################
 def source_matrix(voluEl,cl_tet_s_keys, source1, total_weights_s):
-    """Calculation of the source matrix
+    """
+    Calculation of the source matrix
 
-    Args:
-        voluEl (array of int): indeces of all the bolume elements (tetrahedra) in the mesh
-        cl_tet_s_keys (dict keys): clossest tetrahedrons indeces to the source
-        source1 (array of floats): energy density of source number 1 at each time step position
-        total_weights_s (dict): weights for each 4 closest points to the source position for interpolation
+    Parameters
+    ----------
+        voluEl : array of int
+            Indeces of all the bolume elements (tetrahedra) in the mesh
+        cl_tet_s_keys : Dict keys
+            Clossest tetrahedrons indeces to the source
+        source1 : array of floats
+            Energy density of source number 1 at each time step position
+        total_weights_s : dict
+            Weights for each 4 closest points to the source position for interpolation
 
-    Returns:
-        s (array of floats): matrix of tretrahedron central points inserting source energy
+    Returns
+    -------
+        s : array of floats
+            Matrix of tretrahedron central points inserting source energy
     """
 
     #INTERPOLATION WITH CELL CENTRES - SOURCE MATRIX
@@ -914,15 +1087,22 @@ def source_matrix(voluEl,cl_tet_s_keys, source1, total_weights_s):
 #RECEIVER INTERPOLATION
 ###############################################################################
 def receiver_interp(cell_center, coord_rec):
-    """Interpolation of the receiver position
+    """
+    Interpolation of the receiver position
 
-    Args:
-        cell_center (array of floats): the coordinates of the center of the cell element per each element
-        coord_rec (list): coordinates of the receiver position
+    Parameters
+    ----------
+        cell_center : array of floats
+            The coordinates of the center of the cell element per each element
+        coord_rec : list
+            Coordinates of the receiver position
 
-    Returns:
-        cl_tet_r_keys (dict keys): closest tetrahedrons indeces to the receiver
-        total_weights_r (dict): weights for each 4 closest points to the receiver position for interpolation
+    Returns
+    -------
+        cl_tet_r_keys : dict keys
+            Closest tetrahedrons indeces to the receiver
+        total_weights_r : dict
+            Weights for each 4 closest points to the receiver position for interpolation
     """
     
     #RECEIVER INTERPOLATION CALCULATED WITHIN 4 CENTRE CELL SELECTED (TETRAHEDRON)
@@ -970,15 +1150,22 @@ def receiver_interp(cell_center, coord_rec):
 ###############################################################################
 
 def room_dimensions(nodecoords):
-    """Calculation of the room dimensions
+    """
+    Calculation of the room dimensions
 
-    Args:
-        nodecoords (array of floats): the coordinates of each node in the mesh
+    Parameters
+    ----------
+        nodecoords : array of floats
+            The coordinates of each node in the mesh
 
-    Returns:
-        room_length (float): length of the room
-        room_width (float): width of the room
-        room_height (float): height of the room
+    Returns
+    -------
+        room_length : float
+            Length of the room
+        room_width : float
+            Width of the room
+        room_height : float
+            Height of the room
     """
     #Extract x-coordinates of all nodes LENGTH
     x_coordinates = nodecoords[:, 0]
@@ -1011,22 +1198,36 @@ def room_dimensions(nodecoords):
 #CALCULATION OF LINE RECEIVERS
 ###############################################################################
 def line_receivers(room_length, room_width, coord_rec, coord_source, cell_center):
-    """Definition of a line point receiver
+    """
+    Definition of a line point receiver
 
-    Args:
-        room_length (float): length of the room
-        room_width (float): width of the room
-        coord_rec (list): coordinates of the receiver position
-        coord_source (list): coordinates of the source position
-        cell_center (array of floats): the coordinates of the center of the cell element per each element
+    Parameters
+    ----------
+        room_length : float
+            Length of the room
+        room_width : float
+            Width of the room
+        coord_rec : list
+            Coordinates of the receiver position
+        coord_source : list
+            Coordinates of the source position
+        cell_center : array of floats
+            The coordinates of the center of the cell element per each element
 
-    Returns:
-        x_axis (array of floats): linspace on x_axis with distance dx
-        y_axis (array of floats): linspace on y_axis with distance dy
-        line_rec_x_idx_list (list): indexes of center cells close to the line receiver position in the x axis
-        dist_x (array of floats): distance between each line receiver point cell and the source in the x axis
-        line_rec_y_idx_list (list): indexes of center cells close to the line receiver position in the y axis
-        dist_y (array of floats): distance between each line receiver point cell and the source in the y axis
+    Returns
+    -------
+        x_axis : array of floats
+            Linspace on x_axis with distance dx
+        y_axis : array of floats
+            Linspace on y_axis with distance dy
+        line_rec_x_idx_list : list
+            Indexes of center cells close to the line receiver position in the x axis
+        dist_x : array of floats 
+            Distance between each line receiver point cell and the source in the x axis
+        line_rec_y_idx_list : list
+            Indexes of center cells close to the line receiver position in the y axis
+        dist_y : array of floats 
+            Distance between each line receiver point cell and the source in the y axis
     """
     #Arange linespace lines
     dx = 0.5
@@ -1071,17 +1272,26 @@ def line_receivers(room_length, room_width, coord_rec, coord_source, cell_center
 ###############################################################################
 
 def beta_zero(boundary_areas, dt, Dx, interior_tet_sum, cell_volume):
-    """Calculation of factor beta_zero
+    """
+    Calculation of factor beta_zero
 
-    Args:
-        boundary_areas (array of floats): product between the area and the correspondent absorption term for each surface for each tetrahedron
-        dt (float): time step
-        Dx (float): diffusion coefficient in the x direction (equal to the theoretical diffusion coefficient)
-        interior_tet_sum (array of floats): sum of interior_tet per columns
-        cell_volume (array of floats): the volume of each element cell
+    Parameters
+    ----------
+        boundary_areas : array of floats
+            Product between the area and the correspondent absorption term for each surface for each tetrahedron
+        dt : float
+            Time step
+        Dx : float
+            Diffusion coefficient in the x direction (equal to the theoretical diffusion coefficient)
+        interior_tet_sum : array of floats
+            Sum of interior_tet per columns
+        cell_volume : array of floats
+            The volume of each element cell
 
-    Returns:
-        beta_zero_freq (list): coefficient beta zero used in the calculation of the energy density per each frequency
+    Returns
+    -------
+        beta_zero_freq : list
+            Coefficient beta zero used in the calculation of the energy density per each frequency
     """
     beta_zero_freq = []
     for iBand in range(len(boundary_areas)):
@@ -1099,39 +1309,70 @@ def beta_zero(boundary_areas, dt, Dx, interior_tet_sum, cell_volume):
 ############################################################################### 
 
 def computing_energy_density(nBands, voluEl, recording_steps, beta_zero_freq, dt, c0, m_atm, Dx, interior_tet, cell_volume, s, cl_tet_r_keys, total_weights_r, tcalc, cl_tet_s_keys, source1, total_weights_s, t, sourceon_time, rho):
-    """Computation of energy density
+    """
+    Computation of energy density
 
-    Args:
-        nBands (int): number of frequency bands
-        voluEl (array of int): indeces of all the bolume elements (tetrahedra) in the mesh
-        recording_steps (int): number of time steps
-        beta_zero_freq (list): coefficient beta zero used in the calculation of the energy density per each frequency
-        dt (float): time step
-        c0 (int): speed of sound
-        m_atm (float): air absorption coefficient
-        Dx (float): diffusion coefficient in the x direction (equal to the theoretical diffusion coefficient)
-        interior_tet (array of floats): matrix of tetrahedron per tetrahedron of the division between shared area and shared distance
-        cell_volume (array of floats): the volume of each element cell
-        s (array of floats): matrix of tretrahedron central points inserting source energy
-        cl_tet_r_keys (dict keys): closest tetrahedrons indeces to the receiver
-        total_weights_r (dict): weights for each 4 closest points to the receiver position for interpolation
-        tcalc (str): type of calculation; "decay" if the source switches off and "stationarysource" if the source is stationary
-        cl_tet_s_keys (dict keys): clossest tetrahedrons indeces to the source
-        total_weights_s (dict): weights for each 4 closest points to the source position for interpolation
-        source1 (array of floats): energy density of source number 1 at each time step position
-        total_weights_s (dict): weights for each 4 closest points to the source position for interpolation
-        t (array of floats): time array of time steps
-        sourceon_time (float): time that the source stays on
-        rho (float): density of air
+    Parameters
+    ----------
+        nBands : int
+            Number of frequency bands
+        voluEl : array of int
+            Indeces of all the bolume elements (tetrahedra) in the mesh
+        recording_steps : int 
+            Number of time steps
+        beta_zero_freq : list
+            Coefficient beta zero used in the calculation of the energy density per each frequency
+        dt : float
+            Time step
+        c0 : int 
+            Speed of sound
+        m_atm : float
+            Air absorption coefficient
+        Dx : float
+            Diffusion coefficient in the x direction (equal to the theoretical diffusion coefficient)
+        interior_tet : array of floats
+            Matrix of tetrahedron per tetrahedron of the division between shared area and shared distance
+        cell_volume : array of floats 
+            The volume of each element cell
+        s : array of floats 
+            Matrix of tretrahedron central points inserting source energy
+        cl_tet_r_keys : dict keys
+            Closest tetrahedrons indeces to the receiver
+        total_weights_r : dict
+            Weights for each 4 closest points to the receiver position for interpolation
+        tcalc : str
+            Type of calculation; "decay" if the source switches off and "stationarysource" if the source is stationary
+        cl_tet_s_keys : dict keys
+            Closest tetrahedrons indeces to the source
+        total_weights_s : dict
+            Weights for each 4 closest points to the source position for interpolation
+        source1 : array of floats
+            Energy density of source number 1 at each time step position
+        total_weights_s : dict
+            Weights for each 4 closest points to the source position for interpolation
+        t : array of floats
+            Time array of time steps
+        sourceon_time : float
+            Time that the source stays on
+        rho : float
+            Density of air
 
-    Returns:
-        w_new_band (list of arrays): energy density at the time step n+1 at each centre cell per each frequency band
-        w_rec_band (list of arrays): energy density over time at the receiver position per each frequency band
-        w_rec_off_band (list of arrays): energy density over time after the source is switched off at the receiver position per each frequency band
-        w_rec_off_deriv_band (list of arrays): derivative of the energy density over time after the source is switched off at the receiver position per each frequency band
-        p_rec_off_deriv_band (list of arrays): derivative of the pressure over time after the source is switched off at the receiver position per each frequency band
-        idx_w_rec (int): time index at which the source is switched off
-        t_off (array of floats): time array after the source is switched off
+    Returns
+    -------
+        w_new_band : list of arrays
+            Energy density at the time step n+1 at each centre cell per each frequency band
+        w_rec_band : list of arrays
+            Energy density over time at the receiver position per each frequency band
+        w_rec_off_band : list of arrays
+            Energy density over time after the source is switched off at the receiver position per each frequency band
+        w_rec_off_deriv_band : list of arrays
+            Derivative of the energy density over time after the source is switched off at the receiver position per each frequency band
+        p_rec_off_deriv_band : list of arrays
+            Derivative of the pressure over time after the source is switched off at the receiver position per each frequency band
+        idx_w_rec : int
+            Time index at which the source is switched off
+        t_off : array of floats
+            Time array after the source is switched off
     """
     w_new_band = []
     w_rec_band = []
@@ -1220,43 +1461,78 @@ def computing_energy_density(nBands, voluEl, recording_steps, beta_zero_freq, dt
 ###############################################################################
 
 def freq_parameters(nBands, line_rec_x_idx_list, w_new_band, line_rec_y_idx_list, rho, c0, Ws, dist_x, dist_y, pRef, w_rec_band, w_rec_off_band, tcalc, t, idx_w_rec, V, Eq_A, S, dist_sr):
-    """Computation of sound presure level and reverberation time parameters
+    """
+    Computation of sound presure level and reverberation time parameters
 
-    Args:
-        nBands (int): number of frequency bands
-        line_rec_x_idx_list (list): indexes of center cells close to the line receiver position in the x axis
-        w_new_band (list of arrays): energy density at the time step n+1 at each centre cell per each frequency band
-        line_rec_y_idx_list(list): indexes of center cells close to the line receiver position in the y axis
-        rho (float): density of air
-        c0 (int): speed of sound
-        Ws (float): power of the source
-        dist_x (array of floats): distance between each line receiver point cell and the source in the x axis
-        dist_y (array of floats): distance between each line receiver point cell and the source in the y axis
-        pRef (float): reference pressure
-        w_rec_band (list of arrays): energy density over time at the receiver position per each frequency band
-        w_rec_off_band (list of arrays): energy density over time after the source is switched off at the receiver position per each frequency band
-        tcalc (str): type of calculation; "decay" if the source switches off and "stationarysource" if the source is stationary
-        t (array of floats): time array of time steps
-        idx_w_rec (int): time index at which the source is switched off
-        V (float): volume of the room
-        Eq_A (array of floats): equivalent absorption area
-        S (float): total surface are of the room
-        dist_sr (float): distance between source and receiver position
+    Parameters
+    ----------
+        nBands : int
+            Number of frequency bands
+        line_rec_x_idx_list : list
+            Indexes of center cells close to the line receiver position in the x axis
+        w_new_band : list of arrays
+            Energy density at the time step n+1 at each centre cell per each frequency band
+        line_rec_y_idx_list : list
+            Indexes of center cells close to the line receiver position in the y axis
+        rho : float 
+            Density of air
+        c0 : int
+            Speed of sound
+        Ws : float
+            Power of the source
+        dist_x : array of floats
+            Distance between each line receiver point cell and the source in the x axis
+        dist_y : array of floats
+            Distance between each line receiver point cell and the source in the y axis
+        pRef : float
+            Reference pressure
+        w_rec_band : list of arrays
+            Energy density over time at the receiver position per each frequency band
+        w_rec_off_band : list of arrays
+            Energy density over time after the source is switched off at the receiver position per each frequency band
+        tcalc : str
+            Type of calculation; "decay" if the source switches off and "stationarysource" if the source is stationary
+        t : array of floats
+            Time array of time steps
+        idx_w_rec : int
+            Time index at which the source is switched off
+        V : float
+            Volume of the room
+        Eq_A : array of floats
+            Equivalent absorption area
+        S : float
+            Total surface are of the room
+        dist_sr : float
+            Distance between source and receiver position
 
-    Returns:
-        w_rec_x_band (list of arrays): energy density over time at the each line point receiver position in the x axis per each frequency band
-        w_rec_y_band (list of arrays): energy density over time at the each line point receiver position in the y axis per each frequency band
-        spl_stat_x_band (list of arrays): total sound pressure level (direct field plus reverberant) over time at the each line point receiver position in the x axis per each frequency band
-        spl_stat_y_band (list of arrays): total sound pressure level (direct field plus reverberant) over time at the each line point receiver position in the y axis per each frequency band
-        spl_r_band (list of arrays): sound pressure level over time at the receiver position per each frequency band
-        spl_r_off_band (list of arrays): sound pressure level over time after the source is switched off at the receiver position per each frequency band
-        spl_r_norm_band (list of arrays): sound pressure level over time at the receiver position per each frequency band normalised to its maximum level
-        sch_db_band (list of arrays): energy density over time after the source is switched off at the receiver position per each frequency band
-        t30_band (array of floats): reverberation time T30 per each frequency band
-        edt_band (array of floats): early decay time per each frequency band
-        c80_band (array of floats): clarity per each frequency band
-        d50_band (array of floats): definition per each frequency band
-        ts_band (array of floats): centre time per each frequency band
+    Returns
+    -------
+        w_rec_x_band : list of arrays
+            Energy density over time at the each line point receiver position in the x axis per each frequency band
+        w_rec_y_band : list of arrays
+            Energy density over time at the each line point receiver position in the y axis per each frequency band
+        spl_stat_x_band : list of array
+            Total sound pressure level (direct field plus reverberant) over time at the each line point receiver position in the x axis per each frequency band
+        spl_stat_y_band : list of arrays
+            Total sound pressure level (direct field plus reverberant) over time at the each line point receiver position in the y axis per each frequency band
+        spl_r_band : list of arrays
+            Sound pressure level over time at the receiver position per each frequency band
+        spl_r_off_band : list of arrays
+            Sound pressure level over time after the source is switched off at the receiver position per each frequency band
+        spl_r_norm_band : list of arrays
+            Sound pressure level over time at the receiver position per each frequency band normalised to its maximum level
+        sch_db_band : list of arrays
+            Energy density over time after the source is switched off at the receiver position per each frequency band
+        t30_band : array of floats
+            Reverberation time T30 per each frequency band
+        edt_band : array of floats
+            Early decay time per each frequency band
+        c80_band : array of floats 
+            Clarity per each frequency band
+        d50_band : array of floats 
+            Definition per each frequency band
+        ts_band : array of floats
+            Centre time per each frequency band
     """
     w_rec_x_band = []
     w_rec_y_band = []
@@ -1335,11 +1611,15 @@ def freq_parameters(nBands, line_rec_x_idx_list, w_new_band, line_rec_y_idx_list
 
 # Save all variables to a file
 def save(filename, variables):
-    """Saving of variables
+    """
+    Saving of variables
 
-    Args:
-        filename (str): name of the file to save the results
-        variables (dict): compilation of all the variables of the overal simulation
+    Parameters
+    ----------
+        filename : str
+            Name of the file to save the results
+        variables : dict
+            Compilation of all the variables of the overal simulation
     """
     with open(filename, 'wb') as f:
         # Filter out modules, functions, and other unsupported types

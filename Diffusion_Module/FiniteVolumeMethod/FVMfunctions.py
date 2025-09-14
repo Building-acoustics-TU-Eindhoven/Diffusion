@@ -51,16 +51,24 @@ logger = logging.getLogger(__name__)
 ###############################################################################
 
 def number_freq(num_octave,fc_high,fc_low):
-    """Calculate the frequency array and the number of frequency bands
+    """
+    Calculate the frequency array and the number of frequency bands.
 
-    Args:
-        num_octave (int): number of octaves to calculate (1 or 3 octaves)description
-        fc_high (int): the highest frequency in the calculation
-        fc_low (int): the lowest frequency in the calculation
+    Parameters
+    ----------
+    num_octave : int
+        Number of octaves to calculate (1 or 3 octaves).
+    fc_high : int
+        The highest frequency in the calculation.
+    fc_low : int
+        The lowest frequency in the calculation.
 
-    Returns:
-        int: nBands, Number of frequency bands.
-        list of float: center_freq, Array of all the frequencies to calculate.
+    Returns
+    -------
+    nBands : int
+        Number of frequency bands.
+    center_freq : list of float
+        Array of all the frequencies to calculate.
     """
     x_frequencies  = num_octave * log(fc_high/fc_low) / log(2)
     nBands = int(num_octave * log(fc_high/fc_low) / log(2) + 1)

@@ -37,7 +37,7 @@ Each method is distributed with its own Python code. The main application of the
    DocumentationAuralization.md
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 6
    :caption: API reference:
 
    Diffusion_Module/FVMfunctions

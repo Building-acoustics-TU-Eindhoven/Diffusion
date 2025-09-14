@@ -59,6 +59,7 @@ def number_freq(num_octave,fc_high,fc_low):
         fc_low (int): the lowest frequency in the calculation
 
     Returns:
+    -------
         nBands : int
             number of frequency bands
         center_freq : list of float

@@ -8,13 +8,23 @@ import numpy as np
 from scipy import stats
 
 def t60_decay(t, sch_db, idx_w_rec, rt='t30'):
-    """
-    Reverberation time from a Schroeder decay (Schroeder 1965)
-    :param t: time axis
-    :param sch_db: name of the Schroeder decay calculated with the diffusion equation.
-    :param idx_w_rec: Index at which the t array is equal to the sourceon_time - calculation of RT from when the source stops.
-    :returns: Reverberation time T_{60}
-    """    
+        """
+    Calculation of reverberation time from a Schroeder decay (Schroeder 1965)
+
+    Parameters
+    ----------
+        t : array of floats
+            Time array of time steps
+        sch_db : array
+            Energy density over time after the source is switched off at the receiver position
+        idx_w_rec : int
+            Time index at which the source is switched off
+
+    Returns
+    -------
+        t60 : float
+            Reverberation time T_{60}
+    """  
     if rt == 't30':
         init = -5.0 #because I want the T30, I need to start at -5
         end = -35.0 #because I want the T30, I need to finish at -35

@@ -92,7 +92,7 @@ def abs_term(th,abscoeff_list,c0):
 
     Returns
     -------
-        Absx_array: array of floats
+        Absx_array : array of floats
             Calculated absorption term for each absorption coefficient for each frequency
     """
     Absx_array = np.array([])
@@ -410,7 +410,8 @@ def get_neighbour_faces(voluEl):
         voluEl : array of int 
             Indeces of all the bolume elements (tetrahedra) in the mesh
 
-    Returns:
+    Returns
+    -------
         fxt : dict 
             Dictionary with keys as the nodes of each face and values the volume elements of which this face is neighbour
         txt : dict 

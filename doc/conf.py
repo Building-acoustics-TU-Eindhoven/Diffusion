@@ -44,6 +44,7 @@ source_suffix = {
     '.md': 'myst',
 }
 
+autodoc_mock_imports = ["gmsh"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

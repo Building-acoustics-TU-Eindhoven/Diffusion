@@ -59,11 +59,8 @@ def number_freq(num_octave,fc_high,fc_low):
         fc_low (int): the lowest frequency in the calculation
 
     Returns:
-    -------
-        nBands : int
-            number of frequency bands
-        center_freq : list of float
-            array of all the frequencies to calculate
+        int: nBands, Number of frequency bands.
+        list of float: center_freq, Array of all the frequencies to calculate.
     """
     x_frequencies  = num_octave * log(fc_high/fc_low) / log(2)
     nBands = int(num_octave * log(fc_high/fc_low) / log(2) + 1)

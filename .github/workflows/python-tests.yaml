@@ -20,9 +20,9 @@ jobs:
         python-version: '3.10'
 
     - name: Install system dependencies for Gmsh
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libglu1-mesa
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libglu1-mesa
 
     - name: Install dependencies
       run: |
@@ -30,5 +30,5 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest Diffusion_Module/FiniteVolumeMethod/tests
+        pytest Diffusion_Module/FiniteVolumeMethod/tests -p no:warnings
 

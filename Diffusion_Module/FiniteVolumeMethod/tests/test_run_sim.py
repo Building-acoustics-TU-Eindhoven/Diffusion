@@ -30,7 +30,7 @@ from Diffusion_Module.FiniteVolumeMethod.FVMfunctions import *
 #RUN SIMULATION FUNCTION
 ###############################################################################
 #def run_sim(coord_source, coord_rec,fc_low,fc_high,num_octave, dt,m_atm , c0, Ws, th, pRef, rho, file_name,  dim, tag, center_freq, tcalc = "decay"):
-def run_sim():
+def test_run_sim():
     """Function for running the full calculation. It will use all the fucntions defined in FVMfunctions.py file
 
     Args:
@@ -61,8 +61,7 @@ def run_sim():
         "tcalc": "decay" #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
     }
     
-    abs_coeff_path = 'test_abs_coeff.csv'
-    
+    abs_coeff_path = os.path.join(os.path.dirname(__file__), 'test_abs_coeff.csv')
     
     
     st = time.time() #start time of calculation
@@ -87,14 +86,16 @@ def run_sim():
     # validate and convert to dictionary
     if df_abs.isnull().values.any():
         raise ValueError("Absorption coefficient file contains missing values.")
-        
+    
+    file_path = os.path.join(os.path.dirname(__file__), file_name)
+    
     c0= 343 #adiabatic speed of sound [m.s^-1]
     Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
     pRef = 2 * (10**-5) #Reference pressure in Pa
     rho = 1.21 #air density [kg.m^-3] at 20°C
     
     gmsh.initialize() #Initialize msh file
-    mesh = gmsh.open(file_name) #open the file
+    mesh = gmsh.open(file_path) #open the file
     
     dim = -1
     tag = -1
@@ -183,4 +184,4 @@ def run_sim():
 
 #Calling function %run_sim%
 #results = run_sim(coord_source, coord_rec,fc_low,fc_high,num_octave, dt,m_atm , c0, Ws, th, pRef, rho, file_name, dim, tag, center_freq,tcalc = "decay")
-results = run_sim()
+results = test_run_sim()

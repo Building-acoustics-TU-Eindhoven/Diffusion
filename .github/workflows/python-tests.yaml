@@ -25,5 +25,5 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest Diffusion_Module/tests
+        pytest Diffusion_Module/FiniteVolumeMethod/tests
 

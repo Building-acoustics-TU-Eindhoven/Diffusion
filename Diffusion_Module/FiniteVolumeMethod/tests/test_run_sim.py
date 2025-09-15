@@ -61,8 +61,7 @@ def run_sim():
         "tcalc": "decay" #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
     }
     
-    abs_coeff_path = 'test_abs_coeff.csv'
-    
+    abs_coeff_path = os.path.join(os.path.dirname(__file__), 'test_abs_coeff.csv')
     
     
     st = time.time() #start time of calculation

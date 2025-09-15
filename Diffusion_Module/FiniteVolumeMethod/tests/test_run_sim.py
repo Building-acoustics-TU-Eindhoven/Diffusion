@@ -30,7 +30,7 @@ from Diffusion_Module.FiniteVolumeMethod.FVMfunctions import *
 #RUN SIMULATION FUNCTION
 ###############################################################################
 #def run_sim(coord_source, coord_rec,fc_low,fc_high,num_octave, dt,m_atm , c0, Ws, th, pRef, rho, file_name,  dim, tag, center_freq, tcalc = "decay"):
-def run_sim():
+def test_run_sim():
     """Function for running the full calculation. It will use all the fucntions defined in FVMfunctions.py file
 
     Args:
@@ -184,4 +184,4 @@ def run_sim():
 
 #Calling function %run_sim%
 #results = run_sim(coord_source, coord_rec,fc_low,fc_high,num_octave, dt,m_atm , c0, Ws, th, pRef, rho, file_name, dim, tag, center_freq,tcalc = "decay")
-results = run_sim()
+results = test_run_sim()

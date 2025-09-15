@@ -86,14 +86,16 @@ def run_sim():
     # validate and convert to dictionary
     if df_abs.isnull().values.any():
         raise ValueError("Absorption coefficient file contains missing values.")
-        
+    
+    file_path = os.path.join(os.path.dirname(__file__), file_name)
+    
     c0= 343 #adiabatic speed of sound [m.s^-1]
     Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
     pRef = 2 * (10**-5) #Reference pressure in Pa
     rho = 1.21 #air density [kg.m^-3] at 20°C
     
     gmsh.initialize() #Initialize msh file
-    mesh = gmsh.open(file_name) #open the file
+    mesh = gmsh.open(file_path) #open the file
     
     dim = -1
     tag = -1

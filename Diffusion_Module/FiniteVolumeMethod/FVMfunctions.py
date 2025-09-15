@@ -145,11 +145,11 @@ def surface_materials(group, abscoeff, surface_absorption, absorption_coefficien
     Parameters
     ----------
         group : list
-            Material name in the msh file
+            List of element type (1 for lines, 2 for surface, 3 for volumes), element type number and material name in the msh file
         abscoeff : list of strings
             Absorption coefficient of the group (material name)
         surface_absorption : list of tuples
-            List initialization of absorption term for each surface and for each frequency
+            List initialization for each frequency of a tuple including the surface number and the absorption term for that surface
         absorption_coefficient_dict : dict
             Dictionary initialization of absorption coefficients per each surface and per each frequency 
         nBands : int
@@ -297,7 +297,7 @@ def velem_volume_centre(volumeEl_dict,nodecoords,node_indices):
     Parameters
     ----------
         volumeEl_dict : dict 
-            Dictionary with key the index of the volumetric element (tetrahedra) and value the indeces of the nodes of the tetrahedra
+            Dictionary with key the index of the volumetric element (tetrahedra) and value an array with the indeces of the nodes of the tetrahedra (maximum 4 indeces)
         nodecoords : array of floats 
             The coordinates of each node in the mesh
         node_indices : dict
@@ -358,7 +358,7 @@ def belem_area_centre(boundaryEl_dict,nodecoords,node_indices):
     Parameters
     ----------
         boundaryEl_dict : dict
-            Dictionary with key the index of the boundary element (boudnary surface) and value the indeces of the nodes of the surface
+            Dictionary with key the index of the boundary element (boudnary surface) and value an array with the indeces of the nodes of the surface (maximum 3 indeces)
         nodecoords : array of floats
             The coordinates of each node in the mesh
         node_indices : dict
@@ -408,7 +408,7 @@ def get_neighbour_faces(voluEl):
     Parameters
     ----------
         voluEl : array of int 
-            Indeces of all the bolume elements (tetrahedra) in the mesh
+            Indeces of all the volume elements (tetrahedra) in the mesh
 
     Returns
     -------

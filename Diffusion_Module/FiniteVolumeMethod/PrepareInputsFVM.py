@@ -21,7 +21,7 @@ input_data = {
     "coord_source": [0.5, 0.5, 1.0], #source coordinates x,y,z
     "coord_rec": [2.0, 0.5, 1.0], #rec coordinates x,y,z
     "fc_low": 125, #lowest frequency
-    "fc_high": 2000, #highest frequency
+    "fc_high": 4000, #highest frequency
     "num_octave": 1, # 1 or 3 depending on how many octave you want
     "dt": 1/20000, #time discretization
     "m_atm": 0, #air absorption coefficient [1/m]

@@ -1,13 +1,5 @@
-FVM functions
-=============
-
-.. automodule:: Diffusion_Module.FiniteVolumeMethod.FVMfunctions
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 Reverberation functions
----------  
+=======================
 
 .. automodule:: Diffusion_Module.FiniteVolumeMethod.FunctionRT
     :members:

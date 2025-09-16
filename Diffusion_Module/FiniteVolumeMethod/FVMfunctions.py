@@ -1272,7 +1272,7 @@ def line_receivers(room_length, room_width, coord_rec, coord_source, cell_center
 #CALCULATION OF BETA_ZERO
 ###############################################################################
 
-def beta_zero(boundary_areas, dt, Dx, interior_tet_sum, cell_volume):
+def beta_zero_freq(boundary_areas, dt, Dx, interior_tet_sum, cell_volume):
     """
     Calculation of factor beta_zero
 

@@ -274,7 +274,7 @@ def run_sim(inputs, abs_coeff_path):
     x_axis, y_axis, line_rec_x_idx_list, dist_x, line_rec_y_idx_list, dist_y = line_receivers(room_length, room_width, coord_rec, coord_source, cell_center)
     
     #Calling function %beta_zero%
-    beta_zero_freq = beta_zero(boundary_areas, dt, Dx, interior_tet_sum, cell_volume)
+    beta_zero_freq = beta_zero_freq(boundary_areas, dt, Dx, interior_tet_sum, cell_volume)
     
     #Calling function %computing_energy_density%
     w_new_band, w_rec_band, w_rec_off_band, w_rec_off_deriv_band, p_rec_off_deriv_band, idx_w_rec, t_off = computing_energy_density(nBands, voluEl, recording_steps, beta_zero_freq, dt, c0, m_atm, Dx, interior_tet, cell_volume, s, cl_tet_r_keys, total_weights_r, tcalc, cl_tet_s_keys, source1, total_weights_s, t, sourceon_time, rho)

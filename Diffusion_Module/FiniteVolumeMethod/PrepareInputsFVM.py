@@ -17,11 +17,11 @@ from Diffusion_Module.FiniteVolumeMethod.FVMfunctions import *
 #GENERAL INPUT VARIABLES
 ###############################################################################
 input_data = {
-    "file_name": "3x3x3.msh", #name of the mesh file
-    "coord_source": [0.5, 0.5, 1.0], #source coordinates x,y,z
-    "coord_rec": [2.0, 0.5, 1.0], #rec coordinates x,y,z
+    "file_name": "39x3x3.msh", #name of the mesh file
+    "coord_source": [1.5, 1.5, 1.5], #source coordinates x,y,z
+    "coord_rec": [38.0, 1.5, 1.5], #rec coordinates x,y,z
     "fc_low": 125, #lowest frequency
-    "fc_high": 4000, #highest frequency
+    "fc_high": 2000, #highest frequency
     "num_octave": 1, # 1 or 3 depending on how many octave you want
     "dt": 1/20000, #time discretization
     "m_atm": 0, #air absorption coefficient [1/m]
@@ -37,13 +37,13 @@ vGroupsNames = create_vgroups_names(file_path)
 input_data["vGroupsNames"] = vGroupsNames
 
 #Calling function %number_freq%
-x_frequencies, nBands, center_freq = number_freq(input_data["num_octave"], input_data["fc_high"], input_data["fc_low"])
+nBands, center_freq = number_freq(input_data["num_octave"], input_data["fc_high"], input_data["fc_low"])
 input_data["center_freq"] = center_freq.tolist()
 input_data["nBands"] = nBands
-input_data["x_frequencies"] = x_frequencies
+#input_data["x_frequencies"] = x_frequencies
 
 # Save to JSON
-with open(os.path.join(script_dir,"simulation_inputs.json"), "w") as f:
+with open(os.path.join(script_dir,"simulation_fvm_inputs.json"), "w") as f:
     json.dump(input_data, f, indent=4)
 
 print("Input file successfully created: simulation_inputs.json")

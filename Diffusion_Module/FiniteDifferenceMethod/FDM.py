@@ -28,22 +28,23 @@ from Diffusion_Module.FiniteDifferenceMethod.FDMfunctions import *
 
 #%%
 ###############################################################################
-#INPUT VARIABLES
-###############################################################################
-
-script_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Load input data
-with open(os.path.join(script_dir,"simulation_inputs.json"), "r") as f:
-    inputs = json.load(f)
-
-
-#%%
-###############################################################################
-#CALCULATION SECTION
+#RUN SIMULATION FUNCTION
 ###############################################################################
 
 def run_fdm_sim(inputs):
+    """
+    Function for running the full calculation. It will use all the functions defined in FDMfunctions.py file
+
+    Parameters
+    ----------
+    inputs : dict
+        Dictionary of all the inputs for the simulation (taken from the json file).
+    
+    Returns
+    -------
+    results : dict
+        Dictionary of all the variable calculated during the simulation
+    """
     
     st = time.time() #start time of calculation
     
@@ -63,6 +64,8 @@ def run_fdm_sim(inputs):
     fc_high = inputs["fc_high"]
     num_octave = inputs["num_octave"]
     dx = inputs["dx"]
+    dy = inputs["dx"]
+    dz = inputs["dx"]
     dt = inputs["dt"]
     m_atm = inputs["m_atm"]
     th = inputs["th"]
@@ -70,6 +73,7 @@ def run_fdm_sim(inputs):
     
     #Fixed inputs
     #Set initial condition - Source Info (interrupted method)
+    c0= 343 #adiabatic speed of sound [m.s^-1]
     Ws = 0.01 #Source point power [Watts] interrupted after "sourceon_time" seconds; 10^-2 W => correspondent to 100dB
     pRef = 2 * (10**-5) #Reference pressure in Pa
     rho = 1.21 #air density [kg.m^-3] at 20°C
@@ -94,13 +98,13 @@ def run_fdm_sim(inputs):
     alpha_average, Eq_A = equiv_absorp(alpha_1, alpha_2, alpha_3, alpha_4, alpha_5, alpha_6, S1, S2, S3, S4, S5, S6, S)
 
     #Calling function %rec_sourceon_time%
-    RT_Sabine_band, sourceon_time, recording_time, t, recording_steps, sourceon_steps = rec_sourceon_time(nBands, center_freq, V, Eq_A, dt)
+    RT_Sabine_band, sourceon_time, recording_time, t, recording_steps, sourceon_steps = rec_sourceon_time(nBands, V, Eq_A, dt)
 
     #Calling function %diff_coeff%
     D_th, Dx, Dy, Dz = diff_coeff(V, S, c0)
     
     #Calling function %beta_zero%
-    beta_zero_x, beta_zero_y, beta_zero_z, beta_zero, beta_zero_condition = beta_zero(Dx, Dy, Dz, dx, dy, dz, dt)
+    beta_zero_x, beta_zero_y, beta_zero_z, beta_zero, beta_zero_condition = beta_zero_fun(Dx, Dy, Dz, dx, dy, dz, dt)
         
     #Calling function %initial_cond%
     Vs, w1, s1, source1 = initial_cond(dx, dy, dz, Ws, sourceon_steps, recording_steps)
@@ -118,19 +122,21 @@ def run_fdm_sim(inputs):
     dist_x, dist_y = dist_source_x_y(xx, yy, zz, row_lr_r, row_up_r, col_lr_r, col_up_r, dep_lr_r, dep_up_r, weight_row_lr_r, weight_row_up_r, weight_col_lr_r, weight_col_up_r, weight_dep_lr_r, weight_dep_up_r, coord_source)
     
     #Calling function %computing_energy_density%
-    w_new_band, w_t0_band, w_rec_band, w_rec_off_band, w_rec_x_t0_band, idx_w_rec = computing_energy_density(nBands, Nx, Ny, Nz, recording_steps, x, y, z, center_freq, recording_time, dt, beta_zero, 
+    w_new_band, w_t0_band, w_rec_band, w_rec_off_band, w_rec_x_t0_band, idx_w_rec = computing_energy_density(nBands, c0, m_atm, Nx, Ny, Nz, recording_steps, x, y, z, recording_time, dt, beta_zero, 
+                                 beta_zero_x , beta_zero_y, beta_zero_z, dx, dy, dz, Dx, Dy, Dz, t, sourceon_time, sourceon_steps,
                                  Abs_1, Abs_2, Abs_3, Abs_4, Abs_5, Abs_6, s, source1, 
                                  row_lr_s, row_up_s, col_lr_s, col_up_s, dep_lr_s, dep_up_s, 
                                  weight_row_lr_s, weight_row_up_s, weight_col_lr_s, weight_col_up_s, weight_dep_lr_s, weight_dep_up_s, 
                                  row_lr_r, row_up_r, col_lr_r, col_up_r, dep_lr_r, dep_up_r, 
-                                 weight_row_lr_r, weight_row_up_r, weight_col_lr_r, weight_col_up_r, weight_dep_lr_r, weight_dep_up_r, 
-                                 tcalc = "decay")
+                                 weight_row_lr_r, weight_row_up_r, weight_col_lr_r, weight_col_up_r, weight_dep_lr_r, weight_dep_up_r, tcalc)
     
+    print("Post-processing calculations...")
     #Calling function %freq_parameters%
-    spl_r_band, spl_r_off_band, spl_r_norm_band, sch_db_band, spl_t0_band, spl_new_band, spl_rec_x_t0_band, 
-    t30_band, edt_band, c80_band, d50_band, ts_band = freq_parameters(nBands, rho, c0, w_new_band, w_t0_band, 
-                                                                      w_rec_band, w_rec_off_band, w_rec_x_t0_band, 
-                                                                      idx_w_rec, t, dist_sr, m_atm, V, S, Eq_A)
+    spl_r_band, spl_r_off_band, spl_r_norm_band, sch_db_band, spl_t0_band, spl_new_band, spl_rec_x_t0_band, t30_band, edt_band, c80_band, d50_band, ts_band = freq_parameters(nBands, 
+                                                                                                                                                                              rho, pRef, c0, Ws, 
+                                                                                                                                                                              w_new_band, w_t0_band, w_rec_band, 
+                                                                                                                                                                              w_rec_off_band, w_rec_x_t0_band, idx_w_rec, 
+                                                                                                                                                                              t, dist_sr, m_atm, V, S, Eq_A, tcalc)
         
     et = time.time() #end time
     elapsed_time = et - st
@@ -139,8 +145,24 @@ def run_fdm_sim(inputs):
     
     return results
 
-#Calling function %run_fdm_sim%
-results = run_sim(inputs)  
+
+#%%
+###############################################################################
+#INPUT VARIABLES
+###############################################################################
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Load input data
+if __name__ == "__main__":
+    with open(os.path.join(script_dir,"simulation_fdm_inputs.json"), "r") as f:
+        inputs = json.load(f)
     
-#Calling function %save%
-save('resultsFDM.pkl')
+    
+    #Calling function %run_fdm_sim%
+    results = run_fdm_sim(inputs)  
+        
+    #Calling function %save%
+    save('resultsFDM.pkl')
+    
+    print("Simulation finished successfully! Results in resultsFDM.pkl file")

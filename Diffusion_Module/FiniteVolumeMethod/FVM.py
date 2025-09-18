@@ -50,14 +50,14 @@ st = time.time() #start time of calculation
 ###############################################################################
 
 # Source position
-x_source = 1.0  #position of the source in the x direction [m]
-y_source = 1.0  #position of the source in the y direction [m]
-z_source = 1.2  #position of the source in the z direction [m]
+x_source = 1.5  #position of the source in the x direction [m]
+y_source = 1.5  #position of the source in the y direction [m]
+z_source = 1.5  #position of the source in the z direction [m]
 
 # Receiver position
-x_rec = 2.0 #position of the receiver in the x direction [m]
+x_rec = 38.0 #position of the receiver in the x direction [m]
 y_rec = 1.5 #position of the receiver in the y direction [m]
-z_rec = 1.7 #position of the receiver in the z direction [m]
+z_rec = 1.5 #position of the receiver in the z direction [m]
 
 # Type of Calculation
 #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; 
@@ -103,7 +103,7 @@ rho = 1.21 #air density [kg.m^-3] at 20°C
 ###############################################################################
 #INITIALISE GMSH
 ###############################################################################
-file_name = "3x3x3.msh" #Insert file name, msh file created from sketchUp and then gmsh
+file_name = "39x3x3.msh" #Insert file name, msh file created from sketchUp and then gmsh
 gmsh.initialize() #Initialize msh file
 mesh = gmsh.open(file_name) #open the file
 
@@ -1278,11 +1278,11 @@ if tcalc == "stationarysource":
 ###############################################################################
 #SAVING
 ###############################################################################
-np.save(os.path.join('dt'),dt)
-np.save(os.path.join('w_rec_off_band'),w_rec_off_band)
-np.save(os.path.join('w_rec_off_deriv_band'),w_rec_off_deriv_band)
-np.save(os.path.join('p_rec_off_deriv_band'),p_rec_off_deriv_band)
-np.save(os.path.join('t_off'),t_off)
+# np.save(os.path.join('dt'),dt)
+# np.save(os.path.join('w_rec_off_band'),w_rec_off_band)
+# np.save(os.path.join('w_rec_off_deriv_band'),w_rec_off_deriv_band)
+# np.save(os.path.join('p_rec_off_deriv_band'),p_rec_off_deriv_band)
+# np.save(os.path.join('t_off'),t_off)
 
 
 # Save all variables to a file
@@ -1303,4 +1303,4 @@ def save(filename):
         pickle.dump(filtered_variables, f)
 
 # To save all current variables
-save('resultsFVM.pkl')
+save('resultsFVMALL.pkl')

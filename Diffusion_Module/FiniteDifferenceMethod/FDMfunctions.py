@@ -9,21 +9,15 @@ import math
 import time
 from math import ceil
 from math import log
-
 import numpy as np
-#uncomment this if you need drawnow
-#from drawnow import drawnow
-
-#from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
-
 import pickle
 import types
 
-from Diffusion_Module.FiniteDifferentMethod.FunctionClarity import clarity
-from Diffusion_Module.FiniteDifferentMethod.FunctionDefinition import definition
-from Diffusion_Module.FiniteDifferentMethod.FunctionCentreTime import centretime
-from Diffusion_Module.FiniteDifferentMethod.FunctionRT import t60_decay
+from Diffusion_Module.FiniteDifferenceMethod.FunctionClarity import clarity
+from Diffusion_Module.FiniteDifferenceMethod.FunctionDefinition import definition
+from Diffusion_Module.FiniteDifferenceMethod.FunctionCentreTime import centretime
+from Diffusion_Module.FiniteDifferenceMethod.FunctionRT import t60_decay
 
 #%%
 ###############################################################################
@@ -32,7 +26,7 @@ from Diffusion_Module.FiniteDifferentMethod.FunctionRT import t60_decay
 
 def number_freq(num_octave,fc_high,fc_low):
     """
-    Calculate the frequency array and the number of frequency bands.
+    Calculation of the frequency array and the number of frequency bands.
 
     Parameters
     ----------
@@ -59,6 +53,37 @@ def number_freq(num_octave,fc_high,fc_low):
 
 #Room characteristics
 def room_charact(length,width,height):
+    """
+    Calculation of the total surface and volume of the room.
+
+    Parameters
+    ----------
+    length : float
+        length of the room in meters.
+    width : float
+        Width of the room in meters.
+    height : float
+        Height of the room in meters.
+
+    Returns
+    -------
+    S1 : float
+        Surface area of the Surface 1 (floor).
+    S2 : float
+        Surface area of the Surface 2 (ceiling).
+    S3 : float
+        Surface area of the Surface 3 (wall front).
+    S4 : float
+        Surface area of the Surface 4 (wall back).
+    S5 : float
+        Surface area of the Surface 5 (wall left).
+    S6 : float
+        Surface area of the Surface 6 (wall right).
+    S : float
+        Total surface area of the room
+    V : float
+        Volume of the room
+    """
     S1,S2 = length*width, length*width #xy planes
     S3,S4 = length*height, length*height #xz planes
     S5,S6 = width*height, width*height #yz planes
@@ -68,7 +93,47 @@ def room_charact(length,width,height):
 
 
 #Creating of meshgrid
-def create_mesh(length,width,height, dx, dy, dz):
+def create_mesh(length, width, height, dx, dy, dz):
+    """
+    Calculation of the 3D mesh of the room.
+
+    Parameters
+    ----------
+    length : float
+        length of the room in meters.
+    width : float
+        Width of the room in meters.
+    height : float
+        Height of the room in meters.
+    dx : float
+        distance step between mesh points in the x axis (recommended 0.5)
+    dy : float
+        distance step between mesh points in the y axis (recommended equal to dx)
+    dz : float
+        distance step between mesh points in the z axis (recommended equal to dx)
+
+    Returns
+    -------
+    x : array of floats
+        Linspace of the mesh point in the x axis.
+    y : array of floats
+        Linspace of the mesh point in the y axis.
+    z : array of floats
+        Linspace of the mesh point in the z axis.
+    Nx : int
+        Number of mesh points in the x direction.
+    Ny : int
+        Number of mesh points in the y direction.
+    Nz : int
+        Number of mesh points in the z direction.
+    xx : array of floats
+        3D matrix for the x coordinates
+    yy : array of floats
+        3D matrix for the y coordinates
+    zz : array of floats
+        3D matrix for the z coordinates
+    
+    """
     x = np.arange(0, length+dx, dx) #mesh points in space x direction
     y = np.arange(0, width+dy, dy) #mesh points in space y direction
     z = np.arange(0, height+dz, dz) #mesh points in space z direction
@@ -80,6 +145,23 @@ def create_mesh(length,width,height, dx, dy, dz):
 
 #Absorption term for boundary conditions 
 def abs_term(th,alpha,c0):
+    """
+    Calculate the absorption term (Sabine, Eyring or Modified)
+
+    Parameters
+    ----------
+        th : int
+            The options for the absorption term; Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
+        alpha : list
+            Absrption coefficient for each frequency
+        c0 : int 
+            Speed of sound 
+
+    Returns
+    -------
+        Absx_array : array of floats
+            Calculated absorption term for each absorption coefficient for each frequency
+    """
     Absx_array = np.array([])
     for abs_coeff in alpha:
         #print(abs_coeff)
@@ -99,12 +181,81 @@ def abs_term(th,alpha,c0):
 ###############################################################################
 #Absorption parameters for room
 def equiv_absorp(alpha_1, alpha_2, alpha_3, alpha_4, alpha_5, alpha_6, S1, S2, S3, S4, S5, S6, S):
+    """
+    Calculation of the eqauivalent absorption area
+
+    Parameters
+    ----------
+        alpha_1 : list
+            Absrption coefficient for each frequency of Surface 1
+        alpha_2 : list
+            Absrption coefficient for each frequency of Surface 2
+        alpha_3 : list
+            Absrption coefficient for each frequency of Surface 3
+        alpha_4 : list
+            Absrption coefficient for each frequency of Surface 4
+        alpha_5 : list
+            Absrption coefficient for each frequency of Surface 5
+        alpha_6 : list
+            Absrption coefficient for each frequency of Surface 6
+        S1 : float
+            Surface area of the Surface 1 (floor).
+        S2 : float
+            Surface area of the Surface 2 (ceiling).
+        S3 : float
+            Surface area of the Surface 3 (wall front).
+        S4 : float
+            Surface area of the Surface 4 (wall back).
+        S5 : float
+            Surface area of the Surface 5 (wall left).
+        S6 : float
+            Surface area of the Surface 6 (wall right).
+        S : float
+            Total surface area of the room
+
+    Returns
+    -------
+        alpha_average : array of floats
+            Average absorption coefficient per each frequency.
+        Eq_A : array of floats
+            Equivalent absorption area
+    """
     alpha_average = (np.multiply(alpha_1,S1) + np.multiply(alpha_2,S2) + np.multiply(alpha_3,S3) + np.multiply(alpha_4,S4) + np.multiply(alpha_5,S5) + np.multiply(alpha_6,S6))/S #average absorption
     Eq_A = np.multiply(alpha_1,S1) + np.multiply(alpha_2,S2) + np.multiply(alpha_3,S3) + np.multiply(alpha_4,S4) + np.multiply(alpha_5,S5) + np.multiply(alpha_6,S6) #equivalent absorption area of the room
     return alpha_average, Eq_A
 
 
-def rec_sourceon_time(nBands, center_freq, V, Eq_A, dt):
+def rec_sourceon_time(nBands, V, Eq_A, dt):
+    """
+    Calculation of the time the sources stays on and the recording time
+
+    Parameters
+    ----------
+        nBands : int
+            Number of frequency bands
+        V : float
+            Volume of the room
+        Eq_A : array of floats
+            Equivalent absorption
+        dt : float
+            Time step
+
+    Returns
+    -------
+        RT_Sabine_band : list
+            Reverberation time calculated with Sabine
+        sourceon_time : float
+            Time that the source stays on
+        recording_time : float
+            Length of the simulaton run
+        t : array of floats
+            Time array of time steps
+        recording_steps : int
+            Number of time steps
+        sourceon_steps : int
+            Number of time steps that the source is on.
+        
+    """
     RT_Sabine_band = []
     for iBand in range(nBands):
         #freq = center_freq[iBand]
@@ -136,6 +287,8 @@ def diff_coeff(V, S, c0):
 
     Returns
     -------
+        D_th : float 
+            Theoretical diffusion coefficient 
         Dx : float 
             Diffusion coefficient in the x direction (equal to the theoretical diffusion coefficient)
         Dy : float 
@@ -154,7 +307,40 @@ def diff_coeff(V, S, c0):
 
 
 #Mesh numbers
-def beta_zero(Dx, Dy, Dz, dx, dy, dz, dt):
+def beta_zero_fun(Dx, Dy, Dz, dx, dy, dz, dt):
+    """
+    Calculation of factor beta_zero
+
+    Parameters
+    ----------
+        Dx : float
+            Diffusion coefficient in the x direction (equal to the theoretical diffusion coefficient)
+        Dy : float
+            Diffusion coefficient in the y direction (equal to the theoretical diffusion coefficient)
+        Dz : float
+            Diffusion coefficient in the z direction (equal to the theoretical diffusion coefficient)
+        dx : float
+            distance step between mesh points in the x axis (recommended 0.5)
+        dy : float
+            distance step between mesh points in the y axis (recommended equal to dx)
+        dz : float
+            distance step between mesh points in the z axis (recommended equal to dx)
+        dt : float
+            Time step
+
+    Returns
+    -------
+        beta_zero_x : float
+            Coefficient beta zero in the x axis used in the calculation of the energy density
+        beta_zero_y : float
+            Coefficient beta zero in the y axis used in the calculation of the energy density
+        beta_zero_z : float
+            Coefficient beta zero in the z axis used in the calculation of the energy density
+        beta_zero : float
+            Sum of the coefficients beta_zero_x, beta_zero_y and beta_zero_z
+        beta_zero_condition: float
+            If this value is more than 1, it flags it up as an error for possible inconvergence
+    """
     beta_zero_x = (2*Dx*dt)/(dx**2) #mesh number in x direction
     beta_zero_y = (2*Dy*dt)/(dy**2) #mesh number in x direction
     beta_zero_z = (2*Dz*dt)/(dz**2) #mesh number in x direction
@@ -168,6 +354,35 @@ def beta_zero(Dx, Dy, Dz, dx, dy, dz, dt):
     
 #Initial condition - Source Info (interrupted method)
 def initial_cond(dx, dy, dz, Ws, sourceon_steps, recording_steps):
+    """
+    Definition of initial conditions
+
+    Parameters
+    ----------
+        dx : float
+            distance step between mesh points in the x axis (recommended 0.5)
+        dy : float
+            distance step between mesh points in the y axis (recommended equal to dx)
+        dz : float
+            distance step between mesh points in the z axis (recommended equal to dx)
+        Ws : float
+            Power of the source
+        sourceon_steps : int
+            Number of time steps that the source stays on
+        recording_steps : int
+            Number of time steps
+
+    Returns
+    -------
+        Vs : float
+            Volume of the source
+        w1 : float
+            Power density of the source [Watts/(m^3))]
+        s1 : array of floats
+            Energy density of source number 1 at each source on time step position
+        source1 : array of floats
+            Energy density of source number 1 at time step position
+    """
     Vs=dx*dy*dz  #Volume of the source
     w1=Ws/Vs #w1 = round(Ws/Vs,4) #power density of the source [Watts/(m^3))]
     s1 = np.multiply(w1,np.ones(sourceon_steps)) #energy density of source number 1 at each time step position
@@ -179,6 +394,57 @@ def initial_cond(dx, dy, dz, Ws, sourceon_steps, recording_steps):
 #SOURCE INTERPOLATION
 ###############################################################################
 def source_interp(coord_source, dx, dy, dz, source1, Nx,Ny,Nz):
+    """
+    Interpolation of source position
+
+    Parameters
+    ----------
+        coord_source : list
+            Coordinates of the source position
+        dx : float
+            distance step between mesh points in the x axis (recommended 0.5)
+        dy : float
+            distance step between mesh points in the y axis (recommended equal to dx)
+        dz : float
+            distance step between mesh points in the z axis (recommended equal to dx)
+        source1 : array of floats
+            Energy density of source number 1 at time step position
+        Nx : int
+            Number of mesh points in the x direction.
+        Ny : int
+            Number of mesh points in the y direction.
+        Nz : int
+            Number of mesh points in the z direction.
+
+    Returns
+    -------
+        s : array of floats
+            Matrix of 3D mesh points inserting source energy
+        row_lr_s : int 
+            Lower fractional index in the x direction of the source position
+        row_up_s : int 
+            Upper fractional index in the x direction of the source position
+        col_lr_s : int 
+            Lower fractional index in the y direction of the source position
+        col_up_s : int 
+            Upper fractional index in the y direction of the source position
+        dep_lr_s : int 
+            Lower fractional index in the z direction of the source position
+        dep_up_s : int 
+            Upper fractional index in the z direction of the source position
+        weight_row_lr_s : float
+            Lower interpolation weight in the x direction of the source position
+        weight_row_up_s : float
+            Upper interpolation weight in the x direction of the source position
+        weight_col_lr_s : float
+            Lower interpolation weight in the y direction of the source position
+        weight_col_up_s : float
+            Upper interpolation weight in the y direction of the source position
+        weight_dep_lr_s : float
+            Lower interpolation weight in the z direction of the source position
+        weight_dep_up_s : float
+            Upper interpolation weight in the z direction of the source position
+    """
     # Calculate the fractional indices
     row_lr_s = int(np.floor(coord_source[0] / dx))
     row_up_s = row_lr_s + 1
@@ -209,7 +475,6 @@ def source_interp(coord_source, dx, dy, dz, source1, Nx,Ny,Nz):
 
     return s, row_lr_s, row_up_s, col_lr_s, col_up_s, dep_lr_s, dep_up_s, weight_row_lr_s, weight_row_up_s, weight_col_lr_s, weight_col_up_s, weight_dep_lr_s, weight_dep_up_s
 
-s, row_lr_s, row_up_s, col_lr_s, col_up_s, dep_lr_s, dep_up_s, weight_row_lr_s, weight_row_up_s, weight_col_lr_s, weight_col_up_s, weight_dep_lr_s, weight_dep_up_s = source_interp(coord_source, dx, dy, dz, source1)
 
 
 ###############################################################################
@@ -217,6 +482,47 @@ s, row_lr_s, row_up_s, col_lr_s, col_up_s, dep_lr_s, dep_up_s, weight_row_lr_s, 
 ###############################################################################
 
 def rec_interp(coord_rec, dx, dy, dz):
+    """
+    Interpolation of receiver position
+
+    Parameters
+    ----------
+        coord_rec : list
+            Coordinates of the receiver position
+        dx : float
+            distance step between mesh points in the x axis (recommended 0.5)
+        dy : float
+            distance step between mesh points in the y axis (recommended equal to dx)
+        dz : float
+            distance step between mesh points in the z axis (recommended equal to dx)
+
+    Returns
+    -------
+        row_lr_r : int 
+            Lower fractional index in the x direction of the receiver position
+        row_up_r : int 
+            Upper fractional index in the x direction of the receiver position
+        col_lr_r : int 
+            Lower fractional index in the y direction of the receiver position
+        col_up_r : int 
+            Upper fractional index in the y direction of the receiver position
+        dep_lr_r : int 
+            Lower fractional index in the z direction of the receiver position
+        dep_up_r : int 
+            Upper fractional index in the z direction of the receiver position
+        weight_row_lr_r : float
+            Lower interpolation weight in the x direction of the receiver position
+        weight_row_up_r : float
+            Upper interpolation weight in the x direction of the receiver position
+        weight_col_lr_r : float
+            Lower interpolation weight in the y direction of the receiver position
+        weight_col_up_r : float
+            Upper interpolation weight in the y direction of the receiver position
+        weight_dep_lr_r : float
+            Lower interpolation weight in the z direction of the receiver position
+        weight_dep_up_rs : float
+            Upper interpolation weight in the z direction of the receiver position
+    """
     #Calculate the fractional indices for receiver
     row_lr_r = int(np.floor(coord_rec[0] / dx))
     row_up_r = row_lr_r + 1
@@ -235,7 +541,6 @@ def rec_interp(coord_rec, dx, dy, dz):
     
     return row_lr_r, row_up_r, col_lr_r, col_up_r, dep_lr_r, dep_up_r, weight_row_lr_r, weight_row_up_r, weight_col_lr_r, weight_col_up_r, weight_dep_lr_r, weight_dep_up_r
 
-row_lr_r, row_up_r, col_lr_r, col_up_r, dep_lr_r, dep_up_r, weight_row_lr_r, weight_row_up_r, weight_col_lr_r, weight_col_up_r, weight_dep_lr_r, weight_dep_up_r = rec_interp(coord_rec, dx, dy, dz)
 
 
 def dist_source_receiver(coord_rec, coord_source):
@@ -258,11 +563,56 @@ def dist_source_receiver(coord_rec, coord_source):
     dist_sr = math.sqrt((abs(coord_rec[0] - coord_source[0]))**2 + (abs(coord_rec[1] - coord_source[1]))**2 + (abs(coord_rec[2] - coord_source[2]))**2) #distance between source and receiver
     return dist_sr
 
-dist_sr = dist_source_receiver(coord_rec, coord_source)
-
 
 
 def dist_source_x_y(xx, yy, zz, row_lr_r, row_up_r, col_lr_r, col_up_r, dep_lr_r, dep_up_r, weight_row_lr_r, weight_row_up_r, weight_col_lr_r, weight_col_up_r, weight_dep_lr_r, weight_dep_up_r, coord_source):
+    """
+    Calcualtion of distance source and receiver on a line in the x and y directions
+
+    Parameters
+    ----------
+        xx : array of floats
+            3D matrix for the x coordinates
+        yy : array of floats
+            3D matrix for the y coordinates
+        zz : array of floats
+            3D matrix for the z coordinates
+        row_lr_r : int 
+            Lower fractional index in the x direction of the receiver position
+        row_up_r : int 
+            Upper fractional index in the x direction of the receiver position
+        col_lr_r : int 
+            Lower fractional index in the y direction of the receiver position
+        col_up_r : int 
+            Upper fractional index in the y direction of the receiver position
+        dep_lr_r : int 
+            Lower fractional index in the z direction of the receiver position
+        dep_up_r : int 
+            Upper fractional index in the z direction of the receiver position
+        weight_row_lr_r : float
+            Lower interpolation weight in the x direction of the receiver position
+        weight_row_up_r : float
+            Upper interpolation weight in the x direction of the receiver position
+        weight_col_lr_r : float
+            Lower interpolation weight in the y direction of the receiver position
+        weight_col_up_r : float
+            Upper interpolation weight in the y direction of the receiver position
+        weight_dep_lr_r : float
+            Lower interpolation weight in the z direction of the receiver position
+        weight_dep_up_r : float
+            Upper interpolation weight in the z direction of the receiver position
+        coord_source : list
+            Coordinates of the source position
+
+
+    Returns
+    -------
+        dist_x : array of floats
+            Distance between source and each mesh point in the x direction on a line 
+        dist_y : array of floats
+            Distance between source and each mesh point in the y direction on a line 
+    """
+    
     #distance between source and each mesh point in the x direction 
     dist_x = np.sqrt((((xx[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
         (xx[:, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\
@@ -318,20 +668,156 @@ def dist_source_x_y(xx, yy, zz, row_lr_r, row_up_r, col_lr_r, col_up_r, dep_lr_r
 
     return dist_x, dist_y
 
-dist_x, dist_y = dist_source_x_y(xx, yy, zz, row_lr_r, row_up_r, col_lr_r, col_up_r, dep_lr_r, dep_up_r, weight_row_lr_r, weight_row_up_r, weight_col_lr_r, weight_col_up_r, weight_dep_lr_r, weight_dep_up_r, coord_source)
-
 #%%
 ###############################################################################
 #MAIN CALCULATION - COMPUTING ENERGY DENSITY
 ############################################################################### 
 
-def computing_energy_density(nBands, Nx, Ny, Nz, recording_steps, x, y, z, center_freq, recording_time, dt, beta_zero, 
+def computing_energy_density(nBands, c0, m_atm, Nx, Ny, Nz, recording_steps, x, y, z, recording_time, dt, beta_zero, 
+                             beta_zero_x , beta_zero_y, beta_zero_z, dx, dy, dz, Dx, Dy, Dz, t, sourceon_time, sourceon_steps,
                              Abs_1, Abs_2, Abs_3, Abs_4, Abs_5, Abs_6, s, source1, 
                              row_lr_s, row_up_s, col_lr_s, col_up_s, dep_lr_s, dep_up_s, 
                              weight_row_lr_s, weight_row_up_s, weight_col_lr_s, weight_col_up_s, weight_dep_lr_s, weight_dep_up_s, 
                              row_lr_r, row_up_r, col_lr_r, col_up_r, dep_lr_r, dep_up_r, 
                              weight_row_lr_r, weight_row_up_r, weight_col_lr_r, weight_col_up_r, weight_dep_lr_r, weight_dep_up_r, 
-                             tcalc = "decay"):
+                             tcalc):
+    """
+    Computation of energy density
+
+    Parameters
+    ----------
+        nBands : int
+            Number of frequency bands
+        c0 : int 
+            Speed of sound
+        m_atm : float
+            Air absorption coefficient
+        Nx : int
+            Number of mesh points in the x direction.
+        Ny : int
+            Number of mesh points in the y direction.
+        Nz : int
+            Number of mesh points in the z direction.
+        recording_steps : int 
+            Number of time steps
+        x : array of floats
+            Linspace of the mesh point in the x axis.
+        y : array of floats
+            Linspace of the mesh point in the y axis.
+        z : array of floats
+            Linspace of the mesh point in the z axis.
+        recording_time : float
+            Length of the simulaton run
+        dt : float
+            Time step
+        beta_zero : float
+            Sum of the coefficients beta_zero_x, beta_zero_y and beta_zero_z
+        beta_zero_x : float
+            Coefficient beta zero in the x axis used in the calculation of the energy density
+        beta_zero_y : float
+            Coefficient beta zero in the y axis used in the calculation of the energy density
+        beta_zero_z : float
+            Coefficient beta zero in the z axis used in the calculation of the energy density
+        dx : float
+            distance step between mesh points in the x axis (recommended 0.5)
+        dy : float
+            distance step between mesh points in the y axis (recommended equal to dx)
+        dz : float
+            distance step between mesh points in the z axis (recommended equal to dx)
+        Dx : float
+            Diffusion coefficient in the x direction (equal to the theoretical diffusion coefficient)
+        Dy : float
+            Diffusion coefficient in the y direction (equal to the theoretical diffusion coefficient)
+        Dz : float
+            Diffusion coefficient in the z direction (equal to the theoretical diffusion coefficient)
+        t : array of floats
+            Time array of time steps
+        sourceon_time : float
+            Time that the source stays on
+        sourceon_steps : int
+            Number of time steps that the source stays on
+        Abs_1 : array of floats
+            Calculated absorption term for Surface 1 for each frequency
+        Abs_2 : array of floats
+            Calculated absorption term for Surface 2 for each frequency
+        Abs_3 : array of floats
+            Calculated absorption term for Surface 3 for each frequency        
+        Abs_4 : array of floats
+            Calculated absorption term for Surface 4 for each frequency
+        Abs_5 : array of floats
+            Calculated absorption term for Surface 5 for each frequency
+        Abs_6 : array of floats
+            Calculated absorption term for Surface 6 for each frequency
+        s : array of floats
+            Matrix of 3D mesh points inserting source energy
+        source1 : array of floats
+            Energy density of source number 1 at time step position
+        row_lr_s : int 
+            Lower fractional index in the x direction of the source position
+        row_up_s : int 
+            Upper fractional index in the x direction of the source position
+        col_lr_s : int 
+            Lower fractional index in the y direction of the source position
+        col_up_s : int 
+            Upper fractional index in the y direction of the source position
+        dep_lr_s : int 
+            Lower fractional index in the z direction of the source position
+        dep_up_s : int 
+            Upper fractional index in the z direction of the source position
+        weight_row_lr_s : float
+            Lower interpolation weight in the x direction of the source position
+        weight_row_up_s : float
+            Upper interpolation weight in the x direction of the source position
+        weight_col_lr_s : float
+            Lower interpolation weight in the y direction of the source position
+        weight_col_up_s : float
+            Upper interpolation weight in the y direction of the source position
+        weight_dep_lr_s : float
+            Lower interpolation weight in the z direction of the source position
+        weight_dep_up_s : float
+            Upper interpolation weight in the z direction of the source position
+        row_lr_r : int 
+            Lower fractional index in the x direction of the receiver position
+        row_up_r : int 
+            Upper fractional index in the x direction of the receiver position
+        col_lr_r : int 
+            Lower fractional index in the y direction of the receiver position
+        col_up_r : int 
+            Upper fractional index in the y direction of the receiver position
+        dep_lr_r : int 
+            Lower fractional index in the z direction of the receiver position
+        dep_up_r : int 
+            Upper fractional index in the z direction of the receiver position
+        weight_row_lr_r : float
+            Lower interpolation weight in the x direction of the receiver position
+        weight_row_up_r : float
+            Upper interpolation weight in the x direction of the receiver position
+        weight_col_lr_r : float
+            Lower interpolation weight in the y direction of the receiver position
+        weight_col_up_r : float
+            Upper interpolation weight in the y direction of the receiver position
+        weight_dep_lr_r : float
+            Lower interpolation weight in the z direction of the receiver position
+        weight_dep_up_r : float
+            Upper interpolation weight in the z direction of the receiver position
+        tcalc : str
+            Type of calculation; "decay" if the source switches off and "stationarysource" if the source is stationary
+
+    Returns
+    -------
+        w_new_band : array of floats
+            Energy density at the time step n+1 at each mesh point per each frequency band
+        w_t0_band : array of floats
+            Energy density at the time step t=0 (when the source is switched off) at each mesh point per each frequency band
+        w_rec_band : array of floats
+            Energy density over time at the receiver position per each frequency band
+        w_rec_off_band : list of arrays
+            Energy density over time after the source is switched off at the receiver position per each frequency band
+        w_rec_x_t0_band : array of floats
+            Energy density at the time step t=0 (when the source is switched off) in the line receivers per each frequency band
+        idx_w_rec : int
+            Time index at which the source is switched off
+    """
     w_new_band = np.zeros((nBands, Nx, Ny, Nz))
     w_t0_band = np.zeros((nBands, Nx, Ny, Nz))
     w_rec_band = np.zeros((nBands, recording_steps))
@@ -502,20 +988,81 @@ def computing_energy_density(nBands, Nx, Ny, Nz, recording_steps, x, y, z, cente
 
     return w_new_band, w_t0_band, w_rec_band, w_rec_off_band, w_rec_x_t0_band, idx_w_rec
 
-w_new_band, w_t0_band, w_rec_band, w_rec_off_band, w_rec_x_t0_band, idx_w_rec = computing_energy_density(nBands, Nx, Ny, Nz, recording_steps, x, y, z, center_freq, recording_time, dt, beta_zero, 
-                             Abs_1, Abs_2, Abs_3, Abs_4, Abs_5, Abs_6, s, source1, 
-                             row_lr_s, row_up_s, col_lr_s, col_up_s, dep_lr_s, dep_up_s, 
-                             weight_row_lr_s, weight_row_up_s, weight_col_lr_s, weight_col_up_s, weight_dep_lr_s, weight_dep_up_s, 
-                             row_lr_r, row_up_r, col_lr_r, col_up_r, dep_lr_r, dep_up_r, 
-                             weight_row_lr_r, weight_row_up_r, weight_col_lr_r, weight_col_up_r, weight_dep_lr_r, weight_dep_up_r, 
-                             tcalc = "decay")
 #%%
 
 ###############################################################################
 #RESULTS
 ###############################################################################
-def freq_parameters(nBands, rho, c0, w_new_band, w_t0_band, w_rec_band, w_rec_off_band, w_rec_x_t0_band, idx_w_rec, t, dist_sr, m_atm, V, S, Eq_A):
+def freq_parameters(nBands, rho, pRef, c0, Ws, w_new_band, w_t0_band, w_rec_band, w_rec_off_band, w_rec_x_t0_band, idx_w_rec, t, dist_sr, m_atm, V, S, Eq_A, tcalc):
+    """
+    Computation of sound presure level and reverberation time parameters
 
+    Parameters
+    ----------
+        nBands : int
+            Number of frequency bands
+        rho : float 
+            Density of air
+        pRef : float
+            Reference pressure
+        c0 : int
+            Speed of sound
+        Ws : float
+            Power of the source
+        w_new_band : array of floats
+            Energy density at the time step n+1 at each mesh point per each frequency band
+        w_t0_band : array of floats
+            Energy density at the time step t=0 (when the source is switched off) at each mesh point per each frequency band
+        w_rec_band : array of floats
+            Energy density over time at the receiver position per each frequency band
+        w_rec_off_band : list of arrays
+            Energy density over time after the source is switched off at the receiver position per each frequency band
+        w_rec_x_t0_band : array of floats
+            Energy density at the time step t=0 (when the source is switched off) in the line receivers per each frequency band
+        idx_w_rec : int
+            Time index at which the source is switched off
+        t : array of floats
+            Time array of time steps
+        dist_sr : float
+            Distance between source and receiver position
+        m_atm : float
+            Air absorption coefficient
+        V : float
+            Volume of the room
+        S : float
+            Total surface area of the room
+        Eq_A : array of floats
+            Equivalent absorption
+        tcalc : str
+            Type of calculation; "decay" if the source switches off and "stationarysource" if the source is stationary
+
+    Returns
+    -------
+        spl_r_band : array of floats
+            Sound pressure level over time at the receiver position per each frequency band
+        spl_r_off_band : array of floats
+            Sound pressure level over time after the source is switched off at the receiver position per each frequency band
+        spl_r_norm_band : list of arrays
+            Sound pressure level over time at the receiver position per each frequency band normalised to its maximum level
+        sch_db_band : list of arrays
+            Energy density over time after the source is switched off at the receiver position per each frequency band
+        spl_t0_band : list of arrays
+            Sound pressure level at the time step t= 0 (when the source is switched off) at the receiver position per each frequency band
+        spl_new_band : list of arrays
+            Sound pressure level at the time step n+1 per each mesh point per each frequency band
+        spl_rec_x_t0_band : list of arrays
+            Sound pressure level at the time step t= 0 (when the source is switched off) per each receiver position in a line per each frequency band
+        t30_band : array of floats
+            Reverberation time T30 per each frequency band
+        edt_band : array of floats
+            Early decay time per each frequency band
+        c80_band : array of floats 
+            Clarity per each frequency band
+        d50_band : array of floats 
+            Definition per each frequency band
+        ts_band : array of floats
+            Centre time per each frequency band
+    """
     spl_r_band = []
     spl_r_off_band = []
     spl_r_norm_band = []
@@ -578,205 +1125,6 @@ def freq_parameters(nBands, rho, c0, w_new_band, w_t0_band, w_rec_band, w_rec_of
     
     return spl_r_band, spl_r_off_band, spl_r_norm_band, sch_db_band, spl_t0_band, spl_new_band, spl_rec_x_t0_band, t30_band, edt_band, c80_band, d50_band, ts_band
 
-spl_r_band, spl_r_off_band, spl_r_norm_band, sch_db_band, spl_t0_band, spl_new_band, spl_rec_x_t0_band, t30_band, edt_band, c80_band, d50_band, ts_band = freq_parameters(nBands, rho, c0, w_new_band, w_t0_band, w_rec_band, w_rec_off_band, w_rec_x_t0_band, idx_w_rec, t, dist_sr, m_atm, V, S, Eq_A)
-    
-et = time.time() #end time
-elapsed_time = et - st
-
-#%%
-###############################################################################
-#FIGURES & POST-PROCESSING
-###############################################################################
-
-# if tcalc == "decay":
-#     #Figure 5: Decay of SPL in the recording_time
-#     plt.figure(5)
-#     plt.plot(t, spl_r)  # plot sound pressure level with Pref = (2e-5)**5
-#     plt.title("Figure 5 :SPL over time at the receiver")
-#     plt.xlabel("t [s]")
-#     plt.ylabel("SPL [dB]")
-#     plt.xlim()
-#     plt.ylim()
-#     plt.xticks(np.arange(0, recording_time + 0.1, 0.5))
-#     plt.yticks(np.arange(0, 120, 20))
-
-#     #Figure 6: Decay of SPL in the recording_time normalised to maximum 0dB
-#     plt.figure(6)
-#     plt.plot(t,spl_r_norm)
-#     plt.title("Figure 6: Normalised SPL over time at the receiver")
-#     plt.xlabel("t [s]")
-#     plt.ylabel("SPL [dB]")
-#     plt.xlim()
-#     plt.ylim()
-#     plt.xticks(np.arange(0, recording_time +0.1, 0.1))
-#     plt.yticks(np.arange(0, -60, -10))
-    
-#     #Figure 7: Energy density at the receiver over time
-#     plt.figure(7)
-#     plt.plot(t,w_rec)
-#     plt.title("Figure 7: Energy density over time at the receiver")
-#     plt.xlabel("t [s]")
-#     plt.ylabel("Energy density [kg m^-1 s^-2]")
-#     plt.xlim()
-#     plt.ylim()
-#     plt.xticks(np.arange(0, recording_time +0.1, 0.1))
-    
-#     #Figure 8: Schroeder decay
-#     plt.figure(8)
-#     plt.plot(t[idx_w_rec:],sch_db)
-#     plt.title("Figure 8: Schroeder decay (Energy Decay Curve)")
-#     plt.xlabel("t [s]")
-#     plt.ylabel("Energy decay [dB]")
-#     plt.xlim()
-#     plt.ylim()
-#     #plt.xticks(np.arange(t, recording_time +0.1, 0.1))
-    
-#     #Figure 9: 2D image of the energy density in the room
-#     w_new_2d = w_new[:,:,dep_up_r] #The 3D w_new array is slised at the the desired z level
-#     plt.figure(9)
-#     plt.imshow(w_new_2d, origin='lower', extent=[x[0], x[-1], y[0], y[-1]], aspect='equal') #plot with the extent being the room dimension x and y 
-#     plt.colorbar(label='Energy Density [kg/ms^2]')
-#     plt.xlabel('X [m]')
-#     plt.ylabel('Y [m]')
-#     plt.title('Figure 9: Energy Density at Z = z_rec and t = recording_time')
-#     plt.show()
-    
-#     #Figure 10: 2D image of the SDL in the room
-#     sdl_2d = sdl[:,:,dep_up_r] #The 3D w_new array is slised at the the desired z level
-#     plt.figure(10)
-#     plt.imshow(sdl_2d, origin='lower', extent=[x[0], x[-1], y[0], y[-1]], aspect='equal') #plot with the extent being the room dimension x and y 
-#     plt.colorbar(label='Sound Density Level [dB]')
-#     plt.xlabel('X [m]')
-#     plt.ylabel('Y [m]')
-#     plt.title('Figure 10: Sound Density level at Z = z_rec and t = recording_time')
-#     plt.show()
-    
-#     #Figure 11: 2D image of the SPL in the room
-#     spl_2d = spl[:,:,dep_up_r] #The 3D w_new array is slised at the the desired z level
-#     plt.figure(11)
-#     plt.imshow(spl_2d, origin='lower', extent=[x[0], x[-1], y[0], y[-1]], aspect='equal') #plot with the extent being the room dimension x and y 
-#     plt.colorbar(label='Sound Pressure Level [dB]')
-#     plt.xlabel('X [m]')
-#     plt.ylabel('Y [m]')
-#     plt.title('Figure 11: Sound Pressure level at Z = z_rec and t = recording_time')
-#     plt.show()
-    
-#     #Figure 12: Energy density at t=recording_time over the space x.
-#     plt.figure(12)
-#     plt.title("Figure 12: Energy density over the x axis at t=recording_time")
-#     plt.plot(x,w_rec_x_end)
-#     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
-#     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')
-    
-#     #Figure 13: Energy density at t=sourceoff_step over the space x.
-#     plt.figure(13)
-#     plt.title("Figure 13: Energy density over the x axis at t=0")
-#     plt.plot(x,w_rec_x_t0)
-#     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
-#     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
-    
-#     #Figure 14: SPL at t=sourceoff_step over the space x. reverb sound only
-#     plt.figure(14)
-#     plt.title("Figure 14: SPL REVERB over the x axis at t=0")
-#     plt.plot(x,spl_rec_x_t0)
-#     plt.ylabel('$\mathrm{SPL \ [dB]}$')
-#     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
-       
-#     #Figure 15: Energy density at t=1*mean_free over the space x.
-#     plt.figure(15)
-#     plt.title("Figure 15: Energy density over the x axis at t=1*mean_free_time")
-#     plt.plot(x,w_rec_x_1l)
-#     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
-#     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
-    
-#     #Figure 16: SPL at  t=1*mean_free over the space x. reverb sound only
-#     plt.figure(16)
-#     plt.title("Figure 16: SPL REVERB over the x axis at t=1*mean_free")
-#     plt.plot(x,spl_rec_x_1l)
-#     plt.ylabel('$\mathrm{SPL \ [dB]}$')
-#     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')    
-    
-#     #Figure 17: Energy density at t=2*mean_free over the space x.
-#     plt.figure(17)
-#     plt.title("Figure 17: Energy density over the x axis at t=2*mean_free_time")
-#     plt.plot(x,w_rec_x_2l)
-#     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
-#     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
-    
-#     #Figure 18: SPL at  t=2*mean_free over the space x. reverb sound only
-#     plt.figure(18)
-#     plt.title("Figure 18: SPL REVERB over the x axis at t=2*mean_free")
-#     plt.plot(x,spl_rec_x_2l)
-#     plt.ylabel('$\mathrm{SPL \ [dB]}$')
-#     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')      
-    
-#     #Figure 19: Energy density at t=3*mean_free over the space x.
-#     plt.figure(19)
-#     plt.title("Figure 19: Energy density over the x axis at t=3*mean_free_time")
-#     plt.plot(x,w_rec_x_3l)
-#     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
-#     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
-    
-#     #Figure 20: SPL at  t=3*mean_free over the space x. reverb sound only
-#     plt.figure(20)
-#     plt.title("Figure 20: SPL REVERB over the x axis at t=3*mean_free")
-#     plt.plot(x,spl_rec_x_3l)
-#     plt.ylabel('$\mathrm{SPL \ [dB]}$')
-#     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
-    
-#     #Figure 21: Energy density at t=5*mean_free over the space x.
-#     plt.figure(21)
-#     plt.title("Figure 21: Energy density over the x axis at t=5*mean_free_time")
-#     plt.plot(x,w_rec_x_5l)
-#     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
-#     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
-    
-#     #Figure 22: SPL at  t=5*mean_free over the space x. reverb sound only
-#     plt.figure(22)
-#     plt.title("Figure 22: SPL REVERB over the x axis at t=5*mean_free")
-#     plt.plot(x,spl_rec_x_5l)
-#     plt.ylabel('$\mathrm{SPL \ [dB]}$')
-#     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$') 
-    
-# if tcalc == "stationarysource":
-
-#     #Figure 3: Decay of SPL in the recording_time at the receiver
-#     plt.figure(3)
-#     plt.plot(t,spl_r) #plot sound pressure level with Pref = (2e-5)**5
-#     plt.title("Figure 3: SPL over time at the receiver")
-#     plt.xlabel("t [s]")
-#     plt.ylabel("SPL [dB]")
-#     plt.xlim()
-#     plt.ylim()
-#     plt.xticks(np.arange(0, recording_time +0.1, 0.5))
-#     #plt.yticks(np.arange(0, 120, 20))
-
-#     #Figure 4: Decay of SPL in the recording_time normalised to maximum 0dB
-#     plt.figure(4)
-#     plt.title("Figure 4: Normalised SPL over time at the receiver")
-#     plt.plot(t,spl_r_norm)
-#     plt.xlabel("t [s]")
-#     plt.ylabel("SPL [dB]")
-#     plt.xlim()
-#     plt.ylim()
-#     plt.xticks(np.arange(0, recording_time +0.1, 0.1))
-#     plt.yticks(np.arange(0, -60, -10))
-
-#     #Figure 5: Energy density over time at the receiver
-#     plt.figure(5)
-#     plt.title("Figure 5: Energy density over time at the receiver")
-#     plt.plot(t,w_rec)
-#     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
-#     plt.xlabel("t [s]")
-
-    
-#     #Figure 8: Energy density at t=recording_time over the space x.
-#     plt.figure(8)
-#     plt.title("Figure 8: Energy density over the x axis at t=recording_time")
-#     plt.plot(x,w_rec_x_end)
-#     plt.ylabel('$\mathrm{Energy \ Density \ [kg/ms^2]}$')
-#     plt.xlabel('$\mathrm{Distance \ along \ x \ axis \ [m]}$')
-    
 #%%
 ###############################################################################
 #SAVING
@@ -791,7 +1139,7 @@ def save(filename):
         filename : str
             Name of the file to save the results
         variables : dict
-            Compilation of all the variables of the overal simulation
+            Compilation of all the variables of the overall simulation
     """
     with open(filename, 'wb') as f:
         # Filter out modules, functions, and other unsupported types
@@ -807,6 +1155,3 @@ def save(filename):
                 print(f"Could not pickle {k}: {str(e)}")
 
         pickle.dump(filtered_variables, f)
-
-# To save all current variables
-save('resultsFDM.pkl')

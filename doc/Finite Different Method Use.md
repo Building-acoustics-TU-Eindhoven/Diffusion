@@ -84,7 +84,7 @@ Within the fixed inputs, there are:
 ## Acoustics Calculation
 The acoustic calculation is based on the Du Fort and Frankel method (explicit unconditionally stable Finite difference method) solving the diffusion equation (Navarro et al., 2012). More information regarding the Finite Different Method in the paragraph below.
 
-## Acoustics parameters
+### Acoustics parameters
 
 The diffusion equation method predicts the time-dependent propagation of the sound energy density $w(\mathbf{r}, t)$ in the evaluated frequency band. 
 

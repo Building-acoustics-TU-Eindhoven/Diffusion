@@ -15,12 +15,12 @@ input_data = {
     "room_dim": [39,3,3],
     "coord_source": [0.5, 0.5, 1.0], #source coordinates x,y,z
     "coord_rec": [2.0, 0.5, 1.0], #rec coordinates x,y,z
-    "alpha_1": [0.1, 0.1, 0.1, 0.1, 0.1], #Absorption coefficient for Surface1 - Floor
-    "alpha_2": [0.1, 0.1, 0.1, 0.1, 0.1], #Absorption coefficient for Surface2 - Ceiling
-    "alpha_3": [0.1, 0.1, 0.1, 0.1, 0.1], #Absorption coefficient for Surface3 - Wall Front
-    "alpha_4": [0.1, 0.1, 0.1, 0.1, 0.1], #Absorption coefficient for Surface4 - Wall Back
-    "alpha_5": [0.1, 0.1, 0.1, 0.1, 0.1], #Absorption coefficient for Surface5 - Wall Left
-    "alpha_6": [0.1, 0.1, 0.1, 0.1, 0.1], #Absorption coefficient for Surface6 - Wall Right
+    "alpha_1": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1], #Absorption coefficient for Surface1 - Floor
+    "alpha_2": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1], #Absorption coefficient for Surface2 - Ceiling
+    "alpha_3": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1], #Absorption coefficient for Surface3 - Wall Front
+    "alpha_4": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1], #Absorption coefficient for Surface4 - Wall Back
+    "alpha_5": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1], #Absorption coefficient for Surface5 - Wall Left
+    "alpha_6": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1], #Absorption coefficient for Surface6 - Wall Right
     "fc_low": 125, #lowest frequency
     "fc_high": 4000, #highest frequency
     "num_octave": 1, # 1 or 3 depending on how many octave you want

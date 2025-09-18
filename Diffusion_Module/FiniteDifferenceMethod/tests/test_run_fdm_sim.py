@@ -42,16 +42,16 @@ def test_run_fdm_sim():
         Dictionary of all the variable calculated during the simulation
     """
     
-    input_data = {
+    inputs = {
         "room_dim": [8.0, 8.0, 8.0],
         "coord_source": [4.0, 4.0, 4.0], #source coordinates x,y,z
         "coord_rec": [2.0, 2.0, 2.0], #rec coordinates x,y,z
-        "alpha_1": [1/6, 1/6, 1/6, 1/6, 1/6, 1/6], #Absorption coefficient for Surface1 - Floor
-        "alpha_2": [1/6, 1/6, 1/6, 1/6, 1/6, 1/6], #Absorption coefficient for Surface2 - Ceiling
-        "alpha_3": [1/6, 1/6, 1/6, 1/6, 1/6, 1/6], #Absorption coefficient for Surface3 - Wall Front
-        "alpha_4": [1/6, 1/6, 1/6, 1/6, 1/6, 1/6], #Absorption coefficient for Surface4 - Wall Back
-        "alpha_5": [1/6, 1/6, 1/6, 1/6, 1/6, 1/6], #Absorption coefficient for Surface5 - Wall Left
-        "alpha_6": [1/6, 1/6, 1/6, 1/6, 1/6, 1/6], #Absorption coefficient for Surface6 - Wall Right
+        "alpha_1": [0.80, 0.82, 0.84, 0.86, 0.88, 0.90], #Absorption coefficient for Surface1 - Floor
+        "alpha_2": [0.80, 0.82, 0.84, 0.86, 0.88, 0.90], #Absorption coefficient for Surface2 - Ceiling
+        "alpha_3": [0.80, 0.82, 0.84, 0.86, 0.88, 0.90], #Absorption coefficient for Surface3 - Wall Front
+        "alpha_4": [0.80, 0.82, 0.84, 0.86, 0.88, 0.90], #Absorption coefficient for Surface4 - Wall Back
+        "alpha_5": [0.80, 0.82, 0.84, 0.86, 0.88, 0.90], #Absorption coefficient for Surface5 - Wall Left
+        "alpha_6": [0.80, 0.82, 0.84, 0.86, 0.88, 0.90], #Absorption coefficient for Surface6 - Wall Right
         "fc_low": 125, #lowest frequency
         "fc_high": 4000, #highest frequency
         "num_octave": 1, # 1 or 3 depending on how many octave you want

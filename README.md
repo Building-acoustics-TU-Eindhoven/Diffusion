@@ -25,7 +25,7 @@ For both the numerical methods, the main software works with the following assoc
 3. To run the codes, check the documentation below depending on the method you want to use and check the Tutorial sections of the documentation.
 
 ## Documentation
-The [documentation](https://building-acoustics-tu-eindhoven.github.io/Diffusion/index.html) gives an introduction of the package for both FDM and FVM.
+The [documentation](https://building-acoustics-tu-eindhoven.github.io/Diffusion/) gives an introduction of the package for both FDM and FVM.
 
 ## Authors
 Software is being developed by Ilaria Fichera at Eindhoven University of Technology (TU/e). 

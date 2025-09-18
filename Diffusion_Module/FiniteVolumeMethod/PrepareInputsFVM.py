@@ -17,9 +17,9 @@ from Diffusion_Module.FiniteVolumeMethod.FVMfunctions import *
 #GENERAL INPUT VARIABLES
 ###############################################################################
 input_data = {
-    "file_name": "39x3x3.msh", #name of the mesh file
+    "file_name": "3x3x3.msh", #name of the mesh file
     "coord_source": [1.5, 1.5, 1.5], #source coordinates x,y,z
-    "coord_rec": [38.0, 1.5, 1.5], #rec coordinates x,y,z
+    "coord_rec": [2.0, 1.5, 1.5], #rec coordinates x,y,z
     "fc_low": 125, #lowest frequency
     "fc_high": 2000, #highest frequency
     "num_octave": 1, # 1 or 3 depending on how many octave you want

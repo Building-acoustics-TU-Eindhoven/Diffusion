@@ -21,3 +21,5 @@ Diffusion_Module/FiniteVolumeMethod/absorption_coefficients.csv
 Diffusion_Module/FiniteVolumeMethod/simulation_inputs.json
 doc/Documentation1D.md
 doc/Documentation2D.md
+Diffusion_Module/FiniteDifferenceMethod/FDMfrequencies.py
+Diffusion_Module/FiniteDifferenceMethod/FDMOneFrequency.py

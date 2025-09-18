@@ -11,29 +11,14 @@ Created on Wed Aug  2 16:12:40 2023
 ###############################################################################
 #Code developed by Ilaria Fichera for the analysis of the FVM method adapted solving the 3D diffusion equation with one intermittent omnidirectional sound source
 #Import modules
-import itertools
 import math
 import pickle
 import time
 import types
-import os
-
 from math import ceil
 from math import log
-
 import gmsh
 import numpy as np
-
-#from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
-from matplotlib import cm
-from matplotlib.ticker import LinearLocator
-
-# from scipy import stats
-# from scipy.interpolate import griddata
-# from scipy.integrate import simps
-# from scipy import linalg#from matplotlib.animation import FuncAnimation
-# from scipy.sparse import lil_matrix
 
 from Diffusion_Module.FiniteVolumeMethod.FunctionClarity import clarity
 from Diffusion_Module.FiniteVolumeMethod.FunctionDefinition import definition
@@ -185,7 +170,7 @@ def surface_materials(group, abscoeff, surface_absorption, absorption_coefficien
     Abs_term = abs_term(th, abscoeff_list,c0) #calculates the absorption term based on the type of boundary condition th
     for entity in entities:
         absorption_coefficient_dict[entity] = abscoeff_list
-        surface_absorption.append((entity, Abs_term)) #absorption term (alpha*surfaceofwall) for each wall of the room
+        surface_absorption.append((entity, Abs_term.copy())) #absorption term (alpha*surfaceofwall) for each wall of the room
         surface_absorption = sorted(surface_absorption, key=lambda x: x[0])
     
     return absorption_coefficient_dict, surface_absorption
@@ -579,7 +564,7 @@ def surface_absorption_fun(vGroupsNames,df_abs,nBands,th,c0):
             raise ValueError(f"No absorption data found for surface: {name_group}")
 
         abscoeff = row.iloc[0, 1:].values.astype(float).tolist() #input(f"Enter absorption coefficient for frequency {fc_low} to {fc_high} for {name_abs_coeff}:") 
-        surface_materials (group, abscoeff, surface_absorption, absorption_coefficient_dict,nBands,th,c0)
+        absorption_coefficient_dict, surface_absorption = surface_materials (group, abscoeff, surface_absorption, absorption_coefficient_dict,nBands,th,c0)
 
     for entity, Abs_term in surface_absorption:
         triangle_faces, _ = gmsh.model.mesh.getElementsByType(2, entity) #Get all the triangle faces for the current surface
@@ -670,19 +655,16 @@ def boundary_triang(velemNodes, nBands, bounNode, nodecoords, node_indices, tria
     for idx, element in enumerate(velemNodes):  # for index and element in the number of tetrahedrons
         # if idx == 491:
         tetrahedron_boundary_areas = 0  # initialization tetrahedron face on boundary*its absorption term
-        total_tetrahedron_boundary_areas = np.zeros(
-            nBands)  # initialization total tetrahedron face on boundary*its absorption term if there are more than one face in the tetrahedron that is on the boundary
+        total_tetrahedron_boundary_areas = np.zeros(nBands)  # initialization total tetrahedron face on boundary*its absorption term if there are more than one face in the tetrahedron that is on the boundary
         # print(idx)
-        node_combinations = [list(nodes) for nodes in itertools.combinations(element,
-                                                                                3)]  # all possible combinations of the nodes of the tetrahedrons (it checks also for the order of the nodes in the same combination)
+        node_combinations = [list(nodes) for nodes in itertools.combinations(element,3)]  # all possible combinations of the nodes of the tetrahedrons (it checks also for the order of the nodes in the same combination)
         # Check if the nodes are in any order in bounNode
         is_boundary = False  # variable to say that at the beginning the face in not on a boundary
         for nodes in node_combinations:  # for each node in each combination
             for surface_idx, surface in enumerate(bounNode):  # for index and surface in the number of nodes
                 surface_set = sorted(set(surface))  # creates a set of the surface nodes
                 surface_set_idx = surface_idx
-                nodes_set = sorted(
-                    set(nodes))  # create a set of the node combination of the tetrahedron into consideration
+                nodes_set = sorted(set(nodes))  # create a set of the node combination of the tetrahedron into consideration
                 # surface_list = list(surface)
                 if nodes_set == surface_set:  # if these are equal, it means that the tetrahedron into consideration has a surface in the boundary and therefore is_boundary gets the value of True.
                     # print(surface_set)
@@ -698,8 +680,7 @@ def boundary_triang(velemNodes, nBands, bounNode, nodecoords, node_indices, tria
                         # bc1 = gmsh.model.mesh.getNode(nodes[1])[0] #coordinates of vertix 1
                         # bc2 = gmsh.model.mesh.getNode(nodes[2])[0] #coordinates of vertix 2
 
-                        face_area = 0.5 * np.linalg.norm(np.cross(bc1 - bc0,
-                                                                    bc2 - bc0))  # Compute the area using half of the cross product's magnitude
+                        face_area = 0.5 * np.linalg.norm(np.cross(bc1 - bc0, bc2 - bc0))  # Compute the area using half of the cross product's magnitude
                         # print(face_area)
 
                         face_areas[idx] = face_area  # area of the surface that is on boundary per each tetrahedron
@@ -707,8 +688,7 @@ def boundary_triang(velemNodes, nBands, bounNode, nodecoords, node_indices, tria
 
                         if face_area > 0:
                             # Use the index to access the corresponding absorption area
-                            face_absorption_product = face_area * triangle_face_absorption[
-                                surface_set_idx]  # calculate the product between the area*the correspondent absorption term
+                            face_absorption_product = face_area * triangle_face_absorption[surface_set_idx]  # calculate the product between the area*the correspondent absorption term
                             # print(face_absorption_product)
 
                             tetrahedron_boundary_areas += face_absorption_product  # add the calculation to the tetrahedron correspondent
@@ -1272,7 +1252,7 @@ def line_receivers(room_length, room_width, coord_rec, coord_source, cell_center
 #CALCULATION OF BETA_ZERO
 ###############################################################################
 
-def beta_zero(boundary_areas, dt, Dx, interior_tet_sum, cell_volume):
+def beta_zero_freq_fun(boundary_areas, dt, Dx, interior_tet_sum, cell_volume):
     """
     Calculation of factor beta_zero
 
@@ -1611,7 +1591,7 @@ def freq_parameters(nBands, line_rec_x_idx_list, w_new_band, line_rec_y_idx_list
 ###############################################################################
 
 # Save all variables to a file
-def save(filename, variables):
+def save(filename,variables):
     """
     Saving of variables
 

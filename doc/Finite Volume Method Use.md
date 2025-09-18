@@ -66,7 +66,7 @@ In order to create a volumetric mesh of the room, the following steps need to be
 15. The .geo file needs to be saved in the same folder as the "CreateMeshFVM.py" file and the "FVM.py" file.
 16. The gmsh.exe file needs also to be positioned in the same folder.
 
-#### Mesh creation
+### Mesh creation
 The volumetric mesh is to be created. The file _CreateMeshFVM.py_ allows to create the volumetric mesh using Gmsh software. The only parameters that need to be set in this file are:
 - the name of the names of the geo file you want to simulate (e.g. _3x3x3.geo_);
 - the name of the mesh file you want this python file to generate (e.g. _3x3x3.msh_); and
@@ -128,7 +128,7 @@ Each surface (including doors, windows etc...) would require frequency dependent
 ## Acoustics Calculation
 The acoustic calculation is based on the Finite Volume method (FVM) solving the diffusion equation (Munoz, 2019). More information regarding the Finite Volume Method in the paragraph below.
 
-## Acoustics parameters
+### Acoustics parameters
 The diffusion equation method predicts the time-dependent and spatial-dependent propagation of the sound energy density $w(\mathbf{r}, t)$ in the evaluated frequency bands.
 
 #### Sound Density Level

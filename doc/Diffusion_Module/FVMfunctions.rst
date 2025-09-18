@@ -1,27 +1,17 @@
-API reference
+FVM functions
 =============
 
+Main function
+-------------
+.. automodule:: Diffusion_Module.FiniteVolumeMethod.FVMcall
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Internal functions
+------------------
 .. automodule:: Diffusion_Module.FiniteVolumeMethod.FVMfunctions
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: Diffusion_Module.FiniteVolumeMethod.FunctionRT
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: Diffusion_Module.FiniteVolumeMethod.FunctionDefinition
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: Diffusion_Module.FiniteVolumeMethod.FunctionClarity
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-.. automodule:: Diffusion_Module.FiniteVolumeMethod.FunctionCentreTime
     :members:
     :undoc-members:
     :show-inheritance:

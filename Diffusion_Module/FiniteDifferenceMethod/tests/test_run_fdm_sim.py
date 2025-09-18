@@ -43,8 +43,8 @@ def test_run_fdm_sim():
     """
     
     inputs = {
-        "room_dim": [8.0, 8.0, 8.0],
-        "coord_source": [4.0, 4.0, 4.0], #source coordinates x,y,z
+        "room_dim": [3.0, 3.0, 3.0],
+        "coord_source": [1.0, 1.0, 1.0], #source coordinates x,y,z
         "coord_rec": [2.0, 2.0, 2.0], #rec coordinates x,y,z
         "alpha_1": [0.80, 0.82, 0.84, 0.86, 0.88, 0.90], #Absorption coefficient for Surface1 - Floor
         "alpha_2": [0.80, 0.82, 0.84, 0.86, 0.88, 0.90], #Absorption coefficient for Surface2 - Ceiling

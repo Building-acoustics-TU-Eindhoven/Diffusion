@@ -13,7 +13,7 @@ DiffEq3DAxis.py
 results.pkl
 FVM-varD.py
 gmsh.exe
-resultsFVM.pkl
+Diffusion_Module/FiniteVolumeMethod/resultsFVM.pkl
 imp_resp.wav
 Auralization/auralization.wav
 doc/_build

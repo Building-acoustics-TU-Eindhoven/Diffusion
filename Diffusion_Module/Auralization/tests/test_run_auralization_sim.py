@@ -32,8 +32,8 @@ def test_run_auralization_sim():
             Dictionary of all the variable calculated including auralization and impulse response wav files.
     """
 
-    anechoic_signal = os.path.join(os.path.dirname(__file__), 'Frequency(english).wav')
-    resultsFVM = load(os.path.join(os.path.dirname(__file__), 'resultsFVM.pkl')) 
+    anechoic_signal = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Frequency(english).wav')
+    resultsFVM = load(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resultsFVM.pkl')) 
     
     #Import data needed from the resultsFVM pickle file
     dt_sim = resultsFVM["dt"]   #Import delta t (time step) from the simulation calc
@@ -195,11 +195,7 @@ def test_run_auralization_sim():
     # #plt.axhline(0, color='black', linewidth=0.1)
     # #plt.legend(loc='best')
     # plt.show()
-    
-    scipy.io.wavfile.write("imp_resp.wav", fs, imp_resp_norm)
-    #Play the impulse response
-    #sd.play(imp_tot, fs)
-    
+
     print("Starting convolution...")
     st, ht, sh_conv, t_conv, sh_conv_normalized = convolution_fun(data_signal,fs,imp_tot)
     #Play the convolved signal
@@ -223,9 +219,6 @@ def test_run_auralization_sim():
     #     plt.legend(loc='best')
     # plt.tight_layout(rect=[0, 0, 1, 0.96])
     # plt.show()
-
-    # Write the normalized data to a WAV file
-    scipy.io.wavfile.write("auralization.wav", fs, sh_conv_normalized)
     
     results = locals()
     

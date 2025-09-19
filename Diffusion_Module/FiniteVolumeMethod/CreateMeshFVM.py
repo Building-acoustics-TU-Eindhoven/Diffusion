@@ -61,8 +61,8 @@ def generate_mesh(geo_file_path, name_gmsh_file, characteristic_length):
 ###############################################################################
 # The variables to be assigned by the user directly
 # Only name of the file
-name_of_geo_file = '39x3x3.geo'
-name_of_gmsh_file = "39x3x3.msh"
+name_of_geo_file = '3x3x3.geo'
+name_of_gmsh_file = "3x3x3.msh"
 length_of_mesh = 1
 
 # The file assumed to be in the same folder as "CreatemeshFVM.py" file

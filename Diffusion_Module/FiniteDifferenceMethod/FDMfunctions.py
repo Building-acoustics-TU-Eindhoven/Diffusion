@@ -10,7 +10,7 @@ import time
 from math import ceil
 from math import log
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import pickle
 import types
 
@@ -966,7 +966,7 @@ def computing_energy_density(nBands, c0, m_atm, Nx, Ny, Nz, recording_steps, x, 
         w_rec_off_band.append(w_rec_off) 
         w_rec_x_t0_band[iBand] = w_rec_x_t0
     
-    plt.show()
+    #plt.show()
     
     w_rec_x_end = ((w_new[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\
         (w_new[:, col_lr_r, dep_up_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_up_r))+\

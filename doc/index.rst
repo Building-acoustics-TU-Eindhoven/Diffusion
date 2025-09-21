@@ -40,10 +40,10 @@ Each method is distributed with its own Python code. The main application of the
    :maxdepth: 6
    :caption: API reference:
 
-   Diffusion_Module/FDMfunctions
-   Diffusion_Module/FVMfunctions
-   Diffusion_Module/ReverberationFunctions
-   Diffusion_Module/Auralizationfunctions
+   Diffusion_Module_ADE/FDMfunctions
+   Diffusion_Module_ADE/FVMfunctions
+   Diffusion_Module_ADE/ReverberationFunctions
+   Diffusion_Module_ADE/Auralizationfunctions
    
 .. toctree::
    :maxdepth: 2

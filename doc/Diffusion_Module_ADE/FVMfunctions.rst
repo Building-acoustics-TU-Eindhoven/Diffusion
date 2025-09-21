@@ -3,7 +3,7 @@ FVM functions
 
 Main function
 -------------
-.. automodule:: Diffusion_Module_ADE.FiniteVolumeMethod.FVMcall
+.. automodule:: Diffusion_Module_ADE.FiniteVolumeMethod.FVM
     :members:
     :undoc-members:
     :show-inheritance:

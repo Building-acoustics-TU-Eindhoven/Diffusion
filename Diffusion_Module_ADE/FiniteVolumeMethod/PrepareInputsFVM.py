@@ -2,7 +2,7 @@
 """
 Created on Wed Sep 10 14:37:26 2025
 
-@author: 20225533
+@author: Ilaria Fichera
 """
 
 import gmsh
@@ -40,8 +40,6 @@ with open(os.path.join(script_dir,"simulation_fvm_inputs.json"), "w") as f:
     json.dump(input_data, f, indent=4)
 
 print("Input file successfully created: simulation_inputs.json")
-    
-gmsh.finalize()
 
 #%%
 ###############################################################################

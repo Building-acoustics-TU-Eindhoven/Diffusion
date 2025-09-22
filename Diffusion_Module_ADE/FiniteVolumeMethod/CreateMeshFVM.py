@@ -2,7 +2,7 @@
 """
 Created on Mon Oct 30 08:56:01 2023
 
-@author: 20225533
+@author: Ilaria Fichera
 """
 
 # Code developed by Ilaria Fichera for the analysis of the FVM method adapted solving the 3D diffusion equation with one intermittent omnidirectional sound source
@@ -73,7 +73,7 @@ length_of_mesh = 1
 base_dir = os.path.dirname(os.path.abspath(__file__))  # Directory of the current script
 
 def main():
-    gmsh.initialize()
+    #gmsh.initialize()
     parser = argparse.ArgumentParser(description='process the input path, taking dynamically.')
 
     parser.add_argument(
@@ -104,7 +104,7 @@ def main():
 
     args = parser.parse_args()
     generate_mesh(args.geo_file_path, args.name_gmsh_file, args.length_of_mesh)
-    gmsh.finalize()
+    #gmsh.finalize()
 
 if __name__ == '__main__':
     main()

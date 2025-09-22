@@ -2,7 +2,7 @@
 """
 Created on Tue Feb 28 10:39:42 2023
 
-@author: 20225533
+@author: Ilaria Fichera
 """
 #Code developed by Ilaria Fichera for the analysis of the FDM method Du Fort & Frankel solving the 3D diffusion equation with one intermittent omnidirectional sound source
 import math

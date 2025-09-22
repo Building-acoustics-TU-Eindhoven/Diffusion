@@ -13,7 +13,7 @@ To use the software, the following files are to be used:
 - _FVM.py_: it contains the main function run_fvm_sim to run the full simulation and calculate the acoustics parameters in the room.
 
 The main software works with the following associated functions:
-+ _FVMfunctions.py_ include all the main functions that are used in the full simualtion;
++ _FVMfunctions.py_ include all the main functions that are used in the full simulation;
 + _FunctionRT.py_ calculates the reverberation time of the room in question;
 + _FunctionClarity.py_ calculates the clarity $C_{80}$ of the room in question based on Barron's revised theory formula;
 + _FunctionDefinition.py_ calculates the definition $D_{50}$ of the room in question based on Barron's revised theory formula;

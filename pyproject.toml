@@ -6,9 +6,9 @@ readme = "README.md"
 license = {file = "LICENSE.md"}
 requires-python = ">=3.10"
 authors = [
-    {name = "Ilaria Fichera", email = "i.fichera@tue.nl"}
-    {name = "Cédric Van hoorickx", email = "c.m.l.van.hoorickx@tue.nl"}
-    {name = "Maarten Hoornikx", email = "m.c.j.hornikx@tue.nl"}
+    {name = "Ilaria Fichera", email = "i.fichera@tue.nl"},
+    {name = "Cédric Van hoorickx", email = "c.m.l.van.hoorickx@tue.nl"},
+    {name = "Maarten Hoornikx", email = "m.c.j.hornikx@tue.nl"},
 ]
 keywords = [
     "room acoustics", 

@@ -30,5 +30,5 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest Diffusion_Module/Auralization/tests -p no:warnings
+        pytest Diffusion_Module_ADE/Auralization/tests -p no:warnings
 

@@ -35,7 +35,7 @@ def load(filename):
     """
     import pickle
     with open(filename, 'rb') as f:
-        variables = pickle.load(f)
+        variables = pickle.load(f, encoding="latin1")
         globals().update(variables)
     
     return variables

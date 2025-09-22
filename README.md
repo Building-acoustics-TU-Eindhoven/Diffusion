@@ -13,7 +13,9 @@ The package acousticDE is formed by three subfolders:
 ## Installation
 Use pip to install acousticDE
 
-<pre> ```bash pip install acousticDE ``` </pre>
+```bash 
+pip install acousticDE
+```
 
 To run the codes/functions, check the [documentation](https://building-acoustics-tu-eindhoven.github.io/Diffusion/) below depending on the method you want to use and check the Tutorial sections of the documentation.
 

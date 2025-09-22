@@ -2,7 +2,7 @@
 """
 Created on Wed Aug  2 16:12:40 2023
 
-@author: 20225533
+@author: Ilaria Fichera
 """
 
 #%%

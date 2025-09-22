@@ -13,7 +13,7 @@ To use the software, the following files are to be used:
 - _FVM.py_: it contains the main function run_fvm_sim to run the full simulation and calculate the acoustics parameters in the room.
 
 The main software works with the following associated functions:
-+ _FVMfunctions.py_ include all the main functions that are used in the full simualtion;
++ _FVMfunctions.py_ include all the main functions that are used in the full simulation;
 + _FunctionRT.py_ calculates the reverberation time of the room in question;
 + _FunctionClarity.py_ calculates the clarity $C_{80}$ of the room in question based on Barron's revised theory formula;
 + _FunctionDefinition.py_ calculates the definition $D_{50}$ of the room in question based on Barron's revised theory formula;
@@ -26,22 +26,22 @@ The geometry for this method is defined within SketchUp.
 In order to create a volumetric mesh of the room, the following steps need to be follow in SketchUp:
 1. Create the 3D geometry of the room to simulate in SketchUp, setting the units of the geometry in meters;
 2. In the MeshKit extension banner in SketchUp software, set the active mesher to gmsh by clicking on the "edit configuration button"
-![editconfigurationbutton](images/editconfigurationbutton.png)
+![editconfigurationbutton](/images/editconfigurationbutton.png)
 3. Include the Gmsh Path of the gmsh.exe and select gmsh as the active mesher;
 4. Group the overal geometry (surfaces and edges) bounding the internal air volume by selecting everything, right-clicking and clicking "Make Group";
-5. Select the Group and click "Set selected as an smesh region and define properties" ![Set selected as an smesh region and define properties](images/setselectedasansmeshregion.png) in MeshKit;
+5. Select the Group and click "Set selected as an smesh region and define properties" ![Set selected as an smesh region and define properties](/images/setselectedasansmeshregion.png) in MeshKit;
 6. In the "Region Options: gmsh" menu, keep all the default option but change only the name of the region by writing, for example, "RoomVolume" and click "ok";
 7. Open the group by double clicking on the object;
 8. Select one or multiple surfaces you want to assign a boundary property;
-9. Click "Add tetgen boundary to selected" ![Add tetgen boundary to selected](images/addtetgenboundary.png) in MeshKit;
+9. Click "Add tetgen boundary to selected" ![Add tetgen boundary to selected](/images/addtetgenboundary.png) in MeshKit;
 10. Under "Refine", change the refinement to 1;
 11. Under "Name": change the name to "materialname" e.g."carpet" and click "ok";
-12. After finishing defining all the boundaries, select the group and click "export to generate mesh" ![export to generate mesh](images/export.png) in MeshKit;
+12. After finishing defining all the boundaries, select the group and click "export to generate mesh" ![export to generate mesh](/images/export.png) in MeshKit;
 13. Select Format = "gmsh" en Units = "m" and click "ok";
 14. Keep the default options apart from "pointSizes" which should change to True, click "ok" and save the .geo file with the name of your choice;
 
 The .geo file has been created. This needs to be converted into a .msh file, to get the full volumetric mesh.
-Using the [⬇ CreateMeshFVM.py](https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/Diffusion/refs/heads/master/Diffusion_Module_ADE/FiniteVolumeMethod/CreateMeshFVM.py) script, please input the following variables:
+Using the [⬇ Download CreateMeshFVM.py](_static/download_CreateMeshFVM.html) script, please input the following variables:
 - the name of the names of the geo file you want to simulate (e.g. _3x3x3.geo_);
 - the name of the mesh file you want this python file to generate (e.g. _3x3x3.msh_); and
 - the length_of_mesh. The mesh length value describes the size of the spatial resolution of the mesh in the space and is vital to discretize correctly the space and achieve precise and converged results. Through various trials, it has been established that a mesh length of 1 meters is generally adequate. However, for computations involving complex geometries or small rooms, a smaller length of mesh (0.5 meters or lower) is recommended. The mesh length choice is contingent upon user preferences for details in parameters values, room dimensions but mostly dependent on the mean free path of the room. Infact, the length of mesh would need to be of the order of one mean free path of the room (equal or smaller than the mean free path of the room).
@@ -55,7 +55,7 @@ length_of_mesh = 1
 This script create the volumetric mesh using Gmsh software. The method is suitable for any type of geometry.
 
 ### General inputs
-The general inputs needs to be set by using the script [⬇ PrepareInputsFVM.py](https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/Diffusion/refs/heads/master/Diffusion_Module_ADE/FiniteVolumeMethod/PrepareInputsFVM.py)
+The general inputs needs to be set by using the script <a href="https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/Diffusion/refs/heads/master/Diffusion_Module_ADE/FiniteVolumeMethod/PrepareInputsFVM.py" download>⬇ Download PrepareInputsFVM.py</a>
 <!-- 
 [_PrepareInputsFVM.py_](https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/Diffusion/refs/heads/master/Diffusion_Module_ADE/FiniteVolumeMethod/PrepareInputsFVM.py?raw=true) -->
 

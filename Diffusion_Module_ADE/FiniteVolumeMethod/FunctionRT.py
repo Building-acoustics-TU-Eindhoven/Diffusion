@@ -2,7 +2,7 @@
 """
 Created on Fri Feb 17 08:56:15 2023
 
-@author: 20225533
+@author: Ilaria Fichera
 """
 import numpy as np
 from scipy import stats

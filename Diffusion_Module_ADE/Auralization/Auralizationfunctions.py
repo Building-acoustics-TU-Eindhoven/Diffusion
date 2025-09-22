@@ -33,6 +33,7 @@ def load(filename):
         variables : dict
             Variables from the FVM results
     """
+    import pickle
     with open(filename, 'rb') as f:
         variables = pickle.load(f)
         globals().update(variables)

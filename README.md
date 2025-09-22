@@ -1,31 +1,24 @@
 ## Diffusion Equation Software for Room Acoustics Modeling
-The software implementation is part of an ongoing research in the Building Acoustics Group at the Built Environment Department of Eindhoven University of Technology. The software is currectly **UNDER DEVELOPMENT** and it is being implemented by Ilaria Fichera in Python language.
-
-The goal of the project is to specifically implement, develop and validate the diffusion equation modelling method.
-Solving the diffusion equation allows to study the acoustics properties of a room and to obtain the distribution of acoustic energy over space and time in a specific room.
+acousticDE is an open-source software package developed for the simulation of room acoustics based on the diffusion equation method. The package provides two complementary numerical implementation of this method: the Finite Volume Method (FVM) and the Finite Difference Method (FDM). In addition, it includes a tool for auralization enabling users to listen to acoustic renderings generated from the results of the Finite Volume Method. The main strenght of acousticDE is in its ability to predict the distribution of acoustic energy over space and time within a given room. With only a minimal set of input parameters, the software delivers accurate and computationally efficient estimates of both the energy propagation and room acoustics properties. This makes it a valuable tool for researchers and practitioners interested in architectural and room acoustics. The software is being developed as part of an ongoing research within the Building Acoustics Group at the Department of Built Environment, Eindhoven University of Technology. It is currently under active development and implemented in Python by Ilaria Fichera. 
 
 ## Release version
-Version 1.0
+Version 0.1.0
 
 ## Repository structure
-The solution of the Diffusion Equation is currently investigated with two different numerical methods: the Finite Different Method (FDM) by Du Fort&Frankel (Navarro et al., 2012) and the Finite Volume Method (FVM) (Munoz, 2019). 
-The FDM can be used for parallelepiped shapes while the FVM can be used for any shape/geometry.
-The FDM script is developed for 3D spaces in the Python files _FDM.py_.
-The FVM script is developed for 3D spaces in the Python file _FVM.py_. 
+The package acousticDE is formed by three subfolders: 
++ _Auralization_ generates the auralization wav file for the room in question;
++ _FiniteDifferenceMethod_ computes the room acoustics based on the diffusion equation using the finite difference method (Navarro et al., 2012);
++ _FiniteVolumeMethod_ computes the room acoustics based on the diffusion equation using the finite volume method (Munoz, 2019);
 
-For both the numerical methods, the main software works with the following associated functions:
-+ _FunctionRT.py_ calculates the reverberation time of the room in question;
-+ _FunctionClarity.py_ calculates the clarity $C_{80}$ of the room in question based on Barron's revised theory formula;
-+ _FunctionDefinition.py_ calculates the definition $D_{50}$ of the room in question based on Barron's revised theory formula;
-+ _FunctionCentreTime.py_ calculates the centre time $T_s$ of the room in question based on Barron's revised theory formula.
+## Installation
+Use pip to install acousticDE
 
-## Setup and Usage instructions
-1. Download and install Anaconda or download and install any Python software IDE you prefer;
-2. Clone/Fork this repository to a folder of your preference;
-3. To run the codes, check the documentation below depending on the method you want to use and check the Tutorial sections of the documentation.
+<pre> ```bash pip install acousticDE ``` </pre>
 
-## Documentation
-The [documentation](https://building-acoustics-tu-eindhoven.github.io/Diffusion/) gives an introduction of the package for both FDM and FVM.
+To run the codes/functions, check the [documentation](https://building-acoustics-tu-eindhoven.github.io/Diffusion/) below depending on the method you want to use and check the Tutorial sections of the documentation.
+
+## Usage & Documentation
+The [documentation](https://building-acoustics-tu-eindhoven.github.io/Diffusion/) is created to help to use and develop acousticDE effectively. To use acousticDE, please refer to the Tutorial section of the [documentation](https://building-acoustics-tu-eindhoven.github.io/Diffusion/). In addition, the documentation gives an introduction of the package for both FDM and FVM.
 
 ## Authors
 Software is being developed by Ilaria Fichera at Eindhoven University of Technology (TU/e). 
@@ -37,6 +30,6 @@ This research is founded by the Dutch Research Council (<u>[NWO](https://www.nwo
 Diffusion is under copyright of Building Acoustics Group at the Eindhoven University of Technology and is licensed under GNU General Public License v2.0. See LICENSE.md for more details.
 
 ## References
-+ J. M. Navarro, J. Escolano and J. J. Lopez, Implementation and evaluation of a diffusion equation model based on finite difference schemes for sound field prediction in rooms, Applied Acoustics 73 (2012) 659–665.
+J. M. Navarro, J. Escolano and J. J. Lopez, Implementation and evaluation of a diffusion equation model based on finite difference schemes for sound field prediction in rooms, Applied Acoustics 73 (2012) 659–665.
 
-+ R. P. Muñoz, Numerical modeling for urban sound propagation: developments in wave-based and energy based methods, PhD Thesis, Technische Universiteit Eindhoven, 2019.
+R. P. Muñoz, Numerical modeling for urban sound propagation: developments in wave-based and energy based methods, PhD Thesis, Technische Universiteit Eindhoven, 2019.

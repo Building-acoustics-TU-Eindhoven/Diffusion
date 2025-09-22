@@ -1,51 +1,27 @@
 # Finite Volume Method Use
 
 ## Requirements
-1. Download and install Anaconda or download and install any preferred Python software IDE;
-2. Clone/Fork this repository to a folder of your preference;
-3. Open the Main files through the preferred IDE and test the software;
-4. Download and install SketchUp from [SketchUp website](https://www.sketchup.com/plans-and-pricing/sketchup-free) or use the free web-based platform;
-5. Download and install g-mesh from [G-mesh website](https://gmsh.info/);
-6. Install the MeshKit extension of SketchUp from the extension warehouse;
-7. Download and install sounddevice Python library [sounddevise](https://pypi.org/project/sounddevice/)
-8. Download and install soundfile Python library [soundfile](https://pypi.org/project/soundfile/)
+1. Set up acousticDE following the instructions in the installation section. 
+2. Download and install SketchUp from [SketchUp website](https://www.sketchup.com/plans-and-pricing/sketchup-free) or use the free web-based platform;
+3. Download and install g-mesh from [G-mesh website](https://gmsh.info/);
+4. Install the MeshKit extension of SketchUp from the extension warehouse.
 
-## Libraries
-To properly run the software, the following libraries are needed:
-- Python version 3.10.9 or above
+## Usage & files
+To use the software, the following files are to be used:
+- _PrepareInputsFVM.py_: to create the json file with the inputs of the room;
+- _CreateMeshFVM.py_: to create the volumetric mesh using Gmsh software;
+- _FVM.py_: it contains the main function run_fvm_sim to run the full simulation and calculate the acoustics parameters in the room.
 
-Libraries for python:
-- math
-- matplotlib
-- numpy
-- scipy
-- sys
-- drawnow
-- time
-- gmsh
-- sounddevice
-- soundfile
-
-## Python running files
-Currently, in the repository there are a lot of python files. This is because the software is still in development. 
-Currently the updated files for users to run the software are:
-- CreateMeshFVM.py: to create the volumetric mesh using Gmsh software;
-- FVM.py: to run the room (as .msh file) and calculate the acoustics parameters in the room.
-
-## Algorithm
-The software is organised in three sections:
-- Input variables:
-    The inputs regarding the room dimensions, frequencies to consider, source and receiver positions along with others are to be inserted for the specific room in question;
-- Initialization and creation of mesh;
-- Material properties.
-- Calculation loop:
-    The "for loop" would loop over the frequencies and the time to calculate the energy density at each tetrahedron and at each time step.
-- Results and Post-processing
-    Results are included in this section together with graphs for the analysis.
+The main software works with the following associated functions:
++ _FVMfunctions.py_ include all the main functions that are used in the full simualtion;
++ _FunctionRT.py_ calculates the reverberation time of the room in question;
++ _FunctionClarity.py_ calculates the clarity $C_{80}$ of the room in question based on Barron's revised theory formula;
++ _FunctionDefinition.py_ calculates the definition $D_{50}$ of the room in question based on Barron's revised theory formula;
++ _FunctionCentreTime.py_ calculates the centre time $T_s$ of the room in question based on Barron's revised theory formula.
 
 ## Inputs
 
-### Geometry
+### Geometry & Mesh
 The geometry for this method is defined within SketchUp. 
 In order to create a volumetric mesh of the room, the following steps need to be follow in SketchUp:
 1. Create the 3D geometry of the room to simulate in SketchUp, setting the units of the geometry in meters;
@@ -63,37 +39,59 @@ In order to create a volumetric mesh of the room, the following steps need to be
 12. After finishing defining all the boundaries, select the group and click "export to generate mesh" ![export to generate mesh](images/export.png) in MeshKit;
 13. Select Format = "gmsh" en Units = "m" and click "ok";
 14. Keep the default options apart from "pointSizes" which should change to True, click "ok" and save the .geo file with the name of your choice;
-15. The .geo file needs to be saved in the same folder as the "CreateMeshFVM.py" file and the "FVM.py" file.
-16. The gmsh.exe file needs also to be positioned in the same folder.
 
-### Mesh creation
-The volumetric mesh is to be created. The file _CreateMeshFVM.py_ allows to create the volumetric mesh using Gmsh software. The only parameters that need to be set in this file are:
+The .geo file has been created. This needs to be converted into a .msh file, to get the full volumetric mesh.
+Using the <a href="https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/Diffusion/refs/heads/master/Diffusion_Module/FiniteVolumeMethod/CreateMeshFVM.py?raw=true" download="CreateMeshFVM.py">
+  <button>⬇ CreateMeshFVM.py</button>
+</a> script, please input the following variables:
 - the name of the names of the geo file you want to simulate (e.g. _3x3x3.geo_);
 - the name of the mesh file you want this python file to generate (e.g. _3x3x3.msh_); and
 - the length_of_mesh. The mesh length value describes the size of the spatial resolution of the mesh in the space and is vital to discretize correctly the space and achieve precise and converged results. Through various trials, it has been established that a mesh length of 1 meters is generally adequate. However, for computations involving complex geometries or small rooms, a smaller length of mesh (0.5 meters or lower) is recommended. The mesh length choice is contingent upon user preferences for details in parameters values, room dimensions but mostly dependent on the mean free path of the room. Infact, the length of mesh would need to be of the order of one mean free path of the room (equal or smaller than the mean free path of the room).
 
-The method is suitable for any type of geometry. 
+<pre> ```
+name_of_geo_file = '3x3x3.geo'
+name_of_gmsh_file = "3x3x3.msh"
+length_of_mesh = 1
+``` </pre>
 
-### Sound source
-The sound sources for this method are defined within the _FVM.py_ python script. 
+This script create the volumetric mesh using Gmsh software. The method is suitable for any type of geometry.
+
+### General inputs
+The general inputs needs to be set by using the script <a href="https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/Diffusion/refs/heads/master/Diffusion_Module/FiniteVolumeMethod/PrepareInputsFVM.py?raw=true" download="PrepareInputsFVM.py">
+  <button>⬇ PrepareInputsFVM.py</button>
+</a>
+
+[_PrepareInputsFVM.py_](https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/Diffusion/refs/heads/master/Diffusion_Module/FiniteVolumeMethod/PrepareInputsFVM.py?raw=true)
+
+Please download the script and define the following inputs:
+<pre> ```
+input_data = {
+    "coord_source": [1.5, 1.5, 1.5], #source coordinates x,y,z
+    "coord_rec": [2.0, 1.5, 1.5], #rec coordinates x,y,z
+    "fc_low": 125, #lowest frequency
+    "fc_high": 2000, #highest frequency
+    "num_octave": 1, # 1 or 3 depending on how many octave you want
+    "dt": 1/20000, #time discretization
+    "m_atm": 0, #air absorption coefficient [1/m]
+    "th": 3, #int(input("Enter type Absortion conditions (option 1,2,3):")) # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
+    "tcalc": "decay" #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
+}
+
+file_path = os.path.join(script_dir, '3x3x3.msh') # Full path to the file
+``` </pre>
+
+#### Sound source
+The sound sources for this method are defined within the _PrepareInputsFVM.py_ python script. 
 The model allows for the insertion of only one source position per calculation. 
 The sound source is defined as an omnidirectional source. The users can input the sound power of the source $W_s$ in Watts and its position in the room in the following variables *x_{source\}*,*y_\{source\}*,*z_\{source\}* in meters in the x,y,z directions.
 
-### Receiver
-The receivers for this method are defined within the _FVM.py_ python script. 
+#### Receiver
+The receivers for this method are defined within the _PrepareInputsFVM.py_ python script. 
 The model allows for the insertion of only one acoustics receiver position per calculation. These are defined as point omnidirectional receivers. The users will input the position of the receiver in the room in the following variables *x_\{rec\}*,*y_\{rec\}*,*z_\{rec\}* in meters in the x,y,z directions.
 
-### Type of calculation
-The type of calculation for this method is defined within the _FVM.py_ python script. 
-The source is defined as an interrupted noise source. The time within which the source stays on before getting switch off is predefined depending on the theoretical calculated Sabine reverberation time of the room in the variable *sourceon_\{time\}*. There is the option to toggle the sound source on and off or keep it stationary. This can be done by changing the variable "tcalc" from "decay" to "stationarysource".
-
-### Frequency range
-The frequency range for this method is defined within the _FVM.py_ python script. 
-The frequency resolution should be included as inputs variables *fc_\{low\}* and *fc_\{high\}*; these should be the middle frequency of a band. The maximum number of frequencies is set in octave bands and can be choosen by the user. Normally, *fc_\{low\}* is set to 125 Hz and *fc_\{high\}* is set to 2000 Hz.
-
-### Discretization variables
-#### Spatial discretization
-The Finite Volume method works with a spatial volumetric discretization. This is defined in the mesh length variable of the _CreateMeshFVM.py_ file. Appropriate mesh length needs to be chosen depending on the use as described above. 
+#### Frequency range
+The frequency range for this method is defined within the _PrepareInputsFVM.py_ python script. 
+The frequency resolution should be included as inputs variables *fc_\{low\}* and *fc_\{high\}*; these should be the middle frequency of a band. The maximum number of frequencies is set in octave bands and can be choosen by the user. Normally, *fc_\{low\}* is set to 125 Hz and *fc_\{high\}* is set to 2000 Hz. The number of octave need to be also set: 1 for one octave and 3 for third octave bands.
 
 #### Time discretization dt
 The time discretization for this method is defined within the _FVM.py_ python script. 
@@ -106,27 +104,34 @@ where $\Delta v$ is the mesh length chosen.
 The time discretization is defined in seconds. 
 
 ### Air absorption
-The air absorption for this method is defined within the _FVM.py_ python script. 
+The air absorption for this method is defined within the _PrepareInputsFVM.py_ python script. 
 The absorption of air will need to be entered. The air absorption is defined as *m_\{atm\}* and in 1/meters and it is only one value for all the frequency bands.
 
-### Fixed inputs
+#### Absorption Term
+In the diffusion equation model, three different absorption terms conditions can be used. More info about these terms are shown in the software theory documentation of the FVM. The user can choose the preferred one. The options are Option 1 for the Sabine absorption term, Option 2 for Eyring absorption term and Option 3 for the Modified absorption term. These are absorption factors for the boundary conditions. Currently, the most accurate absorption factor is set as the Option 3 Modified as it has been demostrated that this is accurate for low and high absorption coefficients.
+
+#### Type of calculation
+The type of calculation for this method is defined within the _PrepareInputsFVM.py_ python script. 
+The source is defined as an interrupted noise source. The time within which the source stays on before getting switch off is predefined depending on the theoretical calculated Sabine reverberation time of the room in the variable *sourceon_\{time\}*. There is the option to toggle the sound source on and off or keep it stationary. This can be done by changing the variable "tcalc" from "decay" to "stationarysource".
+
+#### Surface materials
+The surface materials names are defined in the SketchUp file as mentioned above. 
+Each surface (including doors, windows etc...) would require frequency dependent absorption coefficients. The file _PrepareInputsFVM.py_ will create a csv file, with a table of the surface name defined in SketchUp and the frequency range chosen. Open the .csv file and input all the absorption coefficients for each frequency and for each material.
+
+
+The file _PrepareInputsFVM.py_ will create a .json file with the general inputs and a .csv file with a table for the absorption coefficients to fill in. 
+
+<!-- ### Fixed inputs
 Within the fixed inputs, there are:
 - Adiabatic speed of sound defined as 343 m/s;
 - Source power defined as 0.01 W (100dB);
-- Absorption conditions term (Option 1 Sabine, Option 2 Eyring, Option 3 Modified). These are absorption factors for the boundary conditions. Currently, the most accurate absorption factor is set as the Option 3 Modified as it has been demostrated that this is accurate for low and high absorption coefficients;
+
 - Reference pressure defined as $2 \cdot (10^{-5})$ Pa;
-- Air density at 20°C defined as 1.21 $kg/m^{-3}$.
+- Air density at 20°C defined as 1.21 $kg/m^{-3}$. -->
 
-### Mesh file
-The mesh file will need to be entered in the main _FVM.py_ file in the variable "file_name". This will give the input for the calculation to run a specific room (as a .msh file).
-
-### Surface materials
-The surface materials names are defined in the SketchUp file as mentioned above. 
-Each surface (including doors, windows etc...) would require frequency dependent absorption coefficients. During the calculation (quite soon after pressing "Run"), the python script will prompt you with a question regarding the absorption coefficients of the surface of the room. It is important to include the absorption coefficient per each frequency set up previously separated by commas as per this example:
-"`Enter absorption coefficient for frequency {fc_low} to {fc_high} for carpet:`0.15,0.17,0.20,0.25,0.25".
 
 ## Acoustics Calculation
-The acoustic calculation is based on the Finite Volume method (FVM) solving the diffusion equation (Munoz, 2019). More information regarding the Finite Volume Method in the paragraph below.
+Once all the inputs have been set, the main calculation can be run using the function run_fvm_sim as described in the API references. To run, this function, a .msh file, a .json file and a .csv file paths are needed. The acoustic calculation is based on the Finite Volume method (FVM) solving the diffusion equation (Munoz, 2019). More information regarding the Finite Volume Method in the paragraph below.
 
 ### Acoustics parameters
 The diffusion equation method predicts the time-dependent and spatial-dependent propagation of the sound energy density $w(\mathbf{r}, t)$ in the evaluated frequency bands.

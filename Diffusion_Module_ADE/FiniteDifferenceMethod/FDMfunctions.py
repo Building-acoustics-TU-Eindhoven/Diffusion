@@ -949,6 +949,9 @@ def comput_energy_density(nBands, c0, m_atm, Nx, Ny, Nz, recording_steps, x, y, 
             if (percentDone > curPercent):
                 print(str(curPercent + 1) + "% done")
                 curPercent += 1;
+                
+            import warnings
+            warnings.filterwarnings("ignore")
         
                     
         w_rec_x_t0 = ((w_t0[:, col_lr_r, dep_lr_r]*(weight_row_lr_r * weight_col_lr_r * weight_dep_lr_r))+\

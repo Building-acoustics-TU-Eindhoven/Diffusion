@@ -216,3 +216,5 @@ def run_fvm_sim(mesh_file_path, inputs_path, abs_coeff_path):
     print("Simulation finished successfully! Results in resultsFVM.pkl file")
     
     return results
+
+script_dir = os.path.dirname(os.path.abspath(__file__))

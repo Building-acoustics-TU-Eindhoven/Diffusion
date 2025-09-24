@@ -1432,6 +1432,9 @@ def computing_energy_density(nBands, voluEl, recording_steps, beta_zero_freq, dt
         w_rec_off_band.append(w_rec_off)
         w_rec_off_deriv_band.append(w_rec_off_deriv)
         p_rec_off_deriv_band.append(p_rec_off_deriv)
+        
+        import warnings
+        warnings.filterwarnings("ignore")
     
     return w_new_band, w_rec_band, w_rec_off_band, w_rec_off_deriv_band, p_rec_off_deriv_band, idx_w_rec, t_off
 
@@ -1600,7 +1603,7 @@ def save_fvm(filename,variables):
         filename : str
             Name of the file to save the results
         variables : dict
-            Compilation of all the variables of the overal simulation
+            Compilation of all the variables of the overall simulation
     """
     with open(filename, 'wb') as f:
         # Filter out modules, functions, and other unsupported types

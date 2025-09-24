@@ -145,10 +145,53 @@ def run_fdm_sim(inputs_path):
     et = time.time() #end time
     elapsed_time = et - st
     
-    results = locals()
+    #results = locals()
+    
+    results = {"length" : length,
+               "width" : width,
+               "height" : height,
+               "coord_source" : coord_source,
+               "coord_rec" : coord_rec,
+               "alpha_1" : alpha_1,
+               "alpha_2" : alpha_2,
+               "alpha_3" : alpha_3,
+               "alpha_4" : alpha_4,
+               "alpha_5" : alpha_5,
+               "alpha_6" : alpha_6,
+               "fc_low" : fc_low,
+               "fc_high" : fc_high,
+               "num_octave" : num_octave,
+               "dx" : dx,
+               "dy" : dy,
+               "dz" : dz,
+               "dt" : dt,
+               "m_atm" : m_atm,
+               "th" : th,
+               "tcalc" : tcalc,
+               "center_freq" : center_freq,
+               "t": t,
+               "w_new_band" : w_new_band, 
+               "w_t0_band" : w_t0_band,
+               "w_rec_band" : w_rec_band, 
+               "w_rec_off_band" : w_rec_off_band, 
+               "w_rec_x_t0_band" : w_rec_x_t0_band,
+               "idx_w_rec" : idx_w_rec,                      
+               "spl_r_band" : spl_r_band, 
+               "spl_r_off_band" : spl_r_off_band, 
+               "spl_r_norm_band" : spl_r_norm_band, 
+               "sch_db_band" : sch_db_band, 
+               "spl_t0_band" : spl_t0_band, 
+               "spl_new_band" : spl_new_band, 
+               "spl_rec_x_t0_band" : spl_rec_x_t0_band,
+               "t30_band" : t30_band, 
+               "edt_band" : edt_band, 
+               "c80_band" : c80_band, 
+               "d50_band" : d50_band, 
+               "ts_band" : ts_band,
+               }
     
     #Calling function %save%
-    save_fdm('resultsFDM.pkl')
+    save_fdm('resultsFDM.pkl',results)
     
     print("Simulation finished successfully! Results in resultsFDM.pkl file")
     

@@ -17,7 +17,7 @@ The main software works with the following associated functions:
 
 ## Inputs
 
-The general inputs needs to be set by using the script <a href="https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/Diffusion/refs/heads/master/acousticDE/FiniteDifferenceMethod/PrepareInputsFDM.py" download>â¬‡ Download PrepareInputsFDM.py</a>.
+The general inputs needs to be set by using the script <a href="https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/acousticDE/refs/heads/master/acousticDE/FiniteDifferenceMethod/PrepareInputsFDM.py" download>â¬‡ Download PrepareInputsFDM.py</a>.
 
 Please download the script and define the following inputs:
 ```

@@ -3,7 +3,7 @@
 ## Requirements
 1. Set up acousticDE following the instructions in the installation section. 
 2. Download and install SketchUp from [SketchUp website](https://www.sketchup.com/plans-and-pricing/sketchup-free) or use the free web-based platform;
-3. Download and install g-mesh from [G-mesh website](https://gmsh.info/);
+3. Download and install g-mesh from [G-msh website](https://gmsh.info/);
 4. Install the MeshKit extension of SketchUp from the extension warehouse.
 
 ## Usage & files
@@ -41,7 +41,7 @@ In order to create a volumetric mesh of the room, the following steps need to be
 14. Keep the default options apart from "pointSizes" which should change to True, click "ok" and save the .geo file with the name of your choice;
 
 The .geo file has been created. This needs to be converted into a .msh file, to get the full volumetric mesh.
-Using the <a href="https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/Diffusion/refs/heads/master/acousticDE/FiniteVolumeMethod/CreateMeshFVM.py" download>â¬‡ Download CreateMeshFVM.py</a> script, please input the following variables:
+Using the <a href="https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/acousticDE/refs/heads/master/acousticDE/FiniteVolumeMethod/CreateMeshFVM.py" download>â¬‡ Download CreateMeshFVM.py</a> script, please input the following variables:
 - the name of the names of the geo file you want to simulate (e.g. _3x3x3.geo_);
 - the name of the mesh file you want this python file to generate (e.g. _3x3x3.msh_); and
 - the length_of_mesh. The mesh length value describes the size of the spatial resolution of the mesh in the space and is vital to discretize correctly the space and achieve precise and converged results. Through various trials, it has been established that a mesh length of 1 meters is generally adequate. However, for computations involving complex geometries or small rooms, a smaller length of mesh (0.5 meters or lower) is recommended. The mesh length choice is contingent upon user preferences for details in parameters values, room dimensions but mostly dependent on the mean free path of the room. Infact, the length of mesh would need to be of the order of one mean free path of the room (equal or smaller than the mean free path of the room).
@@ -55,7 +55,7 @@ length_of_mesh = 1
 This script create the volumetric mesh using Gmsh software. The method is suitable for any type of geometry.
 
 ### General inputs
-The general inputs needs to be set by using the script <a href="https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/Diffusion/refs/heads/master/acousticDE/FiniteVolumeMethod/PrepareInputsFVM.py" download>â¬‡ Download PrepareInputsFVM.py</a>
+The general inputs needs to be set by using the script <a href="https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/acousticDE/refs/heads/master/acousticDE/FiniteVolumeMethod/PrepareInputsFVM.py" download>â¬‡ Download PrepareInputsFVM.py</a>
 <!-- 
 [_PrepareInputsFVM.py_](https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/Diffusion/refs/heads/master/acousticDE/FiniteVolumeMethod/PrepareInputsFVM.py?raw=true) -->
 

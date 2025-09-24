@@ -17,10 +17,10 @@ Use pip to install acousticDE
 pip install acousticDE
 ```
 
-To run the codes/functions, check the [documentation](https://building-acoustics-tu-eindhoven.github.io/Diffusion/) below depending on the method you want to use and check the Tutorial sections of the documentation.
+To run the codes/functions, check the [documentation](https://building-acoustics-tu-eindhoven.github.io/acousticDE/) below depending on the method you want to use and check the Tutorial sections of the documentation.
 
 ## Usage & Documentation
-The [documentation](https://building-acoustics-tu-eindhoven.github.io/Diffusion/) is created to help to use and develop acousticDE effectively. To use acousticDE, please refer to the Tutorial section of the [documentation](https://building-acoustics-tu-eindhoven.github.io/Diffusion/). In addition, the documentation gives an introduction of the package for both FDM and FVM.
+The [documentation](https://building-acoustics-tu-eindhoven.github.io/acousticDE/) is created to help to use and develop acousticDE effectively. To use acousticDE, please refer to the Tutorial section of the [documentation](https://building-acoustics-tu-eindhoven.github.io/acousticDE/). In addition, the documentation gives an introduction of the package for both FDM and FVM.
 
 ## Authors
 Software is being developed by Ilaria Fichera at Eindhoven University of Technology (TU/e). 

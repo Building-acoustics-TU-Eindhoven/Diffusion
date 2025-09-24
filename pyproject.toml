@@ -1,6 +1,6 @@
 [project]
 name = "acousticDE"
-version = "0.1.4"
+version = "0.1.0"
 description = "Acoustics Simulation using the Diffusion Equation"
 readme = "README.md"
 license = {file = "LICENSE.md" }

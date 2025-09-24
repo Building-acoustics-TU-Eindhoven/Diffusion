@@ -1,0 +1,407 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auralization functions &mdash; Diffusion Equation for Acoustics 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Finite Different Method Demo Tutorial" href="../Finite%20Different%20Method%20Demo%20Tutorial.html" />
+    <link rel="prev" title="Reverberation functions" href="ReverberationFunctions.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Diffusion Equation for Acoustics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Software Presentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Overview.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Use:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Finite%20Different%20Method%20Use.html">Finite Different Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Finite%20Volume%20Method%20Use.html">Finite Volume Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Auralization%20Use.html">Auralization Use</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Theory:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../DocumentationFDM.html">Diffusion Equation Finite Different Method (FDM) documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DocumentationFVM.html">Diffusion Equation Finite Volume Method (FVM) Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DocumentationAuralization.html">Auralization Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="FDMfunctions.html">FDM functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FVMfunctions.html">FVM functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ReverberationFunctions.html">Reverberation functions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Auralization functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-acousticDE.Auralization.Auralization">Main function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.Auralization.Auralization.run_auralization"><code class="docutils literal notranslate"><span class="pre">run_auralization()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-acousticDE.Auralization.Auralizationfunctions">Internal functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.Auralization.Auralizationfunctions.butter_filter"><code class="docutils literal notranslate"><span class="pre">butter_filter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.Auralization.Auralizationfunctions.convolution_fun"><code class="docutils literal notranslate"><span class="pre">convolution_fun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.Auralization.Auralizationfunctions.create_noise"><code class="docutils literal notranslate"><span class="pre">create_noise()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.Auralization.Auralizationfunctions.extract_anechoic"><code class="docutils literal notranslate"><span class="pre">extract_anechoic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.Auralization.Auralizationfunctions.filtered_envelope"><code class="docutils literal notranslate"><span class="pre">filtered_envelope()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.Auralization.Auralizationfunctions.filtered_noise"><code class="docutils literal notranslate"><span class="pre">filtered_noise()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.Auralization.Auralizationfunctions.generate_imp_resp"><code class="docutils literal notranslate"><span class="pre">generate_imp_resp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.Auralization.Auralizationfunctions.load"><code class="docutils literal notranslate"><span class="pre">load()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.Auralization.Auralizationfunctions.resample_pressure"><code class="docutils literal notranslate"><span class="pre">resample_pressure()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.Auralization.Auralizationfunctions.square_root_fun"><code class="docutils literal notranslate"><span class="pre">square_root_fun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.Auralization.Auralizationfunctions.unfiltered_envelope"><code class="docutils literal notranslate"><span class="pre">unfiltered_envelope()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Finite%20Different%20Method%20Demo%20Tutorial.html">Finite Different Method Demo Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Finite%20Volume%20Method%20Demo%20Tutorial.html">Finite Volume Method Demo Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Diffusion Equation for Acoustics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Auralization functions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/acousticDE/Auralizationfunctions.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="auralization-functions">
+<h1>Auralization functions<a class="headerlink" href="#auralization-functions" title="Link to this heading"></a></h1>
+<section id="module-acousticDE.Auralization.Auralization">
+<span id="main-function"></span><h2>Main function<a class="headerlink" href="#module-acousticDE.Auralization.Auralization" title="Link to this heading"></a></h2>
+<p>Created on Thu Feb 22 14:33:58 2024</p>
+<p>&#64;author: Ilaria Fichera</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.Auralization.Auralization.run_auralization">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.Auralization.Auralization.</span></span><span class="sig-name descname"><span class="pre">run_auralization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">anechoic_signal_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resultsFVM_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/Auralization/Auralization.html#run_auralization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.Auralization.Auralization.run_auralization" title="Link to this definition"></a></dt>
+<dd><p>Function for running the full auralization calculation. It will use all the functions defined in Auralizationfunctions.py file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>anechoic_signal_path</strong> (<em>str</em>) – String of the wav file of the anechoic sound</p></li>
+<li><p><strong>resultsFVM_path</strong> (<em>str</em>) – String of the results from the FVM simulation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>results</strong> – Dictionary of all the variable calculated including auralization and impulse response wav files.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-acousticDE.Auralization.Auralizationfunctions">
+<span id="internal-functions"></span><h2>Internal functions<a class="headerlink" href="#module-acousticDE.Auralization.Auralizationfunctions" title="Link to this heading"></a></h2>
+<p>Created on Thu Feb 22 14:33:58 2024</p>
+<p>&#64;author: Ilaria Fichera</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.Auralization.Auralizationfunctions.butter_filter">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.Auralization.Auralizationfunctions.</span></span><span class="sig-name descname"><span class="pre">butter_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_freq</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/Auralization/Auralizationfunctions.html#butter_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.Auralization.Auralizationfunctions.butter_filter" title="Link to this definition"></a></dt>
+<dd><p>Creation of Butterworth bandpass filter</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fs</strong> (<em>float</em>) – Sample frequency of the anechoic signal</p></li>
+<li><p><strong>center_freq</strong> (<em>array</em><em> of </em><em>int</em>) – Array of all the frequencies to calculate.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>filter_tot</strong> – Filter coefficient per each frequency</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of arrays</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.Auralization.Auralizationfunctions.convolution_fun">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.Auralization.Auralizationfunctions.</span></span><span class="sig-name descname"><span class="pre">convolution_fun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_signal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imp_tot</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/Auralization/Auralizationfunctions.html#convolution_fun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.Auralization.Auralizationfunctions.convolution_fun" title="Link to this definition"></a></dt>
+<dd><p>Convolution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_signal</strong> (<em>array</em><em> of </em><em>floats</em>) – Signal data of the anechoic file</p></li>
+<li><p><strong>fs</strong> (<em>float</em>) – Sample frequency of the anechoic signal</p></li>
+<li><p><strong>imp_tot</strong> (<em>array</em><em> of </em><em>floats</em>) – Total impulse response in the time domain</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>st</strong> (<em>array of floats</em>) – Time vector of the speech signal</p></li>
+<li><p><strong>ht</strong> (<em>array of floats</em>) – Time vector of the room impulse response</p></li>
+<li><p><strong>sh_conv</strong> (<em>array of floats</em>) – Convolution of the impulse response with the anechoic signal</p></li>
+<li><p><strong>t_conv</strong> (<em>array of floats</em>) – Time vector of the convolved signal</p></li>
+<li><p><strong>sh_conv_normalized</strong> (<em>array of floats</em>) – Convolution of the impulse response with the anechoic signal normalised to its maximum values</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.Auralization.Auralizationfunctions.create_noise">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.Auralization.Auralizationfunctions.</span></span><span class="sig-name descname"><span class="pre">create_noise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_rec_off_deriv_band_resampled</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/Auralization/Auralizationfunctions.html#create_noise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.Auralization.Auralizationfunctions.create_noise" title="Link to this definition"></a></dt>
+<dd><p>Creation of random noise</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>p_rec_off_deriv_band_resampled</strong> (<em>list</em><em> of </em><em>arrays</em>) – Pressure over time after the source is switched off per each frequency resampled</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>noise</strong> – Random noise vector with unifrom distribution over time</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array of float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.Auralization.Auralizationfunctions.extract_anechoic">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.Auralization.Auralizationfunctions.</span></span><span class="sig-name descname"><span class="pre">extract_anechoic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">anechoic_signal</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/Auralization/Auralizationfunctions.html#extract_anechoic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.Auralization.Auralizationfunctions.extract_anechoic" title="Link to this definition"></a></dt>
+<dd><p>Extracting information form the anechoic signal</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>anechoic_signal</strong> (<em>wav</em>) – wav file of the anechoic sound</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>data_signal</strong> (<em>array of floats</em>) – Signal data of the anechoic file</p></li>
+<li><p><strong>fs</strong> (<em>float</em>) – Sample frequency of the anechoic signal</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.Auralization.Auralizationfunctions.filtered_envelope">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.Auralization.Auralizationfunctions.</span></span><span class="sig-name descname"><span class="pre">filtered_envelope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filt_noise_band</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_rec_off_deriv_band_resampled</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">square_root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_off_resampled</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nBands</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/Auralization/Auralizationfunctions.html#filtered_envelope"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.Auralization.Auralizationfunctions.filtered_envelope" title="Link to this definition"></a></dt>
+<dd><p>Calculation of filtered envelope</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filt_noise_band</strong> (<em>array</em><em> of </em><em>floats</em>) – Results of the time domain convolution of the noise with the filter per each frequency</p></li>
+<li><p><strong>p_rec_off_deriv_band_resampled</strong> (<em>list</em><em> of </em><em>arrays</em>) – Pressure over time after the source is switched off per each frequency resampled</p></li>
+<li><p><strong>square_root</strong> (<em>list</em><em> of </em><em>arrays</em>) – Square rooted pressure over time after the source is switched off per each frequency resampled</p></li>
+<li><p><strong>t_off_resampled</strong> (<em>array</em><em> of </em><em>float</em>) – Time array after the source is switched off resampled</p></li>
+<li><p><strong>nBands</strong> (<em>int</em>) – Number of frequency bands.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>imp_filt_band</strong> (<em>list of arrays</em>) – Multiplication of the envelope with filtered random noise</p></li>
+<li><p><em>t_off_padded</em> – Time array after the source is switched off padded to the legnth of the filt_noise_band</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.Auralization.Auralizationfunctions.filtered_noise">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.Auralization.Auralizationfunctions.</span></span><span class="sig-name descname"><span class="pre">filtered_noise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">noise</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_tot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/Auralization/Auralizationfunctions.html#filtered_noise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.Auralization.Auralizationfunctions.filtered_noise" title="Link to this definition"></a></dt>
+<dd><p>Calculation of filtered noise</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>noise</strong> (<em>array</em><em> of </em><em>float</em>) – Random noise vector with unifrom distribution over time</p></li>
+<li><p><strong>filter_tot</strong> (<em>list</em><em> of </em><em>arrays</em>) – Filter coefficient per each frequency</p></li>
+<li><p><strong>fs</strong> (<em>float</em>) – Sample frequency of the anechoic signal</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>filt_noise_band</strong> (<em>array of floats</em>) – Results of the time domain convolution of the noise with the filter per each frequency</p></li>
+<li><p><strong>filt_noise_band_freq</strong> (<em>array of complex</em>) – Frequency response of the filtered random noise</p></li>
+<li><p><strong>fv</strong> (<em>array of float</em>) – Frequency vector</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.Auralization.Auralizationfunctions.generate_imp_resp">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.Auralization.Auralizationfunctions.</span></span><span class="sig-name descname"><span class="pre">generate_imp_resp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imp_filt_band</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/Auralization/Auralizationfunctions.html#generate_imp_resp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.Auralization.Auralizationfunctions.generate_imp_resp" title="Link to this definition"></a></dt>
+<dd><p>Generation of impulse response</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>imp_filt_band</strong> (<em>list</em><em> of </em><em>arrays</em>) – Multiplication of the envelope with filtered random noise</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>imp_tot</strong> (<em>array of floats</em>) – Total impulse response in the time domain</p></li>
+<li><p><strong>freq_spectrum</strong> (<em>array of floats</em>) – Total impulse response in the frequency domain</p></li>
+<li><p><strong>imp_resp_norm</strong> (<em>array of int</em>) – Total impulse response in the time domain normalised to its maximum value</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.Auralization.Auralizationfunctions.load">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.Auralization.Auralizationfunctions.</span></span><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/Auralization/Auralizationfunctions.html#load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.Auralization.Auralizationfunctions.load" title="Link to this definition"></a></dt>
+<dd><p>Loading variables</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>) – Name of the file to load the variables from</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>variables</strong> – Variables from the FVM results</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.Auralization.Auralizationfunctions.resample_pressure">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.Auralization.Auralizationfunctions.</span></span><span class="sig-name descname"><span class="pre">resample_pressure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_rec_off_deriv_band</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fs_sim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_off_sim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/Auralization/Auralizationfunctions.html#resample_pressure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.Auralization.Auralizationfunctions.resample_pressure" title="Link to this definition"></a></dt>
+<dd><p>Resampling the pressure over time to the dimension of the anechoic signal</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p_rec_off_deriv_band</strong> (<em>list</em><em> of </em><em>arrays</em>) – Pressure over time after the source is switched off per each frequency</p></li>
+<li><p><strong>fs</strong> (<em>float</em>) – Sample frequency of the anechoic signal</p></li>
+<li><p><strong>fs_sim</strong> (<em>float</em>) – Sample frequency of the FVM simulation</p></li>
+<li><p><strong>t_off_sim</strong> (<em>array</em><em> of </em><em>float</em>) – Time array after the source is switched off</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>p_rec_off_deriv_band_resampled</strong> (<em>list of arrays</em>) – Pressure over time after the source is switched off per each frequency resampled</p></li>
+<li><p><strong>t_off_resampled</strong> (<em>array of float</em>) – Time array after the source is switched off resampled</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.Auralization.Auralizationfunctions.square_root_fun">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.Auralization.Auralizationfunctions.</span></span><span class="sig-name descname"><span class="pre">square_root_fun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_rec_off_deriv_band_resampled</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/Auralization/Auralizationfunctions.html#square_root_fun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.Auralization.Auralizationfunctions.square_root_fun" title="Link to this definition"></a></dt>
+<dd><p>Resampling the pressure over time to the dimension of the anechoic signal</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>p_rec_off_deriv_band_resampled</strong> (<em>list</em><em> of </em><em>arrays</em>) – Pressure over time after the source is switched off per each frequency resampled</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>square_root</strong> – Square rooted pressure over time after the source is switched off per each frequency resampled</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of arrays</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.Auralization.Auralizationfunctions.unfiltered_envelope">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.Auralization.Auralizationfunctions.</span></span><span class="sig-name descname"><span class="pre">unfiltered_envelope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nBands</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">square_root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/Auralization/Auralizationfunctions.html#unfiltered_envelope"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.Auralization.Auralizationfunctions.unfiltered_envelope" title="Link to this definition"></a></dt>
+<dd><p>Calculation of unfiltered envelope</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nBands</strong> (<em>int</em>) – Number of frequency bands.</p></li>
+<li><p><strong>square_root</strong> (<em>list</em><em> of </em><em>arrays</em>) – Square rooted pressure over time after the source is switched off per each frequency resampled</p></li>
+<li><p><strong>noise</strong> (<em>array</em><em> of </em><em>float</em>) – Random noise vector with unifrom distribution over time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>imp_unfilt_band</strong> – Multiplication of the envelope with random noise (and not filter)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of arrays</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ReverberationFunctions.html" class="btn btn-neutral float-left" title="Reverberation functions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../Finite%20Different%20Method%20Demo%20Tutorial.html" class="btn btn-neutral float-right" title="Finite Different Method Demo Tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Ilaria Fichera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

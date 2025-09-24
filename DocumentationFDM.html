@@ -1,0 +1,244 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diffusion Equation Finite Different Method (FDM) documentation &mdash; Diffusion Equation for Acoustics 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=2709fde1"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Diffusion Equation Finite Volume Method (FVM) Documentation" href="DocumentationFVM.html" />
+    <link rel="prev" title="Auralization Use" href="Auralization%20Use.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Diffusion Equation for Acoustics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Software Presentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Overview.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Use:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Different%20Method%20Use.html">Finite Different Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Volume%20Method%20Use.html">Finite Volume Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Auralization%20Use.html">Auralization Use</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Theory:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Diffusion Equation Finite Different Method (FDM) documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#theory-of-diffusion-equation-model">Theory of Diffusion Equation model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#finite-different-scheme">Finite Different Scheme</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#diffusion-equation">Diffusion Equation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#boundary-conditions">Boundary Conditions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="DocumentationFVM.html">Diffusion Equation Finite Volume Method (FVM) Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DocumentationAuralization.html">Auralization Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="acousticDE/FDMfunctions.html">FDM functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acousticDE/FVMfunctions.html">FVM functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acousticDE/ReverberationFunctions.html">Reverberation functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acousticDE/Auralizationfunctions.html">Auralization functions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Different%20Method%20Demo%20Tutorial.html">Finite Different Method Demo Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Volume%20Method%20Demo%20Tutorial.html">Finite Volume Method Demo Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Diffusion Equation for Acoustics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Diffusion Equation Finite Different Method (FDM) documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/DocumentationFDM.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="diffusion-equation-finite-different-method-fdm-documentation">
+<h1>Diffusion Equation Finite Different Method (FDM) documentation<a class="headerlink" href="#diffusion-equation-finite-different-method-fdm-documentation" title="Link to this heading"></a></h1>
+<p>The software is based on the Du Fort and Frankel method (explicit unconditionally stable Finite difference method) solving the diffusion equation (Navarro et al., 2012).</p>
+<section id="theory-of-diffusion-equation-model">
+<h2>Theory of Diffusion Equation model<a class="headerlink" href="#theory-of-diffusion-equation-model" title="Link to this heading"></a></h2>
+<p>The model for the sound energy density <span class="math notranslate nohighlight">\(w(\mathbf{r}, t)\)</span> at position <span class="math notranslate nohighlight">\(\mathbf{r} = [x,y,z]\)</span> and at time <span class="math notranslate nohighlight">\(t\)</span> on a domain <span class="math notranslate nohighlight">\(V\)</span> is based on the following partial differential equation:</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial w(\mathbf{r}, t)}{\partial t}
+- D \left( \frac{\partial^2 w(\mathbf{r}, t)}{\partial x^2}
++ \frac{\partial^2 w(\mathbf{r}, t)}{\partial y^2}
++ \frac{\partial^2 w(\mathbf{r}, t)}{\partial z^2} \right)
++ c m w(\mathbf{r}, t) = P(t)\delta(\mathbf{r} - \mathbf{r}_s)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\frac{\partial^2}{\partial x^2}\)</span>, <span class="math notranslate nohighlight">\(\frac{\partial^2}{\partial y^2}\)</span>, <span class="math notranslate nohighlight">\(\frac{\partial^2}{\partial z^2}\)</span> are the Laplace operators and <span class="math notranslate nohighlight">\(D = \frac{\lambda c}{3}\)</span> is the so-called theoretical diffusion coefficient with <span class="math notranslate nohighlight">\(c\)</span> being the speed of sound. The diffusion coefficient is a constant value that takes into account the room geometry and volume trough the mean free path defined for proportionate rooms as <span class="math notranslate nohighlight">\(\lambda = \frac{4 V}{S}\)</span> with volume <span class="math notranslate nohighlight">\(V\)</span> of the room and <span class="math notranslate nohighlight">\(S\)</span> the total surface area. The term <span class="math notranslate nohighlight">\(P(t)\)</span> indicates a sound source term at position <span class="math notranslate nohighlight">\(r_s\)</span>. The term <span class="math notranslate nohighlight">\(c m w(\mathbf{r}, t)\)</span> accounts for the atmospheric attenuation within the room, where <span class="math notranslate nohighlight">\(m\)</span> is the absorption coefficient of air (Billon et al., 2008).</p>
+<p>The main partial differential equation is associated with mixed boundary conditions on a domain <span class="math notranslate nohighlight">\(\partial V\)</span>, as follows:</p>
+<div class="math notranslate nohighlight">
+\[-D \frac{\partial w(\mathbf{r}, t)} {\partial n} = A_{r}(\mathbf{r},\alpha ) c w(\mathbf{r}, t) \text{ on } \partial V\]</div>
+<p>This models the effect of the absorption at the surfaces in the sound field.
+The term <span class="math notranslate nohighlight">\(n\)</span> indicates the vector normal to the surface and the term <span class="math notranslate nohighlight">\(A_{r}\)</span> is dependent on the absorption coefficient <span class="math notranslate nohighlight">\(\alpha\)</span>. Depending on the scope and on the absorption coefficient to use, the absorption term <span class="math notranslate nohighlight">\(A_{r}\)</span> is defined differently. There are three different absorption factors <span class="math notranslate nohighlight">\(A_{r}\)</span>: the Sabine (Picaut at al., 1999; Valeau at al., 2006), the Eyring (Jing et al., 2007; Billon et al., 2008) and the modified by Xiang (Jing et al., 2008).</p>
+</section>
+<section id="finite-different-scheme">
+<h2>Finite Different Scheme<a class="headerlink" href="#finite-different-scheme" title="Link to this heading"></a></h2>
+<section id="diffusion-equation">
+<h3>Diffusion Equation<a class="headerlink" href="#diffusion-equation" title="Link to this heading"></a></h3>
+<p>The software is implemented using the explicit unconditionally stable numerical Finite Different Method called Du Fort and Frankel to solve the diffusion equation (Navarro et al., 2012).
+The Dufort and Frankel method is an expansion of the Forward-Time-Centere-space (FTCS) method with a truncation order of <span class="math notranslate nohighlight">\(O[\Delta t^2] + O[\Delta v^2] + O[\Delta t^2 x \Delta v^2]\)</span>. It is an explicit and unconditionally stable method with <span class="math notranslate nohighlight">\(\Delta t\)</span> as time step discretization and <span class="math notranslate nohighlight">\(\Delta v=\Delta x=\Delta y=\Delta z\)</span> as spatial discretization. The <span class="math notranslate nohighlight">\(\Delta v\)</span> and <span class="math notranslate nohighlight">\(\Delta t\)</span> are to define depending on the room in order for the results to converge to the exact one (Navarro et al. 2012). Generally a <span class="math notranslate nohighlight">\(\Delta v &lt; 0.5\)</span> and <span class="math notranslate nohighlight">\( \Delta t &gt; 1/32000\)</span> is sufficient, but it depends on the dimensions of the room and the precision to obtain. The smaller the two values the more accurate the calculation will be however, with an increase in computational time.</p>
+<p>According to the Dufort and Frankel method, the discretization is based on the following:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(i\)</span> is the spatial element along <span class="math notranslate nohighlight">\(x\)</span> direction;</p></li>
+<li><p><span class="math notranslate nohighlight">\(j\)</span> is the spatial element along <span class="math notranslate nohighlight">\(y\)</span> direction;</p></li>
+<li><p><span class="math notranslate nohighlight">\(k\)</span> is the spatial element along <span class="math notranslate nohighlight">\(z\)</span> direction;</p></li>
+<li><p><span class="math notranslate nohighlight">\(n\)</span> is the temporal element.</p></li>
+</ul>
+<p>with the following surface definition:</p>
+<p><img alt="Grid 1D" src="_images/Surfaces.png" /></p>
+<p>The full discretised partial differential equation is:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}w_{i,j,k}^{n+1} = \frac{1}{1+ \beta_{0}} \Big( 
+(w_{i,j,k}^{n-1} (1- \beta_{0}) - 2\Delta t \, c_{l} \, w_{i,j,k}^{n} - 2 \Delta t \, P_{i_s,j_s,k_s}^{n}) \\
++ \beta_{0x}(w_{i+1,j,k}^{n} + w_{i-1,j,k}^{n}) 
++ \beta_{0y}(w_{i,j+1,k}^{n} + w_{i,j-1,k}^{n}) 
++ \beta_{0z}(w_{i,j,k+1}^{n} + w_{i,j,k-1}^{n}) 
+\Big)\end{split}\]</div>
+<p>Where:</p>
+<div class="math notranslate nohighlight">
+\[\beta_{0{x}}=\beta_{0{y}}=\beta_{0{z}}= \frac{2 D \Delta t}{\Delta x^2} \]</div>
+<p>And</p>
+<div class="math notranslate nohighlight">
+\[\beta_{0}=\beta_{0{x}}+\beta_{0{y}}+\beta_{0{z}} \]</div>
+<p>Each term of the equation is discretized as follows:</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial w(\mathbf{r}, t)}{\partial t} =&gt; w_{i,j,k}^{n} = \frac{w_{i,j,k}^{n+1} - w_{i,j,k}^{n-1}}{2 \Delta t}\]</div>
+<div class="math notranslate nohighlight">
+\[\frac{\partial ^2 w(\mathbf{r}, t)} {\partial x^2} =&gt; w_{i,j,k}^n = \frac{w_{i+1,j,k}^n - 2(\frac{w_{i,j,k}^{n+1}+w_{i,j,k}^{n-1}}{2}+w_{i-1,j,k}^n)}{\Delta x^2}\]</div>
+<div class="math notranslate nohighlight">
+\[\frac{\partial ^2 w(\mathbf{r}, t)} {\partial y^2} =&gt; w_{i,j,k}^n = \frac{w_{i,j+1,k}^n - 2(\frac{w_{i,j,k}^{n+1}+w_{i,j,k}^{n-1}}{2}+w_{i,j-1,k}^n)}{\Delta y^2}\]</div>
+<div class="math notranslate nohighlight">
+\[\frac{\partial ^2 w(\mathbf{r}, t)} {\partial z^2} =&gt; w_{i,j,k}^n = \frac{w_{i,j,k+1}^n - 2(\frac{w_{i,j,k}^{n+1}+w_{i,j,k}^{n-1}}{2}+w_{i,j,k-1}^n)}{\Delta z^2}\]</div>
+<div class="math notranslate nohighlight">
+\[c m w(\mathbf{r}, t) =&gt; c m w_{i,j,k}^n\]</div>
+<div class="math notranslate nohighlight">
+\[P(t) \delta (r-r_s ) =&gt; P_{i_{s},j_{s},k_{s}}^n\]</div>
+<p>This is a soft source term at position <span class="math notranslate nohighlight">\(i_{s},j_{s},k_{s}\)</span> and at the time step of <span class="math notranslate nohighlight">\(n\)</span>.
+According to Navarro et al. 2012, the source term function is: <span class="math notranslate nohighlight">\(w_{i_s,j_s,k_s}^{n+1}= w_{i_s,j_s,k_s}^{n+1}+2 \Delta t P_{i_s,j_s,k_s}^n\)</span></p>
+<p>The stability criterion is the following (Navarro et al., 2012):</p>
+<div class="math notranslate nohighlight">
+\[\frac{\beta_0^{2} - 1}{1+\beta_0^2+2 \beta_0} \leq 1\]</div>
+<p>Where <span class="math notranslate nohighlight">\(\beta_{0}\)</span> is a term of constants in the discretization of the diffusion equation defined above.</p>
+</section>
+<section id="boundary-conditions">
+<h3>Boundary Conditions<a class="headerlink" href="#boundary-conditions" title="Link to this heading"></a></h3>
+<p>Additional equations are needed to describe the sound field at the boundaries. The discretized equations are based on the forward and backward three points formula (Necati et al., 2017).
+Only the one directional formulas have been included as examples.</p>
+<ol class="arabic simple">
+<li><p>Forward Difference Approximation (first derivative - three points formula) for <span class="math notranslate nohighlight">\(x=0\)</span>, any <span class="math notranslate nohighlight">\(j\)</span> and any <span class="math notranslate nohighlight">\(k\)</span>.</p></li>
+</ol>
+<div class="math notranslate nohighlight">
+\[\frac{\partial w(\mathbf{r}, t)}{\partial n} =&gt; w_{0,j,k}^{n+1} = \frac{-3 w_{0}^{n+1}+4w_{1}^{n+1}- w_{2}^{n+1}}{2 \Delta x}\]</div>
+<ol class="arabic simple" start="2">
+<li><p>Backward Difference Approximation (first derivative - three points formula) for <span class="math notranslate nohighlight">\(x=L_{x}\)</span>, any <span class="math notranslate nohighlight">\(j\)</span> and any <span class="math notranslate nohighlight">\(k\)</span>.</p></li>
+</ol>
+<div class="math notranslate nohighlight">
+\[\frac{\partial w(\mathbf{r}, t)}{\partial n} =&gt; w_{L_{x}}^{n+1} = \frac{3 w_{L_{x}}^{n+1}-4w_{L_{x-1}}^{n+1}+ w_{L_{x-2}}^{n+1}}{2\Delta x}\]</div>
+<p>And the discretized boundary reshaped are:</p>
+<p>1.1. Forward Difference Approximation for <span class="math notranslate nohighlight">\(x=0\)</span>, any <span class="math notranslate nohighlight">\(j\)</span> and any <span class="math notranslate nohighlight">\(k\)</span></p>
+<div class="math notranslate nohighlight">
+\[w_{0}^{n+1}=   \frac{4w_{1}^{n+1}-2w_{2}^{n+1}}{3+ \frac{2 A_{x_{0}} \Delta x}{D_{x}}}\]</div>
+<p>2.1. Backward Difference Approximation for <span class="math notranslate nohighlight">\(x=L_{x}\)</span>, any <span class="math notranslate nohighlight">\(j\)</span> and any <span class="math notranslate nohighlight">\(k\)</span></p>
+<div class="math notranslate nohighlight">
+\[w_{L_{x}}^{n+1}=   \frac{4w_{L_{x-1}}^{n+1}-2w_{L_{x-2}}^{n+1}}{3+\frac{2 A_{x_{L_x}} \Delta x}{D_{x}}}\]</div>
+</section>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>J. M. Navarro, J. Escolano, J. J. Lopez, Implementation and evaluation of a diffusion equation model based on finite difference schemes for sound field prediction in rooms, Applied Acoustics 73 (6-7) (2012) 659â€“665.</p></li>
+<li><p>A. Billon, J. Picaut, C. Foy, V. Valeau, A. Sakout, Introducing atmospheric attenuation within a diffusion model for room-acoustic predictions, The Journal of the Acoustical Society of America 123 (6) (2008) 4040â€“4043.</p></li>
+<li><p>J. Picaut, L. Simon, A Mathematical Model of Diffuse Sound Field Based on a Diffusion Equation, ACUSTICA acta acustica 83 (1997) 614â€“621.</p></li>
+<li><p>V. Valeau, J. Picaut, M. Hodgson, On the use of a diffusion equation for room-acoustic prediction, The Journal of the Acoustical Society of America 119 (3) (2006) 1504â€“1513.</p></li>
+<li><p>Y. Jing, N. Xiang, A modified diffusion equation for room-acoustic predication, The Journal of the Acoustical Society of America 121 (6) (2007) 3284â€“3287.</p></li>
+<li><p>Y. Jing, N. Xiang, On boundary conditions for the diffusion equation in room-acoustic prediction: Theory, simulations, and experiments, The Journal of the Acoustical Society of America 123 (1) (2008) 145â€“153.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Auralization%20Use.html" class="btn btn-neutral float-left" title="Auralization Use" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="DocumentationFVM.html" class="btn btn-neutral float-right" title="Diffusion Equation Finite Volume Method (FVM) Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Ilaria Fichera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

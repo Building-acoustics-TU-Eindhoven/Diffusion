@@ -1,0 +1,514 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>acousticDE.Auralization.Auralizationfunctions &mdash; Diffusion Equation for Acoustics 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Diffusion Equation for Acoustics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Software Presentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Overview.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Use:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Finite%20Different%20Method%20Use.html">Finite Different Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Finite%20Volume%20Method%20Use.html">Finite Volume Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Auralization%20Use.html">Auralization Use</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Theory:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../DocumentationFDM.html">Diffusion Equation Finite Different Method (FDM) documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../DocumentationFVM.html">Diffusion Equation Finite Volume Method (FVM) Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../DocumentationAuralization.html">Auralization Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../acousticDE/FDMfunctions.html">FDM functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../acousticDE/FVMfunctions.html">FVM functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../acousticDE/ReverberationFunctions.html">Reverberation functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../acousticDE/Auralizationfunctions.html">Auralization functions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Finite%20Different%20Method%20Demo%20Tutorial.html">Finite Different Method Demo Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Finite%20Volume%20Method%20Demo%20Tutorial.html">Finite Volume Method Demo Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Diffusion Equation for Acoustics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">acousticDE.Auralization.Auralizationfunctions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for acousticDE.Auralization.Auralizationfunctions</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Thu Feb 22 14:33:58 2024</span>
+
+<span class="sd">@author: Ilaria Fichera</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1">#%%</span>
+<span class="c1">###############################################################################</span>
+<span class="c1">#IMPORT PACKAGES</span>
+<span class="c1">###############################################################################</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="c1">#import matplotlib.pyplot as plt</span>
+<span class="c1"># import sounddevice as sd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">soundfile</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sf</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">signal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">butter</span><span class="p">,</span> <span class="n">sosfilt</span><span class="p">,</span> <span class="n">sosfreqz</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+
+<div class="viewcode-block" id="load">
+<a class="viewcode-back" href="../../../acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralizationfunctions.load">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loading variables</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            Name of the file to load the variables from</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        variables : dict</span>
+<span class="sd">            Variables from the FVM results</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;latin1&quot;</span><span class="p">)</span>
+        <span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">variables</span></div>
+
+
+
+<div class="viewcode-block" id="extract_anechoic">
+<a class="viewcode-back" href="../../../acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralizationfunctions.extract_anechoic">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_anechoic</span><span class="p">(</span><span class="n">anechoic_signal</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracting information form the anechoic signal</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        anechoic_signal : wav</span>
+<span class="sd">            wav file of the anechoic sound</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        data_signal : array of floats </span>
+<span class="sd">            Signal data of the anechoic file</span>
+<span class="sd">        fs : float</span>
+<span class="sd">            Sample frequency of the anechoic signal</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Extract data and sampling rate from file</span>
+    <span class="n">data_signal</span><span class="p">,</span> <span class="n">fs</span> <span class="o">=</span> <span class="n">sf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">anechoic_signal</span><span class="p">)</span> <span class="c1">#this returns &quot;data_signal&quot;, which is the </span>
+    <span class="c1">#audiodata (one_dimentional array) of the anechoic signal. It returns also the</span>
+    <span class="c1">#&quot;fs&quot; sample frequency of the signal</span>
+
+    <span class="k">return</span> <span class="n">data_signal</span><span class="p">,</span> <span class="n">fs</span></div>
+
+
+<div class="viewcode-block" id="resample_pressure">
+<a class="viewcode-back" href="../../../acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralizationfunctions.resample_pressure">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">resample_pressure</span><span class="p">(</span><span class="n">p_rec_off_deriv_band</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">fs_sim</span><span class="p">,</span> <span class="n">t_off_sim</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Resampling the pressure over time to the dimension of the anechoic signal</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        p_rec_off_deriv_band : list of arrays</span>
+<span class="sd">            Pressure over time after the source is switched off per each frequency</span>
+<span class="sd">        fs : float</span>
+<span class="sd">            Sample frequency of the anechoic signal</span>
+<span class="sd">        fs_sim : float</span>
+<span class="sd">            Sample frequency of the FVM simulation</span>
+<span class="sd">        t_off_sim : array of float</span>
+<span class="sd">            Time array after the source is switched off</span>
+<span class="sd">            </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        p_rec_off_deriv_band_resampled : list of arrays</span>
+<span class="sd">            Pressure over time after the source is switched off per each frequency resampled</span>
+<span class="sd">        t_off_resampled : array of float</span>
+<span class="sd">            Time array after the source is switched off resampled</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">num_samples</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">p_rec_off_deriv_band</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">fs</span> <span class="o">/</span> <span class="n">fs_sim</span><span class="p">)</span>
+    <span class="n">p_rec_off_deriv_band_resampled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">p_rec_off_deriv_band</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">num_samples</span><span class="p">))</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p_rec_off_deriv_band</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    
+        <span class="n">p_rec_off_deriv_band_resampled</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">resample_poly</span><span class="p">(</span><span class="n">p_rec_off_deriv_band</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">up</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">fs</span><span class="p">),</span> <span class="n">down</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">fs_sim</span><span class="p">))</span>
+        
+    <span class="c1">#Clip negative values to zero</span>
+    <span class="n">p_rec_off_deriv_band_resampled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">p_rec_off_deriv_band_resampled</span><span class="p">,</span> <span class="n">a_min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">a_max</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    
+    <span class="n">t_off_resampled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">t_off_sim</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">num_samples</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">p_rec_off_deriv_band_resampled</span><span class="p">,</span> <span class="n">t_off_resampled</span></div>
+
+
+
+<div class="viewcode-block" id="square_root_fun">
+<a class="viewcode-back" href="../../../acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralizationfunctions.square_root_fun">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">square_root_fun</span><span class="p">(</span><span class="n">p_rec_off_deriv_band_resampled</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Resampling the pressure over time to the dimension of the anechoic signal</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        p_rec_off_deriv_band_resampled : list of arrays</span>
+<span class="sd">            Pressure over time after the source is switched off per each frequency resampled</span>
+<span class="sd">            </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        square_root : list of arrays</span>
+<span class="sd">            Square rooted pressure over time after the source is switched off per each frequency resampled</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#From the envelope of the impulse response, we need to get the impulse response</span>
+    <span class="n">square_root</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">p_rec_off_deriv_band_resampled</span><span class="p">)</span> <span class="c1">#this gives the impulse response at each frequency</span>
+    <span class="k">return</span> <span class="n">square_root</span></div>
+
+
+
+<div class="viewcode-block" id="create_noise">
+<a class="viewcode-back" href="../../../acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralizationfunctions.create_noise">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_noise</span><span class="p">(</span><span class="n">p_rec_off_deriv_band_resampled</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creation of random noise</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        p_rec_off_deriv_band_resampled : list of arrays</span>
+<span class="sd">            Pressure over time after the source is switched off per each frequency resampled</span>
+<span class="sd">            </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        noise : array of float</span>
+<span class="sd">            Random noise vector with unifrom distribution over time</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">p_rec_off_deriv_band_resampled</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="o">-</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="c1">#random noise vector with unifrom distribution and with numbers between -1 and 1</span>
+    <span class="n">noise</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">noise</span><span class="p">)</span> <span class="c1">#this line of code is used for passing from a row vector to a column vector</span>
+    <span class="n">mean_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">noise</span><span class="p">)</span>
+    <span class="n">difference_squared</span> <span class="o">=</span> <span class="p">(</span><span class="n">noise</span> <span class="o">-</span> <span class="n">mean_value</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">variance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">difference_squared</span><span class="p">)</span> 
+    <span class="k">return</span> <span class="n">noise</span></div>
+
+
+
+<div class="viewcode-block" id="butter_filter">
+<a class="viewcode-back" href="../../../acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralizationfunctions.butter_filter">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">butter_filter</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">center_freq</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creation of Butterworth bandpass filter</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        fs : float</span>
+<span class="sd">            Sample frequency of the anechoic signal</span>
+<span class="sd">        center_freq : array of int</span>
+<span class="sd">            Array of all the frequencies to calculate.</span>
+<span class="sd">            </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        filter_tot : list of arrays</span>
+<span class="sd">            Filter coefficient per each frequency</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Nyquist_freq</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fs</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> 
+    <span class="n">filter_order</span> <span class="o">=</span> <span class="mi">8</span> <span class="c1">#number of biquad sections of the desired system</span>
+    <span class="n">nth_octave</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># e.g., 3 for third-octave</span>
+    
+    <span class="c1"># Create filter</span>
+    <span class="n">filter_tot</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">fc</span> <span class="ow">in</span> <span class="n">center_freq</span><span class="p">:</span>
+        <span class="c1"># Calculate low and high cutoff frequencies for each band</span>
+        <span class="n">lowcut</span> <span class="o">=</span> <span class="n">fc</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">nth_octave</span><span class="p">)))</span>
+        <span class="n">highcut</span> <span class="o">=</span> <span class="n">fc</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">nth_octave</span><span class="p">)))</span>
+        
+        <span class="c1"># Normalize the cutoff frequencies by the Nyquist frequency</span>
+        <span class="n">low</span> <span class="o">=</span> <span class="n">lowcut</span> <span class="o">/</span> <span class="n">Nyquist_freq</span>
+        <span class="n">high</span> <span class="o">=</span> <span class="n">highcut</span> <span class="o">/</span> <span class="n">Nyquist_freq</span>
+        
+        <span class="c1"># Design Butterworth bandpass filter</span>
+        <span class="n">butter_band</span> <span class="o">=</span> <span class="n">butter</span><span class="p">(</span><span class="n">filter_order</span><span class="p">,</span> <span class="p">[</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">],</span> <span class="n">btype</span><span class="o">=</span><span class="s1">&#39;band&#39;</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s1">&#39;sos&#39;</span><span class="p">)</span> <span class="c1"># butter_band contains the second-order sections representation of the Butterworth filter</span>
+        
+        <span class="c1"># Append filter coefficients to filter tot</span>
+        <span class="n">filter_tot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">butter_band</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">filter_tot</span></div>
+
+
+
+<div class="viewcode-block" id="filtered_noise">
+<a class="viewcode-back" href="../../../acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralizationfunctions.filtered_noise">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">filtered_noise</span><span class="p">(</span><span class="n">noise</span><span class="p">,</span> <span class="n">filter_tot</span><span class="p">,</span> <span class="n">fs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculation of filtered noise</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        noise : array of float</span>
+<span class="sd">            Random noise vector with unifrom distribution over time</span>
+<span class="sd">        filter_tot : list of arrays</span>
+<span class="sd">            Filter coefficient per each frequency</span>
+<span class="sd">        fs : float</span>
+<span class="sd">            Sample frequency of the anechoic signal</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        filt_noise_band : array of floats</span>
+<span class="sd">            Results of the time domain convolution of the noise with the filter per each frequency</span>
+<span class="sd">        filt_noise_band_freq : array of complex</span>
+<span class="sd">            Frequency response of the filtered random noise</span>
+<span class="sd">        fv : array of float</span>
+<span class="sd">            Frequency vector</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1">#TIME DOMAIN OF THE FILTERED RANDOM NOISE: for each band the sosfilt creates a time domain convolution of the noise with the filter</span>
+    <span class="n">filt_noise_band</span> <span class="o">=</span> <span class="p">[</span><span class="n">sosfilt</span><span class="p">(</span><span class="n">band</span><span class="p">,</span> <span class="n">noise</span><span class="p">)</span> <span class="k">for</span> <span class="n">band</span> <span class="ow">in</span> <span class="n">filter_tot</span><span class="p">]</span> <span class="c1">#this is in the time domain because the sosfilt gives the time domain     </span>
+        
+    <span class="c1">#FREQUENCY DOMAIN OF THE FILTERED RANDOM NOISE: Frequency response of the filtered random noise</span>
+    <span class="n">filt_noise_band_freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">filt_noise_band</span><span class="p">)</span>
+    
+    <span class="c1"># fv is the freqeuncy vector for the x axis</span>
+    <span class="n">nSamples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">noise</span><span class="p">)</span>
+    <span class="n">fv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nSamples</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">fs</span><span class="o">/</span><span class="n">nSamples</span><span class="p">)</span> <span class="c1">#This can also be written with linspace as #np.linspace((0, (nSamples-1)))*fs/nSamples;</span>
+       
+    <span class="c1">#Make the filt_noise_band list into an array</span>
+    <span class="n">filt_noise_band</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">filt_noise_band</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">filt_noise_band</span><span class="p">,</span> <span class="n">filt_noise_band_freq</span><span class="p">,</span> <span class="n">fv</span></div>
+
+
+
+<div class="viewcode-block" id="unfiltered_envelope">
+<a class="viewcode-back" href="../../../acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralizationfunctions.unfiltered_envelope">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">unfiltered_envelope</span><span class="p">(</span><span class="n">nBands</span><span class="p">,</span> <span class="n">square_root</span><span class="p">,</span> <span class="n">noise</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculation of unfiltered envelope</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        nBands : int</span>
+<span class="sd">            Number of frequency bands.</span>
+<span class="sd">        square_root : list of arrays</span>
+<span class="sd">            Square rooted pressure over time after the source is switched off per each frequency resampled</span>
+<span class="sd">        noise : array of float</span>
+<span class="sd">            Random noise vector with unifrom distribution over time</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        imp_unfilt_band : list of arrays</span>
+<span class="sd">            Multiplication of the envelope with random noise (and not filter)</span>
+<span class="sd">            </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#Multiplication of SQUARE-ROOT of envelope with random noise only (UNFILTERED)</span>
+    <span class="n">imp_unfilt_band</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">fi</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nBands</span><span class="p">):</span>
+        <span class="n">imp_unfilt</span> <span class="o">=</span> <span class="n">square_root</span><span class="p">[</span><span class="n">fi</span><span class="p">,:]</span> <span class="o">*</span> <span class="n">noise</span>
+        <span class="n">imp_unfilt_band</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">imp_unfilt</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">imp_unfilt_band</span></div>
+
+
+
+<div class="viewcode-block" id="filtered_envelope">
+<a class="viewcode-back" href="../../../acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralizationfunctions.filtered_envelope">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">filtered_envelope</span><span class="p">(</span><span class="n">filt_noise_band</span><span class="p">,</span><span class="n">p_rec_off_deriv_band_resampled</span><span class="p">,</span> <span class="n">square_root</span><span class="p">,</span> <span class="n">t_off_resampled</span><span class="p">,</span> <span class="n">nBands</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculation of filtered envelope</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        filt_noise_band : array of floats</span>
+<span class="sd">            Results of the time domain convolution of the noise with the filter per each frequency</span>
+<span class="sd">        p_rec_off_deriv_band_resampled : list of arrays</span>
+<span class="sd">            Pressure over time after the source is switched off per each frequency resampled</span>
+<span class="sd">        square_root : list of arrays</span>
+<span class="sd">            Square rooted pressure over time after the source is switched off per each frequency resampled</span>
+<span class="sd">        t_off_resampled : array of float</span>
+<span class="sd">            Time array after the source is switched off resampled</span>
+<span class="sd">        nBands : int</span>
+<span class="sd">            Number of frequency bands.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        imp_filt_band : list of arrays</span>
+<span class="sd">            Multiplication of the envelope with filtered random noise</span>
+<span class="sd">        t_off_padded : </span>
+<span class="sd">            Time array after the source is switched off padded to the legnth of the filt_noise_band   </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#Padding the square-root to the same length as the filtered random noise</span>
+    <span class="n">pad_length</span> <span class="o">=</span> <span class="n">filt_noise_band</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">p_rec_off_deriv_band_resampled</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">square_root_padded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">square_root</span><span class="p">,</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="n">pad_length</span><span class="p">))</span> <span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span> <span class="p">)</span>
+    <span class="n">t_off_padded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">t_off_resampled</span><span class="p">,</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="n">pad_length</span><span class="p">))</span> <span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span> <span class="p">)</span>
+    
+    <span class="c1">#Multiplication of SQUARE-ROOT of envelope with filtered random noise (FILTERED)</span>
+    <span class="n">imp_filt_band</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">fi</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nBands</span><span class="p">):</span>
+        <span class="n">imp_filt</span> <span class="o">=</span> <span class="n">square_root_padded</span><span class="p">[</span><span class="n">fi</span><span class="p">,:]</span><span class="o">*</span><span class="n">filt_noise_band</span><span class="p">[</span><span class="n">fi</span><span class="p">,:]</span>
+        <span class="n">imp_filt_band</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">imp_filt</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">imp_filt_band</span><span class="p">,</span> <span class="n">t_off_padded</span></div>
+
+
+
+<div class="viewcode-block" id="generate_imp_resp">
+<a class="viewcode-back" href="../../../acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralizationfunctions.generate_imp_resp">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_imp_resp</span><span class="p">(</span><span class="n">imp_filt_band</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generation of impulse response</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        imp_filt_band : list of arrays</span>
+<span class="sd">            Multiplication of the envelope with filtered random noise</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        imp_tot : array of floats</span>
+<span class="sd">            Total impulse response in the time domain</span>
+<span class="sd">        freq_spectrum : array of floats</span>
+<span class="sd">            Total impulse response in the frequency domain</span>
+<span class="sd">        imp_resp_norm : array of int</span>
+<span class="sd">            Total impulse response in the time domain normalised to its maximum value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#Sum of the bands in the time domain</span>
+    <span class="n">imp_tot</span> <span class="o">=</span> <span class="p">[</span><span class="nb">sum</span><span class="p">(</span><span class="n">imp_filt_band</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">imp_filt_band</span><span class="p">)))</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">imp_filt_band</span><span class="p">[</span><span class="mi">0</span><span class="p">]))]</span>
+    <span class="n">imp_tot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">imp_tot</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    
+    <span class="c1">#Frequency domain of the total impulse response</span>
+    <span class="n">freq_spectrum</span> <span class="o">=</span> <span class="mi">20</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">imp_tot</span><span class="p">)))</span>
+    
+    <span class="n">imp_resp_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">(</span><span class="n">imp_tot</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">imp_tot</span><span class="p">))</span> <span class="o">*</span> <span class="mi">32767</span><span class="p">)</span> 
+    
+    <span class="k">return</span> <span class="n">imp_tot</span><span class="p">,</span> <span class="n">freq_spectrum</span><span class="p">,</span> <span class="n">imp_resp_norm</span></div>
+
+
+
+<div class="viewcode-block" id="convolution_fun">
+<a class="viewcode-back" href="../../../acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralizationfunctions.convolution_fun">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">convolution_fun</span><span class="p">(</span><span class="n">data_signal</span><span class="p">,</span><span class="n">fs</span><span class="p">,</span><span class="n">imp_tot</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convolution</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        data_signal : array of floats </span>
+<span class="sd">            Signal data of the anechoic file</span>
+<span class="sd">        fs : float</span>
+<span class="sd">            Sample frequency of the anechoic signal</span>
+<span class="sd">        imp_tot : array of floats</span>
+<span class="sd">            Total impulse response in the time domain</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        st : array of floats</span>
+<span class="sd">            Time vector of the speech signal</span>
+<span class="sd">        ht : array of floats</span>
+<span class="sd">            Time vector of the room impulse response</span>
+<span class="sd">        sh_conv : array of floats</span>
+<span class="sd">            Convolution of the impulse response with the anechoic signal</span>
+<span class="sd">        t_conv : array of floats</span>
+<span class="sd">            Time vector of the convolved signal</span>
+<span class="sd">        sh_conv_normalized : array of floats</span>
+<span class="sd">            Convolution of the impulse response with the anechoic signal normalised to its maximum values</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#Convolution of the impulse_rand with the anechoic signal</span>
+    <span class="n">st</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,(</span><span class="nb">len</span><span class="p">(</span><span class="n">data_signal</span><span class="p">))</span><span class="o">/</span><span class="n">fs</span><span class="p">,</span><span class="mi">1</span><span class="o">/</span><span class="n">fs</span><span class="p">)</span> <span class="c1">#Time vector of the speech signal</span>
+    <span class="n">ht</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,(</span><span class="nb">len</span><span class="p">(</span><span class="n">imp_tot</span><span class="p">))</span><span class="o">/</span><span class="n">fs</span><span class="p">,</span><span class="mi">1</span><span class="o">/</span><span class="n">fs</span><span class="p">)</span>  <span class="c1">#Time vector of the room impulse response</span>
+    
+    <span class="c1">#Create impulse response</span>
+    <span class="n">sh_conv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">imp_tot</span><span class="p">,</span><span class="n">data_signal</span><span class="p">)</span> <span class="c1">#convolution of the impulse response with the anechoic signal</span>
+    <span class="n">sh_conv</span> <span class="o">=</span> <span class="n">sh_conv</span><span class="o">/</span><span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">sh_conv</span><span class="p">))</span> <span class="c1">#normalized to the maximum value of the convolved signal</span>
+    
+    <span class="n">t_conv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,(</span><span class="nb">len</span><span class="p">(</span><span class="n">sh_conv</span><span class="p">))</span><span class="o">/</span><span class="n">fs</span><span class="p">,</span><span class="mi">1</span><span class="o">/</span><span class="n">fs</span><span class="p">)</span> <span class="c1">#Time vector of the convolved signal</span>
+    
+    <span class="c1"># Normalize the floating-point data to the range of int16</span>
+    <span class="n">sh_conv_normalized</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">(</span><span class="n">sh_conv</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">sh_conv</span><span class="p">))</span> <span class="o">*</span> <span class="mi">32767</span><span class="p">)</span> <span class="c1">#32767 scales the normalized data to the range of 16-bit integers (-32768 to 32767).</span>
+
+    <span class="k">return</span> <span class="n">st</span><span class="p">,</span> <span class="n">ht</span><span class="p">,</span> <span class="n">sh_conv</span><span class="p">,</span> <span class="n">t_conv</span><span class="p">,</span> <span class="n">sh_conv_normalized</span></div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Ilaria Fichera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

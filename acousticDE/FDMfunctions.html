@@ -1,0 +1,695 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FDM functions &mdash; Diffusion Equation for Acoustics 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="FVM functions" href="FVMfunctions.html" />
+    <link rel="prev" title="Auralization Documentation" href="../DocumentationAuralization.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Diffusion Equation for Acoustics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Software Presentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Overview.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Use:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Finite%20Different%20Method%20Use.html">Finite Different Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Finite%20Volume%20Method%20Use.html">Finite Volume Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Auralization%20Use.html">Auralization Use</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Theory:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../DocumentationFDM.html">Diffusion Equation Finite Different Method (FDM) documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DocumentationFVM.html">Diffusion Equation Finite Volume Method (FVM) Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DocumentationAuralization.html">Auralization Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">FDM functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-acousticDE.FiniteDifferenceMethod.FDM">Main function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteDifferenceMethod.FDM.run_fdm_sim"><code class="docutils literal notranslate"><span class="pre">run_fdm_sim()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-acousticDE.FiniteDifferenceMethod.FDMfunctions">Internal functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.abs_term"><code class="docutils literal notranslate"><span class="pre">abs_term()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.beta_zero_fun"><code class="docutils literal notranslate"><span class="pre">beta_zero_fun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.comput_energy_density"><code class="docutils literal notranslate"><span class="pre">comput_energy_density()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.create_mesh"><code class="docutils literal notranslate"><span class="pre">create_mesh()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.diff_coeff"><code class="docutils literal notranslate"><span class="pre">diff_coeff()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.dist_source_receiver"><code class="docutils literal notranslate"><span class="pre">dist_source_receiver()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.dist_source_x_y"><code class="docutils literal notranslate"><span class="pre">dist_source_x_y()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.equiv_absorp"><code class="docutils literal notranslate"><span class="pre">equiv_absorp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.freq_param"><code class="docutils literal notranslate"><span class="pre">freq_param()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.initial_condition"><code class="docutils literal notranslate"><span class="pre">initial_condition()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.number_freq"><code class="docutils literal notranslate"><span class="pre">number_freq()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.rec_sourceon_time"><code class="docutils literal notranslate"><span class="pre">rec_sourceon_time()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.receiver_interpolation"><code class="docutils literal notranslate"><span class="pre">receiver_interpolation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.room_charact"><code class="docutils literal notranslate"><span class="pre">room_charact()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.save_fdm"><code class="docutils literal notranslate"><span class="pre">save_fdm()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.source_interpolation"><code class="docutils literal notranslate"><span class="pre">source_interpolation()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="FVMfunctions.html">FVM functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ReverberationFunctions.html">Reverberation functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Auralizationfunctions.html">Auralization functions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Finite%20Different%20Method%20Demo%20Tutorial.html">Finite Different Method Demo Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Finite%20Volume%20Method%20Demo%20Tutorial.html">Finite Volume Method Demo Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Diffusion Equation for Acoustics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">FDM functions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/acousticDE/FDMfunctions.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="fdm-functions">
+<h1>FDM functions<a class="headerlink" href="#fdm-functions" title="Link to this heading"></a></h1>
+<section id="module-acousticDE.FiniteDifferenceMethod.FDM">
+<span id="main-function"></span><h2>Main function<a class="headerlink" href="#module-acousticDE.FiniteDifferenceMethod.FDM" title="Link to this heading"></a></h2>
+<p>Created on Tue Feb 28 10:39:42 2023</p>
+<p>&#64;author: Ilaria Fichera</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteDifferenceMethod.FDM.run_fdm_sim">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteDifferenceMethod.FDM.</span></span><span class="sig-name descname"><span class="pre">run_fdm_sim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteDifferenceMethod/FDM.html#run_fdm_sim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteDifferenceMethod.FDM.run_fdm_sim" title="Link to this definition"></a></dt>
+<dd><p>Function for running the full calculation. It will use all the functions defined in FDMfunctions.py file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>inputs_path</strong> (<em>str</em>) – String of the json file with all the inputs for the simulation.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>results</strong> – Dictionary of all the variable calculated during the simulation</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-acousticDE.FiniteDifferenceMethod.FDMfunctions">
+<span id="internal-functions"></span><h2>Internal functions<a class="headerlink" href="#module-acousticDE.FiniteDifferenceMethod.FDMfunctions" title="Link to this heading"></a></h2>
+<p>Created on Tue Feb 28 10:39:42 2023</p>
+<p>&#64;author: Ilaria Fichera</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteDifferenceMethod.FDMfunctions.abs_term">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteDifferenceMethod.FDMfunctions.</span></span><span class="sig-name descname"><span class="pre">abs_term</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">th</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteDifferenceMethod/FDMfunctions.html#abs_term"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.abs_term" title="Link to this definition"></a></dt>
+<dd><p>Calculate the absorption term (Sabine, Eyring or Modified)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>th</strong> (<em>int</em>) – The options for the absorption term; Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)</p></li>
+<li><p><strong>alpha</strong> (<em>list</em>) – Absrption coefficient for each frequency</p></li>
+<li><p><strong>c0</strong> (<em>int</em>) – Speed of sound</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Absx_array</strong> – Calculated absorption term for each absorption coefficient for each frequency</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array of floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteDifferenceMethod.FDMfunctions.beta_zero_fun">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteDifferenceMethod.FDMfunctions.</span></span><span class="sig-name descname"><span class="pre">beta_zero_fun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteDifferenceMethod/FDMfunctions.html#beta_zero_fun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.beta_zero_fun" title="Link to this definition"></a></dt>
+<dd><p>Calculation of factor beta_zero</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Dx</strong> (<em>float</em>) – Diffusion coefficient in the x direction (equal to the theoretical diffusion coefficient)</p></li>
+<li><p><strong>Dy</strong> (<em>float</em>) – Diffusion coefficient in the y direction (equal to the theoretical diffusion coefficient)</p></li>
+<li><p><strong>Dz</strong> (<em>float</em>) – Diffusion coefficient in the z direction (equal to the theoretical diffusion coefficient)</p></li>
+<li><p><strong>dx</strong> (<em>float</em>) – distance step between mesh points in the x axis (recommended 0.5)</p></li>
+<li><p><strong>dy</strong> (<em>float</em>) – distance step between mesh points in the y axis (recommended equal to dx)</p></li>
+<li><p><strong>dz</strong> (<em>float</em>) – distance step between mesh points in the z axis (recommended equal to dx)</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – Time step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>beta_zero_x</strong> (<em>float</em>) – Coefficient beta zero in the x axis used in the calculation of the energy density</p></li>
+<li><p><strong>beta_zero_y</strong> (<em>float</em>) – Coefficient beta zero in the y axis used in the calculation of the energy density</p></li>
+<li><p><strong>beta_zero_z</strong> (<em>float</em>) – Coefficient beta zero in the z axis used in the calculation of the energy density</p></li>
+<li><p><strong>beta_zero</strong> (<em>float</em>) – Sum of the coefficients beta_zero_x, beta_zero_y and beta_zero_z</p></li>
+<li><p><strong>beta_zero_condition</strong> (<em>float</em>) – If this value is more than 1, it flags it up as an error for possible inconvergence</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteDifferenceMethod.FDMfunctions.comput_energy_density">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteDifferenceMethod.FDMfunctions.</span></span><span class="sig-name descname"><span class="pre">comput_energy_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nBands</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m_atm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ny</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recording_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recording_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_zero</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_zero_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_zero_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_zero_z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sourceon_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sourceon_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Abs_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Abs_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Abs_3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Abs_4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Abs_5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Abs_6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_lr_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_up_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_lr_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_up_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep_lr_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep_up_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_row_lr_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_row_up_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_col_lr_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_col_up_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_dep_lr_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_dep_up_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_lr_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_up_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_lr_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_up_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep_lr_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep_up_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_row_lr_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_row_up_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_col_lr_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_col_up_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_dep_lr_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_dep_up_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tcalc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteDifferenceMethod/FDMfunctions.html#comput_energy_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.comput_energy_density" title="Link to this definition"></a></dt>
+<dd><p>Computation of energy density</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nBands</strong> (<em>int</em>) – Number of frequency bands</p></li>
+<li><p><strong>c0</strong> (<em>int</em>) – Speed of sound</p></li>
+<li><p><strong>m_atm</strong> (<em>float</em>) – Air absorption coefficient</p></li>
+<li><p><strong>Nx</strong> (<em>int</em>) – Number of mesh points in the x direction.</p></li>
+<li><p><strong>Ny</strong> (<em>int</em>) – Number of mesh points in the y direction.</p></li>
+<li><p><strong>Nz</strong> (<em>int</em>) – Number of mesh points in the z direction.</p></li>
+<li><p><strong>recording_steps</strong> (<em>int</em>) – Number of time steps</p></li>
+<li><p><strong>x</strong> (<em>array</em><em> of </em><em>floats</em>) – Linspace of the mesh point in the x axis.</p></li>
+<li><p><strong>y</strong> (<em>array</em><em> of </em><em>floats</em>) – Linspace of the mesh point in the y axis.</p></li>
+<li><p><strong>z</strong> (<em>array</em><em> of </em><em>floats</em>) – Linspace of the mesh point in the z axis.</p></li>
+<li><p><strong>recording_time</strong> (<em>float</em>) – Length of the simulaton run</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – Time step</p></li>
+<li><p><strong>beta_zero</strong> (<em>float</em>) – Sum of the coefficients beta_zero_x, beta_zero_y and beta_zero_z</p></li>
+<li><p><strong>beta_zero_x</strong> (<em>float</em>) – Coefficient beta zero in the x axis used in the calculation of the energy density</p></li>
+<li><p><strong>beta_zero_y</strong> (<em>float</em>) – Coefficient beta zero in the y axis used in the calculation of the energy density</p></li>
+<li><p><strong>beta_zero_z</strong> (<em>float</em>) – Coefficient beta zero in the z axis used in the calculation of the energy density</p></li>
+<li><p><strong>dx</strong> (<em>float</em>) – distance step between mesh points in the x axis (recommended 0.5)</p></li>
+<li><p><strong>dy</strong> (<em>float</em>) – distance step between mesh points in the y axis (recommended equal to dx)</p></li>
+<li><p><strong>dz</strong> (<em>float</em>) – distance step between mesh points in the z axis (recommended equal to dx)</p></li>
+<li><p><strong>Dx</strong> (<em>float</em>) – Diffusion coefficient in the x direction (equal to the theoretical diffusion coefficient)</p></li>
+<li><p><strong>Dy</strong> (<em>float</em>) – Diffusion coefficient in the y direction (equal to the theoretical diffusion coefficient)</p></li>
+<li><p><strong>Dz</strong> (<em>float</em>) – Diffusion coefficient in the z direction (equal to the theoretical diffusion coefficient)</p></li>
+<li><p><strong>t</strong> (<em>array</em><em> of </em><em>floats</em>) – Time array of time steps</p></li>
+<li><p><strong>sourceon_time</strong> (<em>float</em>) – Time that the source stays on</p></li>
+<li><p><strong>sourceon_steps</strong> (<em>int</em>) – Number of time steps that the source stays on</p></li>
+<li><p><strong>Abs_1</strong> (<em>array</em><em> of </em><em>floats</em>) – Calculated absorption term for Surface 1 for each frequency</p></li>
+<li><p><strong>Abs_2</strong> (<em>array</em><em> of </em><em>floats</em>) – Calculated absorption term for Surface 2 for each frequency</p></li>
+<li><p><strong>Abs_3</strong> (<em>array</em><em> of </em><em>floats</em>) – Calculated absorption term for Surface 3 for each frequency</p></li>
+<li><p><strong>Abs_4</strong> (<em>array</em><em> of </em><em>floats</em>) – Calculated absorption term for Surface 4 for each frequency</p></li>
+<li><p><strong>Abs_5</strong> (<em>array</em><em> of </em><em>floats</em>) – Calculated absorption term for Surface 5 for each frequency</p></li>
+<li><p><strong>Abs_6</strong> (<em>array</em><em> of </em><em>floats</em>) – Calculated absorption term for Surface 6 for each frequency</p></li>
+<li><p><strong>s</strong> (<em>array</em><em> of </em><em>floats</em>) – Matrix of 3D mesh points inserting source energy</p></li>
+<li><p><strong>source1</strong> (<em>array</em><em> of </em><em>floats</em>) – Energy density of source number 1 at time step position</p></li>
+<li><p><strong>row_lr_s</strong> (<em>int</em>) – Lower fractional index in the x direction of the source position</p></li>
+<li><p><strong>row_up_s</strong> (<em>int</em>) – Upper fractional index in the x direction of the source position</p></li>
+<li><p><strong>col_lr_s</strong> (<em>int</em>) – Lower fractional index in the y direction of the source position</p></li>
+<li><p><strong>col_up_s</strong> (<em>int</em>) – Upper fractional index in the y direction of the source position</p></li>
+<li><p><strong>dep_lr_s</strong> (<em>int</em>) – Lower fractional index in the z direction of the source position</p></li>
+<li><p><strong>dep_up_s</strong> (<em>int</em>) – Upper fractional index in the z direction of the source position</p></li>
+<li><p><strong>weight_row_lr_s</strong> (<em>float</em>) – Lower interpolation weight in the x direction of the source position</p></li>
+<li><p><strong>weight_row_up_s</strong> (<em>float</em>) – Upper interpolation weight in the x direction of the source position</p></li>
+<li><p><strong>weight_col_lr_s</strong> (<em>float</em>) – Lower interpolation weight in the y direction of the source position</p></li>
+<li><p><strong>weight_col_up_s</strong> (<em>float</em>) – Upper interpolation weight in the y direction of the source position</p></li>
+<li><p><strong>weight_dep_lr_s</strong> (<em>float</em>) – Lower interpolation weight in the z direction of the source position</p></li>
+<li><p><strong>weight_dep_up_s</strong> (<em>float</em>) – Upper interpolation weight in the z direction of the source position</p></li>
+<li><p><strong>row_lr_r</strong> (<em>int</em>) – Lower fractional index in the x direction of the receiver position</p></li>
+<li><p><strong>row_up_r</strong> (<em>int</em>) – Upper fractional index in the x direction of the receiver position</p></li>
+<li><p><strong>col_lr_r</strong> (<em>int</em>) – Lower fractional index in the y direction of the receiver position</p></li>
+<li><p><strong>col_up_r</strong> (<em>int</em>) – Upper fractional index in the y direction of the receiver position</p></li>
+<li><p><strong>dep_lr_r</strong> (<em>int</em>) – Lower fractional index in the z direction of the receiver position</p></li>
+<li><p><strong>dep_up_r</strong> (<em>int</em>) – Upper fractional index in the z direction of the receiver position</p></li>
+<li><p><strong>weight_row_lr_r</strong> (<em>float</em>) – Lower interpolation weight in the x direction of the receiver position</p></li>
+<li><p><strong>weight_row_up_r</strong> (<em>float</em>) – Upper interpolation weight in the x direction of the receiver position</p></li>
+<li><p><strong>weight_col_lr_r</strong> (<em>float</em>) – Lower interpolation weight in the y direction of the receiver position</p></li>
+<li><p><strong>weight_col_up_r</strong> (<em>float</em>) – Upper interpolation weight in the y direction of the receiver position</p></li>
+<li><p><strong>weight_dep_lr_r</strong> (<em>float</em>) – Lower interpolation weight in the z direction of the receiver position</p></li>
+<li><p><strong>weight_dep_up_r</strong> (<em>float</em>) – Upper interpolation weight in the z direction of the receiver position</p></li>
+<li><p><strong>tcalc</strong> (<em>str</em>) – Type of calculation; “decay” if the source switches off and “stationarysource” if the source is stationary</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>w_new_band</strong> (<em>array of floats</em>) – Energy density at the time step n+1 at each mesh point per each frequency band</p></li>
+<li><p><strong>w_t0_band</strong> (<em>array of floats</em>) – Energy density at the time step t=0 (when the source is switched off) at each mesh point per each frequency band</p></li>
+<li><p><strong>w_rec_band</strong> (<em>array of floats</em>) – Energy density over time at the receiver position per each frequency band</p></li>
+<li><p><strong>w_rec_off_band</strong> (<em>list of arrays</em>) – Energy density over time after the source is switched off at the receiver position per each frequency band</p></li>
+<li><p><strong>w_rec_x_t0_band</strong> (<em>array of floats</em>) – Energy density at the time step t=0 (when the source is switched off) in the line receivers per each frequency band</p></li>
+<li><p><strong>idx_w_rec</strong> (<em>int</em>) – Time index at which the source is switched off</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteDifferenceMethod.FDMfunctions.create_mesh">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteDifferenceMethod.FDMfunctions.</span></span><span class="sig-name descname"><span class="pre">create_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteDifferenceMethod/FDMfunctions.html#create_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.create_mesh" title="Link to this definition"></a></dt>
+<dd><p>Calculation of the 3D mesh of the room.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>length</strong> (<em>float</em>) – length of the room in meters.</p></li>
+<li><p><strong>width</strong> (<em>float</em>) – Width of the room in meters.</p></li>
+<li><p><strong>height</strong> (<em>float</em>) – Height of the room in meters.</p></li>
+<li><p><strong>dx</strong> (<em>float</em>) – distance step between mesh points in the x axis (recommended 0.5)</p></li>
+<li><p><strong>dy</strong> (<em>float</em>) – distance step between mesh points in the y axis (recommended equal to dx)</p></li>
+<li><p><strong>dz</strong> (<em>float</em>) – distance step between mesh points in the z axis (recommended equal to dx)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>x</strong> (<em>array of floats</em>) – Linspace of the mesh point in the x axis.</p></li>
+<li><p><strong>y</strong> (<em>array of floats</em>) – Linspace of the mesh point in the y axis.</p></li>
+<li><p><strong>z</strong> (<em>array of floats</em>) – Linspace of the mesh point in the z axis.</p></li>
+<li><p><strong>Nx</strong> (<em>int</em>) – Number of mesh points in the x direction.</p></li>
+<li><p><strong>Ny</strong> (<em>int</em>) – Number of mesh points in the y direction.</p></li>
+<li><p><strong>Nz</strong> (<em>int</em>) – Number of mesh points in the z direction.</p></li>
+<li><p><strong>xx</strong> (<em>array of floats</em>) – 3D matrix for the x coordinates</p></li>
+<li><p><strong>yy</strong> (<em>array of floats</em>) – 3D matrix for the y coordinates</p></li>
+<li><p><strong>zz</strong> (<em>array of floats</em>) – 3D matrix for the z coordinates</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteDifferenceMethod.FDMfunctions.diff_coeff">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteDifferenceMethod.FDMfunctions.</span></span><span class="sig-name descname"><span class="pre">diff_coeff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteDifferenceMethod/FDMfunctions.html#diff_coeff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.diff_coeff" title="Link to this definition"></a></dt>
+<dd><p>Calculation of the theoretical diffusion coefficient</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>V</strong> (<em>float</em>) – Volume of the room</p></li>
+<li><p><strong>S</strong> (<em>float</em>) – Total surface are of the room</p></li>
+<li><p><strong>c0</strong> (<em>int</em>) – Speed of sound</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>D_th</strong> (<em>float</em>) – Theoretical diffusion coefficient</p></li>
+<li><p><strong>Dx</strong> (<em>float</em>) – Diffusion coefficient in the x direction (equal to the theoretical diffusion coefficient)</p></li>
+<li><p><strong>Dy</strong> (<em>float</em>) – Diffusion coefficient in the y direction (equal to the theoretical diffusion coefficient)</p></li>
+<li><p><strong>Dz</strong> (<em>float</em>) – Diffusion coefficient in the z direction (equal to the theoretical diffusion coefficient)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteDifferenceMethod.FDMfunctions.dist_source_receiver">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteDifferenceMethod.FDMfunctions.</span></span><span class="sig-name descname"><span class="pre">dist_source_receiver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coord_rec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord_source</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteDifferenceMethod/FDMfunctions.html#dist_source_receiver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.dist_source_receiver" title="Link to this definition"></a></dt>
+<dd><p>Calculation of the distance between source and receiver positions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coord_rec</strong> (<em>list</em>) – Coordinates of the receiver position</p></li>
+<li><p><strong>coord_source</strong> (<em>list</em>) – Coordinates of the source position</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dist_sr</strong> – Distance between source and receiver position</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteDifferenceMethod.FDMfunctions.dist_source_x_y">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteDifferenceMethod.FDMfunctions.</span></span><span class="sig-name descname"><span class="pre">dist_source_x_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_lr_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_up_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_lr_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_up_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep_lr_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep_up_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_row_lr_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_row_up_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_col_lr_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_col_up_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_dep_lr_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_dep_up_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord_source</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteDifferenceMethod/FDMfunctions.html#dist_source_x_y"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.dist_source_x_y" title="Link to this definition"></a></dt>
+<dd><p>Calcualtion of distance source and receiver on a line in the x and y directions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xx</strong> (<em>array</em><em> of </em><em>floats</em>) – 3D matrix for the x coordinates</p></li>
+<li><p><strong>yy</strong> (<em>array</em><em> of </em><em>floats</em>) – 3D matrix for the y coordinates</p></li>
+<li><p><strong>zz</strong> (<em>array</em><em> of </em><em>floats</em>) – 3D matrix for the z coordinates</p></li>
+<li><p><strong>row_lr_r</strong> (<em>int</em>) – Lower fractional index in the x direction of the receiver position</p></li>
+<li><p><strong>row_up_r</strong> (<em>int</em>) – Upper fractional index in the x direction of the receiver position</p></li>
+<li><p><strong>col_lr_r</strong> (<em>int</em>) – Lower fractional index in the y direction of the receiver position</p></li>
+<li><p><strong>col_up_r</strong> (<em>int</em>) – Upper fractional index in the y direction of the receiver position</p></li>
+<li><p><strong>dep_lr_r</strong> (<em>int</em>) – Lower fractional index in the z direction of the receiver position</p></li>
+<li><p><strong>dep_up_r</strong> (<em>int</em>) – Upper fractional index in the z direction of the receiver position</p></li>
+<li><p><strong>weight_row_lr_r</strong> (<em>float</em>) – Lower interpolation weight in the x direction of the receiver position</p></li>
+<li><p><strong>weight_row_up_r</strong> (<em>float</em>) – Upper interpolation weight in the x direction of the receiver position</p></li>
+<li><p><strong>weight_col_lr_r</strong> (<em>float</em>) – Lower interpolation weight in the y direction of the receiver position</p></li>
+<li><p><strong>weight_col_up_r</strong> (<em>float</em>) – Upper interpolation weight in the y direction of the receiver position</p></li>
+<li><p><strong>weight_dep_lr_r</strong> (<em>float</em>) – Lower interpolation weight in the z direction of the receiver position</p></li>
+<li><p><strong>weight_dep_up_r</strong> (<em>float</em>) – Upper interpolation weight in the z direction of the receiver position</p></li>
+<li><p><strong>coord_source</strong> (<em>list</em>) – Coordinates of the source position</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>dist_x</strong> (<em>array of floats</em>) – Distance between source and each mesh point in the x direction on a line</p></li>
+<li><p><strong>dist_y</strong> (<em>array of floats</em>) – Distance between source and each mesh point in the y direction on a line</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteDifferenceMethod.FDMfunctions.equiv_absorp">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteDifferenceMethod.FDMfunctions.</span></span><span class="sig-name descname"><span class="pre">equiv_absorp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteDifferenceMethod/FDMfunctions.html#equiv_absorp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.equiv_absorp" title="Link to this definition"></a></dt>
+<dd><p>Calculation of the eqauivalent absorption area</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alpha_1</strong> (<em>list</em>) – Absrption coefficient for each frequency of Surface 1</p></li>
+<li><p><strong>alpha_2</strong> (<em>list</em>) – Absrption coefficient for each frequency of Surface 2</p></li>
+<li><p><strong>alpha_3</strong> (<em>list</em>) – Absrption coefficient for each frequency of Surface 3</p></li>
+<li><p><strong>alpha_4</strong> (<em>list</em>) – Absrption coefficient for each frequency of Surface 4</p></li>
+<li><p><strong>alpha_5</strong> (<em>list</em>) – Absrption coefficient for each frequency of Surface 5</p></li>
+<li><p><strong>alpha_6</strong> (<em>list</em>) – Absrption coefficient for each frequency of Surface 6</p></li>
+<li><p><strong>S1</strong> (<em>float</em>) – Surface area of the Surface 1 (floor).</p></li>
+<li><p><strong>S2</strong> (<em>float</em>) – Surface area of the Surface 2 (ceiling).</p></li>
+<li><p><strong>S3</strong> (<em>float</em>) – Surface area of the Surface 3 (wall front).</p></li>
+<li><p><strong>S4</strong> (<em>float</em>) – Surface area of the Surface 4 (wall back).</p></li>
+<li><p><strong>S5</strong> (<em>float</em>) – Surface area of the Surface 5 (wall left).</p></li>
+<li><p><strong>S6</strong> (<em>float</em>) – Surface area of the Surface 6 (wall right).</p></li>
+<li><p><strong>S</strong> (<em>float</em>) – Total surface area of the room</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>alpha_average</strong> (<em>array of floats</em>) – Average absorption coefficient per each frequency.</p></li>
+<li><p><strong>Eq_A</strong> (<em>array of floats</em>) – Equivalent absorption area</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteDifferenceMethod.FDMfunctions.freq_param">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteDifferenceMethod.FDMfunctions.</span></span><span class="sig-name descname"><span class="pre">freq_param</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nBands</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pRef</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ws</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_new_band</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_t0_band</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_rec_band</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_rec_off_band</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_rec_x_t0_band</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx_w_rec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_sr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m_atm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Eq_A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tcalc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteDifferenceMethod/FDMfunctions.html#freq_param"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.freq_param" title="Link to this definition"></a></dt>
+<dd><p>Computation of sound presure level and reverberation time parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nBands</strong> (<em>int</em>) – Number of frequency bands</p></li>
+<li><p><strong>rho</strong> (<em>float</em>) – Density of air</p></li>
+<li><p><strong>pRef</strong> (<em>float</em>) – Reference pressure</p></li>
+<li><p><strong>c0</strong> (<em>int</em>) – Speed of sound</p></li>
+<li><p><strong>Ws</strong> (<em>float</em>) – Power of the source</p></li>
+<li><p><strong>w_new_band</strong> (<em>array</em><em> of </em><em>floats</em>) – Energy density at the time step n+1 at each mesh point per each frequency band</p></li>
+<li><p><strong>w_t0_band</strong> (<em>array</em><em> of </em><em>floats</em>) – Energy density at the time step t=0 (when the source is switched off) at each mesh point per each frequency band</p></li>
+<li><p><strong>w_rec_band</strong> (<em>array</em><em> of </em><em>floats</em>) – Energy density over time at the receiver position per each frequency band</p></li>
+<li><p><strong>w_rec_off_band</strong> (<em>list</em><em> of </em><em>arrays</em>) – Energy density over time after the source is switched off at the receiver position per each frequency band</p></li>
+<li><p><strong>w_rec_x_t0_band</strong> (<em>array</em><em> of </em><em>floats</em>) – Energy density at the time step t=0 (when the source is switched off) in the line receivers per each frequency band</p></li>
+<li><p><strong>idx_w_rec</strong> (<em>int</em>) – Time index at which the source is switched off</p></li>
+<li><p><strong>t</strong> (<em>array</em><em> of </em><em>floats</em>) – Time array of time steps</p></li>
+<li><p><strong>dist_sr</strong> (<em>float</em>) – Distance between source and receiver position</p></li>
+<li><p><strong>m_atm</strong> (<em>float</em>) – Air absorption coefficient</p></li>
+<li><p><strong>V</strong> (<em>float</em>) – Volume of the room</p></li>
+<li><p><strong>S</strong> (<em>float</em>) – Total surface area of the room</p></li>
+<li><p><strong>Eq_A</strong> (<em>array</em><em> of </em><em>floats</em>) – Equivalent absorption</p></li>
+<li><p><strong>tcalc</strong> (<em>str</em>) – Type of calculation; “decay” if the source switches off and “stationarysource” if the source is stationary</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>spl_r_band</strong> (<em>array of floats</em>) – Sound pressure level over time at the receiver position per each frequency band</p></li>
+<li><p><strong>spl_r_off_band</strong> (<em>array of floats</em>) – Sound pressure level over time after the source is switched off at the receiver position per each frequency band</p></li>
+<li><p><strong>spl_r_norm_band</strong> (<em>list of arrays</em>) – Sound pressure level over time at the receiver position per each frequency band normalised to its maximum level</p></li>
+<li><p><strong>sch_db_band</strong> (<em>list of arrays</em>) – Energy density over time after the source is switched off at the receiver position per each frequency band</p></li>
+<li><p><strong>spl_t0_band</strong> (<em>list of arrays</em>) – Sound pressure level at the time step t= 0 (when the source is switched off) at the receiver position per each frequency band</p></li>
+<li><p><strong>spl_new_band</strong> (<em>list of arrays</em>) – Sound pressure level at the time step n+1 per each mesh point per each frequency band</p></li>
+<li><p><strong>spl_rec_x_t0_band</strong> (<em>list of arrays</em>) – Sound pressure level at the time step t= 0 (when the source is switched off) per each receiver position in a line per each frequency band</p></li>
+<li><p><strong>t30_band</strong> (<em>array of floats</em>) – Reverberation time T30 per each frequency band</p></li>
+<li><p><strong>edt_band</strong> (<em>array of floats</em>) – Early decay time per each frequency band</p></li>
+<li><p><strong>c80_band</strong> (<em>array of floats</em>) – Clarity per each frequency band</p></li>
+<li><p><strong>d50_band</strong> (<em>array of floats</em>) – Definition per each frequency band</p></li>
+<li><p><strong>ts_band</strong> (<em>array of floats</em>) – Centre time per each frequency band</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteDifferenceMethod.FDMfunctions.initial_condition">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteDifferenceMethod.FDMfunctions.</span></span><span class="sig-name descname"><span class="pre">initial_condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ws</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sourceon_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recording_steps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteDifferenceMethod/FDMfunctions.html#initial_condition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.initial_condition" title="Link to this definition"></a></dt>
+<dd><p>Definition of initial conditions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dx</strong> (<em>float</em>) – distance step between mesh points in the x axis (recommended 0.5)</p></li>
+<li><p><strong>dy</strong> (<em>float</em>) – distance step between mesh points in the y axis (recommended equal to dx)</p></li>
+<li><p><strong>dz</strong> (<em>float</em>) – distance step between mesh points in the z axis (recommended equal to dx)</p></li>
+<li><p><strong>Ws</strong> (<em>float</em>) – Power of the source</p></li>
+<li><p><strong>sourceon_steps</strong> (<em>int</em>) – Number of time steps that the source stays on</p></li>
+<li><p><strong>recording_steps</strong> (<em>int</em>) – Number of time steps</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>Vs</strong> (<em>float</em>) – Volume of the source</p></li>
+<li><p><strong>w1</strong> (<em>float</em>) – Power density of the source [Watts/(m^3))]</p></li>
+<li><p><strong>s1</strong> (<em>array of floats</em>) – Energy density of source number 1 at each source on time step position</p></li>
+<li><p><strong>source1</strong> (<em>array of floats</em>) – Energy density of source number 1 at time step position</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteDifferenceMethod.FDMfunctions.number_freq">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteDifferenceMethod.FDMfunctions.</span></span><span class="sig-name descname"><span class="pre">number_freq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_octave</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fc_high</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fc_low</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteDifferenceMethod/FDMfunctions.html#number_freq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.number_freq" title="Link to this definition"></a></dt>
+<dd><p>Calculation of the frequency array and the number of frequency bands.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_octave</strong> (<em>int</em>) – Number of octaves to calculate (1 or 3 octaves).</p></li>
+<li><p><strong>fc_high</strong> (<em>int</em>) – The highest frequency in the calculation.</p></li>
+<li><p><strong>fc_low</strong> (<em>int</em>) – The lowest frequency in the calculation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>nBands</strong> (<em>int</em>) – Number of frequency bands.</p></li>
+<li><p><strong>center_freq</strong> (<em>list of float</em>) – Array of all the frequencies to calculate.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteDifferenceMethod.FDMfunctions.rec_sourceon_time">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteDifferenceMethod.FDMfunctions.</span></span><span class="sig-name descname"><span class="pre">rec_sourceon_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nBands</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Eq_A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteDifferenceMethod/FDMfunctions.html#rec_sourceon_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.rec_sourceon_time" title="Link to this definition"></a></dt>
+<dd><p>Calculation of the time the sources stays on and the recording time</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nBands</strong> (<em>int</em>) – Number of frequency bands</p></li>
+<li><p><strong>V</strong> (<em>float</em>) – Volume of the room</p></li>
+<li><p><strong>Eq_A</strong> (<em>array</em><em> of </em><em>floats</em>) – Equivalent absorption</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – Time step</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>RT_Sabine_band</strong> (<em>list</em>) – Reverberation time calculated with Sabine</p></li>
+<li><p><strong>sourceon_time</strong> (<em>float</em>) – Time that the source stays on</p></li>
+<li><p><strong>recording_time</strong> (<em>float</em>) – Length of the simulaton run</p></li>
+<li><p><strong>t</strong> (<em>array of floats</em>) – Time array of time steps</p></li>
+<li><p><strong>recording_steps</strong> (<em>int</em>) – Number of time steps</p></li>
+<li><p><strong>sourceon_steps</strong> (<em>int</em>) – Number of time steps that the source is on.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteDifferenceMethod.FDMfunctions.receiver_interpolation">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteDifferenceMethod.FDMfunctions.</span></span><span class="sig-name descname"><span class="pre">receiver_interpolation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coord_rec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteDifferenceMethod/FDMfunctions.html#receiver_interpolation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.receiver_interpolation" title="Link to this definition"></a></dt>
+<dd><p>Interpolation of receiver position</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coord_rec</strong> (<em>list</em>) – Coordinates of the receiver position</p></li>
+<li><p><strong>dx</strong> (<em>float</em>) – distance step between mesh points in the x axis (recommended 0.5)</p></li>
+<li><p><strong>dy</strong> (<em>float</em>) – distance step between mesh points in the y axis (recommended equal to dx)</p></li>
+<li><p><strong>dz</strong> (<em>float</em>) – distance step between mesh points in the z axis (recommended equal to dx)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>row_lr_r</strong> (<em>int</em>) – Lower fractional index in the x direction of the receiver position</p></li>
+<li><p><strong>row_up_r</strong> (<em>int</em>) – Upper fractional index in the x direction of the receiver position</p></li>
+<li><p><strong>col_lr_r</strong> (<em>int</em>) – Lower fractional index in the y direction of the receiver position</p></li>
+<li><p><strong>col_up_r</strong> (<em>int</em>) – Upper fractional index in the y direction of the receiver position</p></li>
+<li><p><strong>dep_lr_r</strong> (<em>int</em>) – Lower fractional index in the z direction of the receiver position</p></li>
+<li><p><strong>dep_up_r</strong> (<em>int</em>) – Upper fractional index in the z direction of the receiver position</p></li>
+<li><p><strong>weight_row_lr_r</strong> (<em>float</em>) – Lower interpolation weight in the x direction of the receiver position</p></li>
+<li><p><strong>weight_row_up_r</strong> (<em>float</em>) – Upper interpolation weight in the x direction of the receiver position</p></li>
+<li><p><strong>weight_col_lr_r</strong> (<em>float</em>) – Lower interpolation weight in the y direction of the receiver position</p></li>
+<li><p><strong>weight_col_up_r</strong> (<em>float</em>) – Upper interpolation weight in the y direction of the receiver position</p></li>
+<li><p><strong>weight_dep_lr_r</strong> (<em>float</em>) – Lower interpolation weight in the z direction of the receiver position</p></li>
+<li><p><strong>weight_dep_up_rs</strong> (<em>float</em>) – Upper interpolation weight in the z direction of the receiver position</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteDifferenceMethod.FDMfunctions.room_charact">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteDifferenceMethod.FDMfunctions.</span></span><span class="sig-name descname"><span class="pre">room_charact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteDifferenceMethod/FDMfunctions.html#room_charact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.room_charact" title="Link to this definition"></a></dt>
+<dd><p>Calculation of the total surface and volume of the room.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>length</strong> (<em>float</em>) – length of the room in meters.</p></li>
+<li><p><strong>width</strong> (<em>float</em>) – Width of the room in meters.</p></li>
+<li><p><strong>height</strong> (<em>float</em>) – Height of the room in meters.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>S1</strong> (<em>float</em>) – Surface area of the Surface 1 (floor).</p></li>
+<li><p><strong>S2</strong> (<em>float</em>) – Surface area of the Surface 2 (ceiling).</p></li>
+<li><p><strong>S3</strong> (<em>float</em>) – Surface area of the Surface 3 (wall front).</p></li>
+<li><p><strong>S4</strong> (<em>float</em>) – Surface area of the Surface 4 (wall back).</p></li>
+<li><p><strong>S5</strong> (<em>float</em>) – Surface area of the Surface 5 (wall left).</p></li>
+<li><p><strong>S6</strong> (<em>float</em>) – Surface area of the Surface 6 (wall right).</p></li>
+<li><p><strong>S</strong> (<em>float</em>) – Total surface area of the room</p></li>
+<li><p><strong>V</strong> (<em>float</em>) – Volume of the room</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteDifferenceMethod.FDMfunctions.save_fdm">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteDifferenceMethod.FDMfunctions.</span></span><span class="sig-name descname"><span class="pre">save_fdm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteDifferenceMethod/FDMfunctions.html#save_fdm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.save_fdm" title="Link to this definition"></a></dt>
+<dd><p>Saving of variables</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – Name of the file to save the results</p></li>
+<li><p><strong>variables</strong> (<em>dict</em>) – Compilation of all the variables of the overall simulation</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteDifferenceMethod.FDMfunctions.source_interpolation">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteDifferenceMethod.FDMfunctions.</span></span><span class="sig-name descname"><span class="pre">source_interpolation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coord_source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ny</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nz</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteDifferenceMethod/FDMfunctions.html#source_interpolation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteDifferenceMethod.FDMfunctions.source_interpolation" title="Link to this definition"></a></dt>
+<dd><p>Interpolation of source position</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coord_source</strong> (<em>list</em>) – Coordinates of the source position</p></li>
+<li><p><strong>dx</strong> (<em>float</em>) – distance step between mesh points in the x axis (recommended 0.5)</p></li>
+<li><p><strong>dy</strong> (<em>float</em>) – distance step between mesh points in the y axis (recommended equal to dx)</p></li>
+<li><p><strong>dz</strong> (<em>float</em>) – distance step between mesh points in the z axis (recommended equal to dx)</p></li>
+<li><p><strong>source1</strong> (<em>array</em><em> of </em><em>floats</em>) – Energy density of source number 1 at time step position</p></li>
+<li><p><strong>Nx</strong> (<em>int</em>) – Number of mesh points in the x direction.</p></li>
+<li><p><strong>Ny</strong> (<em>int</em>) – Number of mesh points in the y direction.</p></li>
+<li><p><strong>Nz</strong> (<em>int</em>) – Number of mesh points in the z direction.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>s</strong> (<em>array of floats</em>) – Matrix of 3D mesh points inserting source energy</p></li>
+<li><p><strong>row_lr_s</strong> (<em>int</em>) – Lower fractional index in the x direction of the source position</p></li>
+<li><p><strong>row_up_s</strong> (<em>int</em>) – Upper fractional index in the x direction of the source position</p></li>
+<li><p><strong>col_lr_s</strong> (<em>int</em>) – Lower fractional index in the y direction of the source position</p></li>
+<li><p><strong>col_up_s</strong> (<em>int</em>) – Upper fractional index in the y direction of the source position</p></li>
+<li><p><strong>dep_lr_s</strong> (<em>int</em>) – Lower fractional index in the z direction of the source position</p></li>
+<li><p><strong>dep_up_s</strong> (<em>int</em>) – Upper fractional index in the z direction of the source position</p></li>
+<li><p><strong>weight_row_lr_s</strong> (<em>float</em>) – Lower interpolation weight in the x direction of the source position</p></li>
+<li><p><strong>weight_row_up_s</strong> (<em>float</em>) – Upper interpolation weight in the x direction of the source position</p></li>
+<li><p><strong>weight_col_lr_s</strong> (<em>float</em>) – Lower interpolation weight in the y direction of the source position</p></li>
+<li><p><strong>weight_col_up_s</strong> (<em>float</em>) – Upper interpolation weight in the y direction of the source position</p></li>
+<li><p><strong>weight_dep_lr_s</strong> (<em>float</em>) – Lower interpolation weight in the z direction of the source position</p></li>
+<li><p><strong>weight_dep_up_s</strong> (<em>float</em>) – Upper interpolation weight in the z direction of the source position</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../DocumentationAuralization.html" class="btn btn-neutral float-left" title="Auralization Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="FVMfunctions.html" class="btn btn-neutral float-right" title="FVM functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Ilaria Fichera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

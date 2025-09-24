@@ -1,0 +1,354 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Finite Volume Method Use &mdash; Diffusion Equation for Acoustics 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=2709fde1"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Auralization Use" href="Auralization%20Use.html" />
+    <link rel="prev" title="Finite Different Method Use" href="Finite%20Different%20Method%20Use.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Diffusion Equation for Acoustics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Software Presentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Overview.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Use:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Different%20Method%20Use.html">Finite Different Method Use</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Finite Volume Method Use</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usage-files">Usage &amp; files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inputs">Inputs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#geometry-mesh">Geometry &amp; Mesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#general-inputs">General inputs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#sound-source">Sound source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#receiver">Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#frequency-range">Frequency range</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#time-discretization-dt">Time discretization dt</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#air-absorption">Air absorption</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#absorption-term">Absorption Term</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#type-of-calculation">Type of calculation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#surface-materials">Surface materials</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#acoustics-calculation">Acoustics Calculation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#acoustics-parameters">Acoustics parameters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#sound-density-level">Sound Density Level</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sound-pressure-level">Sound Pressure Level</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reverberation-time-rt-and-early-decay-time-edt">Reverberation time (RT) and Early Decay Time (EDT)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#clarity-definition-and-centre-time">Clarity, Definition and Centre Time</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Auralization%20Use.html">Auralization Use</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Theory:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="DocumentationFDM.html">Diffusion Equation Finite Different Method (FDM) documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DocumentationFVM.html">Diffusion Equation Finite Volume Method (FVM) Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DocumentationAuralization.html">Auralization Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="acousticDE/FDMfunctions.html">FDM functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acousticDE/FVMfunctions.html">FVM functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acousticDE/ReverberationFunctions.html">Reverberation functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acousticDE/Auralizationfunctions.html">Auralization functions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Different%20Method%20Demo%20Tutorial.html">Finite Different Method Demo Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Volume%20Method%20Demo%20Tutorial.html">Finite Volume Method Demo Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Diffusion Equation for Acoustics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Finite Volume Method Use</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Finite Volume Method Use.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="finite-volume-method-use">
+<h1>Finite Volume Method Use<a class="headerlink" href="#finite-volume-method-use" title="Link to this heading"></a></h1>
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Set up acousticDE following the instructions in the installation section.</p></li>
+<li><p>Download and install SketchUp from <a class="reference external" href="https://www.sketchup.com/plans-and-pricing/sketchup-free">SketchUp website</a> or use the free web-based platform;</p></li>
+<li><p>Download and install g-mesh from <a class="reference external" href="https://gmsh.info/">G-msh website</a>;</p></li>
+<li><p>Install the MeshKit extension of SketchUp from the extension warehouse.</p></li>
+</ol>
+</section>
+<section id="usage-files">
+<h2>Usage &amp; files<a class="headerlink" href="#usage-files" title="Link to this heading"></a></h2>
+<p>To use the software, the following files are to be used:</p>
+<ul class="simple">
+<li><p><em>PrepareInputsFVM.py</em>: to create the json file with the inputs of the room;</p></li>
+<li><p><em>CreateMeshFVM.py</em>: to create the volumetric mesh using Gmsh software;</p></li>
+<li><p><em>FVM.py</em>: it contains the main function run_fvm_sim to run the full simulation and calculate the acoustics parameters in the room.</p></li>
+</ul>
+<p>The main software works with the following associated functions:</p>
+<ul class="simple">
+<li><p><em>FVMfunctions.py</em> include all the main functions that are used in the full simulation;</p></li>
+<li><p><em>FunctionRT.py</em> calculates the reverberation time of the room in question;</p></li>
+<li><p><em>FunctionClarity.py</em> calculates the clarity <span class="math notranslate nohighlight">\(C_{80}\)</span> of the room in question based on Barron’s revised theory formula;</p></li>
+<li><p><em>FunctionDefinition.py</em> calculates the definition <span class="math notranslate nohighlight">\(D_{50}\)</span> of the room in question based on Barron’s revised theory formula;</p></li>
+<li><p><em>FunctionCentreTime.py</em> calculates the centre time <span class="math notranslate nohighlight">\(T_s\)</span> of the room in question based on Barron’s revised theory formula.</p></li>
+</ul>
+</section>
+<section id="inputs">
+<h2>Inputs<a class="headerlink" href="#inputs" title="Link to this heading"></a></h2>
+<section id="geometry-mesh">
+<h3>Geometry &amp; Mesh<a class="headerlink" href="#geometry-mesh" title="Link to this heading"></a></h3>
+<p>The geometry for this method is defined within SketchUp.
+In order to create a volumetric mesh of the room, the following steps need to be follow in SketchUp:</p>
+<ol class="arabic simple">
+<li><p>Create the 3D geometry of the room to simulate in SketchUp, setting the units of the geometry in meters;</p></li>
+<li><p>In the MeshKit extension banner in SketchUp software, set the active mesher to gmsh by clicking on the “edit configuration button”
+<img alt="editconfigurationbutton" src="_images/editconfigurationbutton.png" /></p></li>
+<li><p>Include the Gmsh Path of the gmsh.exe and select gmsh as the active mesher;</p></li>
+<li><p>Group the overal geometry (surfaces and edges) bounding the internal air volume by selecting everything, right-clicking and clicking “Make Group”;</p></li>
+<li><p>Select the Group and click “Set selected as an smesh region and define properties” <img alt="Set selected as an smesh region and define properties" src="_images/setselectedasansmeshregion.png" /> in MeshKit;</p></li>
+<li><p>In the “Region Options: gmsh” menu, keep all the default option but change only the name of the region by writing, for example, “RoomVolume” and click “ok”;</p></li>
+<li><p>Open the group by double clicking on the object;</p></li>
+<li><p>Select one or multiple surfaces you want to assign a boundary property;</p></li>
+<li><p>Click “Add tetgen boundary to selected” <img alt="Add tetgen boundary to selected" src="_images/addtetgenboundary.png" /> in MeshKit;</p></li>
+<li><p>Under “Refine”, change the refinement to 1;</p></li>
+<li><p>Under “Name”: change the name to “materialname” e.g.”carpet” and click “ok”;</p></li>
+<li><p>After finishing defining all the boundaries, select the group and click “export to generate mesh” <img alt="export to generate mesh" src="_images/export.png" /> in MeshKit;</p></li>
+<li><p>Select Format = “gmsh” en Units = “m” and click “ok”;</p></li>
+<li><p>Keep the default options apart from “pointSizes” which should change to True, click “ok” and save the .geo file with the name of your choice;</p></li>
+</ol>
+<p>The .geo file has been created. This needs to be converted into a .msh file, to get the full volumetric mesh.
+Using the <a href="https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/acousticDE/refs/heads/master/acousticDE/FiniteVolumeMethod/CreateMeshFVM.py" download>â¬‡ Download CreateMeshFVM.py</a> script, please input the following variables:</p>
+<ul class="simple">
+<li><p>the name of the names of the geo file you want to simulate (e.g. <em>3x3x3.geo</em>);</p></li>
+<li><p>the name of the mesh file you want this python file to generate (e.g. <em>3x3x3.msh</em>); and</p></li>
+<li><p>the length_of_mesh. The mesh length value describes the size of the spatial resolution of the mesh in the space and is vital to discretize correctly the space and achieve precise and converged results. Through various trials, it has been established that a mesh length of 1 meters is generally adequate. However, for computations involving complex geometries or small rooms, a smaller length of mesh (0.5 meters or lower) is recommended. The mesh length choice is contingent upon user preferences for details in parameters values, room dimensions but mostly dependent on the mean free path of the room. Infact, the length of mesh would need to be of the order of one mean free path of the room (equal or smaller than the mean free path of the room).</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">name_of_geo_file</span> <span class="o">=</span> <span class="s1">&#39;3x3x3.geo&#39;</span>
+<span class="n">name_of_gmsh_file</span> <span class="o">=</span> <span class="s2">&quot;3x3x3.msh&quot;</span>
+<span class="n">length_of_mesh</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<p>This script create the volumetric mesh using Gmsh software. The method is suitable for any type of geometry.</p>
+</section>
+<section id="general-inputs">
+<h3>General inputs<a class="headerlink" href="#general-inputs" title="Link to this heading"></a></h3>
+<p>The general inputs needs to be set by using the script <a href="https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/acousticDE/refs/heads/master/acousticDE/FiniteVolumeMethod/PrepareInputsFVM.py" download>â¬‡ Download PrepareInputsFVM.py</a></p>
+<!-- 
+[_PrepareInputsFVM.py_](https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/Diffusion/refs/heads/master/acousticDE/FiniteVolumeMethod/PrepareInputsFVM.py?raw=true) -->
+<p>Please download the script and define the following inputs:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">input_data</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;coord_source&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">],</span> <span class="c1">#source coordinates x,y,z</span>
+    <span class="s2">&quot;coord_rec&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">],</span> <span class="c1">#rec coordinates x,y,z</span>
+    <span class="s2">&quot;fc_low&quot;</span><span class="p">:</span> <span class="mi">125</span><span class="p">,</span> <span class="c1">#lowest frequency</span>
+    <span class="s2">&quot;fc_high&quot;</span><span class="p">:</span> <span class="mi">2000</span><span class="p">,</span> <span class="c1">#highest frequency</span>
+    <span class="s2">&quot;num_octave&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="c1"># 1 or 3 depending on how many octave you want</span>
+    <span class="s2">&quot;dt&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="o">/</span><span class="mi">20000</span><span class="p">,</span> <span class="c1">#time discretization</span>
+    <span class="s2">&quot;m_atm&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="c1">#air absorption coefficient [1/m]</span>
+    <span class="s2">&quot;th&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="c1">#int(input(&quot;Enter type Absortion conditions (option 1,2,3):&quot;)) # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)</span>
+    <span class="s2">&quot;tcalc&quot;</span><span class="p">:</span> <span class="s2">&quot;decay&quot;</span> <span class="c1">#Choose &quot;decay&quot; if the objective is to calculate the energy decay of the room with all its energetic parameters; Choose &quot;stationarysource&quot; if the aim is to understand the behaviour of a room subject to a stationary source</span>
+<span class="p">}</span>
+
+<span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">script_dir</span><span class="p">,</span> <span class="s1">&#39;3x3x3.msh&#39;</span><span class="p">)</span> <span class="c1"># Full path to the file</span>
+</pre></div>
+</div>
+<section id="sound-source">
+<h4>Sound source<a class="headerlink" href="#sound-source" title="Link to this heading"></a></h4>
+<p>The sound sources for this method are defined within the <em>PrepareInputsFVM.py</em> python script.
+The model allows for the insertion of only one source position per calculation.
+The sound source is defined as an omnidirectional source. The users can input the sound power of the source <span class="math notranslate nohighlight">\(W_s\)</span> in Watts and its position in the room in the following variables <em>x_{source}</em>,<em>y_{source}</em>,<em>z_{source}</em> in meters in the x,y,z directions.</p>
+</section>
+<section id="receiver">
+<h4>Receiver<a class="headerlink" href="#receiver" title="Link to this heading"></a></h4>
+<p>The receivers for this method are defined within the <em>PrepareInputsFVM.py</em> python script.
+The model allows for the insertion of only one acoustics receiver position per calculation. These are defined as point omnidirectional receivers. The users will input the position of the receiver in the room in the following variables <em>x_{rec}</em>,<em>y_{rec}</em>,<em>z_{rec}</em> in meters in the x,y,z directions.</p>
+</section>
+<section id="frequency-range">
+<h4>Frequency range<a class="headerlink" href="#frequency-range" title="Link to this heading"></a></h4>
+<p>The frequency range for this method is defined within the <em>PrepareInputsFVM.py</em> python script.
+The frequency resolution should be included as inputs variables <em>fc_{low}</em> and <em>fc_{high}</em>; these should be the middle frequency of a band. The maximum number of frequencies is set in octave bands and can be choosen by the user. Normally, <em>fc_{low}</em> is set to 125 Hz and <em>fc_{high}</em> is set to 2000 Hz. The number of octave need to be also set: 1 for one octave and 3 for third octave bands.</p>
+</section>
+<section id="time-discretization-dt">
+<h4>Time discretization dt<a class="headerlink" href="#time-discretization-dt" title="Link to this heading"></a></h4>
+<p>The time discretization for this method is defined within the <em>FVM.py</em> python script.
+The time discretization will need to be chosen appropriately.
+According the Navarro 2012, to get good converged results, the time discretization <span class="math notranslate nohighlight">\(\Delta t\)</span> will need to be defined depending on the length of mesh chosen. To make sure that the predictions converge to a fixed value with a very low error, the following empirical criterion will need to apply.</p>
+<div class="math notranslate nohighlight">
+\[10^{-8} = \Delta t^2 \Delta v^{-2}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Delta v\)</span> is the mesh length chosen.
+The time discretization is defined in seconds.</p>
+</section>
+</section>
+<section id="air-absorption">
+<h3>Air absorption<a class="headerlink" href="#air-absorption" title="Link to this heading"></a></h3>
+<p>The air absorption for this method is defined within the <em>PrepareInputsFVM.py</em> python script.
+The absorption of air will need to be entered. The air absorption is defined as <em>m_{atm}</em> and in 1/meters and it is only one value for all the frequency bands.</p>
+<section id="absorption-term">
+<h4>Absorption Term<a class="headerlink" href="#absorption-term" title="Link to this heading"></a></h4>
+<p>In the diffusion equation model, three different absorption terms conditions can be used. More info about these terms are shown in the software theory documentation of the FVM. The user can choose the preferred one. The options are Option 1 for the Sabine absorption term, Option 2 for Eyring absorption term and Option 3 for the Modified absorption term. These are absorption factors for the boundary conditions. Currently, the most accurate absorption factor is set as the Option 3 Modified as it has been demostrated that this is accurate for low and high absorption coefficients.</p>
+</section>
+<section id="type-of-calculation">
+<h4>Type of calculation<a class="headerlink" href="#type-of-calculation" title="Link to this heading"></a></h4>
+<p>The type of calculation for this method is defined within the <em>PrepareInputsFVM.py</em> python script.
+The source is defined as an interrupted noise source. The time within which the source stays on before getting switch off is predefined depending on the theoretical calculated Sabine reverberation time of the room in the variable <em>sourceon_{time}</em>. There is the option to toggle the sound source on and off or keep it stationary. This can be done by changing the variable “tcalc” from “decay” to “stationarysource”.</p>
+</section>
+<section id="surface-materials">
+<h4>Surface materials<a class="headerlink" href="#surface-materials" title="Link to this heading"></a></h4>
+<p>The surface materials names are defined in the SketchUp file as mentioned above.
+Each surface (including doors, windows etc…) would require frequency dependent absorption coefficients. The file <em>PrepareInputsFVM.py</em> will create a csv file, with a table of the surface name defined in SketchUp and the frequency range chosen. Open the .csv file and input all the absorption coefficients for each frequency and for each material.</p>
+<p>The file <em>PrepareInputsFVM.py</em> will create a .json file with the general inputs and a .csv file with a table for the absorption coefficients to fill in.</p>
+<!-- ### Fixed inputs
+Within the fixed inputs, there are:
+- Adiabatic speed of sound defined as 343 m/s;
+- Source power defined as 0.01 W (100dB);
+
+- Reference pressure defined as $2 \cdot (10^{-5})$ Pa;
+- Air density at 20Â°C defined as 1.21 $kg/m^{-3}$. -->
+</section>
+</section>
+</section>
+<section id="acoustics-calculation">
+<h2>Acoustics Calculation<a class="headerlink" href="#acoustics-calculation" title="Link to this heading"></a></h2>
+<p>Once all the inputs have been set, the main calculation can be run using the function run_fvm_sim as described in the API references. To run, this function, a .msh file, a .json file and a .csv file paths are needed. The acoustic calculation is based on the Finite Volume method (FVM) solving the diffusion equation (Munoz, 2019). More information regarding the Finite Volume Method in the paragraph below.</p>
+<section id="acoustics-parameters">
+<h3>Acoustics parameters<a class="headerlink" href="#acoustics-parameters" title="Link to this heading"></a></h3>
+<p>The diffusion equation method predicts the time-dependent and spatial-dependent propagation of the sound energy density <span class="math notranslate nohighlight">\(w(\mathbf{r}, t)\)</span> in the evaluated frequency bands.</p>
+<section id="sound-density-level">
+<h4>Sound Density Level<a class="headerlink" href="#sound-density-level" title="Link to this heading"></a></h4>
+<p>The sound density level can be expressed as function of sound energy density <span class="math notranslate nohighlight">\(w(\mathbf{r}, t)\)</span> as:</p>
+<div class="math notranslate nohighlight">
+\[SDL = 10 log_{10}â¡(w(\mathbf{r}, t))\]</div>
+</section>
+<section id="sound-pressure-level">
+<h4>Sound Pressure Level<a class="headerlink" href="#sound-pressure-level" title="Link to this heading"></a></h4>
+<p>After predicting the time-dependent sound energy density in the room, the sound pressure level decay curve can be expressed as function of sound energy density w(r, t) as:</p>
+<div class="math notranslate nohighlight">
+\[SPL = 20 log_{10} \left( \frac{w(\mathbf{r}, t) \rho c^2}{p_{ref}^2} \right )\]</div>
+<p>where <span class="math notranslate nohighlight">\(p_{ref}\)</span> is <span class="math notranslate nohighlight">\(2 \cdot 10^{-5}\)</span> Pa and <span class="math notranslate nohighlight">\(\rho \)</span> is the air density.</p>
+</section>
+<section id="reverberation-time-rt-and-early-decay-time-edt">
+<h4>Reverberation time (RT) and Early Decay Time (EDT)<a class="headerlink" href="#reverberation-time-rt-and-early-decay-time-edt" title="Link to this heading"></a></h4>
+<p>From the sound pressure level decay curve, the Reverberation time can be estimated. The RT is defined by the time that it takes for the sound pressure level to decay of 60 dB. Depending on the room geometry, occasionally it is difficult to evaluate 60 dB of decay and therefore, the <span class="math notranslate nohighlight">\(T_{30}\)</span> is evaluated. This is obtained from the slope between -5 and -35 dB of the maximum starting level.</p>
+<p>The Early Decay time is defined by the time that it takes for the sound pressure level to decay of 10 dB and it is calculated in a similar way. This is obtained from the slope between 0 and -10 dB of the maximum starting level.</p>
+</section>
+<section id="clarity-definition-and-centre-time">
+<h4>Clarity, Definition and Centre Time<a class="headerlink" href="#clarity-definition-and-centre-time" title="Link to this heading"></a></h4>
+<p>The Clarity (<span class="math notranslate nohighlight">\(C_{80}\)</span>) parameter is the early to late arriving sound energy ratio. Clarity refers to how clear the sound quality is and it is calculated from the impulse response with the following relation:</p>
+<div class="math notranslate nohighlight">
+\[C_{80} = 10 logâ¡ \left( \frac{\int_0^{80ms} p^2(t) \, dt}{\int_{80ms}^\infty p^2 (t) \, dt} \right ) \,  [dB]\]</div>
+<p>The Definition (<span class="math notranslate nohighlight">\(D_{50}\)</span>) parameter is the ratio of the early received sound energy (0-50ms after direct sound arrival) to the total received energy. It referres only to the speech and it is defined as:</p>
+<div class="math notranslate nohighlight">
+\[D_{50} = 10 log \left( \frac{\int_0^{50ms} p^2(t) \, dt}{\int_0^\infty p^2 (t) \, dt} \right ) \,  [\%]\]</div>
+<p>The Centre Time (T_s) parameter is the center of gravity of the squared impulse response. Centre Time avoids the discrete division of the impulse response into early and late periods.</p>
+<div class="math notranslate nohighlight">
+\[T_{s}=10 logâ¡ \left( \frac{\int_0^\infty tp^2(t) \, dt}{\int_0^\infty p^2(t) \, dt} \right)   \,  [s]\]</div>
+<p>A low value indicate that most of the energy arrives early, a high value reveals that there is much reverberance.</p>
+<p>The values for all these parameters are calculated from the Barronâ€™s revisited theory formulas (Vorlander, 2008) with the influence of the direct field neglected.</p>
+</section>
+</section>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>R. P. MuÃ±oz, Numerical modeling for urban sound propagation: developments in wave-based and energy based methods, PhD Thesis, Technische Universiteit Eindhoven, 2019.</p></li>
+<li><p>J. M. Navarro, J. Escolano, J. J. Lopez, Implementation and evaluation of a diffusion equation model based on finite difference schemes for sound field prediction in rooms, Applied Acoustics 73 (6-7) (2012) 659â€“665.</p></li>
+<li><p>M. VorlÃ¤nder, Auralization: fundamentals of acoustics, modelling, simulation, algorithms and acoustic virtual reality,  Springer 2008.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Finite%20Different%20Method%20Use.html" class="btn btn-neutral float-left" title="Finite Different Method Use" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Auralization%20Use.html" class="btn btn-neutral float-right" title="Auralization Use" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Ilaria Fichera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

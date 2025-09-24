@@ -1,0 +1,307 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Finite Different Method Use &mdash; Diffusion Equation for Acoustics 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=2709fde1"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Finite Volume Method Use" href="Finite%20Volume%20Method%20Use.html" />
+    <link rel="prev" title="Overview" href="Overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Diffusion Equation for Acoustics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Software Presentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Overview.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Use:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Finite Different Method Use</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usage-files">Usage &amp; files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inputs">Inputs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#room-dimensions">Room dimensions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sound-source">Sound source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#receiver">Receiver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#surface-material">Surface material</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#frequency-range">Frequency range</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spatial-discretization-delta-x">Spatial discretization <span class="math notranslate nohighlight">\(\Delta x\)</span></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#time-discretization-delta-t">Time discretization <span class="math notranslate nohighlight">\(\Delta t\)</span></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#air-absorption">Air absorption</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#absorption-term">Absorption Term</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#type-of-calculation">Type of calculation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#acoustics-calculation">Acoustics Calculation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#acoustics-parameters">Acoustics parameters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#sound-density-level">Sound Density Level</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sound-pressure-level">Sound Pressure Level</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reverberation-time-rt-and-early-decay-time-edt">Reverberation time (RT) and Early Decay Time (EDT)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#clarity-definition-and-centre-time">Clarity, Definition and Centre Time</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Volume%20Method%20Use.html">Finite Volume Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Auralization%20Use.html">Auralization Use</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Theory:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="DocumentationFDM.html">Diffusion Equation Finite Different Method (FDM) documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DocumentationFVM.html">Diffusion Equation Finite Volume Method (FVM) Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DocumentationAuralization.html">Auralization Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="acousticDE/FDMfunctions.html">FDM functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acousticDE/FVMfunctions.html">FVM functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acousticDE/ReverberationFunctions.html">Reverberation functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acousticDE/Auralizationfunctions.html">Auralization functions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Different%20Method%20Demo%20Tutorial.html">Finite Different Method Demo Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Volume%20Method%20Demo%20Tutorial.html">Finite Volume Method Demo Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Diffusion Equation for Acoustics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Finite Different Method Use</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Finite Different Method Use.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="finite-different-method-use">
+<h1>Finite Different Method Use<a class="headerlink" href="#finite-different-method-use" title="Link to this heading"></a></h1>
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
+<p>Set up acousticDE following the instructions in the installation section.</p>
+</section>
+<section id="usage-files">
+<h2>Usage &amp; files<a class="headerlink" href="#usage-files" title="Link to this heading"></a></h2>
+<p>To use the software, the following files are to be used:</p>
+<ul class="simple">
+<li><p><em>PrepareInputsFDM.py</em>: to create the json file with the inputs of the room;</p></li>
+<li><p><em>FDM.py</em>: it contains the main function run_fdm_sim to run the full simulation and calculate the acoustics parameters in the room.</p></li>
+</ul>
+<p>The main software works with the following associated functions:</p>
+<ul class="simple">
+<li><p><em>FDMfunctions.py</em> include all the main functions that are used in the full simulation;</p></li>
+<li><p><em>FunctionRT.py</em> calculates the reverberation time of the room in question;</p></li>
+<li><p><em>FunctionClarity.py</em> calculates the clarity <span class="math notranslate nohighlight">\(C_{80}\)</span> of the room in question based on Barron’s revised theory formula;</p></li>
+<li><p><em>FunctionDefinition.py</em> calculates the definition <span class="math notranslate nohighlight">\(D_{50}\)</span> of the room in question based on Barron’s revised theory formula;</p></li>
+<li><p><em>FunctionCentreTime.py</em> calculates the centre time <span class="math notranslate nohighlight">\(T_s\)</span> of the room in question based on Barron’s revised theory formula.</p></li>
+</ul>
+</section>
+<section id="inputs">
+<h2>Inputs<a class="headerlink" href="#inputs" title="Link to this heading"></a></h2>
+<p>The general inputs needs to be set by using the script <a href="https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/acousticDE/refs/heads/master/acousticDE/FiniteDifferenceMethod/PrepareInputsFDM.py" download>â¬‡ Download PrepareInputsFDM.py</a>.</p>
+<p>Please download the script and define the following inputs:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">input_data</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;room_dim&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">8.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">],</span> <span class="c1">#dimension of the room x,y,z</span>
+    <span class="s2">&quot;coord_source&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">],</span> <span class="c1">#source coordinates x,y,z</span>
+    <span class="s2">&quot;coord_rec&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span> <span class="c1">#rec coordinates x,y,z</span>
+    <span class="s2">&quot;alpha_1&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">],</span> <span class="c1">#Absorption coefficient for Surface1 - Floor</span>
+    <span class="s2">&quot;alpha_2&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">],</span> <span class="c1">#Absorption coefficient for Surface2 - Ceiling</span>
+    <span class="s2">&quot;alpha_3&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">],</span> <span class="c1">#Absorption coefficient for Surface3 - Wall Front</span>
+    <span class="s2">&quot;alpha_4&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">],</span> <span class="c1">#Absorption coefficient for Surface4 - Wall Back</span>
+    <span class="s2">&quot;alpha_5&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">],</span> <span class="c1">#Absorption coefficient for Surface5 - Wall Left</span>
+    <span class="s2">&quot;alpha_6&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">],</span> <span class="c1">#Absorption coefficient for Surface6 - Wall Right</span>
+    <span class="s2">&quot;fc_low&quot;</span><span class="p">:</span> <span class="mi">125</span><span class="p">,</span> <span class="c1">#lowest frequency</span>
+    <span class="s2">&quot;fc_high&quot;</span><span class="p">:</span> <span class="mi">4000</span><span class="p">,</span> <span class="c1">#highest frequency</span>
+    <span class="s2">&quot;num_octave&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="c1"># 1 or 3 depending on how many octave you want</span>
+    <span class="s2">&quot;dx&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="s2">&quot;dt&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="o">/</span><span class="mi">8000</span><span class="p">,</span> <span class="c1">#time discretization</span>
+    <span class="s2">&quot;m_atm&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="c1">#air absorption coefficient [1/m]</span>
+    <span class="s2">&quot;th&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="c1">#int(input(&quot;Enter type Absortion conditions (option 1,2,3):&quot;)) # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)</span>
+    <span class="s2">&quot;tcalc&quot;</span><span class="p">:</span> <span class="s2">&quot;decay&quot;</span> <span class="c1">#Choose &quot;decay&quot; if the objective is to calculate the energy decay of the room with all its energetic parameters; Choose &quot;stationarysource&quot; if the aim is to understand the behaviour of a room subject to a stationary source</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<section id="room-dimensions">
+<h3>Room dimensions<a class="headerlink" href="#room-dimensions" title="Link to this heading"></a></h3>
+<p>The geometry for this method is defined within the inputs variable section of the python file <em>PrepareInputsFDM.py</em>.
+The method is suitable for parallelepiped and cuboid spaces and therefore, the only inputs are the length, width and height of the room.</p>
+</section>
+<section id="sound-source">
+<h3>Sound source<a class="headerlink" href="#sound-source" title="Link to this heading"></a></h3>
+<p>The model allows for the insertion of only one source position per calculation.
+The sound source is defined as an omnidirectional source. The users can input the sound power of the source <em>W_{s}</em> in Watts and its position in the room in the following variables <em>x_{source}</em>,<em>y_{source}</em>,<em>z_{source}</em> in meters in the x,y,z directions.</p>
+</section>
+<section id="receiver">
+<h3>Receiver<a class="headerlink" href="#receiver" title="Link to this heading"></a></h3>
+<p>The model allows for the insertion of only one acoustics receiver position per calculation. These are defined as point omnidirectional receivers. The users will input the position of the receiver in the room in the following variables <em>x_{rec}</em>,<em>y_{rec}</em>,<em>z_{rec}</em> in meters in the x,y,z directions. The receiver position cannot be equal to the source position, otherwise it will give an error.</p>
+</section>
+<section id="surface-material">
+<h3>Surface material<a class="headerlink" href="#surface-material" title="Link to this heading"></a></h3>
+<p>The surface materials are defined within the inputs variable section of the python file _PrepareInputsFDM.py. The surface material requires a value of absorption coefficient per frequency per surface. It is not possible to include doors, windows or other items within a surface.</p>
+</section>
+<section id="frequency-range">
+<h3>Frequency range<a class="headerlink" href="#frequency-range" title="Link to this heading"></a></h3>
+<p>The frequency range for this method is defined within the <em>PrepareInputsFVM.py</em> python script.
+The frequency resolution should be included as inputs variables <em>fc_{low}</em> and <em>fc_{high}</em>; these should be the middle frequency of a band. The maximum number of frequencies is set in octave bands and can be choosen by the user. Normally, <em>fc_{low}</em> is set to 125 Hz and <em>fc_{high}</em> is set to 2000 Hz. The number of octave need to be also set: 1 for one octave and 3 for third octave bands.</p>
+</section>
+<section id="spatial-discretization-delta-x">
+<h3>Spatial discretization <span class="math notranslate nohighlight">\(\Delta x\)</span><a class="headerlink" href="#spatial-discretization-delta-x" title="Link to this heading"></a></h3>
+<p>The Finite Different method works with a spatial discretization. The space is defined by a mesh grid of points at a distance <span class="math notranslate nohighlight">\(\Delta v\)</span> between each other. The distance <span class="math notranslate nohighlight">\(\Delta v\)</span> is equal for each dimension <span class="math notranslate nohighlight">\(x,y,z\)</span>, therefore <span class="math notranslate nohighlight">\(\Delta v = \Delta x = \Delta y = \Delta z\)</span>, and it is defined in meters.
+It is important to choose an appropriate <span class="math notranslate nohighlight">\(\Delta v\)</span> for the precision of the calculation.
+A <span class="math notranslate nohighlight">\(\Delta v\)</span> of 0.5 meters normally would suffice for a correct calculation, although the choice is contingent upon user preferences for details in parameters values and room dimensions. It is strongly advised that <span class="math notranslate nohighlight">\(\Delta v\)</span> is a factor of the dimensions of the room (e.g. for a room of 3 x 3 x 3 <span class="math notranslate nohighlight">\(m^3\)</span>, <span class="math notranslate nohighlight">\(\Delta v\)</span> could be 0.5 meters or 0.2 meters or 0.1 meters but it should not be 0.4 meters).</p>
+</section>
+<section id="time-discretization-delta-t">
+<h3>Time discretization <span class="math notranslate nohighlight">\(\Delta t\)</span><a class="headerlink" href="#time-discretization-delta-t" title="Link to this heading"></a></h3>
+<p>According the Navarro 2012, to get good converged results, the time discretization <span class="math notranslate nohighlight">\(\Delta t\)</span> will need to be defined depending on the <span class="math notranslate nohighlight">\(\Delta v\)</span> chosen.
+To make sure that the predictions converge to a fixed value with a very low error, the following empirical cretirion will need to apply.</p>
+<div class="math notranslate nohighlight">
+\[10^{-8} = \Delta t^2 \Delta v^{-2}\]</div>
+<p>The time discretization is defined in seconds.</p>
+</section>
+<section id="air-absorption">
+<h3>Air absorption<a class="headerlink" href="#air-absorption" title="Link to this heading"></a></h3>
+<p>The absorption of the air will need to be inputted. The air absorption is defined as <em>m_{atm}</em> and in 1/meters.</p>
+</section>
+<section id="absorption-term">
+<h3>Absorption Term<a class="headerlink" href="#absorption-term" title="Link to this heading"></a></h3>
+<p>In the diffusion equation model, three different absorption terms conditions can be used. More info about these terms are shown in the software theory documentation of the FVM. The user can choose the preferred one. The options are Option 1 for the Sabine absorption term, Option 2 for Eyring absorption term and Option 3 for the Modified absorption term. These are absorption factors for the boundary conditions. Currently, the most accurate absorption factor is set as the Option 3 Modified as it has been demostrated that this is accurate for low and high absorption coefficients.</p>
+</section>
+<section id="type-of-calculation">
+<h3>Type of calculation<a class="headerlink" href="#type-of-calculation" title="Link to this heading"></a></h3>
+<p>The type of calculation for this method is defined within the <em>PrepareInputsFDM.py</em> python script.
+The source is defined as an interrupted noise source. The time within which the source stays on before getting switch off is predefined depending on the theoretical calculated Sabine reverberation time of the room in the variable <em>sourceon_{time}</em>. There is the option to toggle the sound source on and off or keep it stationary. This can be done by changing the variable “tcalc” from “decay” to “stationarysource”.</p>
+<p>The file <em>PrepareInputsFDM.py</em> will create a .json file with the general inputs. This will be used in the main running function.</p>
+</section>
+</section>
+<section id="acoustics-calculation">
+<h2>Acoustics Calculation<a class="headerlink" href="#acoustics-calculation" title="Link to this heading"></a></h2>
+<p>Once all the inputs have been set, the main calculation can be run using the function run_fvm_sim as described in the API references. To run, this function, a .json file path is needed. The acoustic calculation is based on the Du Fort and Frankel method (explicit unconditionally stable Finite difference method) solving the diffusion equation (Navarro et al., 2012). More information regarding the Finite Different Method in the paragraph below.</p>
+<section id="acoustics-parameters">
+<h3>Acoustics parameters<a class="headerlink" href="#acoustics-parameters" title="Link to this heading"></a></h3>
+<p>The diffusion equation method predicts the time-dependent propagation of the sound energy density <span class="math notranslate nohighlight">\(w(\mathbf{r}, t)\)</span> in the evaluated frequency band.</p>
+<section id="sound-density-level">
+<h4>Sound Density Level<a class="headerlink" href="#sound-density-level" title="Link to this heading"></a></h4>
+<p>The sound density level can be expressed as function of sound energy density <span class="math notranslate nohighlight">\(w(\mathbf{r}, t)\)</span> as:</p>
+<div class="math notranslate nohighlight">
+\[SDL = 10 log_{10}â¡(w(\mathbf{r}, t))\]</div>
+</section>
+<section id="sound-pressure-level">
+<h4>Sound Pressure Level<a class="headerlink" href="#sound-pressure-level" title="Link to this heading"></a></h4>
+<p>After predicting the time-dependent sound energy density in the room, the sound pressure level decay curve can be expressed as function of sound energy density w(r, t) as:</p>
+<div class="math notranslate nohighlight">
+\[SPL = 20 log_{10} \left( \frac{w(\mathbf{r}, t) \rho c^2}{p_{ref}^2} \right )\]</div>
+<p>where <span class="math notranslate nohighlight">\(p_{ref}\)</span> is <span class="math notranslate nohighlight">\(2 \cdot 10^{-5}\)</span> Pa and <span class="math notranslate nohighlight">\(\rho \)</span> is the air density.</p>
+</section>
+<section id="reverberation-time-rt-and-early-decay-time-edt">
+<h4>Reverberation time (RT) and Early Decay Time (EDT)<a class="headerlink" href="#reverberation-time-rt-and-early-decay-time-edt" title="Link to this heading"></a></h4>
+<p>From the sound pressure level decay curve, the Reverberation time can be estimated. The RT is defined by the time that it takes for the sound pressure level to decay of 60 dB. Depending on the room geometry, occasionally it is difficult to evaluate 60 dB of decay and therefore, the <span class="math notranslate nohighlight">\(T_{30}\)</span> is evaluated. This is obtained from the slope between -5 and -35 dB of the maximum starting level.</p>
+<p>The Early Decay time is defined by the time that it takes for the sound pressure level to decay of 10 dB and it is calculated in a similar way. This is obtained from the slope between 0 and -10 dB of the maximum starting level.</p>
+</section>
+<section id="clarity-definition-and-centre-time">
+<h4>Clarity, Definition and Centre Time<a class="headerlink" href="#clarity-definition-and-centre-time" title="Link to this heading"></a></h4>
+<p>The Clarity (<span class="math notranslate nohighlight">\(C_{80}\)</span>) parameter is the early to late arriving sound energy ratio. Clarity refers to how clear the sound quality is and it is calculated from the impulse response with the following relation:</p>
+<div class="math notranslate nohighlight">
+\[C_{80} = 10 logâ¡ \left( \frac{\int_0^{80ms} p^2(t) \, dt}{\int_{80ms}^\infty p^2 (t) \, dt} \right ) \,  [dB]\]</div>
+<p>The Definition (<span class="math notranslate nohighlight">\(D_{50}\)</span>) parameter is the ratio of the early received sound energy (0-50ms after direct sound arrival) to the total received energy. It referres only to the speech and it is defined as:</p>
+<div class="math notranslate nohighlight">
+\[D_{50} = 10 log \left( \frac{\int_0^{50ms} p^2(t) \, dt}{\int_0^\infty p^2 (t) \, dt} \right ) \,  [\%]\]</div>
+<p>The Centre Time (T_s) parameter is the center of gravity of the squared impulse response. Centre Time avoids the discrete division of the impulse response into early and late periods.</p>
+<div class="math notranslate nohighlight">
+\[T_{s}=10 logâ¡ \left( \frac{\int_0^\infty tp^2(t) \, dt}{\int_0^\infty p^2(t) \, dt} \right)   \,  [s]\]</div>
+<p>A low value indicate that most of the energy arrives early, a high value reveals that there is much reverberance.</p>
+<p>The values for all these parameters are calculated from the Barronâ€™s revisited theory formulas (Vorlander, 2008) with the influence of the direct field neglected.</p>
+</section>
+</section>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>J. M. Navarro, J. Escolano, J. J. Lopez, Implementation and evaluation of a diffusion equation model based on finite difference schemes for sound field prediction in rooms, Applied Acoustics 73 (6-7) (2012) 659â€“665.</p></li>
+<li><p>M. VorlÃ¤nder, Auralization: fundamentals of acoustics, modelling, simulation, algorithms and acoustic virtual reality,  Springer 2008.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Overview.html" class="btn btn-neutral float-left" title="Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Finite%20Volume%20Method%20Use.html" class="btn btn-neutral float-right" title="Finite Volume Method Use" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Ilaria Fichera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

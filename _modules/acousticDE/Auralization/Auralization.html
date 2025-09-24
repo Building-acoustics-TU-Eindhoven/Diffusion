@@ -1,0 +1,371 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>acousticDE.Auralization.Auralization &mdash; Diffusion Equation for Acoustics 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Diffusion Equation for Acoustics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Software Presentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Overview.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Use:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Finite%20Different%20Method%20Use.html">Finite Different Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Finite%20Volume%20Method%20Use.html">Finite Volume Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Auralization%20Use.html">Auralization Use</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Theory:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../DocumentationFDM.html">Diffusion Equation Finite Different Method (FDM) documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../DocumentationFVM.html">Diffusion Equation Finite Volume Method (FVM) Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../DocumentationAuralization.html">Auralization Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../acousticDE/FDMfunctions.html">FDM functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../acousticDE/FVMfunctions.html">FVM functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../acousticDE/ReverberationFunctions.html">Reverberation functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../acousticDE/Auralizationfunctions.html">Auralization functions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Finite%20Different%20Method%20Demo%20Tutorial.html">Finite Different Method Demo Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Finite%20Volume%20Method%20Demo%20Tutorial.html">Finite Volume Method Demo Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Diffusion Equation for Acoustics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">acousticDE.Auralization.Auralization</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for acousticDE.Auralization.Auralization</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Thu Feb 22 14:33:58 2024</span>
+
+<span class="sd">@author: Ilaria Fichera</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1">#%%</span>
+<span class="c1">###############################################################################</span>
+<span class="c1">#IMPORT PACKAGES</span>
+<span class="c1">###############################################################################</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">acousticDE.Auralization.Auralizationfunctions</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="run_auralization">
+<a class="viewcode-back" href="../../../acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralization.run_auralization">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_auralization</span><span class="p">(</span><span class="n">anechoic_signal_path</span><span class="p">,</span><span class="n">resultsFVM_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function for running the full auralization calculation. It will use all the functions defined in Auralizationfunctions.py file</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        anechoic_signal_path : str</span>
+<span class="sd">            String of the wav file of the anechoic sound</span>
+<span class="sd">        resultsFVM_path : str</span>
+<span class="sd">            String of the results from the FVM simulation</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        results : dict</span>
+<span class="sd">            Dictionary of all the variable calculated including auralization and impulse response wav files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+  
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">resultsFVM_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">resultsFVM</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+   
+    <span class="c1">#Import data needed from the resultsFVM pickle file</span>
+    <span class="n">dt_sim</span> <span class="o">=</span> <span class="n">resultsFVM</span><span class="p">[</span><span class="s2">&quot;dt&quot;</span><span class="p">]</span>   <span class="c1">#Import delta t (time step) from the simulation calc</span>
+    <span class="n">t_off_sim</span> <span class="o">=</span> <span class="n">resultsFVM</span><span class="p">[</span><span class="s2">&quot;t_off&quot;</span><span class="p">]</span>   <span class="c1">#Import the time t array since the source has been switched off from the simulation calc</span>
+    <span class="n">p_rec_off_deriv_band</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">resultsFVM</span><span class="p">[</span><span class="s2">&quot;p_rec_off_deriv_band&quot;</span><span class="p">])</span> <span class="c1">#import pressure curve from the simulation calc</span>
+    <span class="n">center_freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">resultsFVM</span><span class="p">[</span><span class="s2">&quot;center_freq&quot;</span><span class="p">])</span> <span class="c1">#import frequency bands from the simulation calc</span>
+    
+    <span class="c1">#%%</span>
+    <span class="c1">###############################################################################</span>
+    <span class="c1">#GETTING FIXED DATA</span>
+    <span class="c1">###############################################################################</span>
+    <span class="n">fs_sim</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">dt_sim</span> <span class="c1">#sampling frequency</span>
+    <span class="n">t_off_sim</span> <span class="o">=</span> <span class="n">t_off_sim</span> <span class="o">-</span> <span class="n">t_off_sim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#removing the t_off[0] to make the vector start from zero.</span>
+    <span class="n">center_freq</span> <span class="o">=</span> <span class="n">center_freq</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span> <span class="c1">#centre frequency considered as integers</span>
+    <span class="n">nBands</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">center_freq</span><span class="p">)</span> <span class="c1">#number of frequency bands</span>
+    
+    <span class="n">data_signal</span><span class="p">,</span> <span class="n">fs</span> <span class="o">=</span> <span class="n">extract_anechoic</span><span class="p">(</span><span class="n">anechoic_signal_path</span><span class="p">)</span>
+    <span class="c1">#sd.play(data, fs) #this line allows to listen to the anechoic signal as it is.</span>
+    <span class="c1">#status = sd.wait()  #Wait until file is done playing</span>
+    
+    <span class="n">p_rec_off_deriv_band_resampled</span><span class="p">,</span> <span class="n">t_off_resampled</span> <span class="o">=</span> <span class="n">resample_pressure</span><span class="p">(</span><span class="n">p_rec_off_deriv_band</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">fs_sim</span><span class="p">,</span> <span class="n">t_off_sim</span><span class="p">)</span>
+    <span class="c1"># #FIGURE 1</span>
+    <span class="c1"># plt.figure(figsize=(12, 8))</span>
+    <span class="c1"># plt.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)  #This line disables ticks on the main figure</span>
+    <span class="c1"># plt.title(&#39;Time domain envelope of squared impulse response per octave band filters&#39;)</span>
+    <span class="c1"># for fi in range(nBands):</span>
+    <span class="c1">#     plt.subplot(nBands, 1, fi+1)</span>
+    <span class="c1">#     plt.plot(t_off, p_rec_off_deriv_band[fi], label=f&#39;{center_freq[fi]} Hz ORIGINAL&#39;)</span>
+    <span class="c1">#     plt.plot(t_off_resampled,p_rec_off_deriv_band_resampled[fi], label=f&#39;{center_freq[fi]} Hz RESAMPLED&#39;)</span>
+    
+    <span class="c1">#     plt.xlabel(&#39;Time [s]&#39;)</span>
+    <span class="c1">#     plt.ylabel(&#39;Magnitude [dB]&#39;)</span>
+    <span class="c1">#     plt.grid(True, which=&#39;both&#39;, linestyle=&#39;--&#39;, linewidth=0.5)</span>
+    <span class="c1">#     plt.axhline(0, color=&#39;black&#39;, linewidth=0.5)</span>
+    <span class="c1">#     plt.legend(loc=&#39;best&#39;)</span>
+    <span class="c1"># plt.tight_layout(rect=[0, 0, 1, 0.96])  # Adjust layout to fit suptitle</span>
+    <span class="c1"># plt.show()</span>
+
+    <span class="n">square_root</span> <span class="o">=</span> <span class="n">square_root_fun</span><span class="p">(</span><span class="n">p_rec_off_deriv_band_resampled</span><span class="p">)</span>
+    
+    <span class="n">noise</span> <span class="o">=</span> <span class="n">create_noise</span><span class="p">(</span><span class="n">p_rec_off_deriv_band_resampled</span><span class="p">)</span>
+    <span class="c1"># #FIGURE 2</span>
+    <span class="c1"># plt.figure(figsize=(12, 8))</span>
+    <span class="c1"># plt.plot(t_off_resampled,noise)</span>
+    
+
+    <span class="n">filter_tot</span> <span class="o">=</span> <span class="n">butter_filter</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">center_freq</span><span class="p">)</span>
+    <span class="c1"># #FIGURE 3</span>
+    <span class="c1"># # Plot frequency responses</span>
+    <span class="c1"># plt.figure(figsize=(12, 8))</span>
+    <span class="c1"># for band in range(len(filter_tot)):</span>
+    <span class="c1">#     #print(band)</span>
+    <span class="c1">#     # Compute the frequency response of each filter</span>
+    <span class="c1">#     w, h = sosfreqz(filter_tot[band], worN=2000, fs=fs)</span>
+    <span class="c1">#     # w is the array of frequencies at which the response is computed</span>
+    <span class="c1">#     # h is the frequency response of the filter</span>
+
+    <span class="c1">#     # Plot the magnitude response in decibels</span>
+    <span class="c1">#     plt.semilogx(w, 20 * np.log10(abs(h)), label=f&#39;{center_freq[band]}&#39;)</span>
+    <span class="c1"># plt.title(&#39;Frequency response of octave band filters&#39;)</span>
+    <span class="c1"># plt.xlabel(&#39;Frequency [Hz]&#39;)</span>
+    <span class="c1"># plt.ylabel(&#39;Gain [dB]&#39;)</span>
+    <span class="c1"># plt.grid(True, which=&#39;both&#39;, linestyle=&#39;--&#39;, linewidth=0.5)</span>
+    <span class="c1"># plt.axhline(0, color=&#39;black&#39;, linewidth=0.5)</span>
+    <span class="c1"># plt.legend(loc=&#39;best&#39;)</span>
+    <span class="c1"># plt.show()</span>
+    
+    
+    
+    <span class="n">filt_noise_band</span><span class="p">,</span> <span class="n">filt_noise_band_freq</span><span class="p">,</span> <span class="n">fv</span> <span class="o">=</span> <span class="n">filtered_noise</span><span class="p">(</span><span class="n">noise</span><span class="p">,</span> <span class="n">filter_tot</span><span class="p">,</span> <span class="n">fs</span><span class="p">)</span>
+    <span class="c1"># #FIGURE 4</span>
+    <span class="c1"># #Plot the time domain of the filtered noise</span>
+    <span class="c1"># plt.figure(figsize=(12, 8))</span>
+    <span class="c1"># plt.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)  #This line disables ticks on the main figure</span>
+    <span class="c1"># plt.title(&#39;Time domain response of octave band filtered random noise&#39;)</span>
+    <span class="c1"># for fi in range(nBands):</span>
+    <span class="c1">#     plt.subplot(nBands, 1, fi+1)</span>
+    <span class="c1">#     plt.plot(t_off_resampled, 20 * np.log10(abs(filt_noise_band[fi])), label=f&#39;{center_freq[fi]} Hz&#39;)</span>
+    
+    <span class="c1">#     plt.xlabel(&#39;Time [s]&#39;)</span>
+    <span class="c1">#     plt.ylabel(&#39;Magnitude [dB]&#39;)</span>
+    <span class="c1">#     plt.grid(True, which=&#39;both&#39;, linestyle=&#39;--&#39;, linewidth=0.5)</span>
+    <span class="c1">#     plt.axhline(0, color=&#39;black&#39;, linewidth=0.5)</span>
+    <span class="c1">#     plt.legend(loc=&#39;best&#39;)</span>
+    <span class="c1"># plt.tight_layout(rect=[0, 0, 1, 0.96])  # Adjust layout to fit suptitle</span>
+    <span class="c1"># plt.show()</span>
+        
+    <span class="c1"># #FIGURE 5</span>
+    <span class="c1"># #Plot the frequency response</span>
+    <span class="c1"># plt.figure(figsize=(12, 8))</span>
+    <span class="c1"># plt.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)  #This line disables ticks on the main figure</span>
+    <span class="c1"># plt.title(&#39;Frequency response of octave band filtered random noise&#39;)</span>
+    <span class="c1"># for fi in range(nBands):</span>
+    <span class="c1">#     plt.subplot(nBands, 1, fi+1)</span>
+    <span class="c1">#     plt.semilogx(fv, 20 * np.log10(abs(filt_noise_band_freq[fi, :])), label=f&#39;{center_freq[fi]} Hz&#39;)</span>
+    
+    <span class="c1">#     plt.xlabel(&#39;Frequency [Hz]&#39;)</span>
+    <span class="c1">#     plt.ylabel(&#39;Gain [dB]&#39;)</span>
+    <span class="c1">#     plt.grid(True, which=&#39;both&#39;, linestyle=&#39;--&#39;, linewidth=0.5)</span>
+    <span class="c1">#     #plt.axhline(0, color=&#39;black&#39;, linewidth=0.1)</span>
+    <span class="c1">#     plt.legend(loc=&#39;best&#39;)</span>
+    <span class="c1"># plt.tight_layout(rect=[0, 0, 1, 0.96])  # Adjust layout to fit suptitle</span>
+    <span class="c1"># plt.show()</span>
+    
+
+    <span class="n">imp_unfilt_band</span> <span class="o">=</span> <span class="n">unfiltered_envelope</span><span class="p">(</span><span class="n">nBands</span><span class="p">,</span> <span class="n">square_root</span><span class="p">,</span> <span class="n">noise</span><span class="p">)</span>
+    <span class="c1"># #FIGURE 6</span>
+    <span class="c1"># plt.figure(figsize=(12, 8))</span>
+    <span class="c1"># plt.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)  #This line disables ticks on the main figure</span>
+    <span class="c1"># plt.title(&#39;Time domain of UNfiltered impulse response per frequency band&#39;)</span>
+    <span class="c1"># for fi in range(nBands):</span>
+    <span class="c1">#     plt.subplot(nBands, 1, fi+1)</span>
+    <span class="c1">#     plt.plot(t_off_resampled, imp_unfilt_band[fi], label=f&#39;{center_freq[fi]} Hz&#39;)</span>
+        
+    <span class="c1">#     plt.xlabel(&#39;Time [s]&#39;)</span>
+    <span class="c1">#     plt.ylabel(&#39;Magnitude [dB]&#39;)</span>
+    <span class="c1">#     plt.grid(True, which=&#39;both&#39;, linestyle=&#39;--&#39;, linewidth=0.5)</span>
+    <span class="c1">#     #plt.axhline(0, color=&#39;black&#39;, linewidth=0.1)</span>
+    <span class="c1">#     plt.legend(loc=&#39;best&#39;)</span>
+    <span class="c1"># plt.tight_layout(rect=[0, 0, 1, 0.96])  # Adjust layout to fit suptitle</span>
+    <span class="c1"># plt.show()</span>
+    
+    <span class="n">imp_filt_band</span><span class="p">,</span> <span class="n">t_off_padded</span> <span class="o">=</span> <span class="n">filtered_envelope</span><span class="p">(</span><span class="n">filt_noise_band</span><span class="p">,</span><span class="n">p_rec_off_deriv_band_resampled</span><span class="p">,</span> <span class="n">square_root</span><span class="p">,</span> <span class="n">t_off_resampled</span><span class="p">,</span> <span class="n">nBands</span><span class="p">)</span> 
+    <span class="c1"># #FIGURE 7</span>
+    <span class="c1"># plt.figure(figsize=(12, 8))</span>
+    <span class="c1"># plt.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)  #This line disables ticks on the main figure</span>
+    <span class="c1"># plt.title(&#39;Time domain of filtered impulse response per frequency band&#39;)</span>
+    <span class="c1"># for fi in range(nBands):</span>
+    <span class="c1">#     plt.subplot(nBands, 1, fi+1)    </span>
+    <span class="c1">#     plt.plot(t_off_padded, imp_filt_band[fi], label=f&#39;{center_freq[fi]} Hz&#39;)</span>
+        
+    <span class="c1">#     plt.xlabel(&#39;Time [s]&#39;)</span>
+    <span class="c1">#     plt.ylabel(&#39;Magnitude [dB]&#39;)</span>
+    <span class="c1">#     plt.grid(True, which=&#39;both&#39;, linestyle=&#39;--&#39;, linewidth=0.5)</span>
+    <span class="c1">#     #plt.axhline(0, color=&#39;black&#39;, linewidth=0.1)</span>
+    <span class="c1">#     plt.legend(loc=&#39;best&#39;)</span>
+    <span class="c1"># plt.tight_layout(rect=[0, 0, 1, 0.96])  # Adjust layout to fit suptitle</span>
+    <span class="c1"># plt.show()</span>
+    
+    <span class="n">imp_tot</span><span class="p">,</span> <span class="n">freq_spectrum</span><span class="p">,</span> <span class="n">imp_resp_norm</span> <span class="o">=</span> <span class="n">generate_imp_resp</span><span class="p">(</span><span class="n">imp_filt_band</span><span class="p">)</span>  
+    <span class="c1"># #FIGURE 8</span>
+    <span class="c1"># # Plot impulse response in the time domain</span>
+    <span class="c1"># plt.figure(figsize=(12, 8))</span>
+    <span class="c1"># plt.plot(t_off_padded, imp_tot)</span>
+    <span class="c1"># plt.xlabel(&#39;Time [s]&#39;)</span>
+    <span class="c1"># plt.ylabel(&#39;Magnitude [dB]&#39;)</span>
+    <span class="c1"># plt.grid(True, which=&#39;both&#39;, linestyle=&#39;--&#39;, linewidth=0.5)</span>
+    <span class="c1"># #plt.axhline(0, color=&#39;black&#39;, linewidth=0.1)</span>
+    <span class="c1"># #plt.legend(loc=&#39;best&#39;)</span>
+    <span class="c1"># plt.show()</span>
+       
+    <span class="c1"># #FIGURE 9</span>
+    <span class="c1"># # Plot impulse response in the frequency domain</span>
+    <span class="c1"># plt.figure(figsize=(12, 8))</span>
+    <span class="c1"># plt.semilogx(fv, freq_spectrum)</span>
+    <span class="c1"># plt.xlabel(&#39;Frequency [Hz]&#39;)</span>
+    <span class="c1"># plt.ylabel(&#39;Magnitude [dB]&#39;)</span>
+    <span class="c1"># plt.grid(True, which=&#39;both&#39;, linestyle=&#39;--&#39;, linewidth=0.5)</span>
+    <span class="c1"># #plt.axhline(0, color=&#39;black&#39;, linewidth=0.1)</span>
+    <span class="c1"># #plt.legend(loc=&#39;best&#39;)</span>
+    <span class="c1"># plt.show()</span>
+    
+    <span class="n">scipy</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">wavfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;imp_resp.wav&quot;</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">imp_resp_norm</span><span class="p">)</span>
+    <span class="c1">#Play the impulse response</span>
+    <span class="c1">#sd.play(imp_tot, fs)</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting convolution...&quot;</span><span class="p">)</span>
+    <span class="n">st</span><span class="p">,</span> <span class="n">ht</span><span class="p">,</span> <span class="n">sh_conv</span><span class="p">,</span> <span class="n">t_conv</span><span class="p">,</span> <span class="n">sh_conv_normalized</span> <span class="o">=</span> <span class="n">convolution_fun</span><span class="p">(</span><span class="n">data_signal</span><span class="p">,</span><span class="n">fs</span><span class="p">,</span><span class="n">imp_tot</span><span class="p">)</span>
+    <span class="c1">#Play the convolved signal</span>
+    <span class="c1">#sd.play(sh_conv, fs)</span>
+    
+    <span class="c1"># #FIGURE 10</span>
+    <span class="c1"># plt.figure(figsize=(12, 8))</span>
+    <span class="c1"># plt.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)  #This line disables ticks on the main figure</span>
+    <span class="c1"># plt.title(&#39;Convolution&#39;)</span>
+    <span class="c1"># signals = [</span>
+    <span class="c1">#     (st, data_signal, &#39;anechoic_signal&#39;),</span>
+    <span class="c1">#     (ht, imp_tot, &#39;impulse_response&#39;),</span>
+    <span class="c1">#     (t_conv, sh_conv, &#39;convolved_signal&#39;)</span>
+    <span class="c1"># ]</span>
+    <span class="c1"># for fi, (x, y, label) in enumerate(signals):</span>
+    <span class="c1">#     plt.subplot(3, 1, fi + 1)</span>
+    <span class="c1">#     plt.plot(x, y, label=label)</span>
+    <span class="c1">#     plt.xlabel(&#39;Time [s]&#39;)</span>
+    <span class="c1">#     plt.ylabel(&#39;Magnitude [dB]&#39;)</span>
+    <span class="c1">#     plt.grid(True, which=&#39;both&#39;, linestyle=&#39;--&#39;, linewidth=0.5)</span>
+    <span class="c1">#     plt.legend(loc=&#39;best&#39;)</span>
+    <span class="c1"># plt.tight_layout(rect=[0, 0, 1, 0.96])</span>
+    <span class="c1"># plt.show()</span>
+
+    <span class="c1"># Write the normalized data to a WAV file</span>
+    <span class="n">scipy</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">wavfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;auralization.wav&quot;</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">sh_conv_normalized</span><span class="p">)</span>
+    
+    <span class="n">results</span> <span class="o">=</span> <span class="nb">locals</span><span class="p">()</span>
+    
+    <span class="c1"># remove any un-pickleable objects</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s2">&quot;read&quot;</span><span class="p">):</span>   <span class="c1"># catches file-like objects</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Removing unpickleable object: </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">del</span> <span class="n">results</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;resultsAuralization.pkl&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Simulation finished successfully! Results in resultsAuralization.pkl file&quot;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">results</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Ilaria Fichera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

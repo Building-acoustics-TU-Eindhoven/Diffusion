@@ -1,0 +1,348 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>acousticDE.FiniteVolumeMethod.FVM &mdash; Diffusion Equation for Acoustics 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Diffusion Equation for Acoustics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Software Presentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Overview.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Use:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Finite%20Different%20Method%20Use.html">Finite Different Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Finite%20Volume%20Method%20Use.html">Finite Volume Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Auralization%20Use.html">Auralization Use</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Theory:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../DocumentationFDM.html">Diffusion Equation Finite Different Method (FDM) documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../DocumentationFVM.html">Diffusion Equation Finite Volume Method (FVM) Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../DocumentationAuralization.html">Auralization Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../acousticDE/FDMfunctions.html">FDM functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../acousticDE/FVMfunctions.html">FVM functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../acousticDE/ReverberationFunctions.html">Reverberation functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../acousticDE/Auralizationfunctions.html">Auralization functions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Finite%20Different%20Method%20Demo%20Tutorial.html">Finite Different Method Demo Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Finite%20Volume%20Method%20Demo%20Tutorial.html">Finite Volume Method Demo Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Diffusion Equation for Acoustics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">acousticDE.FiniteVolumeMethod.FVM</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for acousticDE.FiniteVolumeMethod.FVM</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Wed Aug  2 16:12:40 2023</span>
+
+<span class="sd">@author: Ilaria Fichera</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1">#%%</span>
+<span class="c1">###############################################################################</span>
+<span class="c1">#IMPORT LIBRARIES</span>
+<span class="c1">###############################################################################</span>
+<span class="c1">#Code developed by Ilaria Fichera for the analysis of the FVM method adapted solving the 3D diffusion equation with one intermittent omnidirectional sound source</span>
+<span class="c1">#Import modules</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">log</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gmsh</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">acousticDE.FiniteVolumeMethod.FunctionClarity</span><span class="w"> </span><span class="kn">import</span> <span class="n">clarity</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">acousticDE.FiniteVolumeMethod.FunctionDefinition</span><span class="w"> </span><span class="kn">import</span> <span class="n">definition</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">acousticDE.FiniteVolumeMethod.FunctionCentreTime</span><span class="w"> </span><span class="kn">import</span> <span class="n">centretime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">acousticDE.FiniteVolumeMethod.FunctionRT</span><span class="w"> </span><span class="kn">import</span> <span class="n">t60_decay</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">acousticDE.FiniteVolumeMethod.FVMfunctions</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="c1">#%%</span>
+<span class="c1">###############################################################################</span>
+<span class="c1">#RUN SIMULATION FUNCTION</span>
+<span class="c1">###############################################################################</span>
+<span class="c1">#def run_sim(coord_source, coord_rec,fc_low,fc_high,num_octave, dt,m_atm , c0, Ws, th, pRef, rho, file_name,  dim, tag, center_freq, tcalc = &quot;decay&quot;):</span>
+<div class="viewcode-block" id="run_fvm_sim">
+<a class="viewcode-back" href="../../../acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVM.run_fvm_sim">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_fvm_sim</span><span class="p">(</span><span class="n">mesh_file_path</span><span class="p">,</span> <span class="n">inputs_path</span><span class="p">,</span> <span class="n">abs_coeff_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function for running the full calculation. It will use all the functions defined in FVMfunctions.py file</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mesh_file_path : str</span>
+<span class="sd">            String of the name of the mesh file</span>
+<span class="sd">        inputs_path : str</span>
+<span class="sd">            String of the json file with all the inputs for the simulation.</span>
+<span class="sd">        abs_coeff_path : str</span>
+<span class="sd">            String of the csv file of the absorption coefficient inputs</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the values in the absorption coefficient csv file are missing, it will flag an error.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        results : dict</span>
+<span class="sd">            Dictionary of all the variable calculated during the simulation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">st</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="c1">#start time of calculation</span>
+    
+    <span class="c1">#file_path = os.path.join(script_dir, mesh_file) # Full path to the file</span>
+
+    <span class="c1">#Calling function %create_vgroups_names%</span>
+    <span class="n">vGroupsNames</span> <span class="o">=</span> <span class="n">create_vgroups_names</span><span class="p">(</span><span class="n">mesh_file_path</span><span class="p">)</span>
+    
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">script_dir</span><span class="p">,</span><span class="n">inputs_path</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+         
+    <span class="c1"># Access input variables</span>
+    <span class="n">coord_source</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;coord_source&quot;</span><span class="p">]</span>
+    <span class="n">coord_rec</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;coord_rec&quot;</span><span class="p">]</span>
+    <span class="n">fc_low</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;fc_low&quot;</span><span class="p">]</span>
+    <span class="n">fc_high</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;fc_high&quot;</span><span class="p">]</span>
+    <span class="n">num_octave</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;num_octave&quot;</span><span class="p">]</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;dt&quot;</span><span class="p">]</span>
+    <span class="n">m_atm</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;m_atm&quot;</span><span class="p">]</span>
+    <span class="n">th</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;th&quot;</span><span class="p">]</span>
+    <span class="c1">#file_name = inputs[&quot;file_name&quot;]</span>
+    <span class="c1">#center_freq = inputs[&quot;center_freq&quot;]</span>
+    <span class="c1">#nBands = inputs[&quot;nBands&quot;]</span>
+    <span class="c1">#x_frequencies = inputs[&quot;x_frequencies&quot;]</span>
+    <span class="c1">#vGroupsNames = inputs[&quot;vGroupsNames&quot;]</span>
+    <span class="n">tcalc</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tcalc&quot;</span><span class="p">,</span> <span class="s2">&quot;decay&quot;</span><span class="p">)</span>  <span class="c1"># default fallback</span>
+    
+    <span class="n">df_abs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">abs_coeff_path</span><span class="p">)</span>
+    <span class="c1"># validate and convert to dictionary</span>
+    <span class="k">if</span> <span class="n">df_abs</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Absorption coefficient file contains missing values.&quot;</span><span class="p">)</span>
+        
+    <span class="n">c0</span><span class="o">=</span> <span class="mi">343</span> <span class="c1">#adiabatic speed of sound [m.s^-1]</span>
+    <span class="n">Ws</span> <span class="o">=</span> <span class="mf">0.01</span> <span class="c1">#Source point power [Watts] interrupted after &quot;sourceon_time&quot; seconds; 10^-2 W =&gt; correspondent to 100dB</span>
+    <span class="n">pRef</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">10</span><span class="o">**-</span><span class="mi">5</span><span class="p">)</span> <span class="c1">#Reference pressure in Pa</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="mf">1.21</span> <span class="c1">#air density [kg.m^-3] at 20Â°C</span>
+    
+    <span class="n">gmsh</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span> <span class="c1">#Initialize msh file</span>
+    <span class="n">mesh</span> <span class="o">=</span> <span class="n">gmsh</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mesh_file_path</span><span class="p">)</span> <span class="c1">#open the file</span>
+    
+    <span class="n">dim</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">tag</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    
+    <span class="c1">#Calling function %create_vgroups_names%</span>
+    <span class="n">vGroupsNames</span> <span class="o">=</span> <span class="n">create_vgroups_names</span><span class="p">(</span><span class="n">mesh_file_path</span><span class="p">)</span>
+    
+    <span class="c1">#Calling function %number_freq%</span>
+    <span class="n">nBands</span><span class="p">,</span> <span class="n">center_freq</span> <span class="o">=</span> <span class="n">number_freq</span><span class="p">(</span><span class="n">num_octave</span><span class="p">,</span> <span class="n">fc_high</span><span class="p">,</span> <span class="n">fc_low</span><span class="p">)</span>
+    
+    <span class="c1">#Calling function %get_nodes_elem%</span>
+    <span class="n">nodecoords</span><span class="p">,</span> <span class="n">node_indices</span><span class="p">,</span> <span class="n">bounEl</span><span class="p">,</span> <span class="n">bounNode</span><span class="p">,</span> <span class="n">voluEl</span><span class="p">,</span> <span class="n">voluNode</span><span class="p">,</span> <span class="n">belemNodes</span><span class="p">,</span> <span class="n">velemNodes</span><span class="p">,</span> <span class="n">boundaryEl_dict</span><span class="p">,</span> <span class="n">volumeEl_dict</span> <span class="o">=</span> <span class="n">get_nodes_elem</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="n">tag</span><span class="p">)</span>
+    
+    <span class="c1">#Calling function %velem_volume_centre%</span>
+    <span class="n">cell_center</span><span class="p">,</span> <span class="n">cell_volume</span> <span class="o">=</span> <span class="n">velem_volume_centre</span><span class="p">(</span><span class="n">volumeEl_dict</span><span class="p">,</span> <span class="n">nodecoords</span><span class="p">,</span> <span class="n">node_indices</span><span class="p">)</span>
+
+    <span class="c1">#Calling function %belem_area_centre%</span>
+    <span class="n">barea_dict</span><span class="p">,</span> <span class="n">centre_area</span> <span class="o">=</span> <span class="n">belem_area_centre</span><span class="p">(</span><span class="n">boundaryEl_dict</span><span class="p">,</span> <span class="n">nodecoords</span><span class="p">,</span> <span class="n">node_indices</span><span class="p">)</span>
+    
+    <span class="c1">#Calling function %get_neighbour_faces%</span>
+    <span class="n">fxt</span><span class="p">,</span> <span class="n">txt</span><span class="p">,</span> <span class="n">neighbourVolume</span> <span class="o">=</span> <span class="n">get_neighbour_faces</span><span class="p">(</span><span class="n">voluEl</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Completed initial geometry calculation. Starting internal tetrahedrons calculations...&quot;</span><span class="p">)</span>
+    
+    <span class="c1">#Calling function %interior_tetra%</span>
+    <span class="n">interior_tet</span><span class="p">,</span> <span class="n">interior_tet_sum</span> <span class="o">=</span> <span class="n">interior_tetra</span><span class="p">(</span><span class="n">voluEl</span><span class="p">,</span> <span class="n">cell_center</span><span class="p">,</span> <span class="n">velemNodes</span><span class="p">,</span> <span class="n">nodecoords</span><span class="p">,</span> <span class="n">node_indices</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Completed internal tetrahedrons calculation. Starting boundary tetrahedrons calculations...&quot;</span><span class="p">)</span>
+    
+    <span class="c1">#Calling function %surface_absorption%</span>
+    <span class="n">surface_absorption</span><span class="p">,</span> <span class="n">triangle_face_absorption</span><span class="p">,</span> <span class="n">absorption_coefficient_dict</span> <span class="o">=</span> <span class="n">surface_absorption_fun</span><span class="p">(</span><span class="n">vGroupsNames</span><span class="p">,</span><span class="n">df_abs</span><span class="p">,</span><span class="n">nBands</span><span class="p">,</span><span class="n">th</span><span class="p">,</span><span class="n">c0</span><span class="p">)</span>
+    
+    <span class="c1">#Calling function %surface_area%</span>
+    <span class="n">surface_areas</span> <span class="o">=</span> <span class="n">surface_area</span><span class="p">(</span><span class="n">surface_absorption</span><span class="p">,</span> <span class="n">nodecoords</span><span class="p">,</span> <span class="n">node_indices</span><span class="p">)</span>
+    
+    <span class="c1">#Calling function %boundary_triang%</span>
+    <span class="n">boundary_areas</span><span class="p">,</span> <span class="n">total_boundArea</span> <span class="o">=</span> <span class="n">boundary_triang</span><span class="p">(</span><span class="n">velemNodes</span><span class="p">,</span> <span class="n">nBands</span><span class="p">,</span> <span class="n">bounNode</span><span class="p">,</span> <span class="n">nodecoords</span><span class="p">,</span> <span class="n">node_indices</span><span class="p">,</span> <span class="n">triangle_face_absorption</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Completed boundary tetrahedrons calculation. Starting main diffusion equation calculations over time and frequency...&quot;</span><span class="p">)</span>
+    
+    <span class="n">gmsh</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+    
+    <span class="c1">#Calling function %equiv_absorp%</span>
+    <span class="n">V</span><span class="p">,</span><span class="n">S</span><span class="p">,</span><span class="n">Eq_A</span> <span class="o">=</span> <span class="n">equiv_absorp_area</span><span class="p">(</span><span class="n">cell_volume</span><span class="p">,</span> <span class="n">total_boundArea</span><span class="p">,</span> <span class="n">surface_areas</span><span class="p">,</span> <span class="n">absorption_coefficient_dict</span><span class="p">)</span>
+    
+    <span class="c1">#Calling function %calculate_sourceon_time%</span>
+    <span class="n">sourceon_time</span> <span class="o">=</span> <span class="n">calculation_sourceon_time</span><span class="p">(</span><span class="n">nBands</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">Eq_A</span><span class="p">)</span>
+    
+    <span class="c1">#Calling function %rec_time%</span>
+    <span class="n">recording_time</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">recording_steps</span> <span class="o">=</span> <span class="n">calculation_rec_time</span><span class="p">(</span><span class="n">sourceon_time</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">edt</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ir_length</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    
+    <span class="c1">#Calling function %diff_coeff%</span>
+    <span class="n">Dx</span><span class="p">,</span> <span class="n">Dy</span><span class="p">,</span> <span class="n">Dz</span> <span class="o">=</span> <span class="n">diffusion_coeff</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">c0</span><span class="p">)</span>
+    
+    <span class="c1">#Calling function %dist_source_receiver%</span>
+    <span class="n">dist_sr</span> <span class="o">=</span> <span class="n">distance_source_receiver</span><span class="p">(</span><span class="n">coord_rec</span><span class="p">,</span> <span class="n">coord_source</span><span class="p">)</span>
+    
+    <span class="c1">#Calling function %source_interp%</span>
+    <span class="n">cl_tet_s_keys</span><span class="p">,</span> <span class="n">total_weights_s</span> <span class="o">=</span> <span class="n">source_interp</span><span class="p">(</span><span class="n">cell_center</span><span class="p">,</span> <span class="n">coord_source</span><span class="p">)</span>
+    
+    <span class="c1">#Calling function %source_volume%</span>
+    <span class="n">Vs</span> <span class="o">=</span> <span class="n">source_volume</span><span class="p">(</span><span class="n">velemNodes</span><span class="p">,</span> <span class="n">nodecoords</span><span class="p">,</span> <span class="n">coord_source</span><span class="p">,</span> <span class="n">cell_volume</span><span class="p">)</span>
+    
+    <span class="c1">#Calling function %initial_cond%</span>
+    <span class="n">source1</span><span class="p">,</span> <span class="n">sourceon_steps</span> <span class="o">=</span> <span class="n">initial_cond</span><span class="p">(</span><span class="n">Ws</span><span class="p">,</span> <span class="n">Vs</span><span class="p">,</span> <span class="n">sourceon_time</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">recording_steps</span><span class="p">)</span>
+    
+    <span class="c1">#Calling function %source_matrix%</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">source_matrix</span><span class="p">(</span><span class="n">voluEl</span><span class="p">,</span><span class="n">cl_tet_s_keys</span><span class="p">,</span> <span class="n">source1</span><span class="p">,</span> <span class="n">total_weights_s</span><span class="p">)</span>
+    
+    <span class="c1">#Calling function %receiver_interp%</span>
+    <span class="n">cl_tet_r_keys</span><span class="p">,</span> <span class="n">total_weights_r</span> <span class="o">=</span> <span class="n">receiver_interp</span><span class="p">(</span><span class="n">cell_center</span><span class="p">,</span> <span class="n">coord_rec</span><span class="p">)</span>
+    
+    <span class="c1">#Calling function %room_dimensions%</span>
+    <span class="n">room_length</span><span class="p">,</span> <span class="n">room_width</span><span class="p">,</span> <span class="n">room_height</span> <span class="o">=</span> <span class="n">room_dimensions</span><span class="p">(</span><span class="n">nodecoords</span><span class="p">)</span>
+    
+    <span class="c1">#Calling function %line_receivers%</span>
+    <span class="n">x_axis</span><span class="p">,</span> <span class="n">y_axis</span><span class="p">,</span> <span class="n">line_rec_x_idx_list</span><span class="p">,</span> <span class="n">dist_x</span><span class="p">,</span> <span class="n">line_rec_y_idx_list</span><span class="p">,</span> <span class="n">dist_y</span> <span class="o">=</span> <span class="n">line_receivers</span><span class="p">(</span><span class="n">room_length</span><span class="p">,</span> <span class="n">room_width</span><span class="p">,</span> <span class="n">coord_rec</span><span class="p">,</span> <span class="n">coord_source</span><span class="p">,</span> <span class="n">cell_center</span><span class="p">)</span>
+    
+    <span class="c1">#Calling function %beta_zero%</span>
+    <span class="n">beta_zero_freq</span> <span class="o">=</span> <span class="n">beta_zero_freq_fun</span><span class="p">(</span><span class="n">boundary_areas</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">Dx</span><span class="p">,</span> <span class="n">interior_tet_sum</span><span class="p">,</span> <span class="n">cell_volume</span><span class="p">)</span>
+    
+    <span class="c1">#Calling function %computing_energy_density%</span>
+    <span class="n">w_new_band</span><span class="p">,</span> <span class="n">w_rec_band</span><span class="p">,</span> <span class="n">w_rec_off_band</span><span class="p">,</span> <span class="n">w_rec_off_deriv_band</span><span class="p">,</span> <span class="n">p_rec_off_deriv_band</span><span class="p">,</span> <span class="n">idx_w_rec</span><span class="p">,</span> <span class="n">t_off</span> <span class="o">=</span> <span class="n">computing_energy_density</span><span class="p">(</span><span class="n">nBands</span><span class="p">,</span> <span class="n">voluEl</span><span class="p">,</span> <span class="n">recording_steps</span><span class="p">,</span> <span class="n">beta_zero_freq</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">c0</span><span class="p">,</span> <span class="n">m_atm</span><span class="p">,</span> <span class="n">Dx</span><span class="p">,</span> <span class="n">interior_tet</span><span class="p">,</span> <span class="n">cell_volume</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">cl_tet_r_keys</span><span class="p">,</span> <span class="n">total_weights_r</span><span class="p">,</span> <span class="n">tcalc</span><span class="p">,</span> <span class="n">cl_tet_s_keys</span><span class="p">,</span> <span class="n">source1</span><span class="p">,</span> <span class="n">total_weights_s</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">sourceon_time</span><span class="p">,</span> <span class="n">rho</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;100</span><span class="si">% o</span><span class="s2">f main calculation completed&quot;</span><span class="p">)</span>
+    
+    <span class="c1">#Calling function %freq_parameters%</span>
+    <span class="n">w_rec_x_band</span><span class="p">,</span> <span class="n">w_rec_y_band</span><span class="p">,</span> <span class="n">spl_stat_x_band</span><span class="p">,</span> <span class="n">spl_stat_y_band</span><span class="p">,</span> <span class="n">spl_r_band</span><span class="p">,</span> <span class="n">spl_r_off_band</span><span class="p">,</span> <span class="n">spl_r_norm_band</span><span class="p">,</span> <span class="n">sch_db_band</span><span class="p">,</span> <span class="n">t30_band</span><span class="p">,</span> <span class="n">edt_band</span><span class="p">,</span> <span class="n">c80_band</span><span class="p">,</span> <span class="n">d50_band</span><span class="p">,</span> <span class="n">ts_band</span> <span class="o">=</span> <span class="n">freq_parameters</span><span class="p">(</span><span class="n">nBands</span><span class="p">,</span> <span class="n">line_rec_x_idx_list</span><span class="p">,</span> <span class="n">w_new_band</span><span class="p">,</span> <span class="n">line_rec_y_idx_list</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">c0</span><span class="p">,</span> <span class="n">Ws</span><span class="p">,</span> <span class="n">dist_x</span><span class="p">,</span> <span class="n">dist_y</span><span class="p">,</span> <span class="n">pRef</span><span class="p">,</span> <span class="n">w_rec_band</span><span class="p">,</span> <span class="n">w_rec_off_band</span><span class="p">,</span> <span class="n">tcalc</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">idx_w_rec</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">Eq_A</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">dist_sr</span><span class="p">)</span>
+    
+    <span class="n">et</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="c1">#end time</span>
+    <span class="n">elapsed_time</span> <span class="o">=</span> <span class="n">et</span> <span class="o">-</span> <span class="n">st</span>
+    
+    <span class="c1">#results = locals()</span>
+    
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;coord_source&quot;</span> <span class="p">:</span> <span class="n">coord_source</span><span class="p">,</span>
+               <span class="s2">&quot;coord_rec&quot;</span> <span class="p">:</span> <span class="n">coord_rec</span><span class="p">,</span>
+               <span class="s2">&quot;fc_low&quot;</span> <span class="p">:</span> <span class="n">fc_low</span><span class="p">,</span>
+               <span class="s2">&quot;fc_high&quot;</span> <span class="p">:</span> <span class="n">fc_high</span><span class="p">,</span>
+               <span class="s2">&quot;num_octave&quot;</span> <span class="p">:</span> <span class="n">num_octave</span><span class="p">,</span>
+               <span class="s2">&quot;dt&quot;</span> <span class="p">:</span> <span class="n">dt</span><span class="p">,</span>
+               <span class="s2">&quot;m_atm&quot;</span> <span class="p">:</span> <span class="n">m_atm</span><span class="p">,</span>
+               <span class="s2">&quot;th&quot;</span> <span class="p">:</span> <span class="n">th</span><span class="p">,</span>
+               <span class="s2">&quot;tcalc&quot;</span> <span class="p">:</span> <span class="n">tcalc</span><span class="p">,</span>
+               <span class="s2">&quot;df_abs&quot;</span> <span class="p">:</span> <span class="n">df_abs</span><span class="p">,</span>
+               <span class="s2">&quot;center_freq&quot;</span> <span class="p">:</span> <span class="n">center_freq</span><span class="p">,</span>
+               <span class="s2">&quot;t&quot;</span><span class="p">:</span> <span class="n">t</span><span class="p">,</span>
+               <span class="s2">&quot;w_new_band&quot;</span> <span class="p">:</span> <span class="n">w_new_band</span><span class="p">,</span> 
+               <span class="s2">&quot;w_rec_band&quot;</span> <span class="p">:</span> <span class="n">w_rec_band</span><span class="p">,</span> 
+               <span class="s2">&quot;w_rec_off_band&quot;</span> <span class="p">:</span> <span class="n">w_rec_off_band</span><span class="p">,</span> 
+               <span class="s2">&quot;w_rec_off_deriv_band&quot;</span> <span class="p">:</span> <span class="n">w_rec_off_deriv_band</span><span class="p">,</span> 
+               <span class="s2">&quot;p_rec_off_deriv_band&quot;</span> <span class="p">:</span> <span class="n">p_rec_off_deriv_band</span><span class="p">,</span> 
+               <span class="s2">&quot;idx_w_rec&quot;</span> <span class="p">:</span> <span class="n">idx_w_rec</span><span class="p">,</span> 
+               <span class="s2">&quot;t_off&quot;</span> <span class="p">:</span> <span class="n">t_off</span><span class="p">,</span>
+               <span class="s2">&quot;w_rec_x_band&quot;</span> <span class="p">:</span> <span class="n">w_rec_x_band</span><span class="p">,</span> 
+               <span class="s2">&quot;w_rec_y_band&quot;</span> <span class="p">:</span> <span class="n">w_rec_y_band</span><span class="p">,</span> 
+               <span class="s2">&quot;spl_stat_x_band&quot;</span> <span class="p">:</span> <span class="n">spl_stat_x_band</span><span class="p">,</span> 
+               <span class="s2">&quot;spl_stat_y_band&quot;</span> <span class="p">:</span> <span class="n">spl_stat_y_band</span><span class="p">,</span> 
+               <span class="s2">&quot;spl_r_band&quot;</span> <span class="p">:</span> <span class="n">spl_r_band</span><span class="p">,</span> 
+               <span class="s2">&quot;spl_r_off_band&quot;</span> <span class="p">:</span> <span class="n">spl_r_off_band</span><span class="p">,</span> 
+               <span class="s2">&quot;spl_r_norm_band&quot;</span> <span class="p">:</span> <span class="n">spl_r_norm_band</span><span class="p">,</span> 
+               <span class="s2">&quot;sch_db_band&quot;</span> <span class="p">:</span> <span class="n">sch_db_band</span><span class="p">,</span> 
+               <span class="s2">&quot;t30_band&quot;</span> <span class="p">:</span> <span class="n">t30_band</span><span class="p">,</span> 
+               <span class="s2">&quot;edt_band&quot;</span> <span class="p">:</span> <span class="n">edt_band</span><span class="p">,</span> 
+               <span class="s2">&quot;c80_band&quot;</span> <span class="p">:</span> <span class="n">c80_band</span><span class="p">,</span> 
+               <span class="s2">&quot;d50_band&quot;</span> <span class="p">:</span> <span class="n">d50_band</span><span class="p">,</span> 
+               <span class="s2">&quot;ts_band&quot;</span> <span class="p">:</span> <span class="n">ts_band</span><span class="p">,</span>
+               <span class="p">}</span>
+    
+    <span class="n">save_fvm</span><span class="p">(</span><span class="s1">&#39;resultsFVM.pkl&#39;</span><span class="p">,</span><span class="n">results</span><span class="p">)</span>
+        
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Simulation finished successfully! Results in resultsFVM.pkl file&quot;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">results</span></div>
+
+
+<span class="n">script_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Ilaria Fichera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

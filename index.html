@@ -1,0 +1,305 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to Diffusion Equation’s documentation &mdash; Diffusion Equation for Acoustics 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=2709fde1"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Overview" href="Overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            Diffusion Equation for Acoustics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Software Presentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Overview.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Use:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Different%20Method%20Use.html">Finite Different Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Volume%20Method%20Use.html">Finite Volume Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Auralization%20Use.html">Auralization Use</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Theory:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="DocumentationFDM.html">Diffusion Equation Finite Different Method (FDM) documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DocumentationFVM.html">Diffusion Equation Finite Volume Method (FVM) Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DocumentationAuralization.html">Auralization Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="acousticDE/FDMfunctions.html">FDM functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acousticDE/FVMfunctions.html">FVM functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acousticDE/ReverberationFunctions.html">Reverberation functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acousticDE/Auralizationfunctions.html">Auralization functions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Different%20Method%20Demo%20Tutorial.html">Finite Different Method Demo Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Volume%20Method%20Demo%20Tutorial.html">Finite Volume Method Demo Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">Diffusion Equation for Acoustics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Welcome to Diffusion Equation’s documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="welcome-to-diffusion-equation-s-documentation">
+<h1>Welcome to Diffusion Equation’s documentation<a class="headerlink" href="#welcome-to-diffusion-equation-s-documentation" title="Link to this heading"></a></h1>
+<p>The software is an open source new generation of room acoustics software for research, education and industry in acoustics.</p>
+<p>The software is based on the Acoustics Diffusion Equation Method for modeling of sound behaviour in complex geometrical spaces.
+The Diffusion Equation Method is used to understand the acoustics properties of the room and to obtain spatial distribution of acoustics energy over time in specific rooms.
+The software is developed with two numerical methods: the Finite Different Method and the Finite Volume Method.
+Each method is distributed with its own Python code. The main application of the method is room and building acoustics, but in the future it could also lead to more applications.</p>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Software Presentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Overview.html">Overview</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Software Use:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Different%20Method%20Use.html">Finite Different Method Use</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Finite%20Different%20Method%20Use.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Finite%20Different%20Method%20Use.html#usage-files">Usage &amp; files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Finite%20Different%20Method%20Use.html#inputs">Inputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Finite%20Different%20Method%20Use.html#acoustics-calculation">Acoustics Calculation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Finite%20Different%20Method%20Use.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Volume%20Method%20Use.html">Finite Volume Method Use</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Finite%20Volume%20Method%20Use.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Finite%20Volume%20Method%20Use.html#usage-files">Usage &amp; files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Finite%20Volume%20Method%20Use.html#inputs">Inputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Finite%20Volume%20Method%20Use.html#acoustics-calculation">Acoustics Calculation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Finite%20Volume%20Method%20Use.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Auralization%20Use.html">Auralization Use</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Auralization%20Use.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Auralization%20Use.html#usage-files">Usage &amp; files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Auralization%20Use.html#inputs">Inputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Auralization%20Use.html#outputs">Outputs</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Software Theory:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="DocumentationFDM.html">Diffusion Equation Finite Different Method (FDM) documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="DocumentationFDM.html#theory-of-diffusion-equation-model">Theory of Diffusion Equation model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DocumentationFDM.html#finite-different-scheme">Finite Different Scheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DocumentationFDM.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="DocumentationFVM.html">Diffusion Equation Finite Volume Method (FVM) Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="DocumentationFVM.html#theory-of-diffusion-equation-model">Theory of Diffusion Equation model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DocumentationFVM.html#finite-volume-scheme">Finite Volume Scheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DocumentationFVM.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="DocumentationAuralization.html">Auralization Documentation</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">API reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="acousticDE/FDMfunctions.html">FDM functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="acousticDE/FDMfunctions.html#module-acousticDE.FiniteDifferenceMethod.FDM">Main function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FDMfunctions.html#acousticDE.FiniteDifferenceMethod.FDM.run_fdm_sim"><code class="docutils literal notranslate"><span class="pre">run_fdm_sim()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="acousticDE/FDMfunctions.html#module-acousticDE.FiniteDifferenceMethod.FDMfunctions">Internal functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FDMfunctions.html#acousticDE.FiniteDifferenceMethod.FDMfunctions.abs_term"><code class="docutils literal notranslate"><span class="pre">abs_term()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FDMfunctions.html#acousticDE.FiniteDifferenceMethod.FDMfunctions.beta_zero_fun"><code class="docutils literal notranslate"><span class="pre">beta_zero_fun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FDMfunctions.html#acousticDE.FiniteDifferenceMethod.FDMfunctions.comput_energy_density"><code class="docutils literal notranslate"><span class="pre">comput_energy_density()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FDMfunctions.html#acousticDE.FiniteDifferenceMethod.FDMfunctions.create_mesh"><code class="docutils literal notranslate"><span class="pre">create_mesh()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FDMfunctions.html#acousticDE.FiniteDifferenceMethod.FDMfunctions.diff_coeff"><code class="docutils literal notranslate"><span class="pre">diff_coeff()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FDMfunctions.html#acousticDE.FiniteDifferenceMethod.FDMfunctions.dist_source_receiver"><code class="docutils literal notranslate"><span class="pre">dist_source_receiver()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FDMfunctions.html#acousticDE.FiniteDifferenceMethod.FDMfunctions.dist_source_x_y"><code class="docutils literal notranslate"><span class="pre">dist_source_x_y()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FDMfunctions.html#acousticDE.FiniteDifferenceMethod.FDMfunctions.equiv_absorp"><code class="docutils literal notranslate"><span class="pre">equiv_absorp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FDMfunctions.html#acousticDE.FiniteDifferenceMethod.FDMfunctions.freq_param"><code class="docutils literal notranslate"><span class="pre">freq_param()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FDMfunctions.html#acousticDE.FiniteDifferenceMethod.FDMfunctions.initial_condition"><code class="docutils literal notranslate"><span class="pre">initial_condition()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FDMfunctions.html#acousticDE.FiniteDifferenceMethod.FDMfunctions.number_freq"><code class="docutils literal notranslate"><span class="pre">number_freq()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FDMfunctions.html#acousticDE.FiniteDifferenceMethod.FDMfunctions.rec_sourceon_time"><code class="docutils literal notranslate"><span class="pre">rec_sourceon_time()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FDMfunctions.html#acousticDE.FiniteDifferenceMethod.FDMfunctions.receiver_interpolation"><code class="docutils literal notranslate"><span class="pre">receiver_interpolation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FDMfunctions.html#acousticDE.FiniteDifferenceMethod.FDMfunctions.room_charact"><code class="docutils literal notranslate"><span class="pre">room_charact()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FDMfunctions.html#acousticDE.FiniteDifferenceMethod.FDMfunctions.save_fdm"><code class="docutils literal notranslate"><span class="pre">save_fdm()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FDMfunctions.html#acousticDE.FiniteDifferenceMethod.FDMfunctions.source_interpolation"><code class="docutils literal notranslate"><span class="pre">source_interpolation()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="acousticDE/FVMfunctions.html">FVM functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="acousticDE/FVMfunctions.html#module-acousticDE.FiniteVolumeMethod.FVM">Main function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVM.run_fvm_sim"><code class="docutils literal notranslate"><span class="pre">run_fvm_sim()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="acousticDE/FVMfunctions.html#module-acousticDE.FiniteVolumeMethod.FVMfunctions">Internal functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.abs_term"><code class="docutils literal notranslate"><span class="pre">abs_term()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.belem_area_centre"><code class="docutils literal notranslate"><span class="pre">belem_area_centre()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.beta_zero_freq_fun"><code class="docutils literal notranslate"><span class="pre">beta_zero_freq_fun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.boundary_triang"><code class="docutils literal notranslate"><span class="pre">boundary_triang()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.calculation_rec_time"><code class="docutils literal notranslate"><span class="pre">calculation_rec_time()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.calculation_sourceon_time"><code class="docutils literal notranslate"><span class="pre">calculation_sourceon_time()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.computing_energy_density"><code class="docutils literal notranslate"><span class="pre">computing_energy_density()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.create_vgroups_names"><code class="docutils literal notranslate"><span class="pre">create_vgroups_names()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.diffusion_coeff"><code class="docutils literal notranslate"><span class="pre">diffusion_coeff()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.distance_source_receiver"><code class="docutils literal notranslate"><span class="pre">distance_source_receiver()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.equiv_absorp_area"><code class="docutils literal notranslate"><span class="pre">equiv_absorp_area()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.freq_parameters"><code class="docutils literal notranslate"><span class="pre">freq_parameters()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.get_neighbour_faces"><code class="docutils literal notranslate"><span class="pre">get_neighbour_faces()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.get_nodes_elem"><code class="docutils literal notranslate"><span class="pre">get_nodes_elem()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.initial_cond"><code class="docutils literal notranslate"><span class="pre">initial_cond()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.interior_tetra"><code class="docutils literal notranslate"><span class="pre">interior_tetra()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.line_receivers"><code class="docutils literal notranslate"><span class="pre">line_receivers()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.number_freq"><code class="docutils literal notranslate"><span class="pre">number_freq()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.receiver_interp"><code class="docutils literal notranslate"><span class="pre">receiver_interp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.room_dimensions"><code class="docutils literal notranslate"><span class="pre">room_dimensions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.save_fvm"><code class="docutils literal notranslate"><span class="pre">save_fvm()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.source_interp"><code class="docutils literal notranslate"><span class="pre">source_interp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.source_matrix"><code class="docutils literal notranslate"><span class="pre">source_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.source_volume"><code class="docutils literal notranslate"><span class="pre">source_volume()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.surface_absorption_fun"><code class="docutils literal notranslate"><span class="pre">surface_absorption_fun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.surface_area"><code class="docutils literal notranslate"><span class="pre">surface_area()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.surface_materials"><code class="docutils literal notranslate"><span class="pre">surface_materials()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/FVMfunctions.html#acousticDE.FiniteVolumeMethod.FVMfunctions.velem_volume_centre"><code class="docutils literal notranslate"><span class="pre">velem_volume_centre()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="acousticDE/ReverberationFunctions.html">Reverberation functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="acousticDE/ReverberationFunctions.html#acousticDE.FiniteVolumeMethod.FunctionRT.t60_decay"><code class="docutils literal notranslate"><span class="pre">t60_decay()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="acousticDE/ReverberationFunctions.html#acousticDE.FiniteVolumeMethod.FunctionDefinition.definition"><code class="docutils literal notranslate"><span class="pre">definition()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="acousticDE/ReverberationFunctions.html#acousticDE.FiniteVolumeMethod.FunctionClarity.clarity"><code class="docutils literal notranslate"><span class="pre">clarity()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="acousticDE/ReverberationFunctions.html#acousticDE.FiniteVolumeMethod.FunctionCentreTime.centretime"><code class="docutils literal notranslate"><span class="pre">centretime()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="acousticDE/Auralizationfunctions.html">Auralization functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="acousticDE/Auralizationfunctions.html#module-acousticDE.Auralization.Auralization">Main function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralization.run_auralization"><code class="docutils literal notranslate"><span class="pre">run_auralization()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="acousticDE/Auralizationfunctions.html#module-acousticDE.Auralization.Auralizationfunctions">Internal functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralizationfunctions.butter_filter"><code class="docutils literal notranslate"><span class="pre">butter_filter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralizationfunctions.convolution_fun"><code class="docutils literal notranslate"><span class="pre">convolution_fun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralizationfunctions.create_noise"><code class="docutils literal notranslate"><span class="pre">create_noise()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralizationfunctions.extract_anechoic"><code class="docutils literal notranslate"><span class="pre">extract_anechoic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralizationfunctions.filtered_envelope"><code class="docutils literal notranslate"><span class="pre">filtered_envelope()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralizationfunctions.filtered_noise"><code class="docutils literal notranslate"><span class="pre">filtered_noise()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralizationfunctions.generate_imp_resp"><code class="docutils literal notranslate"><span class="pre">generate_imp_resp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralizationfunctions.load"><code class="docutils literal notranslate"><span class="pre">load()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralizationfunctions.resample_pressure"><code class="docutils literal notranslate"><span class="pre">resample_pressure()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralizationfunctions.square_root_fun"><code class="docutils literal notranslate"><span class="pre">square_root_fun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="acousticDE/Auralizationfunctions.html#acousticDE.Auralization.Auralizationfunctions.unfiltered_envelope"><code class="docutils literal notranslate"><span class="pre">unfiltered_envelope()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Different%20Method%20Demo%20Tutorial.html">Finite Different Method Demo Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Finite%20Different%20Method%20Demo%20Tutorial.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Finite%20Volume%20Method%20Demo%20Tutorial.html">Finite Volume Method Demo Tutorial</a></li>
+</ul>
+</div>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Overview.html" class="btn btn-neutral float-right" title="Overview" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Ilaria Fichera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,890 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FVM functions &mdash; Diffusion Equation for Acoustics 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Reverberation functions" href="ReverberationFunctions.html" />
+    <link rel="prev" title="FDM functions" href="FDMfunctions.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Diffusion Equation for Acoustics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Software Presentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Overview.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Use:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Finite%20Different%20Method%20Use.html">Finite Different Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Finite%20Volume%20Method%20Use.html">Finite Volume Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Auralization%20Use.html">Auralization Use</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Theory:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../DocumentationFDM.html">Diffusion Equation Finite Different Method (FDM) documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DocumentationFVM.html">Diffusion Equation Finite Volume Method (FVM) Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DocumentationAuralization.html">Auralization Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="FDMfunctions.html">FDM functions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">FVM functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-acousticDE.FiniteVolumeMethod.FVM">Main function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVM.run_fvm_sim"><code class="docutils literal notranslate"><span class="pre">run_fvm_sim()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-acousticDE.FiniteVolumeMethod.FVMfunctions">Internal functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.abs_term"><code class="docutils literal notranslate"><span class="pre">abs_term()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.belem_area_centre"><code class="docutils literal notranslate"><span class="pre">belem_area_centre()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.beta_zero_freq_fun"><code class="docutils literal notranslate"><span class="pre">beta_zero_freq_fun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.boundary_triang"><code class="docutils literal notranslate"><span class="pre">boundary_triang()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.calculation_rec_time"><code class="docutils literal notranslate"><span class="pre">calculation_rec_time()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.calculation_sourceon_time"><code class="docutils literal notranslate"><span class="pre">calculation_sourceon_time()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.computing_energy_density"><code class="docutils literal notranslate"><span class="pre">computing_energy_density()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.create_vgroups_names"><code class="docutils literal notranslate"><span class="pre">create_vgroups_names()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.diffusion_coeff"><code class="docutils literal notranslate"><span class="pre">diffusion_coeff()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.distance_source_receiver"><code class="docutils literal notranslate"><span class="pre">distance_source_receiver()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.equiv_absorp_area"><code class="docutils literal notranslate"><span class="pre">equiv_absorp_area()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.freq_parameters"><code class="docutils literal notranslate"><span class="pre">freq_parameters()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.get_neighbour_faces"><code class="docutils literal notranslate"><span class="pre">get_neighbour_faces()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.get_nodes_elem"><code class="docutils literal notranslate"><span class="pre">get_nodes_elem()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.initial_cond"><code class="docutils literal notranslate"><span class="pre">initial_cond()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.interior_tetra"><code class="docutils literal notranslate"><span class="pre">interior_tetra()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.line_receivers"><code class="docutils literal notranslate"><span class="pre">line_receivers()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.number_freq"><code class="docutils literal notranslate"><span class="pre">number_freq()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.receiver_interp"><code class="docutils literal notranslate"><span class="pre">receiver_interp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.room_dimensions"><code class="docutils literal notranslate"><span class="pre">room_dimensions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.save_fvm"><code class="docutils literal notranslate"><span class="pre">save_fvm()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.source_interp"><code class="docutils literal notranslate"><span class="pre">source_interp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.source_matrix"><code class="docutils literal notranslate"><span class="pre">source_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.source_volume"><code class="docutils literal notranslate"><span class="pre">source_volume()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.surface_absorption_fun"><code class="docutils literal notranslate"><span class="pre">surface_absorption_fun()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.surface_area"><code class="docutils literal notranslate"><span class="pre">surface_area()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.surface_materials"><code class="docutils literal notranslate"><span class="pre">surface_materials()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.velem_volume_centre"><code class="docutils literal notranslate"><span class="pre">velem_volume_centre()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ReverberationFunctions.html">Reverberation functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Auralizationfunctions.html">Auralization functions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Finite%20Different%20Method%20Demo%20Tutorial.html">Finite Different Method Demo Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Finite%20Volume%20Method%20Demo%20Tutorial.html">Finite Volume Method Demo Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Diffusion Equation for Acoustics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">FVM functions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/acousticDE/FVMfunctions.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="fvm-functions">
+<h1>FVM functions<a class="headerlink" href="#fvm-functions" title="Link to this heading"></a></h1>
+<section id="module-acousticDE.FiniteVolumeMethod.FVM">
+<span id="main-function"></span><h2>Main function<a class="headerlink" href="#module-acousticDE.FiniteVolumeMethod.FVM" title="Link to this heading"></a></h2>
+<p>Created on Wed Aug  2 16:12:40 2023</p>
+<p>&#64;author: Ilaria Fichera</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVM.run_fvm_sim">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVM.</span></span><span class="sig-name descname"><span class="pre">run_fvm_sim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inputs_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abs_coeff_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVM.html#run_fvm_sim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVM.run_fvm_sim" title="Link to this definition"></a></dt>
+<dd><p>Function for running the full calculation. It will use all the functions defined in FVMfunctions.py file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mesh_file_path</strong> – str
+String of the name of the mesh file</p></li>
+<li><p><strong>inputs_path</strong> – str
+String of the json file with all the inputs for the simulation.</p></li>
+<li><p><strong>abs_coeff_path</strong> – str
+String of the csv file of the absorption coefficient inputs</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the values in the absorption coefficient csv file are missing, it will flag an error.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>dict</dt><dd><p>Dictionary of all the variable calculated during the simulation</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>results</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-acousticDE.FiniteVolumeMethod.FVMfunctions">
+<span id="internal-functions"></span><h2>Internal functions<a class="headerlink" href="#module-acousticDE.FiniteVolumeMethod.FVMfunctions" title="Link to this heading"></a></h2>
+<p>Created on Wed Aug  2 16:12:40 2023</p>
+<p>&#64;author: Ilaria Fichera</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.abs_term">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">abs_term</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">th</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abscoeff_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#abs_term"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.abs_term" title="Link to this definition"></a></dt>
+<dd><p>Calculate the absorption term (Sabine, Eyring or Modified)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>th</strong> (<em>int</em>) – The options for the absorption term; Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)</p></li>
+<li><p><strong>abscoeff_list</strong> (<em>list</em>) – Absrption coefficient for each frequency</p></li>
+<li><p><strong>c0</strong> (<em>int</em>) – Speed of sound</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Absx_array</strong> – Calculated absorption term for each absorption coefficient for each frequency</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array of floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.belem_area_centre">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">belem_area_centre</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">boundaryEl_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodecoords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_indices</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#belem_area_centre"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.belem_area_centre" title="Link to this definition"></a></dt>
+<dd><p>Calculation of the area of each boundary surface and its center</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>boundaryEl_dict</strong> (<em>dict</em>) – Dictionary with key the index of the boundary element (boudnary surface) and value an array with the indeces of the nodes of the surface (maximum 3 indeces)</p></li>
+<li><p><strong>nodecoords</strong> (<em>array</em><em> of </em><em>floats</em>) – The coordinates of each node in the mesh</p></li>
+<li><p><strong>node_indices</strong> (<em>dict</em>) – Indeces of all the nodes in the mesh</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>barea_dict</strong> (<em>dict</em>) – Area of each boundary surface element</p></li>
+<li><p><strong>centre_area</strong> (<em>dict</em>) – Center point of each boundary surface element</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.beta_zero_freq_fun">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">beta_zero_freq_fun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">boundary_areas</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interior_tet_sum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_volume</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#beta_zero_freq_fun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.beta_zero_freq_fun" title="Link to this definition"></a></dt>
+<dd><p>Calculation of factor beta_zero</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>boundary_areas</strong> (<em>array</em><em> of </em><em>floats</em>) – Product between the area and the correspondent absorption term for each surface for each tetrahedron</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – Time step</p></li>
+<li><p><strong>Dx</strong> (<em>float</em>) – Diffusion coefficient in the x direction (equal to the theoretical diffusion coefficient)</p></li>
+<li><p><strong>interior_tet_sum</strong> (<em>array</em><em> of </em><em>floats</em>) – Sum of interior_tet per columns</p></li>
+<li><p><strong>cell_volume</strong> (<em>array</em><em> of </em><em>floats</em>) – The volume of each element cell</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>beta_zero_freq</strong> – Coefficient beta zero used in the calculation of the energy density per each frequency</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.boundary_triang">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">boundary_triang</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">velemNodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nBands</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounNode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodecoords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">triangle_face_absorption</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#boundary_triang"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.boundary_triang" title="Link to this definition"></a></dt>
+<dd><p>Assign the correct equaivalent area to each surface to each tetrahedra</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>velemNodes</strong> (<em>array</em><em> of </em><em>int</em>) – Indeces of all the volumetric nodes per each colume element in the mesh</p></li>
+<li><p><strong>nBands</strong> (<em>int</em>) – Number of frequency bands</p></li>
+<li><p><strong>bounNode</strong> (<em>array</em><em> of </em><em>int</em>) – Indeces of all the boundary nodes per each boundary surface in the mesh</p></li>
+<li><p><strong>nodecoords</strong> (<em>array</em><em> of </em><em>floats</em>) – The coordinates of each node in the mesh</p></li>
+<li><p><strong>node_indices</strong> (<em>dict</em>) – Indeces of all the nodes in the mesh</p></li>
+<li><p><strong>triangle_face_absorption</strong> (<em>list</em><em> of </em><em>arrays</em>) – Absorption term value for each triangle face at the boundary</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>boundary_areas</strong> (<em>array of floats</em>) – Product between the area and the correspondent absorption term for each surface for each tetrahedron</p></li>
+<li><p><strong>total_boundArea</strong> (<em>float</em>) – Total surface area of the room</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.calculation_rec_time">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">calculation_rec_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourceon_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ir_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#calculation_rec_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.calculation_rec_time" title="Link to this definition"></a></dt>
+<dd><p>Calculation of the simulation time run</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sourceon_time</strong> (<em>float</em>) – Time that the source stays on</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – Time step</p></li>
+<li><p><strong>edt</strong> (<em>int</em><em>, </em><em>optional</em>) – Early decay time. Defaults to -1.</p></li>
+<li><p><strong>ir_length</strong> (<em>int</em><em>, </em><em>optional</em>) – Impulse response length. Defaults to -1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>recording_time</strong> (<em>float</em>) – Length of the simulaton run</p></li>
+<li><p><strong>t</strong> (<em>array of floats</em>) – Time array of time steps</p></li>
+<li><p><strong>recording_steps</strong> (<em>int</em>) – Number of time steps</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.calculation_sourceon_time">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">calculation_sourceon_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nBands</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Eq_A</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#calculation_sourceon_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.calculation_sourceon_time" title="Link to this definition"></a></dt>
+<dd><p>Calculation of the time the sources stays on</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nBands</strong> (<em>int</em>) – Number of frequency bands</p></li>
+<li><p><strong>V</strong> (<em>float</em>) – Volume of the room</p></li>
+<li><p><strong>Eq_A</strong> (<em>array</em><em> of </em><em>floats</em>) – Equivalent absorption</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>sourceon_time</strong> – Time that the source stays on</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.computing_energy_density">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">computing_energy_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nBands</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voluEl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recording_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_zero_freq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m_atm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interior_tet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_volume</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cl_tet_r_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_weights_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tcalc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cl_tet_s_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_weights_s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sourceon_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#computing_energy_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.computing_energy_density" title="Link to this definition"></a></dt>
+<dd><p>Computation of energy density</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nBands</strong> (<em>int</em>) – Number of frequency bands</p></li>
+<li><p><strong>voluEl</strong> (<em>array</em><em> of </em><em>int</em>) – Indeces of all the bolume elements (tetrahedra) in the mesh</p></li>
+<li><p><strong>recording_steps</strong> (<em>int</em>) – Number of time steps</p></li>
+<li><p><strong>beta_zero_freq</strong> (<em>list</em>) – Coefficient beta zero used in the calculation of the energy density per each frequency</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – Time step</p></li>
+<li><p><strong>c0</strong> (<em>int</em>) – Speed of sound</p></li>
+<li><p><strong>m_atm</strong> (<em>float</em>) – Air absorption coefficient</p></li>
+<li><p><strong>Dx</strong> (<em>float</em>) – Diffusion coefficient in the x direction (equal to the theoretical diffusion coefficient)</p></li>
+<li><p><strong>interior_tet</strong> (<em>array</em><em> of </em><em>floats</em>) – Matrix of tetrahedron per tetrahedron of the division between shared area and shared distance</p></li>
+<li><p><strong>cell_volume</strong> (<em>array</em><em> of </em><em>floats</em>) – The volume of each element cell</p></li>
+<li><p><strong>s</strong> (<em>array</em><em> of </em><em>floats</em>) – Matrix of tretrahedron central points inserting source energy</p></li>
+<li><p><strong>cl_tet_r_keys</strong> (<em>dict keys</em>) – Closest tetrahedrons indeces to the receiver</p></li>
+<li><p><strong>total_weights_r</strong> (<em>dict</em>) – Weights for each 4 closest points to the receiver position for interpolation</p></li>
+<li><p><strong>tcalc</strong> (<em>str</em>) – Type of calculation; “decay” if the source switches off and “stationarysource” if the source is stationary</p></li>
+<li><p><strong>cl_tet_s_keys</strong> (<em>dict keys</em>) – Closest tetrahedrons indeces to the source</p></li>
+<li><p><strong>total_weights_s</strong> (<em>dict</em>) – Weights for each 4 closest points to the source position for interpolation</p></li>
+<li><p><strong>source1</strong> (<em>array</em><em> of </em><em>floats</em>) – Energy density of source number 1 at each time step position</p></li>
+<li><p><strong>total_weights_s</strong> – Weights for each 4 closest points to the source position for interpolation</p></li>
+<li><p><strong>t</strong> (<em>array</em><em> of </em><em>floats</em>) – Time array of time steps</p></li>
+<li><p><strong>sourceon_time</strong> (<em>float</em>) – Time that the source stays on</p></li>
+<li><p><strong>rho</strong> (<em>float</em>) – Density of air</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>w_new_band</strong> (<em>list of arrays</em>) – Energy density at the time step n+1 at each centre cell per each frequency band</p></li>
+<li><p><strong>w_rec_band</strong> (<em>list of arrays</em>) – Energy density over time at the receiver position per each frequency band</p></li>
+<li><p><strong>w_rec_off_band</strong> (<em>list of arrays</em>) – Energy density over time after the source is switched off at the receiver position per each frequency band</p></li>
+<li><p><strong>w_rec_off_deriv_band</strong> (<em>list of arrays</em>) – Derivative of the energy density over time after the source is switched off at the receiver position per each frequency band</p></li>
+<li><p><strong>p_rec_off_deriv_band</strong> (<em>list of arrays</em>) – Derivative of the pressure over time after the source is switched off at the receiver position per each frequency band</p></li>
+<li><p><strong>idx_w_rec</strong> (<em>int</em>) – Time index at which the source is switched off</p></li>
+<li><p><strong>t_off</strong> (<em>array of floats</em>) – Time array after the source is switched off</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.create_vgroups_names">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">create_vgroups_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#create_vgroups_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.create_vgroups_names" title="Link to this definition"></a></dt>
+<dd><p>Create a list of the material names assigned in SketchUp</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>) – Full path to the mesh file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>vGroupsNames</strong> – Names of the materials in the msh file (the material name are the same as the one assigned in the SketchUp file)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.diffusion_coeff">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">diffusion_coeff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#diffusion_coeff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.diffusion_coeff" title="Link to this definition"></a></dt>
+<dd><p>Calculation of the theoretical diffusion coefficient</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>V</strong> (<em>float</em>) – Volume of the room</p></li>
+<li><p><strong>S</strong> (<em>float</em>) – Total surface are of the room</p></li>
+<li><p><strong>c0</strong> (<em>int</em>) – Speed of sound</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>Dx</strong> (<em>float</em>) – Diffusion coefficient in the x direction (equal to the theoretical diffusion coefficient)</p></li>
+<li><p><strong>Dy</strong> (<em>float</em>) – Diffusion coefficient in the y direction (equal to the theoretical diffusion coefficient)</p></li>
+<li><p><strong>Dz</strong> (<em>float</em>) – Diffusion coefficient in the z direction (equal to the theoretical diffusion coefficient)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.distance_source_receiver">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">distance_source_receiver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coord_rec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord_source</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#distance_source_receiver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.distance_source_receiver" title="Link to this definition"></a></dt>
+<dd><p>Calculation of the distance between source and receiver positions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coord_rec</strong> (<em>list</em>) – Coordinates of the receiver position</p></li>
+<li><p><strong>coord_source</strong> (<em>list</em>) – Coordinates of the source position</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>dist_sr</strong> – Distance between source and receiver position</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.equiv_absorp_area">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">equiv_absorp_area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_volume</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_boundArea</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_areas_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">absorption_coefficient_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#equiv_absorp_area"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.equiv_absorp_area" title="Link to this definition"></a></dt>
+<dd><p>Calculation of the eqauivalent absorption area</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cell_volume</strong> (<em>array</em><em> of </em><em>floats</em>) – The volume of each element cell</p></li>
+<li><p><strong>total_boundArea</strong> (<em>float</em>) – Total surface area of the room</p></li>
+<li><p><strong>surface_areas_in</strong> (<em>dict</em>) – Surface are for each surface of the model</p></li>
+<li><p><strong>absorption_coefficient_dict</strong> (<em>dict</em>) – Dictionary of absorption coefficients per each surface and per each frequency</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>V</strong> (<em>float</em>) – Volume of the room</p></li>
+<li><p><strong>S</strong> (<em>float</em>) – Total surface are of the room</p></li>
+<li><p><strong>Eq_A</strong> (<em>array of floats</em>) – Equivalent absorption area</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.freq_parameters">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">freq_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nBands</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_rec_x_idx_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_new_band</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_rec_y_idx_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ws</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pRef</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_rec_band</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_rec_off_band</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tcalc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx_w_rec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Eq_A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_sr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#freq_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.freq_parameters" title="Link to this definition"></a></dt>
+<dd><p>Computation of sound presure level and reverberation time parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nBands</strong> (<em>int</em>) – Number of frequency bands</p></li>
+<li><p><strong>line_rec_x_idx_list</strong> (<em>list</em>) – Indexes of center cells close to the line receiver position in the x axis</p></li>
+<li><p><strong>w_new_band</strong> (<em>list</em><em> of </em><em>arrays</em>) – Energy density at the time step n+1 at each centre cell per each frequency band</p></li>
+<li><p><strong>line_rec_y_idx_list</strong> (<em>list</em>) – Indexes of center cells close to the line receiver position in the y axis</p></li>
+<li><p><strong>rho</strong> (<em>float</em>) – Density of air</p></li>
+<li><p><strong>c0</strong> (<em>int</em>) – Speed of sound</p></li>
+<li><p><strong>Ws</strong> (<em>float</em>) – Power of the source</p></li>
+<li><p><strong>dist_x</strong> (<em>array</em><em> of </em><em>floats</em>) – Distance between each line receiver point cell and the source in the x axis</p></li>
+<li><p><strong>dist_y</strong> (<em>array</em><em> of </em><em>floats</em>) – Distance between each line receiver point cell and the source in the y axis</p></li>
+<li><p><strong>pRef</strong> (<em>float</em>) – Reference pressure</p></li>
+<li><p><strong>w_rec_band</strong> (<em>list</em><em> of </em><em>arrays</em>) – Energy density over time at the receiver position per each frequency band</p></li>
+<li><p><strong>w_rec_off_band</strong> (<em>list</em><em> of </em><em>arrays</em>) – Energy density over time after the source is switched off at the receiver position per each frequency band</p></li>
+<li><p><strong>tcalc</strong> (<em>str</em>) – Type of calculation; “decay” if the source switches off and “stationarysource” if the source is stationary</p></li>
+<li><p><strong>t</strong> (<em>array</em><em> of </em><em>floats</em>) – Time array of time steps</p></li>
+<li><p><strong>idx_w_rec</strong> (<em>int</em>) – Time index at which the source is switched off</p></li>
+<li><p><strong>V</strong> (<em>float</em>) – Volume of the room</p></li>
+<li><p><strong>Eq_A</strong> (<em>array</em><em> of </em><em>floats</em>) – Equivalent absorption area</p></li>
+<li><p><strong>S</strong> (<em>float</em>) – Total surface are of the room</p></li>
+<li><p><strong>dist_sr</strong> (<em>float</em>) – Distance between source and receiver position</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>w_rec_x_band</strong> (<em>list of arrays</em>) – Energy density over time at the each line point receiver position in the x axis per each frequency band</p></li>
+<li><p><strong>w_rec_y_band</strong> (<em>list of arrays</em>) – Energy density over time at the each line point receiver position in the y axis per each frequency band</p></li>
+<li><p><strong>spl_stat_x_band</strong> (<em>list of array</em>) – Total sound pressure level (direct field plus reverberant) over time at the each line point receiver position in the x axis per each frequency band</p></li>
+<li><p><strong>spl_stat_y_band</strong> (<em>list of arrays</em>) – Total sound pressure level (direct field plus reverberant) over time at the each line point receiver position in the y axis per each frequency band</p></li>
+<li><p><strong>spl_r_band</strong> (<em>list of arrays</em>) – Sound pressure level over time at the receiver position per each frequency band</p></li>
+<li><p><strong>spl_r_off_band</strong> (<em>list of arrays</em>) – Sound pressure level over time after the source is switched off at the receiver position per each frequency band</p></li>
+<li><p><strong>spl_r_norm_band</strong> (<em>list of arrays</em>) – Sound pressure level over time at the receiver position per each frequency band normalised to its maximum level</p></li>
+<li><p><strong>sch_db_band</strong> (<em>list of arrays</em>) – Energy density over time after the source is switched off at the receiver position per each frequency band</p></li>
+<li><p><strong>t30_band</strong> (<em>array of floats</em>) – Reverberation time T30 per each frequency band</p></li>
+<li><p><strong>edt_band</strong> (<em>array of floats</em>) – Early decay time per each frequency band</p></li>
+<li><p><strong>c80_band</strong> (<em>array of floats</em>) – Clarity per each frequency band</p></li>
+<li><p><strong>d50_band</strong> (<em>array of floats</em>) – Definition per each frequency band</p></li>
+<li><p><strong>ts_band</strong> (<em>array of floats</em>) – Centre time per each frequency band</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.get_neighbour_faces">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">get_neighbour_faces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voluEl</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#get_neighbour_faces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.get_neighbour_faces" title="Link to this definition"></a></dt>
+<dd><p>Calculation of nighbours volumetric elements and faces</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>voluEl</strong> (<em>array</em><em> of </em><em>int</em>) – Indeces of all the volume elements (tetrahedra) in the mesh</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>fxt</strong> (<em>dict</em>) – Dictionary with keys as the nodes of each face and values the volume elements of which this face is neighbour</p></li>
+<li><p><strong>txt</strong> (<em>dict</em>) – Dictionary with keys as the tetrahedron tag and values as the tet that are neighbours (the tet at the boundary are not counted)</p></li>
+<li><p><strong>neighbourVolume</strong> (<em>array of floats</em>) – Array with the neighbours tetrahedron per each tetrahedron in order from 0 to the number of tetrahedrons</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.get_nodes_elem">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">get_nodes_elem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#get_nodes_elem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.get_nodes_elem" title="Link to this definition"></a></dt>
+<dd><p>Calculates the number of volumetric and boundary elements in the mesh</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dim</strong> (<em>int</em>) – Dimensions of the entities, 0 for points, 1 for curves/edge/lines, 2 for surfaces, 3 for volumes, -1 for all the entities</p></li>
+<li><p><strong>tag</strong> (<em>int</em>) – Indication for nodes (-1 indicates all the nodes of the room)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>nodecoords</strong> (<em>array of floats</em>) – The coordinates of each node in the mesh</p></li>
+<li><p><strong>node_indices</strong> (<em>dict</em>) – Indeces of all the nodes in the mesh</p></li>
+<li><p><strong>bounEl</strong> (<em>array of int</em>) – Indeces of all the boundary surfaces in the mesh</p></li>
+<li><p><strong>bounNode</strong> (<em>array of int</em>) – Indeces of all the boundary nodes per each boundary surface in the mesh</p></li>
+<li><p><strong>voluEl</strong> (<em>array of int</em>) – Indeces of all the bolume elements (tetrahedra) in the mesh</p></li>
+<li><p><strong>voluNode</strong> (<em>array of int</em>) – Indeces of all the volumetric nodes per each colume element in the mesh</p></li>
+<li><p><strong>belemNodes</strong> (<em>array of int</em>) – Indeces of all the boundary nodes per each boundary surface in the mesh</p></li>
+<li><p><strong>velemNodes</strong> (<em>array of int</em>) – Indeces of all the volumetric nodes per each colume element in the mesh</p></li>
+<li><p><strong>boundaryEl_dict</strong> (<em>dict</em>) – Dictionary with key the index of the boundary element (boudnary surface) and value the indeces of the nodes of the surface</p></li>
+<li><p><strong>volumeEl_dict</strong> (<em>dict</em>) – Dictionary with key the index of the volumetric element (tetrahedra) and value the indeces of the nodes of the tetrahedra</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.initial_cond">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">initial_cond</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Ws</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Vs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sourceon_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recording_steps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#initial_cond"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.initial_cond" title="Link to this definition"></a></dt>
+<dd><p>Definition of initial conditions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Ws</strong> (<em>float</em>) – Power of the source</p></li>
+<li><p><strong>Vs</strong> (<em>float</em>) – Volume of the source</p></li>
+<li><p><strong>sourceon_time</strong> (<em>float</em>) – Time that the source stays on</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – Time step</p></li>
+<li><p><strong>recording_steps</strong> (<em>int</em>) – Number of time steps</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>source1</strong> (<em>array of floats</em>) – Energy density of source number 1 at each time step position</p></li>
+<li><p><strong>sourceon_steps</strong> (<em>int</em>) – Number of time steps while the source is on</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.interior_tetra">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">interior_tetra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voluEl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">velemNodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodecoords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_indices</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#interior_tetra"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.interior_tetra" title="Link to this definition"></a></dt>
+<dd><p>Calculation of shared area divided shared distance between tetrahedrons</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>voluEl</strong> (<em>array</em><em> of </em><em>int</em>) – Indeces of all the bolume elements (tetrahedra) in the mesh</p></li>
+<li><p><strong>cell_center</strong> (<em>array</em><em> of </em><em>floats</em>) – The coordinates of the center of the cell element per each element</p></li>
+<li><p><strong>velemNodes</strong> (<em>array</em><em> of </em><em>int</em>) – Indeces of all the volumetric nodes per each colume element in the mesh</p></li>
+<li><p><strong>nodecoords</strong> (<em>array</em><em> of </em><em>floats</em>) – The coordinates of each node in the mesh</p></li>
+<li><p><strong>node_indices</strong> (<em>dict</em>) – Indeces of all the nodes in the mesh</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>interior_tet</strong> (<em>array of floats</em>) – Matrix of tetrahedron per tetrahedron of the division between shared area and shared distance</p></li>
+<li><p><strong>interior_tet_sum</strong> (<em>array of floats</em>) – Sum of interior_tet per columns</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.line_receivers">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">line_receivers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">room_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">room_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord_rec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord_source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_center</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#line_receivers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.line_receivers" title="Link to this definition"></a></dt>
+<dd><p>Definition of a line point receiver</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>room_length</strong> (<em>float</em>) – Length of the room</p></li>
+<li><p><strong>room_width</strong> (<em>float</em>) – Width of the room</p></li>
+<li><p><strong>coord_rec</strong> (<em>list</em>) – Coordinates of the receiver position</p></li>
+<li><p><strong>coord_source</strong> (<em>list</em>) – Coordinates of the source position</p></li>
+<li><p><strong>cell_center</strong> (<em>array</em><em> of </em><em>floats</em>) – The coordinates of the center of the cell element per each element</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>x_axis</strong> (<em>array of floats</em>) – Linspace on x_axis with distance dx</p></li>
+<li><p><strong>y_axis</strong> (<em>array of floats</em>) – Linspace on y_axis with distance dy</p></li>
+<li><p><strong>line_rec_x_idx_list</strong> (<em>list</em>) – Indexes of center cells close to the line receiver position in the x axis</p></li>
+<li><p><strong>dist_x</strong> (<em>array of floats</em>) – Distance between each line receiver point cell and the source in the x axis</p></li>
+<li><p><strong>line_rec_y_idx_list</strong> (<em>list</em>) – Indexes of center cells close to the line receiver position in the y axis</p></li>
+<li><p><strong>dist_y</strong> (<em>array of floats</em>) – Distance between each line receiver point cell and the source in the y axis</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.number_freq">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">number_freq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_octave</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fc_high</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fc_low</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#number_freq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.number_freq" title="Link to this definition"></a></dt>
+<dd><p>Calculate the frequency array and the number of frequency bands.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_octave</strong> (<em>int</em>) – Number of octaves to calculate (1 or 3 octaves).</p></li>
+<li><p><strong>fc_high</strong> (<em>int</em>) – The highest frequency in the calculation.</p></li>
+<li><p><strong>fc_low</strong> (<em>int</em>) – The lowest frequency in the calculation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>nBands</strong> (<em>int</em>) – Number of frequency bands.</p></li>
+<li><p><strong>center_freq</strong> (<em>list of float</em>) – Array of all the frequencies to calculate.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.receiver_interp">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">receiver_interp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord_rec</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#receiver_interp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.receiver_interp" title="Link to this definition"></a></dt>
+<dd><p>Interpolation of the receiver position</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cell_center</strong> (<em>array</em><em> of </em><em>floats</em>) – The coordinates of the center of the cell element per each element</p></li>
+<li><p><strong>coord_rec</strong> (<em>list</em>) – Coordinates of the receiver position</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>cl_tet_r_keys</strong> (<em>dict keys</em>) – Closest tetrahedrons indeces to the receiver</p></li>
+<li><p><strong>total_weights_r</strong> (<em>dict</em>) – Weights for each 4 closest points to the receiver position for interpolation</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.room_dimensions">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">room_dimensions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodecoords</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#room_dimensions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.room_dimensions" title="Link to this definition"></a></dt>
+<dd><p>Calculation of the room dimensions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>nodecoords</strong> (<em>array</em><em> of </em><em>floats</em>) – The coordinates of each node in the mesh</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>room_length</strong> (<em>float</em>) – Length of the room</p></li>
+<li><p><strong>room_width</strong> (<em>float</em>) – Width of the room</p></li>
+<li><p><strong>room_height</strong> (<em>float</em>) – Height of the room</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.save_fvm">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">save_fvm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#save_fvm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.save_fvm" title="Link to this definition"></a></dt>
+<dd><p>Saving of variables</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – Name of the file to save the results</p></li>
+<li><p><strong>variables</strong> (<em>dict</em>) – Compilation of all the variables of the overall simulation</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.source_interp">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">source_interp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord_source</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#source_interp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.source_interp" title="Link to this definition"></a></dt>
+<dd><p>Interpolation of the source position</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cell_center</strong> (<em>array</em><em> of </em><em>floats</em>) – The coordinates of the center of the cell element per each element</p></li>
+<li><p><strong>coord_source</strong> (<em>list</em>) – Coordinates of the source position</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>cl_tet_s_keys</strong> (<em>Dict keys</em>) – Clossest tetrahedrons indeces to the source</p></li>
+<li><p><strong>total_weights_s</strong> (<em>dict</em>) – Weights for each 4 closest points to the source position for interpolation</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.source_matrix">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">source_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">voluEl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cl_tet_s_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_weights_s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#source_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.source_matrix" title="Link to this definition"></a></dt>
+<dd><p>Calculation of the source matrix</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>voluEl</strong> (<em>array</em><em> of </em><em>int</em>) – Indeces of all the bolume elements (tetrahedra) in the mesh</p></li>
+<li><p><strong>cl_tet_s_keys</strong> (<em>Dict keys</em>) – Clossest tetrahedrons indeces to the source</p></li>
+<li><p><strong>source1</strong> (<em>array</em><em> of </em><em>floats</em>) – Energy density of source number 1 at each time step position</p></li>
+<li><p><strong>total_weights_s</strong> (<em>dict</em>) – Weights for each 4 closest points to the source position for interpolation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>s</strong> – Matrix of tretrahedron central points inserting source energy</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array of floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.source_volume">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">source_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">velemNodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodecoords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord_source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_volume</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#source_volume"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.source_volume" title="Link to this definition"></a></dt>
+<dd><p>Calculation of the volume of the source</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>velemNodes</strong> (<em>array</em><em> of </em><em>int</em>) – Indeces of all the volumetric nodes per each colume element in the mesh</p></li>
+<li><p><strong>nodecoords</strong> (<em>array</em><em> of </em><em>floats</em>) – The coordinates of each node in the mesh</p></li>
+<li><p><strong>coord_source</strong> (<em>list</em>) – Coordinates of the source position</p></li>
+<li><p><strong>cell_volume</strong> (<em>array</em><em> of </em><em>floats</em>) – The volume of each element cell</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Vs</strong> – Volume of the source</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.surface_absorption_fun">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">surface_absorption_fun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vGroupsNames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_abs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nBands</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">th</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#surface_absorption_fun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.surface_absorption_fun" title="Link to this definition"></a></dt>
+<dd><p>Assign the absoprtion term to each triangle boundary face depending on the surface material and the frequency</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vGroupsNames</strong> (<em>list</em>) – List of the names of the materials in the msh file (the material name are the same as the one assigned in the SketchUp file)</p></li>
+<li><p><strong>df_abs</strong> (<em>Dataframe</em>) – Absoprtion coefficient for each material assigned</p></li>
+<li><p><strong>nBands</strong> (<em>int</em>) – Number of frequency bands</p></li>
+<li><p><strong>th</strong> (<em>int</em>) – Option for the absorption term; Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)</p></li>
+<li><p><strong>c0</strong> (<em>int</em>) – Speed of sound</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If there are not values in the csv file, it will raise it as an error.:</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>surface_absorption</strong> (<em>list of tuples</em>) – List of absorption term for each surface and for each frequency</p></li>
+<li><p><strong>triangle_face_absorption</strong> (<em>list of arrays</em>) – Absorption term value for each triangle face at the boundary</p></li>
+<li><p><strong>absorption_coefficient_dict</strong> (<em>dict</em>) – Dictionary initialization of absorption coefficients per each surface and per each frequency</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.surface_area">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">surface_area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surface_absorption</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodecoords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_indices</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#surface_area"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.surface_area" title="Link to this definition"></a></dt>
+<dd><p>Calculation of total surface area for each model surface</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>surface_absorption</strong> (<em>list</em><em> of </em><em>tuples</em>) – List of absorption term for each surface and for each frequency</p></li>
+<li><p><strong>nodecoords</strong> (<em>array</em><em> of </em><em>floats</em>) – The coordinates of each node in the mesh</p></li>
+<li><p><strong>node_indices</strong> (<em>dict</em>) – Indeces of all the nodes in the mesh</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>surface_areas</strong> – Surface are for each surface of the model</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.surface_materials">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">surface_materials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abscoeff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface_absorption</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">absorption_coefficient_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nBands</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">th</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#surface_materials"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.surface_materials" title="Link to this definition"></a></dt>
+<dd><p>Calculation of absorption term for each material</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>group</strong> (<em>list</em>) – List of element type (1 for lines, 2 for surface, 3 for volumes), element type number and material name in the msh file</p></li>
+<li><p><strong>abscoeff</strong> (<em>list</em><em> of </em><em>strings</em>) – Absorption coefficient of the group (material name)</p></li>
+<li><p><strong>surface_absorption</strong> (<em>list</em><em> of </em><em>tuples</em>) – List initialization for each frequency of a tuple including the surface number and the absorption term for that surface</p></li>
+<li><p><strong>absorption_coefficient_dict</strong> (<em>dict</em>) – Dictionary initialization of absorption coefficients per each surface and per each frequency</p></li>
+<li><p><strong>nBands</strong> (<em>int</em>) – Number of frequency bands</p></li>
+<li><p><strong>th</strong> (<em>int</em>) – Option for the absorption term; Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)</p></li>
+<li><p><strong>c0</strong> (<em>int</em>) – Speed of sound</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Exception</strong> – If the number of absorption coefficient typed are higher than the number of frequency bands it will raise an error:</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>absorption_coefficient_dict</strong> (<em>dict</em>) – absorption coefficients per each surface and per each frequency</p></li>
+<li><p><strong>surface_absorption</strong> (<em>list of tuples</em>) – Absorption term for each surface and for each frequency</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FVMfunctions.velem_volume_centre">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FVMfunctions.</span></span><span class="sig-name descname"><span class="pre">velem_volume_centre</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volumeEl_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodecoords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_indices</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FVMfunctions.html#velem_volume_centre"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FVMfunctions.velem_volume_centre" title="Link to this definition"></a></dt>
+<dd><p>Calculation of the volume of each cell and its center</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>volumeEl_dict</strong> (<em>dict</em>) – Dictionary with key the index of the volumetric element (tetrahedra) and value an array with the indeces of the nodes of the tetrahedra (maximum 4 indeces)</p></li>
+<li><p><strong>nodecoords</strong> (<em>array</em><em> of </em><em>floats</em>) – The coordinates of each node in the mesh</p></li>
+<li><p><strong>node_indices</strong> (<em>dict</em>) – Indeces of all the nodes in the mesh</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>cell_center</strong> (<em>array of floats</em>) – The coordinates of the center of the cell element per each element</p></li>
+<li><p><strong>cell_volume</strong> (<em>array of floats</em>) – The volume of each element cell</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="FDMfunctions.html" class="btn btn-neutral float-left" title="FDM functions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ReverberationFunctions.html" class="btn btn-neutral float-right" title="Reverberation functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Ilaria Fichera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

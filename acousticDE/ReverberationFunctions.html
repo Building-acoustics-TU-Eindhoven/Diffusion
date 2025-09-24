@@ -1,0 +1,237 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reverberation functions &mdash; Diffusion Equation for Acoustics 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Auralization functions" href="Auralizationfunctions.html" />
+    <link rel="prev" title="FVM functions" href="FVMfunctions.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Diffusion Equation for Acoustics
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Software Presentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Overview.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Use:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Finite%20Different%20Method%20Use.html">Finite Different Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Finite%20Volume%20Method%20Use.html">Finite Volume Method Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Auralization%20Use.html">Auralization Use</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Software Theory:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../DocumentationFDM.html">Diffusion Equation Finite Different Method (FDM) documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DocumentationFVM.html">Diffusion Equation Finite Volume Method (FVM) Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../DocumentationAuralization.html">Auralization Documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="FDMfunctions.html">FDM functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FVMfunctions.html">FVM functions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Reverberation functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FunctionRT.t60_decay"><code class="docutils literal notranslate"><span class="pre">t60_decay()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FunctionDefinition.definition"><code class="docutils literal notranslate"><span class="pre">definition()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FunctionClarity.clarity"><code class="docutils literal notranslate"><span class="pre">clarity()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#acousticDE.FiniteVolumeMethod.FunctionCentreTime.centretime"><code class="docutils literal notranslate"><span class="pre">centretime()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Auralizationfunctions.html">Auralization functions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Finite%20Different%20Method%20Demo%20Tutorial.html">Finite Different Method Demo Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Finite%20Volume%20Method%20Demo%20Tutorial.html">Finite Volume Method Demo Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Diffusion Equation for Acoustics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Reverberation functions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/acousticDE/ReverberationFunctions.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-acousticDE.FiniteVolumeMethod.FunctionRT">
+<span id="reverberation-functions"></span><h1>Reverberation functions<a class="headerlink" href="#module-acousticDE.FiniteVolumeMethod.FunctionRT" title="Link to this heading"></a></h1>
+<p>Created on Fri Feb 17 08:56:15 2023</p>
+<p>&#64;author: Ilaria Fichera</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FunctionRT.t60_decay">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FunctionRT.</span></span><span class="sig-name descname"><span class="pre">t60_decay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sch_db</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx_w_rec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'t30'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FunctionRT.html#t60_decay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FunctionRT.t60_decay" title="Link to this definition"></a></dt>
+<dd><p>Calculation of reverberation time from a Schroeder decay (Schroeder 1965)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>array</em><em> of </em><em>floats</em>) – Time array of time steps</p></li>
+<li><p><strong>sch_db</strong> (<em>array</em>) – Energy density over time after the source is switched off at the receiver position</p></li>
+<li><p><strong>idx_w_rec</strong> (<em>int</em>) – Time index at which the source is switched off</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>t60</strong> – Reverberation time T_{60}</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p id="module-acousticDE.FiniteVolumeMethod.FunctionDefinition">Created on Thu Mar  9 15:25:01 2023</p>
+<p>&#64;author: Ilaria Fichera</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FunctionDefinition.definition">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FunctionDefinition.</span></span><span class="sig-name descname"><span class="pre">definition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Eq_A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FunctionDefinition.html#definition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FunctionDefinition.definition" title="Link to this definition"></a></dt>
+<dd><p>Calculation of definition D50 from a SPL decay using Barron’s revised formula [Vorlander 2008]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t60</strong> (<em>float</em>) – Reverberation time T_{60}</p></li>
+<li><p><strong>V</strong> (<em>float</em>) – Volume of the room</p></li>
+<li><p><strong>Eq_A</strong> (<em>array</em><em> of </em><em>floats</em>) – Equivalent absoption area of the room</p></li>
+<li><p><strong>S</strong> (<em>float</em>) – Total surface area of the rom</p></li>
+<li><p><strong>c0</strong> (<em>int</em>) – Speed of sound</p></li>
+<li><p><strong>dist</strong> (<em>float</em>) – Distance between source and receiver</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>d50</strong> – Definition D_{50}</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p id="module-acousticDE.FiniteVolumeMethod.FunctionClarity">Created on Thu Mar  9 15:25:01 2023</p>
+<p>&#64;author: Ilaria Fichera</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FunctionClarity.clarity">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FunctionClarity.</span></span><span class="sig-name descname"><span class="pre">clarity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Eq_A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FunctionClarity.html#clarity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FunctionClarity.clarity" title="Link to this definition"></a></dt>
+<dd><p>Calculation of clarity C80 from a SPL decay using Barron’s revised formula [Vorlander 2008]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t60</strong> (<em>float</em>) – Reverberation time T_{60}</p></li>
+<li><p><strong>V</strong> (<em>float</em>) – Volume of the room</p></li>
+<li><p><strong>Eq_A</strong> (<em>array</em><em> of </em><em>floats</em>) – Equivalent absoption area of the room</p></li>
+<li><p><strong>S</strong> (<em>float</em>) – Total surface area of the rom</p></li>
+<li><p><strong>c0</strong> (<em>int</em>) – Speed of sound</p></li>
+<li><p><strong>dist</strong> (<em>float</em>) – Distance between source and receiver</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>c80</strong> – Clarity C_{80}</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p id="module-acousticDE.FiniteVolumeMethod.FunctionCentreTime">Created on Thu Mar  9 15:25:01 2023</p>
+<p>&#64;author: Ilaria Fichera</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="acousticDE.FiniteVolumeMethod.FunctionCentreTime.centretime">
+<span class="sig-prename descclassname"><span class="pre">acousticDE.FiniteVolumeMethod.FunctionCentreTime.</span></span><span class="sig-name descname"><span class="pre">centretime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Eq_A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/acousticDE/FiniteVolumeMethod/FunctionCentreTime.html#centretime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#acousticDE.FiniteVolumeMethod.FunctionCentreTime.centretime" title="Link to this definition"></a></dt>
+<dd><p>Calculation of center time Ts from a SPL decay using Barron’s revised formula [Vorlander 2008]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t60</strong> (<em>float</em>) – Reverberation time T_{60}</p></li>
+<li><p><strong>Eq_A</strong> (<em>array</em><em> of </em><em>floats</em>) – Equivalent absoption area of the room</p></li>
+<li><p><strong>S</strong> (<em>float</em>) – Total surface area of the rom</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>c80</strong> – Clarity C_{80}</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="FVMfunctions.html" class="btn btn-neutral float-left" title="FVM functions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Auralizationfunctions.html" class="btn btn-neutral float-right" title="Auralization functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Ilaria Fichera.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

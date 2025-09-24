@@ -36,11 +36,11 @@ file_path = os.path.join(script_dir, 'cube.msh') # Full path to the file
 ###############################################################################
 #SAVE TO JSON
 ###############################################################################
-fname_input_configuration = "cube_input.json"
+fname_input_configuration = "cube_input_fvm.json"
 with open(os.path.join(script_dir, fname_input_configuration), "w") as f:
     json.dump(input_data, f, indent=4)
 
-print("Input file successfully created: simulation_inputs.json")
+print("Input file successfully created: cube_input_fvm.json")
 
 #%%
 ###############################################################################

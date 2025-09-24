@@ -216,22 +216,3 @@ def run_fvm_sim(mesh_file_path, inputs_path, abs_coeff_path):
     print("Simulation finished successfully! Results in resultsFVM.pkl file")
     
     return results
-
-
-#%%
-###############################################################################
-#INPUT VARIABLES
-###############################################################################
-
-script_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Load input data
-if __name__ == "__main__":
-#    with open(os.path.join(script_dir,"simulation_fvm_inputs.json"), "r") as f:
-#        inputs = json.load(f)
-
-    import warnings
-    warnings.filterwarnings("ignore")
-    
-    #Calling function %run_fvm_sim%
-    results = run_fvm_sim("3x3x3.msh","simulation_fvm_inputs.json",'absorption_coefficients.csv')

@@ -241,15 +241,3 @@ def run_auralization(anechoic_signal_path,resultsFVM_path):
     print("Simulation finished successfully! Results in resultsAuralization.pkl file")
     
     return results
-
-#%%
-###############################################################################
-#INPUT VARIABLES
-###############################################################################
-script_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Load input data
-if __name__ == "__main__":
-    
-    #Calling function %run_auralization_sim%
-    results = run_auralization('Frequency(english).wav','resultsFVM.pkl')

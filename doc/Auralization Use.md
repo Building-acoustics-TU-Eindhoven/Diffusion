@@ -2,7 +2,7 @@
 
 ## Requirements
 1. Set up acousticDE following the instructions in the installation section. 
-3. Run the "FVM.py" file and get the results;
+3. Run the _FVM.py_ file and get the results;
 4. Use these results for the auralization.
 
 ## Usage & files

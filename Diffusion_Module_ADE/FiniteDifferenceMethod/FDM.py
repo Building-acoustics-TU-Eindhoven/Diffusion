@@ -196,3 +196,5 @@ def run_fdm_sim(inputs_path):
     print("Simulation finished successfully! Results in resultsFDM.pkl file")
     
     return results       
+
+script_dir = os.path.dirname(os.path.abspath(__file__))

@@ -1,4 +1,4 @@
-# Auralization Use
+﻿# Auralization Use
 
 ## Requirements
 1. Set up acousticDE following the instructions in the installation section. 
@@ -28,3 +28,4 @@ An impulse response wav file representing the reverberant fingerprint of the roo
 
 ### Auralization file
 The calculation include also the creating of a auralization wav file.
+

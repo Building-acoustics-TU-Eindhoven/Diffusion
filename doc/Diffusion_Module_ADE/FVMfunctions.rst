@@ -1,9 +1,9 @@
-FVM functions
+﻿FVM functions
 =============
 
 Main function
 -------------
-.. automodule:: Diffusion_Module_ADE.FiniteVolumeMethod.FVM
+.. automodule:: acousticDE.FiniteVolumeMethod.FVM
     :members:
     :undoc-members:
     :show-inheritance:
@@ -11,7 +11,8 @@ Main function
 
 Internal functions
 ------------------
-.. automodule:: Diffusion_Module_ADE.FiniteVolumeMethod.FVMfunctions
+.. automodule:: acousticDE.FiniteVolumeMethod.FVMfunctions
     :members:
     :undoc-members:
     :show-inheritance:
+

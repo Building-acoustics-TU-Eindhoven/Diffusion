@@ -1,4 +1,4 @@
-name: Run Python Auralization Tests
+﻿name: Run Python Auralization Tests
 
 on:
   push:
@@ -30,5 +30,6 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest Diffusion_Module_ADE/Auralization/tests -p no:warnings
+        pytest acousticDE/Auralization/tests -p no:warnings
+
 

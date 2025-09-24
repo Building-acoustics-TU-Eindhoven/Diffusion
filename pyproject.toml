@@ -1,5 +1,5 @@
-[project]
-name = "Diffusion_Module_ADE"
+﻿[project]
+name = "acousticDE"
 version = "0.1.4"
 description = "Acoustics Simulation using the Diffusion Equation"
 readme = "README.md"
@@ -7,7 +7,7 @@ license = {file = "LICENSE.md"}
 requires-python = ">=3.10"
 authors = [
     {name = "Ilaria Fichera", email = "i.fichera@tue.nl"},
-    {name = "Cédric Van hoorickx", email = "c.m.l.van.hoorickx@tue.nl"},
+    {name = "CÃ©dric Van hoorickx", email = "c.m.l.van.hoorickx@tue.nl"},
     {name = "Maarten Hoornikx", email = "m.c.j.hornikx@tue.nl"},
 ]
 keywords = [
@@ -51,3 +51,4 @@ Source = "https://github.com/building-acoustics-tu-eindhoven/Diffusion"
 [build-system]
 build-backend = "flit_core.buildapi"
 requires = ["flit_core >=3.2,<4"]
+

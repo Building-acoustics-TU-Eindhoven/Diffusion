@@ -1,4 +1,4 @@
----
+﻿---
 title: '`acousticDE`: A diffusion equation model package for room acoustics simulations'
 tags:
   - python
@@ -13,7 +13,7 @@ authors:
     equal-contrib: true
     corresponding: true
     affiliation: "1" # (Multiple affiliations must be quoted)
-  - name: Cédric Van hoorickx
+  - name: CÃ©dric Van hoorickx
     orcid: 0000-0002-9671-5558
     equal-contrib: false # (This is how you can denote equal contributions between multiple authors)
     affiliation: "1" 
@@ -49,7 +49,7 @@ The software has already been applied in a number of scientific publications [Fi
 
 # Method
 
-The diffusion equation method aims to find the temporal and spatial distribution of acoustic energy within a specific room. The modelling method is based on solving the partial differential Diffusion Equation, which is applicable in the high-frequency range and it assumes only diffusely reflecting boundaries following the  Lambert’s law [Valeau2006OnPrediction]. The diffusion equation together with its boundary condition is as follow:
+The diffusion equation method aims to find the temporal and spatial distribution of acoustic energy within a specific room. The modelling method is based on solving the partial differential Diffusion Equation, which is applicable in the high-frequency range and it assumes only diffusely reflecting boundaries following the  Lambertâ€™s law [Valeau2006OnPrediction]. The diffusion equation together with its boundary condition is as follow:
 
 \begin{equation}
     \begin{cases}
@@ -67,7 +67,7 @@ This method allows for an efficient way to calculate acoustics parameters in the
 
 Ilaria Fichera acknowledges contributions from Silvin Willemsen, Marco Berzborn, Hassan Teymoori, Felipe Raymann, and Radovan Bast for their useful tips. 
 
-This research is founded by the Dutch Research Council (NWO),Applied and Engineering Sciences (AES) under grant agreement No. 19430, with project title ”A new era of room acoustics simulation software: from academic advances to a sustainable open-source project and community”.
+This research is founded by the Dutch Research Council (NWO),Applied and Engineering Sciences (AES) under grant agreement No. 19430, with project title â€A new era of room acoustics simulation software: from academic advances to a sustainable open-source project and communityâ€.
 
 # References
 <!-- A list of key references, including to other software addressing related needs. Note that the references should include full names of venues, e.g., journals and conferences, not abbreviations only understood in the context of a specific discipline. -->

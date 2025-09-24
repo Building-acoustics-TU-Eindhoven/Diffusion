@@ -1,4 +1,4 @@
-# Finite Different Method Use
+﻿# Finite Different Method Use
 
 ## Requirements
 Set up acousticDE following the instructions in the installation section. 
@@ -17,7 +17,7 @@ The main software works with the following associated functions:
 
 ## Inputs
 
-The general inputs needs to be set by using the script <a href="https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/Diffusion/refs/heads/master/Diffusion_Module_ADE/FiniteDifferenceMethod/PrepareInputsFDM.py" download>⬇ Download PrepareInputsFDM.py</a>.
+The general inputs needs to be set by using the script <a href="https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/Diffusion/refs/heads/master/acousticDE/FiniteDifferenceMethod/PrepareInputsFDM.py" download>â¬‡ Download PrepareInputsFDM.py</a>.
 
 Please download the script and define the following inputs:
 ```
@@ -97,7 +97,7 @@ The diffusion equation method predicts the time-dependent propagation of the sou
 #### Sound Density Level
 The sound density level can be expressed as function of sound energy density $w(\mathbf{r}, t)$ as:
 ```{math}
-SDL = 10 log_{10}⁡(w(\mathbf{r}, t))
+SDL = 10 log_{10}â¡(w(\mathbf{r}, t))
 ```
 
 #### Sound Pressure Level
@@ -117,7 +117,7 @@ The Early Decay time is defined by the time that it takes for the sound pressure
 The Clarity ($C_{80}$) parameter is the early to late arriving sound energy ratio. Clarity refers to how clear the sound quality is and it is calculated from the impulse response with the following relation:
 
 ```{math}
-C_{80} = 10 log⁡ \left( \frac{\int_0^{80ms} p^2(t) \, dt}{\int_{80ms}^\infty p^2 (t) \, dt} \right ) \,  [dB]
+C_{80} = 10 logâ¡ \left( \frac{\int_0^{80ms} p^2(t) \, dt}{\int_{80ms}^\infty p^2 (t) \, dt} \right ) \,  [dB]
 ```
 
 The Definition ($D_{50}$) parameter is the ratio of the early received sound energy (0-50ms after direct sound arrival) to the total received energy. It referres only to the speech and it is defined as: 
@@ -129,14 +129,15 @@ D_{50} = 10 log \left( \frac{\int_0^{50ms} p^2(t) \, dt}{\int_0^\infty p^2 (t) \
 The Centre Time (T_s) parameter is the center of gravity of the squared impulse response. Centre Time avoids the discrete division of the impulse response into early and late periods. 
 
 ```{math}
-T_{s}=10 log⁡ \left( \frac{\int_0^\infty tp^2(t) \, dt}{\int_0^\infty p^2(t) \, dt} \right)   \,  [s]
+T_{s}=10 logâ¡ \left( \frac{\int_0^\infty tp^2(t) \, dt}{\int_0^\infty p^2(t) \, dt} \right)   \,  [s]
 ```
 
 A low value indicate that most of the energy arrives early, a high value reveals that there is much reverberance.
 
-The values for all these parameters are calculated from the Barron’s revisited theory formulas (Vorlander, 2008) with the influence of the direct field neglected.
+The values for all these parameters are calculated from the Barronâ€™s revisited theory formulas (Vorlander, 2008) with the influence of the direct field neglected.
 
 ## References
-- J. M. Navarro, J. Escolano, J. J. Lopez, Implementation and evaluation of a diffusion equation model based on finite difference schemes for sound field prediction in rooms, Applied Acoustics 73 (6-7) (2012) 659–665.
+- J. M. Navarro, J. Escolano, J. J. Lopez, Implementation and evaluation of a diffusion equation model based on finite difference schemes for sound field prediction in rooms, Applied Acoustics 73 (6-7) (2012) 659â€“665.
 
-- M. Vorländer, Auralization: fundamentals of acoustics, modelling, simulation, algorithms and acoustic virtual reality,  Springer 2008.
+- M. VorlÃ¤nder, Auralization: fundamentals of acoustics, modelling, simulation, algorithms and acoustic virtual reality,  Springer 2008.
+

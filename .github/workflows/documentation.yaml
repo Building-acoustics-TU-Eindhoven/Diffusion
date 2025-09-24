@@ -1,4 +1,4 @@
-name: Docs
+﻿name: Docs
 on: [push, pull_request, workflow_dispatch]
 permissions:
     contents: write
@@ -24,3 +24,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: _build/
           force_orphan: true
+

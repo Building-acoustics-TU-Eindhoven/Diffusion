@@ -1,4 +1,4 @@
-# Finite Volume Method Use
+﻿# Finite Volume Method Use
 
 ## Requirements
 1. Set up acousticDE following the instructions in the installation section. 
@@ -41,7 +41,7 @@ In order to create a volumetric mesh of the room, the following steps need to be
 14. Keep the default options apart from "pointSizes" which should change to True, click "ok" and save the .geo file with the name of your choice;
 
 The .geo file has been created. This needs to be converted into a .msh file, to get the full volumetric mesh.
-Using the <a href="https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/Diffusion/refs/heads/master/Diffusion_Module_ADE/FiniteVolumeMethod/CreateMeshFVM.py" download>⬇ Download CreateMeshFVM.py</a> script, please input the following variables:
+Using the <a href="https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/Diffusion/refs/heads/master/acousticDE/FiniteVolumeMethod/CreateMeshFVM.py" download>â¬‡ Download CreateMeshFVM.py</a> script, please input the following variables:
 - the name of the names of the geo file you want to simulate (e.g. _3x3x3.geo_);
 - the name of the mesh file you want this python file to generate (e.g. _3x3x3.msh_); and
 - the length_of_mesh. The mesh length value describes the size of the spatial resolution of the mesh in the space and is vital to discretize correctly the space and achieve precise and converged results. Through various trials, it has been established that a mesh length of 1 meters is generally adequate. However, for computations involving complex geometries or small rooms, a smaller length of mesh (0.5 meters or lower) is recommended. The mesh length choice is contingent upon user preferences for details in parameters values, room dimensions but mostly dependent on the mean free path of the room. Infact, the length of mesh would need to be of the order of one mean free path of the room (equal or smaller than the mean free path of the room).
@@ -55,9 +55,9 @@ length_of_mesh = 1
 This script create the volumetric mesh using Gmsh software. The method is suitable for any type of geometry.
 
 ### General inputs
-The general inputs needs to be set by using the script <a href="https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/Diffusion/refs/heads/master/Diffusion_Module_ADE/FiniteVolumeMethod/PrepareInputsFVM.py" download>⬇ Download PrepareInputsFVM.py</a>
+The general inputs needs to be set by using the script <a href="https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/Diffusion/refs/heads/master/acousticDE/FiniteVolumeMethod/PrepareInputsFVM.py" download>â¬‡ Download PrepareInputsFVM.py</a>
 <!-- 
-[_PrepareInputsFVM.py_](https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/Diffusion/refs/heads/master/Diffusion_Module_ADE/FiniteVolumeMethod/PrepareInputsFVM.py?raw=true) -->
+[_PrepareInputsFVM.py_](https://raw.githubusercontent.com/Building-acoustics-TU-Eindhoven/Diffusion/refs/heads/master/acousticDE/FiniteVolumeMethod/PrepareInputsFVM.py?raw=true) -->
 
 Please download the script and define the following inputs:
 ```
@@ -123,7 +123,7 @@ Within the fixed inputs, there are:
 - Source power defined as 0.01 W (100dB);
 
 - Reference pressure defined as $2 \cdot (10^{-5})$ Pa;
-- Air density at 20°C defined as 1.21 $kg/m^{-3}$. -->
+- Air density at 20Â°C defined as 1.21 $kg/m^{-3}$. -->
 
 
 ## Acoustics Calculation
@@ -135,7 +135,7 @@ The diffusion equation method predicts the time-dependent and spatial-dependent 
 #### Sound Density Level
 The sound density level can be expressed as function of sound energy density $w(\mathbf{r}, t)$ as:
 ```{math}
-SDL = 10 log_{10}⁡(w(\mathbf{r}, t))
+SDL = 10 log_{10}â¡(w(\mathbf{r}, t))
 ```
 
 #### Sound Pressure Level
@@ -154,7 +154,7 @@ The Early Decay time is defined by the time that it takes for the sound pressure
 The Clarity ($C_{80}$) parameter is the early to late arriving sound energy ratio. Clarity refers to how clear the sound quality is and it is calculated from the impulse response with the following relation:
 
 ```{math}
-C_{80} = 10 log⁡ \left( \frac{\int_0^{80ms} p^2(t) \, dt}{\int_{80ms}^\infty p^2 (t) \, dt} \right ) \,  [dB]
+C_{80} = 10 logâ¡ \left( \frac{\int_0^{80ms} p^2(t) \, dt}{\int_{80ms}^\infty p^2 (t) \, dt} \right ) \,  [dB]
 ```
 
 The Definition ($D_{50}$) parameter is the ratio of the early received sound energy (0-50ms after direct sound arrival) to the total received energy. It referres only to the speech and it is defined as: 
@@ -166,16 +166,17 @@ D_{50} = 10 log \left( \frac{\int_0^{50ms} p^2(t) \, dt}{\int_0^\infty p^2 (t) \
 The Centre Time (T_s) parameter is the center of gravity of the squared impulse response. Centre Time avoids the discrete division of the impulse response into early and late periods. 
 
 ```{math}
-T_{s}=10 log⁡ \left( \frac{\int_0^\infty tp^2(t) \, dt}{\int_0^\infty p^2(t) \, dt} \right)   \,  [s]
+T_{s}=10 logâ¡ \left( \frac{\int_0^\infty tp^2(t) \, dt}{\int_0^\infty p^2(t) \, dt} \right)   \,  [s]
 ```
 
 A low value indicate that most of the energy arrives early, a high value reveals that there is much reverberance.
 
-The values for all these parameters are calculated from the Barron’s revisited theory formulas (Vorlander, 2008) with the influence of the direct field neglected.
+The values for all these parameters are calculated from the Barronâ€™s revisited theory formulas (Vorlander, 2008) with the influence of the direct field neglected.
 
 ## References
-- R. P. Muñoz, Numerical modeling for urban sound propagation: developments in wave-based and energy based methods, PhD Thesis, Technische Universiteit Eindhoven, 2019.
+- R. P. MuÃ±oz, Numerical modeling for urban sound propagation: developments in wave-based and energy based methods, PhD Thesis, Technische Universiteit Eindhoven, 2019.
 
-- J. M. Navarro, J. Escolano, J. J. Lopez, Implementation and evaluation of a diffusion equation model based on finite difference schemes for sound field prediction in rooms, Applied Acoustics 73 (6-7) (2012) 659–665.
+- J. M. Navarro, J. Escolano, J. J. Lopez, Implementation and evaluation of a diffusion equation model based on finite difference schemes for sound field prediction in rooms, Applied Acoustics 73 (6-7) (2012) 659â€“665.
 
-- M. Vorländer, Auralization: fundamentals of acoustics, modelling, simulation, algorithms and acoustic virtual reality,  Springer 2008.
+- M. VorlÃ¤nder, Auralization: fundamentals of acoustics, modelling, simulation, algorithms and acoustic virtual reality,  Springer 2008.
+

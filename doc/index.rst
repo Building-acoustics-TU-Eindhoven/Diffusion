@@ -1,4 +1,4 @@
-.. DiffusionEquationCode documentation master file, created by
+﻿.. DiffusionEquationCode documentation master file, created by
    sphinx-quickstart on Fri Apr 14 14:14:54 2023.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
@@ -40,10 +40,10 @@ Each method is distributed with its own Python code. The main application of the
    :maxdepth: 6
    :caption: API reference:
 
-   Diffusion_Module_ADE/FDMfunctions
-   Diffusion_Module_ADE/FVMfunctions
-   Diffusion_Module_ADE/ReverberationFunctions
-   Diffusion_Module_ADE/Auralizationfunctions
+   acousticDE/FDMfunctions
+   acousticDE/FVMfunctions
+   acousticDE/ReverberationFunctions
+   acousticDE/Auralizationfunctions
    
 .. toctree::
    :maxdepth: 2
@@ -58,3 +58,4 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+

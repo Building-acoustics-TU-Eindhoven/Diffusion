@@ -1,17 +1,18 @@
-FDM functions
+﻿FDM functions
 =============
 
 Main function
 -------------
 
-.. automodule:: Diffusion_Module_ADE.FiniteDifferenceMethod.FDM
+.. automodule:: acousticDE.FiniteDifferenceMethod.FDM
     :members:
     :undoc-members:
     :show-inheritance:
 
 Internal functions
 ------------------
-.. automodule:: Diffusion_Module_ADE.FiniteDifferenceMethod.FDMfunctions
+.. automodule:: acousticDE.FiniteDifferenceMethod.FDMfunctions
     :members:
     :undoc-members:
     :show-inheritance:
+

@@ -1,4 +1,4 @@
-# Diffusion Equation Finite Different Method (FDM) documentation
+﻿# Diffusion Equation Finite Different Method (FDM) documentation
 
 The software is based on the Du Fort and Frankel method (explicit unconditionally stable Finite difference method) solving the diffusion equation (Navarro et al., 2012).
 
@@ -115,14 +115,15 @@ w_{L_{x}}^{n+1}=   \frac{4w_{L_{x-1}}^{n+1}-2w_{L_{x-2}}^{n+1}}{3+\frac{2 A_{x_{
 ```
 
 ## References
-- J. M. Navarro, J. Escolano, J. J. Lopez, Implementation and evaluation of a diffusion equation model based on finite difference schemes for sound field prediction in rooms, Applied Acoustics 73 (6-7) (2012) 659–665.
+- J. M. Navarro, J. Escolano, J. J. Lopez, Implementation and evaluation of a diffusion equation model based on finite difference schemes for sound field prediction in rooms, Applied Acoustics 73 (6-7) (2012) 659â€“665.
 
-- A. Billon, J. Picaut, C. Foy, V. Valeau, A. Sakout, Introducing atmospheric attenuation within a diffusion model for room-acoustic predictions, The Journal of the Acoustical Society of America 123 (6) (2008) 4040–4043.
+- A. Billon, J. Picaut, C. Foy, V. Valeau, A. Sakout, Introducing atmospheric attenuation within a diffusion model for room-acoustic predictions, The Journal of the Acoustical Society of America 123 (6) (2008) 4040â€“4043.
 
-- J. Picaut, L. Simon, A Mathematical Model of Diffuse Sound Field Based on a Diffusion Equation, ACUSTICA acta acustica 83 (1997) 614–621.
+- J. Picaut, L. Simon, A Mathematical Model of Diffuse Sound Field Based on a Diffusion Equation, ACUSTICA acta acustica 83 (1997) 614â€“621.
 
-- V. Valeau, J. Picaut, M. Hodgson, On the use of a diffusion equation for room-acoustic prediction, The Journal of the Acoustical Society of America 119 (3) (2006) 1504–1513.
+- V. Valeau, J. Picaut, M. Hodgson, On the use of a diffusion equation for room-acoustic prediction, The Journal of the Acoustical Society of America 119 (3) (2006) 1504â€“1513.
 
-- Y. Jing, N. Xiang, A modified diffusion equation for room-acoustic predication, The Journal of the Acoustical Society of America 121 (6) (2007) 3284–3287.
+- Y. Jing, N. Xiang, A modified diffusion equation for room-acoustic predication, The Journal of the Acoustical Society of America 121 (6) (2007) 3284â€“3287.
 
-- Y. Jing, N. Xiang, On boundary conditions for the diffusion equation in room-acoustic prediction: Theory, simulations, and experiments, The Journal of the Acoustical Society of America 123 (1) (2008) 145–153.
+- Y. Jing, N. Xiang, On boundary conditions for the diffusion equation in room-acoustic prediction: Theory, simulations, and experiments, The Journal of the Acoustical Society of America 123 (1) (2008) 145â€“153.
+

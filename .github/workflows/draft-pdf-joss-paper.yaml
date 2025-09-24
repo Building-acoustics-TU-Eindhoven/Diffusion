@@ -1,4 +1,4 @@
-name: Draft PDF Joss paper
+﻿name: Draft PDF Joss paper
 on: [push]
 
 jobs:

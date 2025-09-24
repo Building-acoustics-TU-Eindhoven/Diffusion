@@ -1,4 +1,4 @@
-Point(1) = { 0.0, 0.0, 0.0, 1.0 };
+﻿Point(1) = { 0.0, 0.0, 0.0, 1.0 };
 Point(2) = { 0.0, 3.0, 0.0, 1.0 };
 Point(3) = { 3.0, 3.0, 0.0, 1.0 };
 Point(4) = { 3.0, 0.0, 0.0, 1.0 };
@@ -45,4 +45,5 @@ Mesh.Algorithm3D = 1; // Delaunay3D, works for boundary layer insertion.
 Mesh.Optimize = 1; // Gmsh smoother, works with boundary layers (netgen version does not).
 Mesh.CharacteristicLengthFromPoints = 1;
 // Recombine Surface "*";
+
 

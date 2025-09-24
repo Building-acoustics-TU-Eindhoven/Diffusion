@@ -1,4 +1,4 @@
-# Auralization Documentation
+﻿# Auralization Documentation
 
 An auralization, is an audible file that is created by the convolution of an anaechoic audio signal with a simulated room impulse response. It shows how a specific sound (the sound produced by the anechoic file) would sound in the room specifically simulated (room impulse response). The diffusion eqaution method is the method used to produce the energy densities inside the room, which needs to be converted into a time-domain impulse reponse usable for auralization.
 
@@ -24,3 +24,4 @@ This step involves the multiplication between the filtered random noise and the 
 The time vectors for each frequency band are summed element-wise, creating the total broadband impulse response without direct sound.
 
 The final step is the convolution of the total broadband simulated impulse response to a dry recording (anechoic file). This allows the listener to enter the simulated room acoustics environment and hear how the soundwould propagate in that specific room.
+

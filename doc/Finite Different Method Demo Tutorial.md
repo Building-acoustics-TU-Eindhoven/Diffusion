@@ -1,4 +1,4 @@
-# Finite Different Method Demo Tutorial
+﻿# Finite Different Method Demo Tutorial
 
 Test the software with the following inputs (Navarro et al., 2012):
 
@@ -35,4 +35,5 @@ Test if the software provides the following results (Navarro et al., 2012):
 The result file is a pickle file called _resultsFDM.pkl_. All the results are included in this file.
 
 ## References
-- J. M. Navarro, J. Escolano, J. J. Lopez, Implementation and evaluation of a diffusion equation model based on finite difference schemes for sound field prediction in rooms, Applied Acoustics 73 (6-7) (2012) 659–665.
+- J. M. Navarro, J. Escolano, J. J. Lopez, Implementation and evaluation of a diffusion equation model based on finite difference schemes for sound field prediction in rooms, Applied Acoustics 73 (6-7) (2012) 659â€“665.
+

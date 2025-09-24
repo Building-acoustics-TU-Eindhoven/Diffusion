@@ -1,4 +1,4 @@
-name: Run Python FDM Tests
+﻿name: Run Python FDM Tests
 
 on:
   push:
@@ -30,5 +30,6 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest Diffusion_Module_ADE/FiniteDifferenceMethod/tests -p no:warnings
+        pytest acousticDE/FiniteDifferenceMethod/tests -p no:warnings
+
 

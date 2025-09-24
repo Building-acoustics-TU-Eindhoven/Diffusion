@@ -1,4 +1,4 @@
-.DS_Store
+﻿.DS_Store
 __pycache__
 .spyproject/
 __pycache__/
@@ -13,13 +13,14 @@ DiffEq3DAxis.py
 results.pkl
 FVM-varD.py
 gmsh.exe
-Diffusion_Module_ADE/FiniteVolumeMethod/resultsFVM.pkl
+acousticDE/FiniteVolumeMethod/resultsFVM.pkl
 imp_resp.wav
 Auralization/auralization.wav
 doc/_build
-Diffusion_Module_ADE/FiniteVolumeMethod/absorption_coefficients.csv
-Diffusion_Module_ADE/FiniteVolumeMethod/simulation_inputs.json
+acousticDE/FiniteVolumeMethod/absorption_coefficients.csv
+acousticDE/FiniteVolumeMethod/simulation_inputs.json
 doc/Documentation1D.md
 doc/Documentation2D.md
-Diffusion_Module_ADE/FiniteDifferenceMethod/FDMfrequencies.py
-Diffusion_Module_ADE/FiniteDifferenceMethod/FDMOneFrequency.py
+acousticDE/FiniteDifferenceMethod/FDMfrequencies.py
+acousticDE/FiniteDifferenceMethod/FDMOneFrequency.py
+

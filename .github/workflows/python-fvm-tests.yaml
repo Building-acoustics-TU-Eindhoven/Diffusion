@@ -1,4 +1,4 @@
-name: Run Python FVM Tests
+﻿name: Run Python FVM Tests
 
 on:
   push:
@@ -30,5 +30,6 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest Diffusion_Module_ADE/FiniteVolumeMethod/tests -p no:warnings
+        pytest acousticDE/FiniteVolumeMethod/tests -p no:warnings
+
 

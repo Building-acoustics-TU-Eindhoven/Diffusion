@@ -1,4 +1,4 @@
-"""
+﻿"""
 Simulate the energy decay in a cuboid room using the Finite Volume diffusion
 equation.
 """
@@ -8,7 +8,7 @@ import pandas as pd
 import json
 import numpy as np
 import matplotlib.pyplot as plt
-from Diffusion_Module_ADE.FiniteDifferenceMethod.FDM import run_fdm_sim
+from acousticDE.FiniteDifferenceMethod.FDM import run_fdm_sim
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -52,3 +52,4 @@ result = run_fdm_sim(os.path.join(script_dir, fname_input_configuration))
 times = result['t'][:len(result['t'])//2]
 energy_decay_curve = np.array(result['w_rec_off_band'])
 # %%
+

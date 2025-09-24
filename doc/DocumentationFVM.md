@@ -1,4 +1,4 @@
-# Diffusion Equation Finite Volume Method (FVM) Documentation
+﻿# Diffusion Equation Finite Volume Method (FVM) Documentation
 
 The software is based on the Finite Volume method (FVM) solving the diffusion equation (Munoz, 2019).
 
@@ -70,6 +70,7 @@ The full discretised partial differential diffusion equation is:
 ``` -->
 
 ## References
-- R. P. Muñoz, Numerical modeling for urban sound propagation: developments in wave-based and energy based methods, PhD Thesis, Technische Universiteit Eindhoven, 2019.
+- R. P. MuÃ±oz, Numerical modeling for urban sound propagation: developments in wave-based and energy based methods, PhD Thesis, Technische Universiteit Eindhoven, 2019.
 
-- M. Vorländer, Auralization: fundamentals of acoustics, modelling, simulation, algorithms and acoustic virtual reality,  Springer 2008.
+- M. VorlÃ¤nder, Auralization: fundamentals of acoustics, modelling, simulation, algorithms and acoustic virtual reality,  Springer 2008.
+

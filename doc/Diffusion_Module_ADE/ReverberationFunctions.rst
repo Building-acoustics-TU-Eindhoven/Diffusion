@@ -1,22 +1,23 @@
-Reverberation functions
+﻿Reverberation functions
 =======================
 
-.. automodule:: Diffusion_Module_ADE.FiniteVolumeMethod.FunctionRT
+.. automodule:: acousticDE.FiniteVolumeMethod.FunctionRT
     :members:
     :undoc-members:
     :show-inheritance:
 
-.. automodule:: Diffusion_Module_ADE.FiniteVolumeMethod.FunctionDefinition
+.. automodule:: acousticDE.FiniteVolumeMethod.FunctionDefinition
     :members:
     :undoc-members:
     :show-inheritance:
 
-.. automodule:: Diffusion_Module_ADE.FiniteVolumeMethod.FunctionClarity
+.. automodule:: acousticDE.FiniteVolumeMethod.FunctionClarity
     :members:
     :undoc-members:
     :show-inheritance:
 
-.. automodule:: Diffusion_Module_ADE.FiniteVolumeMethod.FunctionCentreTime
+.. automodule:: acousticDE.FiniteVolumeMethod.FunctionCentreTime
     :members:
     :undoc-members:
     :show-inheritance:
+

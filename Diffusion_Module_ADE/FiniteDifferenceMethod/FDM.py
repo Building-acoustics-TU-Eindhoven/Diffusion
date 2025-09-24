@@ -195,21 +195,4 @@ def run_fdm_sim(inputs_path):
     
     print("Simulation finished successfully! Results in resultsFDM.pkl file")
     
-    return results
-
-
-#%%
-###############################################################################
-#INPUT VARIABLES
-###############################################################################
-
-script_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Load input data
-if __name__ == "__main__":
-
-    
-    #Calling function %run_fdm_sim%
-    results = run_fdm_sim("simulation_fdm_inputs.json")  
-        
-
+    return results       

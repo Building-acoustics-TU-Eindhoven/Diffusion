@@ -1,4 +1,4 @@
-﻿[project]
+[project]
 name = "acousticDE"
 version = "0.1.4"
 description = "Acoustics Simulation using the Diffusion Equation"

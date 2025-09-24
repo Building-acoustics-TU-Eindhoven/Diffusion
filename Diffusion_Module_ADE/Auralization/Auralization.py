@@ -15,7 +15,7 @@ import pickle
 import os
 from Diffusion_Module_ADE.Auralization.Auralizationfunctions import *
 
-def run_auralization_sim(anechoic_signal_path,resultsFVM_path):
+def run_auralization(anechoic_signal_path,resultsFVM_path):
     """
     Function for running the full auralization calculation. It will use all the functions defined in Auralizationfunctions.py file
 
@@ -252,4 +252,4 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 if __name__ == "__main__":
     
     #Calling function %run_auralization_sim%
-    results = run_auralization_sim('Frequency(english).wav','resultsFVM.pkl')
+    results = run_auralization('Frequency(english).wav','resultsFVM.pkl')

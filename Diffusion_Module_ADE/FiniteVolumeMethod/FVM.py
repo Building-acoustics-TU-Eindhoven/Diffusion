@@ -175,7 +175,41 @@ def run_fvm_sim(mesh_file_path, inputs_path, abs_coeff_path):
     et = time.time() #end time
     elapsed_time = et - st
     
-    results = locals()
+    #results = locals()
+    
+    results = {"coord_source" : coord_source,
+               "coord_rec" : coord_rec,
+               "fc_low" : fc_low,
+               "fc_high" : fc_high,
+               "num_octave" : num_octave,
+               "dt" : dt,
+               "m_atm" : m_atm,
+               "th" : th,
+               "tcalc" : tcalc,
+               "df_abs" : df_abs,
+               "center_freq" : center_freq,
+               "t": t,
+               "w_new_band" : w_new_band, 
+               "w_rec_band" : w_rec_band, 
+               "w_rec_off_band" : w_rec_off_band, 
+               "w_rec_off_deriv_band" : w_rec_off_deriv_band, 
+               "p_rec_off_deriv_band" : p_rec_off_deriv_band, 
+               "idx_w_rec" : idx_w_rec, 
+               "t_off" : t_off,
+               "w_rec_x_band" : w_rec_x_band, 
+               "w_rec_y_band" : w_rec_y_band, 
+               "spl_stat_x_band" : spl_stat_x_band, 
+               "spl_stat_y_band" : spl_stat_y_band, 
+               "spl_r_band" : spl_r_band, 
+               "spl_r_off_band" : spl_r_off_band, 
+               "spl_r_norm_band" : spl_r_norm_band, 
+               "sch_db_band" : sch_db_band, 
+               "t30_band" : t30_band, 
+               "edt_band" : edt_band, 
+               "c80_band" : c80_band, 
+               "d50_band" : d50_band, 
+               "ts_band" : ts_band,
+               }
     
     save_fvm('resultsFVM.pkl',results)
         

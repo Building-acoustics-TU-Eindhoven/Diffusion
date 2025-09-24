@@ -2,15 +2,27 @@
 
 Test the software with the following inputs (Navarro et al., 2012):
 
-- Spatial discretization: $\Delta x = 0.5 m$;
-- Time discretization: $\Delta t = 1/8000 s$;
-- Recording total time: $T = 2.0 s$;
-- Room dimension: 8.0 m x 8.0 m x 8.0 m;
-- Absorption Coefficient surface $i$: $\alpha = 1/6 \approx 0.17$;
-- Air absorption: $m = 0.0$ 1/m;
-- Absorption term: Modified Absorption Term $A_{M}$;
-- Source position coordinates: 4.0 m, 4.0 m, 4.0 m;
-- Receiver position coordinates: 2.0 m, 2.0 m, 2.0 m;
+```
+input_data = {
+    "room_dim": [8.0, 8.0, 8.0], #dimension of the room x,y,z
+    "coord_source": [4.0, 4.0, 4.0], #source coordinates x,y,z
+    "coord_rec": [2.0, 2.0, 2.0], #rec coordinates x,y,z
+    "alpha_1": [1/6, 1/6, 1/6, 1/6, 1/6, 1/6], #Absorption coefficient for Surface1 - Floor
+    "alpha_2": [1/6, 1/6, 1/6, 1/6, 1/6, 1/6], #Absorption coefficient for Surface2 - Ceiling
+    "alpha_3": [1/6, 1/6, 1/6, 1/6, 1/6, 1/6], #Absorption coefficient for Surface3 - Wall Front
+    "alpha_4": [1/6, 1/6, 1/6, 1/6, 1/6, 1/6], #Absorption coefficient for Surface4 - Wall Back
+    "alpha_5": [1/6, 1/6, 1/6, 1/6, 1/6, 1/6], #Absorption coefficient for Surface5 - Wall Left
+    "alpha_6": [1/6, 1/6, 1/6, 1/6, 1/6, 1/6], #Absorption coefficient for Surface6 - Wall Right
+    "fc_low": 125, #lowest frequency
+    "fc_high": 4000, #highest frequency
+    "num_octave": 1, # 1 or 3 depending on how many octave you want
+    "dx": 0.5,
+    "dt": 1/8000, #time discretization
+    "m_atm": 0, #air absorption coefficient [1/m]
+    "th": 3, #int(input("Enter type Absortion conditions (option 1,2,3):")) # options Sabine (th=1), Eyring (th=2) and modified by Xiang (th=3)
+    "tcalc": "decay" #Choose "decay" if the objective is to calculate the energy decay of the room with all its energetic parameters; Choose "stationarysource" if the aim is to understand the behaviour of a room subject to a stationary source
+}
+```
 
 Test if the software provides the following results (Navarro et al., 2012):
 

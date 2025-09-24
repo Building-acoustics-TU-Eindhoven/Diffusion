@@ -1130,10 +1130,10 @@ def freq_param(nBands, rho, pRef, c0, Ws, w_new_band, w_t0_band, w_rec_band, w_r
 #SAVING
 ###############################################################################
 # Save all variables to a file
-def save_fdm(filename):
+def save_fdm(filename,variables):
     """
     Saving of variables
-    
+
     Parameters
     ----------
         filename : str
@@ -1144,7 +1144,7 @@ def save_fdm(filename):
     with open(filename, 'wb') as f:
         # Filter out modules, functions, and other unsupported types
         filtered_variables = {}
-        for k, v in globals().items():
+        for k, v in variables.items():
             try:
                 # Check if the object can be pickled
                 pickle.dumps(v)

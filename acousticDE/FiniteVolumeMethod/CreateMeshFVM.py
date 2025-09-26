@@ -41,7 +41,13 @@ def generate_mesh(geo_file_path, name_gmsh_file, characteristic_length):
             lc_value = float(line.split('=')[1].strip().strip(';'))
             print("Extracted value:", lc_value)
             break
-    gmsh.initialize()
+
+    should_initialise_gmsh = False
+    if not gmsh.is_initialized():
+        should_initialise_gmsh = True
+
+    if should_initialise_gmsh:
+        gmsh.initialize()
     gmsh.open(geo_file_path)
 
     # Divide by the lc value given in the .geo file to get a correct characteristic length 
@@ -50,8 +56,8 @@ def generate_mesh(geo_file_path, name_gmsh_file, characteristic_length):
     gmsh.model.mesh.generate(3)
     print(gmsh.logger.get())
     gmsh.write(name_gmsh_file)
-    
-    gmsh.finalize()
+    if should_initialise_gmsh:
+        gmsh.finalize()
     # mesh = gmsh.open(name_gmsh_file)  # open the file
 
     # gmsh.fltk.run()  # run the file to see it in gmsh
